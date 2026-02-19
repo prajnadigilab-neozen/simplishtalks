@@ -1,3 +1,8 @@
+/* Tailwind CSS Directives - processed by PostCSS/Vite */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* SimplishTalks - Global Styles */
 
 /* Smooth scrolling */
@@ -26,9 +31,26 @@ html {
 
 /* Shake animation for error messages */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-  20%, 40%, 60%, 80% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 .animate-shake {
@@ -37,8 +59,15 @@ html {
 
 /* Fade-in animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-in {
@@ -51,8 +80,15 @@ html {
 
 /* Zoom in animation */
 @keyframes zoomIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .zoom-in-95 {
@@ -61,8 +97,15 @@ html {
 
 /* Slide in from top */
 @keyframes slideInFromTop {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .slide-in-from-top-2 {

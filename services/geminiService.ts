@@ -8,11 +8,37 @@ let isQuotaExhausted = sessionStorage.getItem('simplish-tts-quota-exhausted') ==
 
 export const getTTSQuotaStatus = () => isQuotaExhausted;
 
+const PRIMARY_MODEL = "gemini-flash-latest";
+const FALLBACK_MODEL = "gemini-1.5-flash";
+
 function getAI() {
   if (!aiInstance) {
     aiInstance = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
   }
   return aiInstance;
+}
+
+// Helper to attempt generation with fallback
+async function generateWithFallback(options: any) {
+  const ai = getAI();
+  try {
+    // Try primary model first
+    return await ai.models.generateContent({
+      ...options,
+      model: PRIMARY_MODEL
+    });
+  } catch (err: any) {
+    // If primary fails with "not found", "404", or "503" (overloaded), try fallback
+    const errorMsg = err.message?.toLowerCase() || "";
+    if (errorMsg.includes('not found') || errorMsg.includes('404') || errorMsg.includes('503')) {
+      console.warn(`Model ${PRIMARY_MODEL} not found, falling back to ${FALLBACK_MODEL}`);
+      return await ai.models.generateContent({
+        ...options,
+        model: FALLBACK_MODEL
+      });
+    }
+    throw err;
+  }
 }
 
 // Simple request queue to manage rate limits
@@ -72,8 +98,7 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
   return ttsQueue.add(async () => {
     try {
       const ai = getAI();
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-tts",
+      const response = await generateWithFallback({
         contents: [{ parts: [{ text }] }],
         config: {
           responseModalities: [Modality.AUDIO],
@@ -111,6 +136,12 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
           isQuotaExhausted = true;
           sessionStorage.setItem('simplish-tts-quota-exhausted', 'true');
           window.dispatchEvent(new CustomEvent('simplish-quota-exhausted'));
+
+          // Auto-reset quota after 5 minutes to prevent permanent lock
+          setTimeout(() => {
+            isQuotaExhausted = false;
+            sessionStorage.removeItem('simplish-tts-quota-exhausted');
+          }, 300000);
         }
       }
 
@@ -123,8 +154,7 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
 export async function evaluatePlacement(formData: { name: string; place: string; introduction: string }) {
   try {
     const ai = getAI();
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+    const response = await generateWithFallback({
       contents: `Evaluate the following student response for an English placement test. 
       The student speaks Kannada. 
       Student Name: ${formData.name}
@@ -179,8 +209,7 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
 
     const base64Audio = await base64Promise;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+    const response = await generateWithFallback({
       contents: {
         parts: [
           {

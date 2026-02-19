@@ -22,29 +22,61 @@ Operational Logic:
 Return your response in a strict JSON format.
 `;
 
+const PRIMARY_MODEL = "gemini-flash-latest";
+const FALLBACK_MODEL = "gemini-1.5-flash";
+
 export async function chatWithCoach(message: string, history: { role: 'user' | 'model', parts: { text: string }[] }[] = []) {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [...history, { role: 'user', parts: [{ text: message }] }],
-      config: {
-        systemInstruction: COACH_SYSTEM_INSTRUCTION,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            replyEn: { type: Type.STRING, description: "The coach's reply in English" },
-            kannadaGuide: { type: Type.STRING, description: "Formatted Kannada translation/explanation" },
-            correction: { type: Type.STRING, description: "Grammatical correction of user's input if needed" },
-            pronunciationTip: { type: Type.STRING, description: "Phonetic tip for Kannada speakers" }
-          },
-          required: ["replyEn"],
-          propertyOrdering: ["replyEn", "kannadaGuide", "correction", "pronunciationTip"]
+    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: PRIMARY_MODEL,
+        contents: [...history, { role: 'user', parts: [{ text: message }] }],
+        config: {
+          systemInstruction: COACH_SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              replyEn: { type: Type.STRING, description: "The coach's reply in English" },
+              kannadaGuide: { type: Type.STRING, description: "Formatted Kannada translation/explanation" },
+              correction: { type: Type.STRING, description: "Grammatical correction of user's input if needed" },
+              pronunciationTip: { type: Type.STRING, description: "Phonetic tip for Kannada speakers" }
+            },
+            required: ["replyEn"],
+            propertyOrdering: ["replyEn", "kannadaGuide", "correction", "pronunciationTip"]
+          }
         }
+      });
+    } catch (err: any) {
+      const errorMsg = err.message?.toLowerCase() || "";
+      if (errorMsg.includes('not found') || errorMsg.includes('404') || errorMsg.includes('503')) {
+        console.warn(`Model ${PRIMARY_MODEL} not found, falling back to ${FALLBACK_MODEL}`);
+        response = await ai.models.generateContent({
+          model: FALLBACK_MODEL,
+          contents: [...history, { role: 'user', parts: [{ text: message }] }],
+          config: {
+            systemInstruction: COACH_SYSTEM_INSTRUCTION,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                replyEn: { type: Type.STRING, description: "The coach's reply in English" },
+                kannadaGuide: { type: Type.STRING, description: "Formatted Kannada translation/explanation" },
+                correction: { type: Type.STRING, description: "Grammatical correction of user's input if needed" },
+                pronunciationTip: { type: Type.STRING, description: "Phonetic tip for Kannada speakers" }
+              },
+              required: ["replyEn"],
+              propertyOrdering: ["replyEn", "kannadaGuide", "correction", "pronunciationTip"]
+            }
+          }
+        });
+      } else {
+        throw err;
       }
-    });
+    }
 
     return JSON.parse(response.text);
   } catch (error: any) {
@@ -67,7 +99,7 @@ export async function saveChatMessage(userId: string, msg: Partial<CoachMessage>
       kannada_guide: msg.kannadaGuide,
       pronunciation_tip: msg.pronunciationTip
     }).select('id').single();
-    
+
     if (error) throw error;
     return data?.id || null;
   } catch (err) {
@@ -95,7 +127,7 @@ export async function getChatHistory(userId: string, lessonId?: string): Promise
       .select('*')
       .eq('user_id', userId)
       .eq('is_hidden_from_user', false);
-    
+
     if (lessonId) {
       query = query.eq('lesson_id', lessonId);
     } else {
@@ -127,7 +159,7 @@ export async function clearUserChatHistory(userId: string, lessonId?: string) {
       .from('chat_history')
       .update({ is_hidden_from_user: true })
       .eq('user_id', userId);
-    
+
     if (lessonId) {
       query = query.eq('lesson_id', lessonId);
     } else {

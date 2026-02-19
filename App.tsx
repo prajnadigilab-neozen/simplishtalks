@@ -45,7 +45,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
           onClick={() => navigate('/')}
           className="cursor-pointer flex items-center transition-transform active:scale-95"
         >
-          <Logo className="w-12 h-12 md:w-16 md:h-16" />
+          <Logo textOnly className={`text-xl md:text-2xl font-black ${isLanding ? 'text-blue-900 dark:text-white' : 'text-white'}`} />
         </div>
       </div>
 

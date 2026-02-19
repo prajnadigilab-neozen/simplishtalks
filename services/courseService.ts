@@ -3,6 +3,16 @@ import { supabase } from '../lib/supabase';
 import { CourseLevel, Module, Lesson, LevelStatus } from '../types';
 import { INITIAL_MODULES } from '../constants';
 
+/** Wraps a promise with a timeout, falling back on rejection. */
+function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms)
+    )
+  ]);
+}
+
 // Helper to split "English | Kannada" strings
 export function splitBilingual(input: any): { en: string, kn: string } {
   if (!input) return { en: '', kn: '' };
@@ -23,17 +33,21 @@ export function splitBilingual(input: any): { en: string, kn: string } {
 export async function fetchAllModules(): Promise<Module[]> {
   try {
     // Optimized: Fetching modules and lessons in a single query using joins
-    const { data: modulesData, error: modulesError } = await supabase
-      .from('modules')
-      .select('*, lessons(*)')
-      .order('order_index', { ascending: true });
+    const query = Promise.resolve(
+      supabase
+        .from('modules')
+        .select('*, lessons(*)')
+        .order('order_index', { ascending: true })
+    );
 
-    if (modulesError) {
-      if (modulesError.code === 'PGRST205' || modulesError.message.includes('not found')) {
-        console.warn("Database tables not found. Falling back to static content.");
-        return INITIAL_MODULES as Module[];
-      }
-      throw modulesError;
+    const { data: modulesData, error: modulesError } = await withTimeout(query, 8000).catch(e => {
+      console.warn('Modules fetch timed out or failed, using static content:', e.message);
+      return { data: null, error: e };
+    });
+
+    // Any error (including timeout) → fall back to static content
+    if (modulesError || !modulesData) {
+      return INITIAL_MODULES as Module[];
     }
 
     if (!modulesData || modulesData.length === 0) {

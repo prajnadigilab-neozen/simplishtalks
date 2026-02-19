@@ -94,14 +94,6 @@ const VoiceCoach: React.FC = () => {
   const [volume, setVolume] = useState(0);
 
   useEffect(() => {
-    const checkKey = async () => {
-      const hasKey = await (window as any).aistudio.hasSelectedApiKey();
-      if (!hasKey) {
-        setShowKeyModal(true);
-      }
-    };
-    checkKey();
-
     const loadData = async () => {
       setLoadingHistory(true);
       const session = await getUserSession();
@@ -123,10 +115,7 @@ const VoiceCoach: React.FC = () => {
     }
   }, [messages]);
 
-  const handleSelectKey = async () => {
-    await (window as any).aistudio.openSelectKey();
-    setShowKeyModal(false);
-  };
+
 
   const handleCancel = () => {
     cleanup();
@@ -169,14 +158,6 @@ const VoiceCoach: React.FC = () => {
   };
 
   const startSession = async () => {
-    if (isConnecting || isConnected) return;
-
-    const hasKey = await (window as any).aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      setShowKeyModal(true);
-      return;
-    }
-
     setIsConnecting(true);
     setError(null);
 
@@ -205,7 +186,7 @@ const VoiceCoach: React.FC = () => {
         : baseInstruction;
 
       const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-12-2025',
+        model: 'gemini-flash-latest',
         callbacks: {
           onopen: () => {
             setIsConnected(true);
@@ -406,40 +387,7 @@ const VoiceCoach: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-blue-900 dark:bg-slate-950 text-white transition-colors overflow-hidden relative">
-      {/* Key Selection Modal */}
-      {showKeyModal && (
-        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-8 rounded-[2.5rem] max-w-sm w-full shadow-2xl text-center border-4 border-amber-400">
-            <span className="text-6xl mb-6 block">🔑</span>
-            <h3 className="text-2xl font-black mb-4">API Key Required</h3>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">
-              To use Live Talking AI, you must select a paid API key with billing enabled.
-            </p>
-            <a
-              href="https://ai.google.dev/gemini-api/docs/billing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-xs font-bold text-blue-600 dark:text-blue-400 underline mb-8"
-            >
-              Learn about billing and API keys
-            </a>
-            <div className="space-y-3">
-              <button
-                onClick={handleSelectKey}
-                className="w-full bg-blue-800 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg"
-              >
-                Select API Key
-              </button>
-              <button
-                onClick={handleCancel}
-                className="w-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
-              >
-                Go Back
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Top Navigation */}
       <div className="p-4 flex items-center justify-between border-b border-white/10 shrink-0">

@@ -21,6 +21,16 @@ let cachedProfile: any = null;
 let lastCacheTime = 0;
 const CACHE_TTL = 1000 * 60 * 5;
 
+/** Wraps a promise with a timeout. Rejects with a timeout error if it takes too long. */
+function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms)
+    )
+  ]);
+}
+
 export async function registerUser(data: RegisterData): Promise<{ success: boolean; error?: string }> {
   try {
     const role = data.adminCode === ADMIN_SECRET ? UserRole.ADMIN : UserRole.USER;
@@ -67,7 +77,7 @@ export async function updateProfile(id: string, updates: any): Promise<{ success
   try {
     const { error } = await supabase
       .from('profiles')
-      .update(updates)
+      .upsert({ id, ...updates })
       .eq('id', id);
 
     if (error) {
@@ -75,7 +85,7 @@ export async function updateProfile(id: string, updates: any): Promise<{ success
       if (columnMatch) {
         const missingColumn = columnMatch[1];
         const { [missingColumn]: _, ...safeUpdates } = updates;
-        const { error: retryError } = await supabase.from('profiles').update(safeUpdates).eq('id', id);
+        const { error: retryError } = await supabase.from('profiles').upsert({ id, ...safeUpdates }).eq('id', id);
         if (retryError) throw retryError;
         return { success: true, error: `Updated, but ${missingColumn} is not supported by DB.` };
       }
@@ -172,12 +182,18 @@ export async function getUserSession() {
     }
 
     // Standardized: Fetching full profile in one clean query
-    // We select individual columns but expect them to exist after v1 migration
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('full_name, place, role, is_restricted, avatar_url')
-      .eq('id', session.user.id)
-      .single();
+    const profileQuery = Promise.resolve(
+      supabase
+        .from('profiles')
+        .select('full_name, place, role, is_restricted, avatar_url')
+        .eq('id', session.user.id)
+        .single()
+    );
+
+    const { data: profile, error } = await withTimeout(profileQuery, 4000).catch(e => {
+      console.warn('Profile fetch timed out or failed:', e.message);
+      return { data: null, error: e };
+    });
 
     if (!error && profile) {
       cachedProfile = {
@@ -195,6 +211,8 @@ export async function getUserSession() {
       cachedProfile = {
         id: session.user.id,
         name: session.user.user_metadata?.full_name || 'User',
+        place: session.user.user_metadata?.place || '',
+        avatar_url: session.user.user_metadata?.avatar_url || '',
         role: session.user.user_metadata?.role || UserRole.USER,
         phone: session.user.phone,
         isLoggedIn: true,

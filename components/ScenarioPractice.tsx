@@ -72,39 +72,75 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
     saveChatMessage(userId, userMsg, lessonId);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
       const historyForAI = messages.map(m => ({
         role: m.role === 'user' ? 'user' as const : 'model' as const,
         parts: [{ text: m.text }]
       }));
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [...historyForAI, { role: 'user', parts: [{ text: input }] }],
-        config: {
-          systemInstruction: `
-            ${scenario.systemInstruction}
-            
-            Rules:
-            1. Stay in character.
-            2. Keep responses short and simple.
-            3. If the student makes a big mistake, gently correct them in English.
-            4. If needed for understanding, provide a Kannada guide in the 'kannadaHelp' field.
-            5. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-               Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
-            6. Return JSON format.
-          `,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              reply: { type: Type.STRING },
-              kannadaHelp: { type: Type.STRING }
-            },
-            required: ["reply"]
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: "gemini-flash-latest",
+          contents: [...historyForAI, { role: 'user', parts: [{ text: input }] }],
+          config: {
+            systemInstruction: `
+              ${scenario.systemInstruction}
+              
+              Rules:
+              1. Stay in character.
+              2. Keep responses short and simple.
+              3. If the student makes a big mistake, gently correct them in English.
+              4. If needed for understanding, provide a Kannada guide in the 'kannadaHelp' field.
+              5. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
+                 Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
+              6. Return JSON format.
+            `,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                reply: { type: Type.STRING },
+                kannadaHelp: { type: Type.STRING }
+              },
+              required: ["reply"]
+            }
           }
+        });
+      } catch (err: any) {
+        if (err.message?.includes('not found') || err.message?.includes('404')) {
+          console.warn("Model gemini-flash-latest not found, falling back to gemini-1.5-flash");
+          response = await ai.models.generateContent({
+            model: "gemini-1.5-flash",
+            contents: [...historyForAI, { role: 'user', parts: [{ text: input }] }],
+            config: {
+              systemInstruction: `
+                ${scenario.systemInstruction}
+                
+                Rules:
+                1. Stay in character.
+                2. Keep responses short and simple.
+                3. If the student makes a big mistake, gently correct them in English.
+                4. If needed for understanding, provide a Kannada guide in the 'kannadaHelp' field.
+                5. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
+                   Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
+                6. Return JSON format.
+              `,
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  reply: { type: Type.STRING },
+                  kannadaHelp: { type: Type.STRING }
+                },
+                required: ["reply"]
+              }
+            }
+          });
+        } else {
+          throw err;
         }
-      });
+      }
 
       const result = JSON.parse(response.text);
       const coachMsg: CoachMessage = {
@@ -176,15 +212,14 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
         ) : (
           messages.map((m, idx) => (
             <div key={idx} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-2`}>
-              <div className={`max-w-[85%] p-4 rounded-3xl shadow-sm ${
-                m.role === 'user' 
-                  ? 'bg-blue-600 text-white rounded-tr-none' 
-                  : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-100 dark:border-slate-700'
-              }`}>
+              <div className={`max-w-[85%] p-4 rounded-3xl shadow-sm ${m.role === 'user'
+                ? 'bg-blue-600 text-white rounded-tr-none'
+                : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-100 dark:border-slate-700'
+                }`}>
                 <div className="flex justify-between items-start gap-4">
                   <p className="font-bold text-sm leading-relaxed">{m.text}</p>
                   {m.role === 'coach' && (
-                    <button 
+                    <button
                       onClick={() => handleSpeak(m.text, `msg-${idx}`)}
                       className={`p-1.5 rounded-lg transition-all ${playingId === `msg-${idx}` ? 'bg-blue-600 text-white animate-pulse' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}
                     >
@@ -219,7 +254,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
 
       {/* Footer */}
       <div className="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex gap-2">
-        <input 
+        <input
           type="text"
           className="flex-1 bg-slate-50 dark:bg-slate-900 p-3 rounded-2xl outline-none font-bold text-sm text-blue-900 dark:text-blue-100 border-2 border-transparent focus:border-blue-500 transition-all"
           placeholder={t({ en: 'Type your reply...', kn: 'ನಿಮ್ಮ ಉತ್ತರವನ್ನು ಬರೆಯಿರಿ...' })}
@@ -227,7 +262,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
           onChange={e => setInput(e.target.value)}
           onKeyPress={e => e.key === 'Enter' && handleSend()}
         />
-        <button 
+        <button
           onClick={handleSend}
           disabled={!input.trim() || isTyping}
           className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center hover:bg-blue-700 active:scale-95 disabled:opacity-50 transition-all"
