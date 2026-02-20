@@ -28,6 +28,12 @@ const LessonView: React.FC = () => {
   const [isFinishing, setIsFinishing] = useState(false);
   const [quotaReached, setQuotaReached] = useState(getTTSQuotaStatus());
 
+  const getYouTubeEmbedUrl = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+  };
+
   useEffect(() => {
     const handleQuota = () => setQuotaReached(true);
     window.addEventListener('simplish-quota-exhausted', handleQuota);
@@ -74,25 +80,60 @@ const LessonView: React.FC = () => {
       )}
 
       {/* Top Media Bar */}
-      <div className="w-full bg-slate-900 shadow-2xl shrink-0">
+      <div className="w-full bg-slate-900 shadow-2xl shrink-0 overflow-hidden">
         {lesson.videoUrl ? (
           <div className="aspect-video">
-            <video src={lesson.videoUrl} controls className="w-full h-full" poster="https://picsum.photos/720/400" />
+            {getYouTubeEmbedUrl(lesson.videoUrl) ? (
+              <iframe
+                src={getYouTubeEmbedUrl(lesson.videoUrl)!}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <video src={lesson.videoUrl} controls className="w-full h-full" poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" />
+            )}
           </div>
         ) : lesson.audioUrl ? (
-          <div className="p-10 flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-blue-900 to-indigo-950">
-            <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center animate-pulse">
-              <span className="text-4xl text-white">🎙️</span>
+          <div className="p-10 flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 relative">
+            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+            <div className="w-24 h-24 bg-blue-600/20 border-2 border-blue-500/50 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full animate-ping bg-blue-500/10"></div>
+              <span className="text-5xl drop-shadow-lg">🎙️</span>
             </div>
-            <audio src={lesson.audioUrl} controls className="w-full max-w-xs" />
-            <p className="text-white/60 font-black text-[10px] uppercase tracking-widest">Audio Lesson</p>
+            <div className="w-full max-w-sm space-y-4 relative z-10">
+              <audio src={lesson.audioUrl} controls className="w-full h-12 rounded-full" />
+              <div className="text-center">
+                <p className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em]">Audio Masterclass</p>
+                <p className="text-white/40 text-[9px] font-medium mt-1 italic">Use headphones for better focus</p>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="h-24 md:h-32 flex items-center justify-center bg-blue-900 text-white font-black text-xl uppercase tracking-widest text-center px-4">
-            {t(lesson.title)}
+          <div className="p-12 flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-slate-900 to-blue-950 relative overflow-hidden min-h-[280px]">
+            {/* Background elements */}
+            <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-purple-600/10 rounded-full blur-3xl"></div>
+
+            <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center shadow-2xl backdrop-blur-md">
+              <span className="text-4xl">📖</span>
+            </div>
+
+            <div className="text-center space-y-2 relative z-10 px-6">
+              <h2 className="text-white text-2xl font-black tracking-tight leading-tight">{t(lesson.title)}</h2>
+              <div className="h-1 w-12 bg-blue-500 mx-auto rounded-full"></div>
+              <p className="text-blue-400/80 font-black text-[10px] uppercase tracking-[0.4em] mt-4">Active Study Mode</p>
+            </div>
+
+            <div className="absolute bottom-4 right-6 flex gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50 animate-pulse"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30 animate-pulse delay-100"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-500/10 animate-pulse delay-200"></div>
+            </div>
           </div>
         )}
       </div>
+
 
       <div className="flex bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors overflow-x-auto no-scrollbar shrink-0">
         <TabButton

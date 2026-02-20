@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { getAllUsers, toggleUserRestriction, deleteUser } from '../services/authService';
 import { getAdminAuditLogs } from '../services/coachService';
-import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson } from '../services/courseService';
+import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson, uploadLessonMedia } from '../services/courseService';
 import { UserRole, CourseLevel, Module, Lesson } from '../types';
+import { useAppStore } from '../store/useAppStore';
 
 const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
@@ -25,6 +26,32 @@ const AdminDashboard: React.FC = () => {
   const [editingModule, setEditingModule] = useState<any | null>(null);
   const [editingLesson, setEditingLesson] = useState<any | null>(null);
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'video' | 'audio') => {
+    const file = e.target.files?.[0];
+    if (!file || !editingLesson) return;
+
+    setProcessingId(`uploading-${type}`);
+    try {
+      const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+      const path = `lessons/${type}s/${fileName}`;
+      const res = await uploadLessonMedia(file, path);
+
+      if (res.error) {
+        alert(`Upload failed: ${res.error.message}`);
+      } else if (res.url) {
+        setEditingLesson({
+          ...editingLesson,
+          [type === 'video' ? 'video_url' : 'audio_url']: res.url
+        });
+        alert("Upload successful!");
+      }
+    } catch (err: any) {
+      alert(`Error during upload: ${err.message}`);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -37,7 +64,6 @@ const AdminDashboard: React.FC = () => {
       if (session) {
         const { data: profile } = await import('../lib/supabase').then(m => m.supabase.from('profiles').select('role').eq('id', session.user.id).single());
         setCurrentUser({ ...session.user, role: profile?.role });
-        console.log("Current Admin/User:", { ...session.user, role: profile?.role });
       }
 
       const moduleData = await fetchAllModules();
@@ -88,7 +114,9 @@ const AdminDashboard: React.FC = () => {
     const res = await saveModule(editingModule);
     if (!res.error) {
       setEditingModule(null);
-      fetchData();
+      await fetchData();
+      const { refreshModules } = useAppStore.getState();
+      await refreshModules();
     } else {
       alert(res.error.message);
     }
@@ -104,14 +132,15 @@ const AdminDashboard: React.FC = () => {
   // Lesson Handlers
   const handleSaveLesson = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Saving lesson payload:", editingLesson);
     setProcessingId('saving-lesson');
     try {
       const res = await saveLesson(editingLesson);
-      console.log("Save response:", res);
       if (!res.error) {
         setEditingLesson(null);
-        fetchData();
+        await fetchData();
+        // Force global store to refresh so the user sees changes immediately
+        const { refreshModules } = useAppStore.getState();
+        await refreshModules();
       } else {
         console.error("Save error:", res.error);
         alert(`Failed to save: ${res.error.message}`);
@@ -201,70 +230,74 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-6">
-            {modules.map((mod: any, idx) => (
-              <div key={mod.id || idx} className="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
-                <div className="p-6 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
-                  <div>
-                    <h4 className="font-black text-lg text-blue-900 dark:text-blue-400">{mod.title.en} | {mod.title.kn}</h4>
-                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest">{mod.level}</p>
+            {modules.map((mod: any, idx) => {
+              return (
+                <div key={mod.id || idx} className="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
+                  <div className="p-6 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                    <div>
+                      <h4 className="font-black text-lg text-blue-900 dark:text-blue-400">{mod.title.en} | {mod.title.kn}</h4>
+                      <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest">{mod.level}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setEditingModule({
+                          id: mod.id,
+                          level: mod.level,
+                          titleStr: `${mod.title.en} | ${mod.title.kn}`,
+                          descStr: `${mod.description.en} | ${mod.description.kn}`,
+                          order_index: mod.order_index
+                        })}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      >
+                        ✏️
+                      </button>
+                      <button onClick={() => handleDeleteModule(mod.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">🗑️</button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setEditingModule({
-                        id: mod.id,
-                        level: mod.level,
-                        titleStr: `${mod.title.en} | ${mod.title.kn}`,
-                        descStr: `${mod.description.en} | ${mod.description.kn}`,
-                        order_index: mod.order_index
-                      })}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                    >
-                      ✏️
-                    </button>
-                    <button onClick={() => handleDeleteModule(mod.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">🗑️</button>
-                  </div>
-                </div>
 
-                <div className="p-6 space-y-4">
-                  <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                    <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lessons</h5>
-                    <button
-                      onClick={() => setEditingLesson({ module_id: mod.id, titleStr: '', notesStr: '', order_index: mod.lessons.length })}
-                      className="text-[10px] font-black text-blue-600 uppercase"
-                    >
-                      + Add Lesson
-                    </button>
-                  </div>
-                  <div className="space-y-2">
-                    {mod.lessons.map((lesson: any, lIdx: number) => (
-                      <div key={lesson.id || lIdx} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 rounded-xl">
-                        <span className="text-xs font-bold">{lesson.title.en}</span>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setEditingLesson({
-                              id: lesson.id,
-                              module_id: mod.id,
-                              titleStr: `${lesson.title.en} | ${lesson.title.kn}`,
-                              notesStr: `${lesson.notes.en} | ${lesson.notes.kn}`,
-                              video_url: lesson.videoUrl,
-                              audio_url: lesson.audioUrl,
-                              pdf_url: lesson.pdfUrl,
-                              text_content: lesson.textContent,
-                              scenario: lesson.scenario,
-                              order_index: lesson.order_index
-                            })}
-                            className="text-xs p-1 opacity-50 hover:opacity-100"
-                          >
-                            ✏️
-                          </button>
-                          <button onClick={() => handleDeleteLesson(lesson.id)} className="text-xs p-1 opacity-50 hover:opacity-100 text-red-500">🗑️</button>
+                  <div className="p-6 space-y-4">
+                    <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                      <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lessons</h5>
+                      <button
+                        onClick={() => {
+                          setEditingLesson({ module_id: mod.id, titleStr: '', notesStr: '', order_index: mod.lessons.length });
+                        }}
+                        className="text-[10px] font-black text-blue-600 uppercase cursor-pointer hover:underline"
+                      >
+                        + Add Lesson
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      {mod.lessons.map((lesson: any, lIdx: number) => (
+                        <div key={lesson.id || lIdx} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                          <span className="text-xs font-bold">{lesson.title.en}</span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setEditingLesson({
+                                id: lesson.id,
+                                module_id: mod.id,
+                                titleStr: `${lesson.title.en} | ${lesson.title.kn}`,
+                                notesStr: `${lesson.notes.en} | ${lesson.notes.kn}`,
+                                video_url: lesson.videoUrl,
+                                audio_url: lesson.audioUrl,
+                                pdf_url: lesson.pdfUrl,
+                                text_content: lesson.textContent,
+                                scenario: lesson.scenario,
+                                order_index: lesson.order_index
+                              })}
+                              className="text-xs p-1 opacity-50 hover:opacity-100"
+                            >
+                              ✏️
+                            </button>
+                            <button onClick={() => handleDeleteLesson(lesson.id)} className="text-xs p-1 opacity-50 hover:opacity-100 text-red-500">🗑️</button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Module Modal */}
@@ -325,19 +358,35 @@ const AdminDashboard: React.FC = () => {
                   {/* Multimedia URLs */}
                   <div className="space-y-4">
                     <h5 className="font-black text-xs text-orange-600 uppercase tracking-widest">Multimedia Files</h5>
+
                     <div>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Video URL (YouTube/MP4)</label>
-                      <input placeholder="https://..." className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900" value={editingLesson.video_url || ''} onChange={e => setEditingLesson({ ...editingLesson, video_url: e.target.value })} />
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Video (Upload or URL)</label>
+                      <div className="flex gap-2">
+                        <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.video_url || ''} onChange={e => setEditingLesson({ ...editingLesson, video_url: e.target.value })} />
+                        <label className="cursor-pointer bg-blue-100 dark:bg-blue-900/30 text-blue-600 p-4 rounded-2xl hover:bg-blue-200 transition-colors">
+                          <input type="file" className="hidden" accept="video/*" onChange={e => handleFileUpload(e, 'video')} />
+                          {processingId === 'uploading-video' ? '⏳' : '📁'}
+                        </label>
+                      </div>
                     </div>
+
                     <div>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Audio URL (MP3/PCM)</label>
-                      <input placeholder="https://..." className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900" value={editingLesson.audio_url || ''} onChange={e => setEditingLesson({ ...editingLesson, audio_url: e.target.value })} />
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Audio (Upload or URL)</label>
+                      <div className="flex gap-2">
+                        <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.audio_url || ''} onChange={e => setEditingLesson({ ...editingLesson, audio_url: e.target.value })} />
+                        <label className="cursor-pointer bg-orange-100 dark:bg-orange-900/30 text-orange-600 p-4 rounded-2xl hover:bg-orange-200 transition-colors">
+                          <input type="file" className="hidden" accept="audio/*" onChange={e => handleFileUpload(e, 'audio')} />
+                          {processingId === 'uploading-audio' ? '⏳' : '📁'}
+                        </label>
+                      </div>
                     </div>
+
                     <div>
                       <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">PDF Notes URL</label>
-                      <input placeholder="https://..." className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900" value={editingLesson.pdf_url || ''} onChange={e => setEditingLesson({ ...editingLesson, pdf_url: e.target.value })} />
+                      <input placeholder="https://..." className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.pdf_url || ''} onChange={e => setEditingLesson({ ...editingLesson, pdf_url: e.target.value })} />
                     </div>
                   </div>
+
                 </div>
 
                 <div className="border-t pt-4 space-y-4">

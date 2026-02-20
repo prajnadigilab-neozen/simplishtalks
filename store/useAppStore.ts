@@ -43,7 +43,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                 console.warn("⚠️ Initialization took too long, forcing load completion.");
                 set({ loading: false, initialized: true });
             }
-        }, 5000);
+        }, 15000);
 
         try {
             console.log("📡 Fetching session and modules...");

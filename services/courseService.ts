@@ -40,7 +40,7 @@ export async function fetchAllModules(): Promise<Module[]> {
         .order('order_index', { ascending: true })
     );
 
-    const { data: modulesData, error: modulesError } = await withTimeout(query, 8000).catch(e => {
+    const { data: modulesData, error: modulesError } = await withTimeout(query, 15000).catch(e => {
       console.warn('Modules fetch timed out or failed, using static content:', e.message);
       return { data: null, error: e };
     });
@@ -139,3 +139,35 @@ export async function saveLesson(adminInput: {
 export async function deleteLesson(id: string) {
   return await supabase.from('lessons').delete().eq('id', id);
 }
+
+/**
+ * Uploads a file to Supabase Storage and returns the public URL.
+ * @param file The file object from input[type="file"]
+ * @param path The folder/filename in the bucket (e.g. "lessons/video_1.mp4")
+ */
+export async function uploadLessonMedia(file: File, path: string): Promise<{ url?: string, error?: any }> {
+  try {
+    const bucketName = 'course-media';
+
+    // 1. Upload the file
+    const { data, error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(path, file, {
+        upsert: true,
+        cacheControl: '3600'
+      });
+
+    if (uploadError) throw uploadError;
+
+    // 2. Get Public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(data.path);
+
+    return { url: publicUrl };
+  } catch (error) {
+    console.error("Upload error:", error);
+    return { error };
+  }
+}
+

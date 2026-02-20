@@ -190,7 +190,7 @@ export async function getUserSession() {
         .single()
     );
 
-    const { data: profile, error } = await withTimeout(profileQuery, 4000).catch(e => {
+    const { data: profile, error } = await withTimeout(profileQuery, 15000).catch(e => {
       console.warn('Profile fetch timed out or failed:', e.message);
       return { data: null, error: e };
     });

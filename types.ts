@@ -39,6 +39,7 @@ export interface Lesson {
 }
 
 export interface Module {
+  id?: string;
   level: CourseLevel;
   title: Record<Language, string>;
   description: Record<Language, string>;
