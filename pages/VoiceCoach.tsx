@@ -124,7 +124,7 @@ const VoiceCoach: React.FC = () => {
 
   const stopAllAudio = () => {
     for (const source of sourcesRef.current) {
-      try { source.stop(); } catch (e) { }
+      try { source.stop(); } catch (e) { console.debug('Error stopping source:', e); }
     }
     sourcesRef.current.clear();
     nextStartTimeRef.current = 0;
@@ -373,7 +373,7 @@ const VoiceCoach: React.FC = () => {
 
   const cleanup = () => {
     if (sessionRef.current) {
-      try { sessionRef.current.close(); } catch (e) { }
+      try { sessionRef.current.close(); } catch (e) { console.debug('Error closing session:', e); }
     }
     stopAllAudio();
     setIsConnected(false);

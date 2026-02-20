@@ -46,13 +46,17 @@ export async function fetchAllModules(): Promise<Module[]> {
     });
 
     // Any error (including timeout) → fall back to static content
-    if (modulesError || !modulesData) {
+    if (modulesError) {
+      console.error("🔴 DATABASE FETCH ERROR. Falling back to static content.", modulesError);
       return INITIAL_MODULES as Module[];
     }
 
     if (!modulesData || modulesData.length === 0) {
+      console.warn("⚠️ DATABASE EMPTY. Falling back to static content.");
       return INITIAL_MODULES as Module[];
     }
+
+    console.log(`✅ Loaded ${modulesData.length} modules from DB:`, modulesData);
 
     return modulesData.map(m => ({
       id: m.id,

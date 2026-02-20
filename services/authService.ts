@@ -15,7 +15,7 @@ export interface LoginData {
   password: string;
 }
 
-const ADMIN_SECRET = "SIMPLISH_PRO_2026";
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || "SIMPLISH_PRO_2026";
 
 let cachedProfile: any = null;
 let lastCacheTime = 0;

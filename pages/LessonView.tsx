@@ -257,7 +257,7 @@ const SpeakButton: React.FC<{ text: string; small?: boolean }> = ({ text, small 
         const audio = await textToSpeech(text);
         if (audio) await playPCM(audio, text);
       }
-    } catch (e) { } finally { setLoading(false); }
+    } catch (e) { console.error("Speak error:", e); } finally { setLoading(false); }
   };
   return (
     <button onClick={handleSpeak} className={`${small ? 'p-1' : 'p-2'} rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ${loading ? 'animate-pulse' : ''}`}>

@@ -1,0 +1,140 @@
+﻿
+> simplish---talks:-english-for-kannada-speakers@0.0.0 lint
+> eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --max-warnings 1000
+
+
+D:\AI\AI Website\simplishtalks\App.tsx
+    6:10  warning  'TRANSLATIONS' is defined but never used                                                                                          @typescript-eslint/no-unused-vars
+    6:24  warning  'INITIAL_MODULES' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+    6:41  warning  'LEVEL_ORDER' is defined but never used                                                                                           @typescript-eslint/no-unused-vars
+    7:10  warning  'CourseLevel' is defined but never used                                                                                           @typescript-eslint/no-unused-vars
+    7:23  warning  'UserProgress' is defined but never used                                                                                          @typescript-eslint/no-unused-vars
+    7:37  warning  'LevelStatus' is defined but never used                                                                                           @typescript-eslint/no-unused-vars
+    7:50  warning  'Module' is defined but never used                                                                                                @typescript-eslint/no-unused-vars
+   10:10  warning  'fetchAllModules' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
+   26:12  warning  Unexpected any. Specify a different type                                                                                          @typescript-eslint/no-explicit-any
+  159:9   warning  'location' is assigned a value but never used                                                                                     @typescript-eslint/no-unused-vars
+  165:5   warning  'modules' is assigned a value but never used                                                                                      @typescript-eslint/no-unused-vars
+  170:5   warning  'updateProgress' is assigned a value but never used                                                                               @typescript-eslint/no-unused-vars
+  171:5   warning  'setPlacementResult' is assigned a value but never used                                                                           @typescript-eslint/no-unused-vars
+  194:6   warning  React Hook useEffect has missing dependencies: 'initialize' and 'setSession'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\AI\AI Website\simplishtalks\components\LanguageContext.tsx
+  28:23  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  40:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+D:\AI\AI Website\simplishtalks\components\ScenarioPractice.tsx
+    7:19  warning  'AudioStore' is defined but never used     @typescript-eslint/no-unused-vars
+   23:14  warning  'lang' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  110:21  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\components\ThemeContext.tsx
+   2:54  warning  'useEffect' is defined but never used                                                                                           @typescript-eslint/no-unused-vars
+  38:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+D:\AI\AI Website\simplishtalks\constants.tsx
+  2:30  warning  'Lesson' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\AI\AI Website\simplishtalks\pages\AdminDashboard.tsx
+    8:10  warning  'UserRole' is defined but never used               @typescript-eslint/no-unused-vars
+    8:41  warning  'Lesson' is defined but never used                 @typescript-eslint/no-unused-vars
+   11:11  warning  't' is assigned a value but never used             @typescript-eslint/no-unused-vars
+   12:9   warning  'navigate' is assigned a value but never used      @typescript-eslint/no-unused-vars
+   13:38  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   15:10  warning  'error' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   17:10  warning  'processingId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   20:10  warning  'auditLogs' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   20:46  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   24:54  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   25:54  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   35:19  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  180:32  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  215:47  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\pages\Dashboard.tsx
+  6:10  warning  'Module' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\AI\AI Website\simplishtalks\pages\LandingPage.tsx
+  10:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\pages\LessonView.tsx
+    6:10  warning  'Module' is defined but never used                 @typescript-eslint/no-unused-vars
+    6:18  warning  'Lesson' is defined but never used                 @typescript-eslint/no-unused-vars
+    6:26  warning  'CourseLevel' is defined but never used            @typescript-eslint/no-unused-vars
+   11:31  warning  'AudioStore' is defined but never used             @typescript-eslint/no-unused-vars
+   19:14  warning  'lang' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   27:44  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   29:10  warning  'quotaReached' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  260:17  error    Empty block statement                              no-empty
+
+D:\AI\AI Website\simplishtalks\pages\ProfilePage.tsx
+   6:20  warning  'CourseLevel' is defined but never used   @typescript-eslint/no-unused-vars
+  15:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  74:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\pages\SettingsPage.tsx
+  17:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\pages\VoiceCoach.tsx
+   11:19  warning  'AudioStore' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+   72:10  warning  'showKeyModal' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+   83:29  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  110:6   warning  React Hook useEffect has a missing dependency: 'cleanup'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  127:40  error    Empty block statement                                                                                       no-empty
+  167:74  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  168:75  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  230:43  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  339:24  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  367:19  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+  376:53  error    Empty block statement                                                                                       no-empty
+
+D:\AI\AI Website\simplishtalks\services\authService.ts
+   20:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   87:34  warning  '_' is assigned a value but never used    @typescript-eslint/no-unused-vars
+   96:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\services\coachService.ts
+   53:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  176:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\services\courseService.ts
+    3:31  warning  'Lesson' is defined but never used        @typescript-eslint/no-unused-vars
+   17:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   65:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\services\geminiService.ts
+   22:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:13  warning  'ai' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  119:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:11  warning  'ai' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  200:11  warning  'ai' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+D:\AI\AI Website\simplishtalks\store\useAppStore.ts
+   3:45  warning  'UserRole' is defined but never used      @typescript-eslint/no-unused-vars
+  10:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\utils\audioUtils.ts
+  41:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\AI\AI Website\simplishtalks\vite.config.ts
+  6:9  warning  'env' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 95 problems (3 errors, 92 warnings)
+

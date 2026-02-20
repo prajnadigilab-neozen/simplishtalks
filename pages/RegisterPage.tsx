@@ -428,7 +428,7 @@ const RegisterPage: React.FC = () => {
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
-                  {t({ en: 'Success!', kn: 'ಯಶಸ್ಸು!' })}
+                  {t({ en: 'Success!', kn: 'ಯಶಸ್ವಿ ಆಗಿದೆ!' })}
                 </>
               ) : loading ? (
                 <>
