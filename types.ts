@@ -20,14 +20,16 @@ export enum CourseLevel {
   EXPERT = 'EXPERT'
 }
 
-// Added audioUrl and textContent to match database schema and usage in LessonView.tsx
 export interface Lesson {
   id: string;
   title: Record<Language, string>;
-  videoUrl?: string;
-  audioUrl?: string; // Optional URL for audio-only lessons
-  pdfUrl?: string; // Optional URL for PDF notes
-  textContent?: string; // Optional long-form text content for the lesson
+  videoUrl?: string;      // Watch/Listen: video
+  audioUrl?: string;      // Watch/Listen: audio
+  pdfUrl?: string;        // Study: PDF file
+  textUrl?: string;       // Study: text file
+  textContent?: string;   // Long-form text content
+  speakPdfUrl?: string;   // SPEAK: PDF file for reading practice
+  speakTextUrl?: string;  // SPEAK: text file for reading practice
   notes: Record<Language, string>;
   isCompleted: boolean;
   scenario?: {

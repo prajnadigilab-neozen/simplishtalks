@@ -26,22 +26,38 @@ const AdminDashboard: React.FC = () => {
   const [editingModule, setEditingModule] = useState<any | null>(null);
   const [editingLesson, setEditingLesson] = useState<any | null>(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'video' | 'audio') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'video' | 'audio' | 'pdf' | 'text' | 'speak_pdf' | 'speak_text') => {
     const file = e.target.files?.[0];
     if (!file || !editingLesson) return;
 
     setProcessingId(`uploading-${type}`);
     try {
       const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-      const path = `lessons/${type}s/${fileName}`;
+      const folderMap: Record<string, string> = {
+        video: 'videos',
+        audio: 'audios',
+        pdf: 'pdfs',
+        text: 'texts',
+        speak_pdf: 'speak_pdfs',
+        speak_text: 'speak_texts'
+      };
+      const path = `lessons/${folderMap[type]}/${fileName}`;
       const res = await uploadLessonMedia(file, path);
 
       if (res.error) {
         alert(`Upload failed: ${res.error.message}`);
       } else if (res.url) {
+        const fieldMap: Record<string, string> = {
+          video: 'video_url',
+          audio: 'audio_url',
+          pdf: 'pdf_url',
+          text: 'text_url',
+          speak_pdf: 'speak_pdf_url',
+          speak_text: 'speak_text_url'
+        };
         setEditingLesson({
           ...editingLesson,
-          [type === 'video' ? 'video_url' : 'audio_url']: res.url
+          [fieldMap[type]]: res.url
         });
         alert("Upload successful!");
       }
@@ -132,24 +148,28 @@ const AdminDashboard: React.FC = () => {
   // Lesson Handlers
   const handleSaveLesson = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("💾 Attempting to save lesson:", editingLesson);
     setProcessingId('saving-lesson');
     try {
-      const res = await saveLesson(editingLesson);
+      const res = await saveLesson(editingLesson) as any;
       if (!res.error) {
+        console.log("✅ Lesson saved successfully!");
         setEditingLesson(null);
         await fetchData();
         // Force global store to refresh so the user sees changes immediately
         const { refreshModules } = useAppStore.getState();
         await refreshModules();
+        alert("Lesson saved successfully!");
       } else {
-        console.error("Save error:", res.error);
-        alert(`Failed to save: ${res.error.message}`);
+        console.error("❌ Save error details:", res.error);
+        alert(`Failed to save: ${res.error.message || 'Unknown database error'}`);
       }
-    } catch (err) {
-      console.error("Unexpected save error:", err);
-      alert("An unexpected error occurred while saving.");
+    } catch (err: any) {
+      console.error("🔥 Unexpected save error:", err);
+      alert(`An unexpected error occurred: ${err.message || 'Check your internet connection'}`);
+    } finally {
+      setProcessingId(null);
     }
-    setProcessingId(null);
   };
 
   const handleDeleteLesson = async (id: string) => {
@@ -281,6 +301,7 @@ const AdminDashboard: React.FC = () => {
                                 video_url: lesson.videoUrl,
                                 audio_url: lesson.audioUrl,
                                 pdf_url: lesson.pdfUrl,
+                                text_url: lesson.textUrl,
                                 text_content: lesson.textContent,
                                 scenario: lesson.scenario,
                                 order_index: lesson.order_index
@@ -357,10 +378,10 @@ const AdminDashboard: React.FC = () => {
 
                   {/* Multimedia URLs */}
                   <div className="space-y-4">
-                    <h5 className="font-black text-xs text-orange-600 uppercase tracking-widest">Multimedia Files</h5>
-
+                    {/* === SECTION 1: WATCH/LISTEN === */}
+                    <h5 className="font-black text-xs text-blue-600 uppercase tracking-widest border-b pb-2">📺 Watch/Listen : Upload Video/Audio</h5>
                     <div>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Video (Upload or URL)</label>
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Video URL</label>
                       <div className="flex gap-2">
                         <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.video_url || ''} onChange={e => setEditingLesson({ ...editingLesson, video_url: e.target.value })} />
                         <label className="cursor-pointer bg-blue-100 dark:bg-blue-900/30 text-blue-600 p-4 rounded-2xl hover:bg-blue-200 transition-colors">
@@ -369,21 +390,61 @@ const AdminDashboard: React.FC = () => {
                         </label>
                       </div>
                     </div>
-
                     <div>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Audio (Upload or URL)</label>
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Audio URL (fallback if no video)</label>
                       <div className="flex gap-2">
                         <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.audio_url || ''} onChange={e => setEditingLesson({ ...editingLesson, audio_url: e.target.value })} />
                         <label className="cursor-pointer bg-orange-100 dark:bg-orange-900/30 text-orange-600 p-4 rounded-2xl hover:bg-orange-200 transition-colors">
-                          <input type="file" className="hidden" accept="audio/*" onChange={e => handleFileUpload(e, 'audio')} />
+                          <input type="file" className="hidden" accept="audio/wav,audio/mpeg,audio/mp4,audio/x-m4a,audio/*" onChange={e => handleFileUpload(e, 'audio')} />
                           {processingId === 'uploading-audio' ? '⏳' : '📁'}
                         </label>
                       </div>
                     </div>
 
+                    {/* === SECTION 2: STUDY === */}
+                    <h5 className="font-black text-xs text-green-600 uppercase tracking-widest border-b pb-2 mt-4">📖 Study : Upload PDF/Text Lessons</h5>
                     <div>
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">PDF Notes URL</label>
-                      <input placeholder="https://..." className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.pdf_url || ''} onChange={e => setEditingLesson({ ...editingLesson, pdf_url: e.target.value })} />
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">PDF File</label>
+                      <div className="flex gap-2">
+                        <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.pdf_url || ''} onChange={e => setEditingLesson({ ...editingLesson, pdf_url: e.target.value })} />
+                        <label className="cursor-pointer bg-green-100 dark:bg-green-900/30 text-green-600 p-4 rounded-2xl hover:bg-green-200 transition-colors">
+                          <input type="file" className="hidden" accept="application/pdf" onChange={e => handleFileUpload(e, 'pdf')} />
+                          {processingId === 'uploading-pdf' ? '⏳' : '📁'}
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Text File</label>
+                      <div className="flex gap-2">
+                        <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.text_url || ''} onChange={e => setEditingLesson({ ...editingLesson, text_url: e.target.value })} />
+                        <label className="cursor-pointer bg-green-100 dark:bg-green-900/30 text-green-600 p-4 rounded-2xl hover:bg-green-200 transition-colors">
+                          <input type="file" className="hidden" accept="text/plain" onChange={e => handleFileUpload(e, 'text')} />
+                          {processingId === 'uploading-text' ? '⏳' : '📁'}
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* === SECTION 3: SPEAK === */}
+                    <h5 className="font-black text-xs text-purple-600 uppercase tracking-widest border-b pb-2 mt-4">🎤 Speak : Upload PDF/Text Lessons</h5>
+                    <div>
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">SPEAK PDF File</label>
+                      <div className="flex gap-2">
+                        <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.speak_pdf_url || ''} onChange={e => setEditingLesson({ ...editingLesson, speak_pdf_url: e.target.value })} />
+                        <label className="cursor-pointer bg-purple-100 dark:bg-purple-900/30 text-purple-600 p-4 rounded-2xl hover:bg-purple-200 transition-colors">
+                          <input type="file" className="hidden" accept="application/pdf" onChange={e => handleFileUpload(e, 'speak_pdf')} />
+                          {processingId === 'uploading-speak_pdf' ? '⏳' : '📁'}
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">SPEAK Text File</label>
+                      <div className="flex gap-2">
+                        <input placeholder="https://..." className="flex-1 p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 text-xs" value={editingLesson.speak_text_url || ''} onChange={e => setEditingLesson({ ...editingLesson, speak_text_url: e.target.value })} />
+                        <label className="cursor-pointer bg-purple-100 dark:bg-purple-900/30 text-purple-600 p-4 rounded-2xl hover:bg-purple-200 transition-colors">
+                          <input type="file" className="hidden" accept="text/plain" onChange={e => handleFileUpload(e, 'speak_text')} />
+                          {processingId === 'uploading-speak_text' ? '⏳' : '📁'}
+                        </label>
+                      </div>
                     </div>
                   </div>
 
@@ -406,8 +467,15 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setEditingLesson(null)} className="flex-1 p-4 bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-white rounded-2xl font-bold transition-colors hover:bg-slate-300 dark:hover:bg-slate-600">Cancel</button>
-                  <button type="submit" className="flex-1 p-4 bg-orange-600 text-white rounded-2xl font-black shadow-lg">Save Multi-Modal Lesson</button>
+                  <button type="button" onClick={() => setEditingLesson(null)} disabled={processingId === 'saving-lesson'} className="flex-1 p-4 bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-white rounded-2xl font-bold transition-colors hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50">Cancel</button>
+                  <button type="submit" disabled={processingId === 'saving-lesson'} className="flex-1 p-4 bg-orange-600 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 disabled:opacity-50">
+                    {processingId === 'saving-lesson' ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Saving...
+                      </>
+                    ) : 'Save Multi-Modal Lesson'}
+                  </button>
                 </div>
               </form>
             </div>

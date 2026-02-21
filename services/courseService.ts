@@ -32,22 +32,13 @@ export function splitBilingual(input: any): { en: string, kn: string } {
 
 export async function fetchAllModules(): Promise<Module[]> {
   try {
-    // Optimized: Fetching modules and lessons in a single query using joins
-    const query = Promise.resolve(
-      supabase
-        .from('modules')
-        .select('*, lessons(*)')
-        .order('order_index', { ascending: true })
-    );
+    const { data: modulesData, error: modulesError } = await supabase
+      .from('modules')
+      .select('*, lessons(*)')
+      .order('order_index', { ascending: true });
 
-    const { data: modulesData, error: modulesError } = await withTimeout(query, 15000).catch(e => {
-      console.warn('Modules fetch timed out or failed, using static content:', e.message);
-      return { data: null, error: e };
-    });
-
-    // Any error (including timeout) → fall back to static content
     if (modulesError) {
-      console.error("🔴 DATABASE FETCH ERROR. Falling back to static content.", modulesError);
+      console.error("🔴 DATABASE FETCH ERROR:", modulesError);
       return INITIAL_MODULES as Module[];
     }
 
@@ -72,7 +63,10 @@ export async function fetchAllModules(): Promise<Module[]> {
           videoUrl: l.video_url,
           audioUrl: l.audio_url,
           pdfUrl: l.pdf_url,
+          textUrl: l.text_url,
           textContent: l.text_content,
+          speakPdfUrl: l.speak_pdf_url,
+          speakTextUrl: l.speak_text_url,
           notes: l.notes,
           scenario: l.scenario,
           isCompleted: false
@@ -112,7 +106,10 @@ export async function saveLesson(adminInput: {
   video_url?: string,
   audio_url?: string,
   pdf_url?: string,
+  text_url?: string,
   text_content?: string,
+  speak_pdf_url?: string,
+  speak_text_url?: string,
   scenario?: any,
   order_index: number
 }) {
@@ -124,15 +121,25 @@ export async function saveLesson(adminInput: {
     video_url: rest.video_url || null,
     audio_url: rest.audio_url || null,
     pdf_url: rest.pdf_url || null,
+    text_url: rest.text_url || null,
     text_content: rest.text_content || null,
+    speak_pdf_url: rest.speak_pdf_url || null,
+    speak_text_url: rest.speak_text_url || null,
     scenario: rest.scenario || null,
     order_index: rest.order_index
   };
 
-  if (id) {
-    return await supabase.from('lessons').update(payload).eq('id', id);
-  } else {
-    return await supabase.from('lessons').insert([payload]);
+  console.log("📤 Payload being sent to Supabase:", payload);
+
+  try {
+    if (id) {
+      return await supabase.from('lessons').update(payload).eq('id', id);
+    } else {
+      return await supabase.from('lessons').insert([payload]).select();
+    }
+  } catch (err) {
+    console.error("❌ Exception during Supabase call:", err);
+    throw err;
   }
 }
 
@@ -142,24 +149,16 @@ export async function deleteLesson(id: string) {
 
 /**
  * Uploads a file to Supabase Storage and returns the public URL.
- * @param file The file object from input[type="file"]
- * @param path The folder/filename in the bucket (e.g. "lessons/video_1.mp4")
  */
 export async function uploadLessonMedia(file: File, path: string): Promise<{ url?: string, error?: any }> {
   try {
     const bucketName = 'course-media';
-
-    // 1. Upload the file
     const { data, error: uploadError } = await supabase.storage
       .from(bucketName)
-      .upload(path, file, {
-        upsert: true,
-        cacheControl: '3600'
-      });
+      .upload(path, file, { upsert: true, cacheControl: '3600' });
 
     if (uploadError) throw uploadError;
 
-    // 2. Get Public URL
     const { data: { publicUrl } } = supabase.storage
       .from(bucketName)
       .getPublicUrl(data.path);
@@ -171,3 +170,53 @@ export async function uploadLessonMedia(file: File, path: string): Promise<{ url
   }
 }
 
+/**
+ * Saves a user's audio recording for the SPEAK section.
+ */
+export async function saveUserRecording(userId: string, lessonId: string, audioBlob: Blob): Promise<{ url?: string, error?: any }> {
+  try {
+    const fileName = `${userId}/${lessonId}/${Date.now()}.webm`;
+    const path = `recordings/${fileName}`;
+    const bucketName = 'course-media';
+
+    const { data, error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(path, audioBlob, { upsert: true, contentType: 'audio/webm' });
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(data.path);
+
+    // Save reference in DB
+    const { error: dbError } = await supabase
+      .from('user_lesson_recordings')
+      .insert([{ user_id: userId, lesson_id: lessonId, audio_url: publicUrl }]);
+
+    if (dbError) throw dbError;
+
+    return { url: publicUrl };
+  } catch (error) {
+    console.error("Recording save error:", error);
+    return { error };
+  }
+}
+
+/**
+ * Fetches all recordings for a user+lesson.
+ */
+export async function fetchUserRecordings(userId: string, lessonId: string) {
+  const { data, error } = await supabase
+    .from('user_lesson_recordings')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('lesson_id', lessonId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Fetch recordings error:", error);
+    return [];
+  }
+  return data || [];
+}
