@@ -14,7 +14,7 @@ interface AppState {
     initialized: boolean;
 
     // Actions
-    initialize: () => Promise<void>;
+    initialize: (forceRefresh?: boolean) => Promise<void>;
     setSession: (session: any) => void;
     updateProgress: (lessonId: string, level: CourseLevel) => Promise<void>;
     unlockNextLevel: (currentLevel: CourseLevel) => Promise<void>;
@@ -31,84 +31,91 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     setSession: (session) => set({ session }),
 
-    initialize: async () => {
-        if (get().initialized) return;
+    initialize: async (forceRefresh?: boolean) => {
+        if (get().initialized && !forceRefresh) return;
 
         set({ loading: true });
         console.log("🚀 Starting App Initialization...");
 
-        // Safety timeout: Ensure loading finishes even if promises hang
-        const timeout = setTimeout(() => {
-            if (get().loading) {
-                console.warn("⚠️ Initialization took too long, forcing load completion.");
-                set({ loading: false, initialized: true });
-            }
-        }, 15000);
-
         try {
-            console.log("📡 Fetching session and modules...");
-            const [session, modules] = await Promise.all([
-                getUserSession().catch(e => { console.error("Session Fetch Error:", e); return null; }),
-                fetchAllModules().catch(e => { console.error("Modules Fetch Error:", e); return []; })
+            // STEP 1: Get auth session. The Navigator Lock is disabled in supabase.ts, 
+            // so this is now fast and reliable with no deadlock risk.
+            const { data: { session: rawSession } } = await supabase.auth.getSession();
+            const userId = rawSession?.user?.id;
+            console.log("✅ Auth check complete. User:", userId || 'Guest');
+
+            // STEP 2: Fetch modules and profile in parallel. Progress is skipped for guests.
+            const [profile, modules, progressResult] = await Promise.all([
+                getUserSession(rawSession).catch(e => {
+                    console.error("Profile fetch error:", e);
+                    return null;
+                }),
+                fetchAllModules().catch(e => {
+                    console.error("Modules fetch error:", e);
+                    return [];
+                }),
+                userId
+                    ? supabase.from('user_progress').select('*').eq('user_id', userId).single()
+                    : Promise.resolve({ data: null, error: null })
             ]);
 
-            console.log("✅ Session and modules received.", { hasSession: !!session, moduleCount: modules?.length });
+            // Fallback: build a minimal session from raw jwt data if profile fetch failed
+            const session = profile ?? (rawSession ? {
+                id: rawSession.user.id,
+                name: rawSession.user.user_metadata?.full_name || 'User',
+                role: rawSession.user.user_metadata?.role || UserRole.USER,
+                isLoggedIn: true,
+                isRestricted: false,
+            } : null);
+
             set({ session, modules: modules || [], initialized: true });
+            console.log("✅ Core state set. Session:", !!session, "Modules:", modules?.length);
 
-            if (session?.id) {
-                try {
-                    console.log("📊 Fetching user progress for:", session.id);
-                    const { data, error } = await supabase
-                        .from('user_progress')
-                        .select('*')
-                        .eq('user_id', session.id)
-                        .single();
+            // STEP 3: Process user progress if available
+            if (progressResult?.data) {
+                const data = progressResult.data;
+                const completedLessons: string[] = data.completed_lessons || [];
+                const currentLevel = (data.current_level as CourseLevel) || CourseLevel.BASIC;
+                const currentLevelIndex = LEVEL_ORDER.indexOf(currentLevel);
 
-                    if (data && !error) {
-                        console.log("✅ Progress fetched.");
-                        const completedLessons = data.completed_lessons || [];
-                        const currentLevel = (data.current_level as CourseLevel) || CourseLevel.BASIC;
-
-                        const progress: UserProgress = {
-                            currentLevel,
-                            completedLessons,
-                            role: session.role,
-                            isPlacementDone: data.is_placement_done
-                        };
-
-                        set({ progress });
-
-                        // Efficient module status mapping
-                        const currentLevelIndex = LEVEL_ORDER.indexOf(currentLevel);
-                        const updatedModules = (modules || []).map(m => {
-                            const mLevel = m.level as CourseLevel;
-                            const mIndex = LEVEL_ORDER.indexOf(mLevel);
-                            const lessons = (m.lessons || []).map((l: any) => ({
-                                ...l,
-                                isCompleted: completedLessons.includes(l.id)
-                            }));
-
-                            let status = LevelStatus.LOCKED;
-                            if (mIndex < currentLevelIndex) status = LevelStatus.COMPLETED;
-                            else if (mIndex === currentLevelIndex) status = LevelStatus.AVAILABLE;
-
-                            return { ...m, lessons, status };
-                        });
-
-                        set({ modules: updatedModules });
-                    } else {
-                        console.log("ℹ️ No progress found or error fetching progress:", error?.message);
+                set({
+                    progress: {
+                        currentLevel,
+                        completedLessons,
+                        role: session?.role || UserRole.USER,
+                        isPlacementDone: data.is_placement_done,
                     }
-                } catch (innerErr) {
-                    console.error("Progress fetch error:", innerErr);
+                });
+
+                // Map completion and lock status onto modules
+                const updatedModules = (modules || []).map(m => {
+                    const mIndex = LEVEL_ORDER.indexOf(m.level as CourseLevel);
+                    const lessons = (m.lessons || []).map((l: any) => ({
+                        ...l,
+                        isCompleted: completedLessons.includes(l.id)
+                    }));
+                    let status = LevelStatus.LOCKED;
+                    if (mIndex < currentLevelIndex) status = LevelStatus.COMPLETED;
+                    else if (mIndex === currentLevelIndex) status = LevelStatus.AVAILABLE;
+                    return { ...m, lessons, status };
+                });
+
+                set({ modules: updatedModules });
+                console.log("✅ Progress loaded. Level:", currentLevel);
+            } else if (progressResult?.error && userId) {
+                // Auth issue: stale JWT - sign out and clear state
+                const errMsg = progressResult.error.message || '';
+                if (progressResult.error.status === 401 || errMsg.includes("JWT")) {
+                    console.warn("🔒 Stale JWT detected — signing out.");
+                    await supabase.auth.signOut();
+                    set({ session: null, progress: null });
+                } else {
+                    console.warn("Progress fetch returned no data:", errMsg);
                 }
-            } else {
-                console.log("ℹ️ No active session, skipping progress fetch.");
             }
         } catch (err) {
-            console.error("Critical Store initialization error:", err);
+            console.error("Critical initialization error:", err);
         } finally {
-            clearTimeout(timeout);
             set({ loading: false });
             console.log("🏁 Initialization complete.");
         }
@@ -126,11 +133,9 @@ export const useAppStore = create<AppState>((set, get) => ({
                     ...l,
                     isCompleted: progress.completedLessons.includes(l.id)
                 }));
-
                 let status = LevelStatus.LOCKED;
                 if (mIndex < currentLevelIndex) status = LevelStatus.COMPLETED;
                 else if (mIndex === currentLevelIndex) status = LevelStatus.AVAILABLE;
-
                 return { ...m, lessons, status };
             });
             set({ modules: updatedModules });
@@ -143,7 +148,6 @@ export const useAppStore = create<AppState>((set, get) => ({
         const { session, progress, modules } = get();
         if (!session?.id || session.isRestricted || !progress) return;
 
-        // 1. Update local state
         const newCompleted = progress.completedLessons.includes(lessonId)
             ? progress.completedLessons
             : [...progress.completedLessons, lessonId];
@@ -163,7 +167,6 @@ export const useAppStore = create<AppState>((set, get) => ({
             modules: updatedModules
         });
 
-        // 2. Persist to DB
         try {
             await supabase.from('user_progress').upsert({
                 user_id: session.id,
@@ -171,7 +174,6 @@ export const useAppStore = create<AppState>((set, get) => ({
                 updated_at: new Date().toISOString()
             });
 
-            // 3. Check for level completion
             const currentModule = updatedModules.find(m => m.level === level);
             if (currentModule) {
                 const isLevelFinished = currentModule.lessons.every(l => l.isCompleted);
@@ -191,25 +193,22 @@ export const useAppStore = create<AppState>((set, get) => ({
         const currentIndex = LEVEL_ORDER.indexOf(currentLevel);
         if (currentIndex < LEVEL_ORDER.length - 1) {
             const nextLevel = LEVEL_ORDER[currentIndex + 1];
-
             const updatedModules = modules.map(m => {
                 if (m.level === nextLevel) return { ...m, status: LevelStatus.AVAILABLE };
                 if (m.level === currentLevel) return { ...m, status: LevelStatus.COMPLETED };
                 return m;
             });
-
             set({
                 progress: { ...progress, currentLevel: nextLevel },
                 modules: updatedModules
             });
-
             await supabase.from('user_progress').update({ current_level: nextLevel }).eq('user_id', session.id);
         } else {
-            const updatedModules = modules.map(m => {
-                if (m.level === currentLevel) return { ...m, status: LevelStatus.COMPLETED };
-                return m;
+            set({
+                modules: modules.map(m =>
+                    m.level === currentLevel ? { ...m, status: LevelStatus.COMPLETED } : m
+                )
             });
-            set({ modules: updatedModules });
         }
     },
 
@@ -218,7 +217,6 @@ export const useAppStore = create<AppState>((set, get) => ({
         if (!session?.id || session.isRestricted) return;
 
         const targetIndex = LEVEL_ORDER.indexOf(level);
-
         set({
             progress: {
                 currentLevel: level,
@@ -234,7 +232,6 @@ export const useAppStore = create<AppState>((set, get) => ({
             if (mIndex === targetIndex) return { ...m, status: LevelStatus.AVAILABLE };
             return { ...m, status: LevelStatus.LOCKED };
         });
-
         set({ modules: updatedModules });
 
         await supabase.from('user_progress').upsert({

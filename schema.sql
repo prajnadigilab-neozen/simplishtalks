@@ -22,6 +22,12 @@ CREATE TABLE public.profiles (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Performance indexes: RLS policies run a subquery on profiles(id, role)
+-- and profiles(id, is_restricted) for every protected request. These indexes
+-- make those checks orders of magnitude faster.
+CREATE INDEX IF NOT EXISTS idx_profiles_id_role ON public.profiles(id, role);
+CREATE INDEX IF NOT EXISTS idx_profiles_id_is_restricted ON public.profiles(id, is_restricted);
+
 -- 2. User Progress Table
 CREATE TABLE public.user_progress (
   user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE PRIMARY KEY,

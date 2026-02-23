@@ -8,6 +8,12 @@ import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson, up
 import { UserRole, CourseLevel, Module, Lesson } from '../types';
 import { useAppStore } from '../store/useAppStore';
 
+interface Notification {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
 const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -25,6 +31,15 @@ const AdminDashboard: React.FC = () => {
   const [modules, setModules] = useState<Module[]>([]);
   const [editingModule, setEditingModule] = useState<any | null>(null);
   const [editingLesson, setEditingLesson] = useState<any | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = Math.random().toString(36).substr(2, 9);
+    setNotifications(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'video' | 'audio' | 'pdf' | 'text' | 'speak_pdf' | 'speak_text') => {
     const file = e.target.files?.[0];
@@ -45,7 +60,7 @@ const AdminDashboard: React.FC = () => {
       const res = await uploadLessonMedia(file, path);
 
       if (res.error) {
-        alert(`Upload failed: ${res.error.message}`);
+        showNotification(`Upload failed: ${res.error.message}`, 'error');
       } else if (res.url) {
         const fieldMap: Record<string, string> = {
           video: 'video_url',
@@ -59,10 +74,10 @@ const AdminDashboard: React.FC = () => {
           ...editingLesson,
           [fieldMap[type]]: res.url
         });
-        alert("Upload successful!");
+        showNotification("Upload successful!", "success");
       }
     } catch (err: any) {
-      alert(`Error during upload: ${err.message}`);
+      showNotification(`Error during upload: ${err.message}`, "error");
     } finally {
       setProcessingId(null);
     }
@@ -109,8 +124,9 @@ const AdminDashboard: React.FC = () => {
     const result = await toggleUserRestriction(userId, !currentStatus);
     if (result.success) {
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_restricted: !currentStatus } : u));
+      showNotification(`User ${!currentStatus ? 'restricted' : 'unrestricted'} successfully`, "success");
     } else {
-      alert(result.error);
+      showNotification(result.error || "Failed to update user restriction", "error");
     }
     setProcessingId(null);
   };
@@ -133,16 +149,22 @@ const AdminDashboard: React.FC = () => {
       await fetchData();
       const { refreshModules } = useAppStore.getState();
       await refreshModules();
+      showNotification("Module saved successfully!", "success");
     } else {
-      alert(res.error.message);
+      showNotification(res.error.message, "error");
     }
     setProcessingId(null);
   };
 
   const handleDeleteModule = async (id: string) => {
     if (!window.confirm("Delete module and all lessons?")) return;
-    await deleteModule(id);
-    fetchData();
+    try {
+      await deleteModule(id);
+      showNotification("Module and its lessons deleted successfully", "success");
+      fetchData();
+    } catch (err: any) {
+      showNotification(`Failed to delete module: ${err.message}`, "error");
+    }
   };
 
   // Lesson Handlers
@@ -159,14 +181,14 @@ const AdminDashboard: React.FC = () => {
         // Force global store to refresh so the user sees changes immediately
         const { refreshModules } = useAppStore.getState();
         await refreshModules();
-        alert("Lesson saved successfully!");
+        showNotification("Lesson saved successfully!", "success");
       } else {
         console.error("❌ Save error details:", res.error);
-        alert(`Failed to save: ${res.error.message || 'Unknown database error'}`);
+        showNotification(`Failed to save: ${res.error.message || 'Unknown database error'}`, 'error');
       }
     } catch (err: any) {
       console.error("🔥 Unexpected save error:", err);
-      alert(`An unexpected error occurred: ${err.message || 'Check your internet connection'}`);
+      showNotification(`An unexpected error occurred: ${err.message || 'Check your internet connection'}`, 'error');
     } finally {
       setProcessingId(null);
     }
@@ -174,8 +196,13 @@ const AdminDashboard: React.FC = () => {
 
   const handleDeleteLesson = async (id: string) => {
     if (!window.confirm("Delete this lesson?")) return;
-    await deleteLesson(id);
-    fetchData();
+    try {
+      await deleteLesson(id);
+      showNotification("Lesson deleted successfully", "success");
+      fetchData();
+    } catch (err: any) {
+      showNotification(`Failed to delete lesson: ${err.message}`, "error");
+    }
   };
 
   if (loading) {
@@ -187,7 +214,32 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="p-6 md:p-10 bg-white dark:bg-slate-900 min-h-full transition-all duration-300">
+    <div className="p-6 md:p-10 bg-white dark:bg-slate-900 min-h-full transition-all duration-300 relative">
+      {/* Toast Notifications */}
+      <div className="fixed top-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none">
+        {notifications.map(n => (
+          <div
+            key={n.id}
+            className={`
+              pointer-events-auto px-6 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 animate-in slide-in-from-right-full duration-300
+              ${n.type === 'success' ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/30 dark:border-green-800' : ''}
+              ${n.type === 'error' ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-800' : ''}
+              ${n.type === 'info' ? 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800' : ''}
+            `}
+          >
+            <span className="text-xl">
+              {n.type === 'success' ? '✅' : n.type === 'error' ? '❌' : 'ℹ️'}
+            </span>
+            <span className="font-black text-xs uppercase tracking-wider">{n.message}</span>
+            <button
+              onClick={() => setNotifications(prev => prev.filter(notif => notif.id !== n.id))}
+              className="ml-auto text-current opacity-50 hover:opacity-100 transition-opacity"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div>
           <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter">Admin Panel</h2>

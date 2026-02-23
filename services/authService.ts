@@ -15,7 +15,11 @@ export interface LoginData {
   password: string;
 }
 
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || "SIMPLISH_PRO_2026";
+// SECURITY: Admin secret MUST come from environment. Never hardcode a fallback.
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET;
+if (!ADMIN_SECRET) {
+  console.error("🔴 SECURITY WARNING: VITE_ADMIN_SECRET is not set in .env.local. Admin registration is disabled.");
+}
 
 let cachedProfile: any = null;
 let lastCacheTime = 0;
@@ -48,7 +52,12 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
       }
     });
 
-    if (authError) throw authError;
+    if (authError) {
+      if (authError.message.includes("User already registered") || authError.status === 422) {
+        return { success: false, error: "This phone number is already registered. Please sign in instead." };
+      }
+      throw authError;
+    }
 
     if (authData.user) {
       const { error: profileError } = await supabase
@@ -69,6 +78,7 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
 
     return { success: true };
   } catch (error: any) {
+    console.error("Signup error:", error);
     return { success: false, error: error.message };
   }
 }
@@ -169,14 +179,33 @@ export async function getAllUsers(): Promise<any[]> {
   }
 }
 
-export async function getUserSession() {
+export async function getUserSession(providedSession?: any) {
   const now = Date.now();
   if (cachedProfile && (now - lastCacheTime < CACHE_TTL)) return cachedProfile;
 
   try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    let session = providedSession;
+    let sessionError = null;
 
-    if (sessionError || !session || !session.user?.id) {
+    if (!session) {
+      const { data: { session: fetchedSession }, error: fetchError } = await supabase.auth.getSession();
+      session = fetchedSession;
+      sessionError = fetchError;
+    }
+
+    if (sessionError) {
+      console.warn("Session refresh or get failed:", sessionError.message);
+      // If it's an invalid refresh token, we should clear everything
+      if (sessionError.message.includes("refresh_token") || sessionError.status === 400) {
+        console.log("🧹 Invalid session detected, clearing storage...");
+        await supabase.auth.signOut();
+        localStorage.removeItem('supabase.auth.token');
+      }
+      cachedProfile = null;
+      return null;
+    }
+
+    if (!session || !session.user?.id) {
       cachedProfile = null;
       return null;
     }
@@ -185,12 +214,12 @@ export async function getUserSession() {
     const profileQuery = Promise.resolve(
       supabase
         .from('profiles')
-        .select('full_name, place, role, is_restricted, avatar_url')
+        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, system_prompt_focus')
         .eq('id', session.user.id)
         .single()
     );
 
-    const { data: profile, error } = await withTimeout(profileQuery, 15000).catch(e => {
+    const { data: profile, error } = await withTimeout(profileQuery, 5000).catch(e => {
       console.warn('Profile fetch timed out or failed:', e.message);
       return { data: null, error: e };
     });
@@ -204,10 +233,14 @@ export async function getUserSession() {
         role: profile.role || session.user.user_metadata?.role || UserRole.USER,
         isRestricted: profile.is_restricted || false,
         avatar_url: profile.avatar_url,
+        preferredModel: profile.preferred_model || 'gemini-2.0-flash',
+        voiceProfile: profile.voice_profile || 'Aoede',
+        systemPromptFocus: profile.system_prompt_focus || '',
         isLoggedIn: true
       };
     } else {
-      // Fallback if profile fetch fails but session exists
+      // Fallback if profile fetch fails (e.g. REST 406 or Timeout) but session exists
+      console.warn("Falling back to session metadata for profile.");
       cachedProfile = {
         id: session.user.id,
         name: session.user.user_metadata?.full_name || 'User',
@@ -215,6 +248,9 @@ export async function getUserSession() {
         avatar_url: session.user.user_metadata?.avatar_url || '',
         role: session.user.user_metadata?.role || UserRole.USER,
         phone: session.user.phone,
+        preferredModel: 'gemini-2.0-flash',
+        voiceProfile: 'Aoede',
+        systemPromptFocus: '',
         isLoggedIn: true,
         isRestricted: false
       };
@@ -223,7 +259,7 @@ export async function getUserSession() {
     lastCacheTime = Date.now();
     return cachedProfile;
   } catch (err) {
-    console.error("getUserSession error:", err);
+    console.error("Critical getUserSession error:", err);
     return null;
   }
 }

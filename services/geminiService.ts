@@ -1,52 +1,19 @@
 
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { supabase } from "../lib/supabase";
 import { AudioStore } from "../utils/audioUtils";
 
-let aiInstance: GoogleGenAI | null = null;
 // Use sessionStorage to persist quota status across page refreshes during the session
 let isQuotaExhausted = sessionStorage.getItem('simplish-tts-quota-exhausted') === 'true';
+let quotaResetTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const getTTSQuotaStatus = () => isQuotaExhausted;
-
-const PRIMARY_MODEL = "gemini-flash-latest";
-const FALLBACK_MODEL = "gemini-1.5-flash";
-
-function getAI() {
-  if (!aiInstance) {
-    aiInstance = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
-  }
-  return aiInstance;
-}
-
-// Helper to attempt generation with fallback
-async function generateWithFallback(options: any) {
-  const ai = getAI();
-  try {
-    // Try primary model first
-    return await ai.models.generateContent({
-      ...options,
-      model: PRIMARY_MODEL
-    });
-  } catch (err: any) {
-    // If primary fails with "not found", "404", or "503" (overloaded), try fallback
-    const errorMsg = err.message?.toLowerCase() || "";
-    if (errorMsg.includes('not found') || errorMsg.includes('404') || errorMsg.includes('503')) {
-      console.warn(`Model ${PRIMARY_MODEL} not found, falling back to ${FALLBACK_MODEL}`);
-      return await ai.models.generateContent({
-        ...options,
-        model: FALLBACK_MODEL
-      });
-    }
-    throw err;
-  }
-}
 
 // Simple request queue to manage rate limits
 class TTSQueue {
   private queue: Array<() => Promise<void>> = [];
   private isProcessing = false;
   private lastRequestTime = 0;
-  private MIN_GAP = 1200; // Increased gap to be safer with rate limits
+  private MIN_GAP = 1200;
 
   async add<T>(fn: () => Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -88,6 +55,10 @@ class TTSQueue {
 
 const ttsQueue = new TTSQueue();
 
+/**
+ * Text-to-Speech via Supabase Edge Function.
+ * API key lives server-side — never in the browser.
+ */
 export async function textToSpeech(text: string, voice: string = 'Kore', retryCount = 0): Promise<string | null> {
   // 1. Check Cache first
   const cached = AudioStore.get(text);
@@ -97,23 +68,19 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
 
   return ttsQueue.add(async () => {
     try {
-      const ai = getAI();
-      const response = await generateWithFallback({
-        contents: [{ parts: [{ text }] }],
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: voice },
-            },
-          },
-        },
+      const { data, error } = await supabase.functions.invoke('tts', {
+        body: { text, voice },
       });
 
-      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-      if (base64Audio) {
-        AudioStore.set(text, base64Audio);
-        return base64Audio;
+      if (error) throw error;
+
+      const result = typeof data === 'string' ? JSON.parse(data) : data;
+
+      if (result.isQuota) throw { status: 'RESOURCE_EXHAUSTED', message: '429' };
+
+      if (result.audio) {
+        AudioStore.set(text, result.audio);
+        return result.audio;
       }
       return null;
     } catch (error: any) {
@@ -123,12 +90,10 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
       const isQuotaError =
         error?.status === 'RESOURCE_EXHAUSTED' ||
         errorMsg.includes('429') ||
-        errorMsg.includes('quota') ||
-        (typeof error === 'object' && JSON.stringify(error).includes('429'));
+        errorMsg.includes('quota');
 
       if (isQuotaError) {
         if (retryCount < 1) {
-          // One retry with a significant backoff
           const delay = 5000;
           await new Promise(r => setTimeout(r, delay));
           return textToSpeech(text, voice, retryCount + 1);
@@ -137,67 +102,55 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
           sessionStorage.setItem('simplish-tts-quota-exhausted', 'true');
           window.dispatchEvent(new CustomEvent('simplish-quota-exhausted'));
 
-          // Auto-reset quota after 5 minutes to prevent permanent lock
-          setTimeout(() => {
+          if (quotaResetTimer) clearTimeout(quotaResetTimer);
+          quotaResetTimer = setTimeout(() => {
             isQuotaExhausted = false;
+            quotaResetTimer = null;
             sessionStorage.removeItem('simplish-tts-quota-exhausted');
           }, 300000);
         }
       }
 
-      aiInstance = null;
       return null;
     }
   });
 }
 
-export async function evaluatePlacement(formData: { name: string; place: string; introduction: string }) {
+/**
+ * Placement evaluation via Supabase Edge Function.
+ */
+export async function evaluatePlacement(data: {
+  name: string;
+  place: string;
+  introduction: string;
+  mcqScore: number;
+  readingTranscription?: string;
+  readingAccuracy?: number;
+}) {
   try {
-    const ai = getAI();
-    const response = await generateWithFallback({
-      contents: `Evaluate the following student response for an English placement test. 
-      The student speaks Kannada. 
-      Student Name: ${formData.name}
-      Place: ${formData.place}
-      Self Introduction: ${formData.introduction}
-      
-      Suggest one of these levels: BASIC, INTERMEDIATE, ADVANCED, EXPERT. 
-      Return the answer in JSON format.`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            suggestedLevel: {
-              type: Type.STRING,
-              description: "Suggested level based on English proficiency",
-            },
-            reasoning: {
-              type: Type.STRING,
-              description: "Short reason for the placement",
-            },
-            score: {
-              type: Type.NUMBER,
-              description: "Score from 1 to 10",
-            }
-          },
-          required: ["suggestedLevel", "reasoning", "score"],
-          propertyOrdering: ["suggestedLevel", "reasoning", "score"]
-        }
-      }
+    const { data: result, error } = await supabase.functions.invoke('evaluate', {
+      body: { type: 'placement', ...data },
     });
 
-    return JSON.parse(response.text);
+    if (error) throw error;
+    return typeof result === 'string' ? JSON.parse(result) : result;
   } catch (error) {
     console.error("Gemini Evaluation Error:", error);
-    aiInstance = null;
-    return { suggestedLevel: "BASIC", reasoning: "Defaulted to Basic due to processing error.", score: 0 };
+    return {
+      suggestedLevel: "BASIC",
+      reasoning: "Defaulted to Basic due to a processing error.",
+      reasoningKn: "ತಾಂತ್ರಿಕ ದೋಷದಿಂದಾಗಿ ಬೇಸಿಕ್ ಮಟ್ಟಕ್ಕೆ ಹೊಂದಿಸಲಾಗಿದೆ.",
+      score: 0
+    };
   }
 }
 
+/**
+ * Speech evaluation via Supabase Edge Function.
+ */
 export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
   try {
-    const ai = getAI();
+    // Convert blob to base64 for the Edge Function
     const reader = new FileReader();
     const base64Promise = new Promise<string>((resolve) => {
       reader.onloadend = () => {
@@ -207,47 +160,16 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
       reader.readAsDataURL(audioBlob);
     });
 
-    const base64Audio = await base64Promise;
+    const audioBase64 = await base64Promise;
 
-    const response = await generateWithFallback({
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: "audio/webm",
-              data: base64Audio
-            }
-          },
-          {
-            text: `Analyze this audio recording. The user is trying to say: "${targetText}".
-            1. Transcribe what the user actually said.
-            2. Compare it to the target text.
-            3. Rate accuracy from 1 to 5.
-            4. Provide a friendly tip in Kannada (written in Kannada script) to improve pronunciation or grammar.
-            Return JSON.`
-          }
-        ]
-      },
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            transcription: { type: Type.STRING },
-            accuracy: { type: Type.NUMBER },
-            feedbackKn: { type: Type.STRING },
-            feedbackEn: { type: Type.STRING }
-          },
-          required: ["transcription", "accuracy", "feedbackKn", "feedbackEn"],
-          propertyOrdering: ["transcription", "accuracy", "feedbackKn", "feedbackEn"]
-        }
-      }
+    const { data: result, error } = await supabase.functions.invoke('evaluate', {
+      body: { type: 'speech', audioBase64, targetText },
     });
 
-    return JSON.parse(response.text);
+    if (error) throw error;
+    return typeof result === 'string' ? JSON.parse(result) : result;
   } catch (error) {
     console.error("Speech Evaluation Error:", error);
-    aiInstance = null;
     return {
       transcription: "Error processing audio",
       accuracy: 0,

@@ -13,6 +13,21 @@ function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
   ]);
 }
 
+/** Retries a function on failure with exponential backoff. */
+async function withRetry<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i === retries) throw e;
+      const delay = 1000 * (i + 1); // 1s, then 2s
+      console.warn(`Retry ${i + 1}/${retries} after ${delay}ms...`);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  throw new Error('All retries failed');
+}
+
 // Helper to split "English | Kannada" strings
 export function splitBilingual(input: any): { en: string, kn: string } {
   if (!input) return { en: '', kn: '' };
@@ -31,51 +46,59 @@ export function splitBilingual(input: any): { en: string, kn: string } {
 }
 
 export async function fetchAllModules(): Promise<Module[]> {
-  try {
-    const { data: modulesData, error: modulesError } = await supabase
-      .from('modules')
-      .select('*, lessons(*)')
-      .order('order_index', { ascending: true });
+  return withRetry(async () => {
+    try {
+      const modulesQuery = supabase
+        .from('modules')
+        .select('*, lessons(*)')
+        .order('order_index', { ascending: true });
 
-    if (modulesError) {
-      console.error("🔴 DATABASE FETCH ERROR:", modulesError);
+      // Explicitly cast to any to avoid PostgrestFilterBuilder vs Promise issues
+      const { data: modulesData, error: modulesError } = await withTimeout(modulesQuery as any, 15000).catch(e => {
+        console.warn("Modules fetch timed out (15s):", e.message);
+        return { data: null, error: e };
+      }) as { data: any[] | null, error: any };
+
+      if (modulesError || !modulesData) {
+        console.error("🔴 DATABASE FETCH ERROR or TIMEOUT:", modulesError);
+        return INITIAL_MODULES as Module[];
+      }
+
+      if (!modulesData || modulesData.length === 0) {
+        console.warn("⚠️ DATABASE EMPTY. Falling back to static content.");
+        return INITIAL_MODULES as Module[];
+      }
+
+      console.log(`✅ Loaded ${modulesData.length} modules from DB:`, modulesData);
+
+      return modulesData.map(m => ({
+        id: m.id,
+        level: m.level as CourseLevel,
+        title: m.title,
+        description: m.description,
+        status: LevelStatus.LOCKED,
+        lessons: (m.lessons || [])
+          .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+          .map((l: any) => ({
+            id: l.id,
+            title: l.title,
+            videoUrl: l.video_url,
+            audioUrl: l.audio_url,
+            pdfUrl: l.pdf_url,
+            textUrl: l.text_url,
+            textContent: l.text_content,
+            speakPdfUrl: l.speak_pdf_url,
+            speakTextUrl: l.speak_text_url,
+            notes: l.notes,
+            scenario: l.scenario,
+            isCompleted: false
+          }))
+      }));
+    } catch (error) {
+      console.error("Fetch Modules Error:", error);
       return INITIAL_MODULES as Module[];
     }
-
-    if (!modulesData || modulesData.length === 0) {
-      console.warn("⚠️ DATABASE EMPTY. Falling back to static content.");
-      return INITIAL_MODULES as Module[];
-    }
-
-    console.log(`✅ Loaded ${modulesData.length} modules from DB:`, modulesData);
-
-    return modulesData.map(m => ({
-      id: m.id,
-      level: m.level as CourseLevel,
-      title: m.title,
-      description: m.description,
-      status: LevelStatus.LOCKED,
-      lessons: (m.lessons || [])
-        .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
-        .map((l: any) => ({
-          id: l.id,
-          title: l.title,
-          videoUrl: l.video_url,
-          audioUrl: l.audio_url,
-          pdfUrl: l.pdf_url,
-          textUrl: l.text_url,
-          textContent: l.text_content,
-          speakPdfUrl: l.speak_pdf_url,
-          speakTextUrl: l.speak_text_url,
-          notes: l.notes,
-          scenario: l.scenario,
-          isCompleted: false
-        }))
-    }));
-  } catch (error) {
-    console.error("Fetch Modules Error:", error);
-    return INITIAL_MODULES as Module[];
-  }
+  }); // end withRetry
 }
 
 export async function saveModule(adminInput: { id?: string, level: string, titleStr: string, descStr: string, order_index: number }) {

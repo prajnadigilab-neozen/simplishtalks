@@ -1,13 +1,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GoogleGenAI, Type } from "@google/genai";
 import { useLanguage } from './LanguageContext';
 import { textToSpeech, getTTSQuotaStatus } from '../services/geminiService';
 import { playPCM, AudioStore } from '../utils/audioUtils';
 import { Language, CoachMessage } from '../types';
 import { getChatHistory, saveChatMessage, clearUserChatHistory } from '../services/coachService';
-import { getUserSession } from '../services/authService';
+import { useAppStore } from '../store/useAppStore';
+import { supabase } from '../lib/supabase';
 
 interface ScenarioPracticeProps {
   scenario: {
@@ -21,38 +21,36 @@ interface ScenarioPracticeProps {
 const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
   const { id: lessonId } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
+  const { session } = useAppStore();
+  const userId = session?.id ?? null;
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isSendingRef = useRef(false);
 
   useEffect(() => {
+    if (!userId) { setLoading(false); return; }
     const loadHistory = async () => {
-      const session = await getUserSession();
-      if (session) {
-        setUserId(session.id);
-        const history = await getChatHistory(session.id, lessonId);
-        if (history.length > 0) {
-          setMessages(history);
-        } else {
-          // Initialize with first message if no history
-          const initialMsg: CoachMessage = {
-            role: 'coach',
-            text: scenario.initialMessage,
-            timestamp: Date.now()
-          };
-          setMessages([initialMsg]);
-          // Optional: save first message to DB
-          saveChatMessage(session.id, initialMsg, lessonId);
-        }
+      const history = await getChatHistory(userId, lessonId);
+      if (history.length > 0) {
+        setMessages(history);
+      } else {
+        const initialMsg: CoachMessage = {
+          role: 'coach',
+          text: scenario.initialMessage,
+          timestamp: Date.now()
+        };
+        setMessages([initialMsg]);
+        saveChatMessage(userId, initialMsg, lessonId);
       }
       setLoading(false);
     };
     loadHistory();
-  }, [lessonId, scenario.initialMessage]);
+  }, [userId, lessonId, scenario.initialMessage]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -61,88 +59,33 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
   }, [messages, isTyping]);
 
   const handleSend = async () => {
-    if (!input.trim() || isTyping || !userId) return;
+    if (isSendingRef.current || !input.trim() || isTyping || !userId) return;
+    isSendingRef.current = true;
 
     const userMsg: CoachMessage = { role: 'user', text: input, timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsTyping(true);
 
-    // Save user message
     saveChatMessage(userId, userMsg, lessonId);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
       const historyForAI = messages.map(m => ({
         role: m.role === 'user' ? 'user' as const : 'model' as const,
         parts: [{ text: m.text }]
       }));
 
-      let response;
-      try {
-        response = await ai.models.generateContent({
-          model: "gemini-flash-latest",
-          contents: [...historyForAI, { role: 'user', parts: [{ text: input }] }],
-          config: {
-            systemInstruction: `
-              ${scenario.systemInstruction}
-              
-              Rules:
-              1. Stay in character.
-              2. Keep responses short and simple.
-              3. If the student makes a big mistake, gently correct them in English.
-              4. If needed for understanding, provide a Kannada guide in the 'kannadaHelp' field.
-              5. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-                 Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
-              6. Return JSON format.
-            `,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                reply: { type: Type.STRING },
-                kannadaHelp: { type: Type.STRING }
-              },
-              required: ["reply"]
-            }
-          }
-        });
-      } catch (err: any) {
-        if (err.message?.includes('not found') || err.message?.includes('404')) {
-          console.warn("Model gemini-flash-latest not found, falling back to gemini-1.5-flash");
-          response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
-            contents: [...historyForAI, { role: 'user', parts: [{ text: input }] }],
-            config: {
-              systemInstruction: `
-                ${scenario.systemInstruction}
-                
-                Rules:
-                1. Stay in character.
-                2. Keep responses short and simple.
-                3. If the student makes a big mistake, gently correct them in English.
-                4. If needed for understanding, provide a Kannada guide in the 'kannadaHelp' field.
-                5. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-                   Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
-                6. Return JSON format.
-              `,
-              responseMimeType: "application/json",
-              responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                  reply: { type: Type.STRING },
-                  kannadaHelp: { type: Type.STRING }
-                },
-                required: ["reply"]
-              }
-            }
-          });
-        } else {
-          throw err;
-        }
-      }
+      const { data, error } = await supabase.functions.invoke('scenario-chat', {
+        body: {
+          message: input,
+          history: historyForAI,
+          systemInstruction: scenario.systemInstruction,
+        },
+      });
 
-      const result = JSON.parse(response.text);
+      if (error) throw error;
+
+      const result = typeof data === 'string' ? JSON.parse(data) : data;
       const coachMsg: CoachMessage = {
         role: 'coach',
         text: result.reply,
@@ -151,12 +94,12 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
       };
 
       setMessages(prev => [...prev, coachMsg]);
-      // Save AI message
       saveChatMessage(userId, coachMsg, lessonId);
     } catch (error) {
       console.error("Scenario AI Error:", error);
     } finally {
       setIsTyping(false);
+      isSendingRef.current = false;
     }
   };
 
@@ -174,7 +117,9 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
   };
 
   const handleReset = async () => {
-    if (!userId || !window.confirm(t({ en: "Restart this scenario?", kn: "ಈ ಸನ್ನಿವೇಶವನ್ನು ಮರುಪ್ರಾರಂಭಿಸಲಿ?" }))) return;
+    if (!userId) return;
+    if (!resetConfirm) { setResetConfirm(true); return; }
+    setResetConfirm(false);
     await clearUserChatHistory(userId, lessonId);
     const initialMsg: CoachMessage = {
       role: 'coach',
@@ -198,7 +143,15 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
             </p>
           </div>
         </div>
-        <button onClick={handleReset} className="p-2 text-slate-300 hover:text-orange-500 transition-colors" title="Reset scenario">
+        <button
+          onClick={handleReset}
+          className={`p-2 transition-colors rounded-full ${resetConfirm
+              ? 'text-orange-500 bg-orange-100 dark:bg-orange-900/20 ring-2 ring-orange-400 animate-pulse'
+              : 'text-slate-300 hover:text-orange-500'
+            }`}
+          title={resetConfirm ? t({ en: "Tap again to confirm", kn: "ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ" }) : "Reset scenario"}
+          onBlur={() => setResetConfirm(false)}
+        >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
           </svg>
@@ -260,7 +213,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
           placeholder={t({ en: 'Type your reply...', kn: 'ನಿಮ್ಮ ಉತ್ತರವನ್ನು ಬರೆಯಿರಿ...' })}
           value={input}
           onChange={e => setInput(e.target.value)}
-          onKeyPress={e => e.key === 'Enter' && handleSend()}
+          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
         />
         <button
           onClick={handleSend}

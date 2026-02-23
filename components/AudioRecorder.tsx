@@ -2,16 +2,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from './LanguageContext';
 import { TRANSLATIONS } from '../constants';
+import {
+  saveRecording,
+  getAllRecordings,
+  deleteRecording as deleteRecordingFromDB,
+  pruneOldRecordings,
+  SavedRecording
+} from '../utils/recordingStore';
 
 interface AudioRecorderProps {
   onRecordingComplete: (blob: Blob) => void;
-  lessonId?: string;
-}
-
-interface SavedRecording {
-  id: string;
-  timestamp: number;
-  dataUrl: string;
   lessonId?: string;
 }
 
@@ -21,28 +21,34 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [savedPractices, setSavedPractices] = useState<SavedRecording[]>([]);
+  const [playbackUrls, setPlaybackUrls] = useState<Map<string, string>>(new Map());
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
 
-  // Format seconds to M:SS
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Load saved practices from localStorage on mount
+  // Load saved practices from IndexedDB on mount
   useEffect(() => {
-    const saved = localStorage.getItem('simplish-saved-recordings');
-    if (saved) {
-      try {
-        setSavedPractices(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse saved recordings", e);
-      }
-    }
-  }, []);
+    getAllRecordings(lessonId).then(recordings => {
+      setSavedPractices(recordings);
+      // Create object URLs for playback
+      const urls = new Map<string, string>();
+      recordings.forEach(rec => {
+        urls.set(rec.id, URL.createObjectURL(rec.blob));
+      });
+      setPlaybackUrls(urls);
+    });
+
+    // Cleanup object URLs on unmount
+    return () => {
+      playbackUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [lessonId]);
 
   // Timer logic
   useEffect(() => {
@@ -62,24 +68,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
     };
   }, [isRecording]);
 
-  const saveToLocalStorage = (blob: Blob) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = () => {
-      const base64data = reader.result as string;
-      const newRecording: SavedRecording = {
-        id: Math.random().toString(36).substr(2, 9),
-        timestamp: Date.now(),
-        dataUrl: base64data,
-        lessonId
-      };
-
-      const updated = [newRecording, ...savedPractices].slice(0, 10); // Increased limit to 10
-      setSavedPractices(updated);
-      localStorage.setItem('simplish-saved-recordings', JSON.stringify(updated));
-    };
-  };
-
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -91,16 +79,43 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
-        saveToLocalStorage(audioBlob);
+
+        // Save to IndexedDB — native Blob, no base64 conversion
+        const newRec: SavedRecording = {
+          id: crypto.randomUUID(),
+          timestamp: Date.now(),
+          blob: audioBlob,
+          lessonId,
+        };
+
+        await saveRecording(newRec);
+        await pruneOldRecordings(20);
+
+        // Refresh the list
+        const all = await getAllRecordings(lessonId);
+        setSavedPractices(all);
+        const urls = new Map(playbackUrls);
+        all.forEach(r => {
+          if (!urls.has(r.id)) urls.set(r.id, URL.createObjectURL(r.blob));
+        });
+        setPlaybackUrls(urls);
+
         onRecordingComplete(audioBlob);
       };
 
       mediaRecorder.start();
       setIsRecording(true);
+
+      // Enforce the 30-second limit shown in the UI
+      setTimeout(() => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+          stopRecording();
+        }
+      }, 30_000);
     } catch (err) {
       console.error("Error accessing microphone:", err);
       alert("Microphone access is required.");
@@ -115,10 +130,15 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
     }
   };
 
-  const deleteRecording = (id: string) => {
-    const updated = savedPractices.filter(rec => rec.id !== id);
-    setSavedPractices(updated);
-    localStorage.setItem('simplish-saved-recordings', JSON.stringify(updated));
+  const handleDelete = async (id: string) => {
+    await deleteRecordingFromDB(id);
+    // Revoke the object URL
+    const url = playbackUrls.get(id);
+    if (url) URL.revokeObjectURL(url);
+    const urls = new Map(playbackUrls);
+    urls.delete(id);
+    setPlaybackUrls(urls);
+    setSavedPractices(prev => prev.filter(rec => rec.id !== id));
   };
 
   return (
@@ -136,7 +156,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
           t(TRANSLATIONS.voiceNote)
         )}
       </div>
-      
+
       <div className="relative">
         {isRecording && (
           <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping scale-150"></div>
@@ -180,13 +200,13 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
             {savedPractices.map((rec) => (
               <div key={rec.id} className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-slate-800 group">
                 <div className="flex-1">
-                  <audio src={rec.dataUrl} controls className="w-full h-8 scale-90 origin-left" />
+                  <audio src={playbackUrls.get(rec.id)} controls className="w-full h-8 scale-90 origin-left" />
                   <div className="text-[8px] font-bold text-slate-400 mt-1 uppercase">
                     {new Date(rec.timestamp).toLocaleString()}
                   </div>
                 </div>
-                <button 
-                  onClick={() => deleteRecording(rec.id)}
+                <button
+                  onClick={() => handleDelete(rec.id)}
                   className="p-2 text-slate-300 hover:text-red-500 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">

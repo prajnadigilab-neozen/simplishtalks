@@ -36,7 +36,8 @@ export const TRANSLATIONS: TranslationStrings = {
   scenarioDesc: { en: "Use what you learned to complete the conversation objective. It's safe to make mistakes here!", kn: "ಸಂಭಾಷಣೆಯ ಉದ್ದೇಶವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ನೀವು ಕಲಿತದ್ದನ್ನು ಬಳಸಿ. ಇಲ್ಲಿ ತಪ್ಪುನ ಮಾಡಲು ಭಯಪಡಬೇಡಿ!" },
 };
 
-const DUMMY_PDF = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+// Placeholder removed — real content is loaded from Supabase.
+// Static fallback modules show no media to avoid broken third-party URLs.
 
 export const INITIAL_MODULES = [
   {
@@ -44,12 +45,12 @@ export const INITIAL_MODULES = [
     title: { en: 'Comfort & Foundations', kn: 'ಮೂಲ ಅಡಿಪಾಯ' },
     description: { en: 'Daily routine, family, and simple present tense.', kn: 'ದೈನಂದಿನ ಚಟುವಟಿಕೆಗಳು ಮತ್ತು ಸರಳ ವರ್ತಮಾನ ಕಾಲ.' },
     lessons: [
-      { 
-        id: 'b1', 
-        title: { en: 'Introduction to Greetings', kn: 'ಶುಭಾಶಯಗಳ ಪರಿಚಯ' }, 
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', 
-        pdfUrl: DUMMY_PDF, 
-        notes: { en: 'Learn how to say Hello and Hi.', kn: 'ಹಲೋ ಮತ್ತು ಹಾಯ್ ಹೇಳಲು ಕಲಿಯಿರಿ.' }, 
+      {
+        id: 'b1',
+        title: { en: 'Introduction to Greetings', kn: 'ಶುಭಾಶಯಗಳ ಪರಿಚಯ' },
+        videoUrl: undefined,
+        pdfUrl: undefined,
+        notes: { en: 'Learn how to say Hello and Hi.', kn: 'ಹಲೋ ಮತ್ತು ಹಾಯ್ ಹೇಳಲು ಕಲಿಯಿರಿ.' },
         isCompleted: false,
         scenario: {
           character: { en: "Neighbor", kn: "ನೆರೆಹೊರೆಯವರು" },
@@ -58,7 +59,7 @@ export const INITIAL_MODULES = [
           initialMessage: "Hello! I saw you moving in today. I'm Ravi, your neighbor. What's your name?"
         }
       },
-      { id: 'b2', title: { en: 'Family Members', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರು' }, videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', pdfUrl: DUMMY_PDF, notes: { en: 'Names for family members in English.', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರ ಹೆಸರುಗಳು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ.' }, isCompleted: false },
+      { id: 'b2', title: { en: 'Family Members', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರು' }, notes: { en: 'Names for family members in English.', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರ ಹೆಸರುಗಳು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ.' }, isCompleted: false },
     ]
   },
   {
@@ -66,12 +67,10 @@ export const INITIAL_MODULES = [
     title: { en: 'Conversations', kn: 'ಸಂಭಾಷಣೆಗಳು' },
     description: { en: 'Everyday situations like hospitals or shops.', kn: 'ಆಸ್ಪತ್ರೆ ಅಥವಾ ಅಂಗಡಿಗಳಂತಹ ದೈನಂದಿನ ಸನ್ನಿವೇಶಗಳು.' },
     lessons: [
-      { 
-        id: 'i1', 
-        title: { en: 'Ordering Food', kn: 'ಆಹಾರ ಆರ್ಡರ್ ಮಾಡುವುದು' }, 
-        videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', 
-        pdfUrl: DUMMY_PDF, 
-        notes: { en: 'How to order at a restaurant.', kn: 'ರೆಸ್ಟೋರೆಂಟ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡುವುದು ಹೇಗೆ.' }, 
+      {
+        id: 'i1',
+        title: { en: 'Ordering Food', kn: 'ಆಹಾರ ಆರ್ಡರ್ ಮಾಡುವುದು' },
+        notes: { en: 'How to order at a restaurant.', kn: 'ರೆಸ್ಟೋರೆಂಟ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡುವುದು ಹೇಗೆ.' },
         isCompleted: false,
         scenario: {
           character: { en: "Waiter", kn: "ವೈಟರ್" },
@@ -87,7 +86,7 @@ export const INITIAL_MODULES = [
     title: { en: 'Fluency', kn: 'ನಿರರ್ಗಳತೆ' },
     description: { en: 'Complex sentences, modals, and emails.', kn: 'ಸಂಕೀರ್ಣ ವಾಕ್ಯಗಳು ಮತ್ತು ಇಮೇಲ್ ಬರಹ.' },
     lessons: [
-      { id: 'a1', title: { en: 'Professional Emails', kn: 'ವೃತ್ತಿಪರ ಇಮೇಲ್‌ಗಳು' }, videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', pdfUrl: DUMMY_PDF, notes: { en: 'Writing business emails.', kn: 'ವ್ಯಾಪಾರ ಇಮೇಲ್‌ಗಳನ್ನು ಬರೆಯುವುದು.' }, isCompleted: false },
+      { id: 'a1', title: { en: 'Professional Emails', kn: 'ವೃತ್ತಿಪರ ಇಮೇಲ್‌ಗಳು' }, notes: { en: 'Writing business emails.', kn: 'ವ್ಯಾಪಾರ ಇಮೇಲ್‌ಗಳನ್ನು ಬರೆಯುವುದು.' }, isCompleted: false },
     ]
   },
   {
@@ -95,7 +94,7 @@ export const INITIAL_MODULES = [
     title: { en: 'Professionalism', kn: 'ವೃತ್ತಿಪರತೆ' },
     description: { en: 'Interviews, presentations, and resumes.', kn: 'ಸಂದರ್ಶನಗಳು ಮತ್ತು ರೆಸ್ಯೂಮ್ ತಯಾರಿಕೆ.' },
     lessons: [
-      { id: 'e1', title: { en: 'Cracking Interviews', kn: 'ಸಂದರ್ಶನ ಎದುರಿಸುವುದು' }, videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', pdfUrl: DUMMY_PDF, notes: { en: 'Common interview questions.', kn: 'ಸಾಮಾನ್ಯ ಸಂದರ್ಶನ ಪ್ರಶ್ನೆಗಳು.' }, isCompleted: false },
+      { id: 'e1', title: { en: 'Cracking Interviews', kn: 'ಸಂದರ್ಶನ ಎದುರಿಸುವುದು' }, notes: { en: 'Common interview questions.', kn: 'ಸಾಮಾನ್ಯ ಸಂದರ್ಶನ ಪ್ರಶ್ನೆಗಳು.' }, isCompleted: false },
     ]
   },
 ];

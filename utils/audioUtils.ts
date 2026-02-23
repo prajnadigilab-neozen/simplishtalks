@@ -9,6 +9,16 @@ export function decodeBase64(base64: string): Uint8Array {
   return bytes;
 }
 
+/** Encode a Uint8Array to base64 — used to send PCM audio to the Gemini Live API */
+export function encodeBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 export async function decodeAudioData(
   data: Uint8Array,
   ctx: AudioContext,
@@ -75,12 +85,12 @@ export async function playPCM(base64Audio: string, textKey?: string) {
     audioBuffer = await decodeAudioData(audioData, ctx, 24000, 1);
     if (textKey) globalBufferCache.set(textKey, audioBuffer);
   }
-  
+
   const source = ctx.createBufferSource();
   source.buffer = audioBuffer;
   source.connect(ctx.destination);
   source.start();
-  
+
   return new Promise((resolve) => {
     source.onended = resolve;
   });

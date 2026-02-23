@@ -1,84 +1,21 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
 import { supabase } from "../lib/supabase";
 import { CoachMessage } from "../types";
 
-const COACH_SYSTEM_INSTRUCTION = `
-You are the backend engine for "SIMPLISH" an AI-powered tutor for Kannada speakers.
-Task: Act as a bilingual English Coach. You receive messages in English, Kannada, or Kanglish.
-
-Operational Logic:
-1. Comprehension: Fully parse Kannada input to understand the user's intent or emotional state.
-2. Response: Always respond in English first. Follow with a Kannada translation/explanation only if the user's input was primarily Kannada or if a complex concept is being explained.
-3. Feedback Loop: 
-    * Identify grammatical errors in the user's English.
-    * Provide a "Correction" field in your response.
-    * Provide a "Pronunciation Tip" if the word used is a common phonetic pitfall for Kannada speakers (e.g., "Hospital" vs "Aaspathre").
-4. Help Formatting (kannadaGuide): 
-    * Use this exact format: [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-    * Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
-5. Tone: Professional, encouraging, and culturally attuned to Karnataka.
-
-Return your response in a strict JSON format.
-`;
-
-const PRIMARY_MODEL = "gemini-flash-latest";
-const FALLBACK_MODEL = "gemini-1.5-flash";
-
+/**
+ * Chat with the AI coach via Supabase Edge Function.
+ * The API key lives server-side — never in the browser bundle.
+ */
 export async function chatWithCoach(message: string, history: { role: 'user' | 'model', parts: { text: string }[] }[] = []) {
   try {
-    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+    const { data, error } = await supabase.functions.invoke('coach-chat', {
+      body: { message, history },
+    });
 
-    let response;
-    try {
-      response = await ai.models.generateContent({
-        model: PRIMARY_MODEL,
-        contents: [...history, { role: 'user', parts: [{ text: message }] }],
-        config: {
-          systemInstruction: COACH_SYSTEM_INSTRUCTION,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              replyEn: { type: Type.STRING, description: "The coach's reply in English" },
-              kannadaGuide: { type: Type.STRING, description: "Formatted Kannada translation/explanation" },
-              correction: { type: Type.STRING, description: "Grammatical correction of user's input if needed" },
-              pronunciationTip: { type: Type.STRING, description: "Phonetic tip for Kannada speakers" }
-            },
-            required: ["replyEn"],
-            propertyOrdering: ["replyEn", "kannadaGuide", "correction", "pronunciationTip"]
-          }
-        }
-      });
-    } catch (err: any) {
-      const errorMsg = err.message?.toLowerCase() || "";
-      if (errorMsg.includes('not found') || errorMsg.includes('404') || errorMsg.includes('503')) {
-        console.warn(`Model ${PRIMARY_MODEL} not found, falling back to ${FALLBACK_MODEL}`);
-        response = await ai.models.generateContent({
-          model: FALLBACK_MODEL,
-          contents: [...history, { role: 'user', parts: [{ text: message }] }],
-          config: {
-            systemInstruction: COACH_SYSTEM_INSTRUCTION,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                replyEn: { type: Type.STRING, description: "The coach's reply in English" },
-                kannadaGuide: { type: Type.STRING, description: "Formatted Kannada translation/explanation" },
-                correction: { type: Type.STRING, description: "Grammatical correction of user's input if needed" },
-                pronunciationTip: { type: Type.STRING, description: "Phonetic tip for Kannada speakers" }
-              },
-              required: ["replyEn"],
-              propertyOrdering: ["replyEn", "kannadaGuide", "correction", "pronunciationTip"]
-            }
-          }
-        });
-      } else {
-        throw err;
-      }
-    }
+    if (error) throw error;
 
-    return JSON.parse(response.text);
+    // Edge function returns JSON string or parsed object
+    return typeof data === 'string' ? JSON.parse(data) : data;
   } catch (error: any) {
     console.error("Coach API Error:", error);
     return {
@@ -120,6 +57,7 @@ export async function deleteChatMessage(msgId: string) {
   }
 }
 
+// Paginated history — fetch last 50 messages, then reverse for display
 export async function getChatHistory(userId: string, lessonId?: string): Promise<CoachMessage[]> {
   try {
     let query = supabase
@@ -134,11 +72,13 @@ export async function getChatHistory(userId: string, lessonId?: string): Promise
       query = query.is('lesson_id', null);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: true });
+    const { data, error } = await query
+      .order('created_at', { ascending: false })
+      .limit(50);
 
     if (error) throw error;
 
-    return data.map(m => ({
+    return data.reverse().map(m => ({
       dbId: m.id,
       role: m.role as 'user' | 'coach',
       text: m.content,

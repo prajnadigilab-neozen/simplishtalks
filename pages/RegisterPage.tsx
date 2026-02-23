@@ -160,8 +160,10 @@ const RegisterPage: React.FC = () => {
 
     if (result.success) {
       setSuccess(true);
-      const session = await getUserSession();
-      setSession(session);
+
+      // Force store to fetch the logged in user's progress and modules
+      await useAppStore.getState().initialize(true);
+      const session = useAppStore.getState().session;
 
       setTimeout(() => {
         if (session?.role === UserRole.ADMIN) {

@@ -6,7 +6,7 @@ import { ThemeProvider, useTheme } from './components/ThemeContext';
 import { TRANSLATIONS, INITIAL_MODULES, LEVEL_ORDER } from './constants';
 import { CourseLevel, UserProgress, LevelStatus, Module, UserRole } from './types';
 import { supabase } from './lib/supabase';
-import { getUserSession, signOutUser } from './services/authService';
+import { signOutUser } from './services/authService';
 import { fetchAllModules } from './services/courseService';
 import LandingPage from './pages/LandingPage';
 import PlacementTest from './pages/PlacementTest';
@@ -176,16 +176,29 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     initialize();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (isExitingRef.current) return;
-      // INITIAL_SESSION is handled by initialize() above — skip to avoid double-fetch
+      // INITIAL_SESSION is handled by initialize() — skip to avoid double-fetch + lock race
       if (event === 'INITIAL_SESSION') return;
+
       if (event === 'SIGNED_OUT') {
         setSession(null);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-        const sessData = await getUserSession();
-        setSession(sessData);
+      } else if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        // Use the session object from the event directly — no redundant getSession() call
+        if (session) {
+          const { user } = session;
+          setSession({
+            id: user.id,
+            name: user.user_metadata?.full_name || 'User',
+            role: user.user_metadata?.role || UserRole.USER,
+            phone: user.phone,
+            place: user.user_metadata?.place || '',
+            isLoggedIn: true,
+            isRestricted: false,
+          });
+        }
       }
+      // TOKEN_REFRESHED is handled silently by Supabase autoRefreshToken — no action needed
     });
 
     return () => {
@@ -196,28 +209,47 @@ const AppContent: React.FC = () => {
   const handleSignOut = async () => {
     setIsExiting(true);
     isExitingRef.current = true;
-
     try {
       await signOutUser();
-      localStorage.clear();
-      sessionStorage.clear();
-      setSession(null);
-
+      // Reset all store state without a page reload
+      useAppStore.setState({ session: null, progress: null, modules: [], initialized: false });
+      setIsExiting(false);
+      isExitingRef.current = false;
       navigate('/', { replace: true });
-      window.location.hash = '#/';
-      window.location.reload();
     } catch (e) {
-      window.location.href = '/';
+      console.error('Sign-out error:', e);
+      setIsExiting(false);
+      isExitingRef.current = false;
     }
   };
 
+  // Skeleton shell: render navbar immediately, skeleton for content area while loading.
+  // This makes the app feel instantaneous rather than showing a blank screen.
   if (loading || isExiting) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-900 transition-colors">
-        <div className="w-14 h-14 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] animate-pulse">
-          {isExiting ? 'Safely Exiting...' : 'SIMPLISH LOADING...'}
-        </p>
+      <div className="min-h-screen bg-white dark:bg-slate-900 flex flex-col max-w-[1280px] mx-auto border-x border-gray-100 dark:border-slate-800">
+        {/* Skeleton Navbar */}
+        <header className="px-4 py-3 md:px-8 md:py-4 sticky top-0 z-50 flex justify-between items-center border-b-2 border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
+          <div className="h-7 w-32 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+          <div className="flex gap-2">
+            <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+            <div className="h-8 w-16 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+          </div>
+        </header>
+        {/* Skeleton Content */}
+        <main className="flex-1 p-6 md:p-10 space-y-6">
+          <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />
+            ))}
+          </div>
+          {isExiting && (
+            <p className="text-center text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] animate-pulse pt-8">
+              Signing out safely...
+            </p>
+          )}
+        </main>
       </div>
     );
   }
@@ -234,13 +266,18 @@ const AppContent: React.FC = () => {
             <Route path="/" element={<LandingPage session={session} />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<RegisterPage />} />
-            <Route path="/settings" element={session ? <SettingsPage /> : <Navigate to="/login" />} />
-            <Route path="/placement" element={session ? <PlacementTest /> : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={session ? ((progress && progress.isPlacementDone) ? <Dashboard /> : <Navigate to="/placement" />) : <Navigate to="/login" />} />
-            <Route path="/lesson/:id" element={session ? <LessonView /> : <Navigate to="/login" />} />
-            <Route path="/coachchat" element={session ? <CoachChat /> : <Navigate to="/login" />} />
-            <Route path="/talk" element={session ? <VoiceCoach /> : <Navigate to="/login" />} />
-            <Route path="/admin" element={session?.role === UserRole.ADMIN ? <AdminDashboard /> : <Navigate to="/dashboard" />} />
+            <Route path="/settings" element={session ? <ErrorBoundary><SettingsPage /></ErrorBoundary> : <Navigate to="/login" />} />
+            <Route path="/placement" element={session ? <ErrorBoundary><PlacementTest /></ErrorBoundary> : <Navigate to="/login" />} />
+            <Route path="/dashboard" element={
+              !session ? <Navigate to="/login" /> :
+                progress === null ? null /* still loading — show nothing, avoid redirect */ :
+                  progress.isPlacementDone ? <ErrorBoundary><Dashboard /></ErrorBoundary> :
+                    <Navigate to="/placement" />
+            } />
+            <Route path="/lesson/:id" element={session ? <ErrorBoundary><LessonView /></ErrorBoundary> : <Navigate to="/login" />} />
+            <Route path="/coachchat" element={session ? <ErrorBoundary><CoachChat /></ErrorBoundary> : <Navigate to="/login" />} />
+            <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
+            <Route path="/admin" element={session?.role === UserRole.ADMIN ? <ErrorBoundary><AdminDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         )}
