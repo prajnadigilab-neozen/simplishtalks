@@ -125,7 +125,6 @@ const AdminDashboard: React.FC = () => {
 
       const reports = await getPlatformReports();
       setReportsData(reports);
-
     } catch (err: any) {
       setError(err.message || "Could not connect to the database.");
     } finally {
@@ -1082,7 +1081,6 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Audit views remain similar... */}
     </div>
   );
