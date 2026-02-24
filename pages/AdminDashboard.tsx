@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { getAllUsers, toggleUserRestriction, deleteUser, mapRole } from '../services/authService';
 import { getAdminAuditLogs } from '../services/coachService';
-import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson, uploadLessonMedia } from '../services/courseService';
+import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson, uploadLessonMedia, getGlobalStats } from '../services/courseService';
 import { UserRole, CourseLevel, Module, Lesson } from '../types';
 import { useAppStore } from '../store/useAppStore';
 
@@ -32,6 +32,7 @@ const AdminDashboard: React.FC = () => {
   const [editingModule, setEditingModule] = useState<any | null>(null);
   const [editingLesson, setEditingLesson] = useState<any | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [globalStats, setGlobalStats] = useState({ totalUsers: 0, activeLearners: 0, totalModules: 0, totalLessons: 0 });
 
   // AI Config State
   const [aiConfig, setAiConfig] = useState({
@@ -111,6 +112,10 @@ const AdminDashboard: React.FC = () => {
 
       const moduleData = await fetchAllModules();
       setModules(moduleData);
+
+      const stats = await getGlobalStats();
+      setGlobalStats(stats);
+
     } catch (err: any) {
       setError(err.message || "Could not connect to the database.");
     } finally {
@@ -124,9 +129,9 @@ const AdminDashboard: React.FC = () => {
 
   const handleAudit = async (userId: string) => {
     setProcessingId(userId);
+    setSelectedAuditUser(userId);
     const logs = await getAdminAuditLogs(userId);
     setAuditLogs(logs);
-    setSelectedAuditUser(userId);
     setActiveTab('audit');
     setProcessingId(null);
   };
@@ -686,7 +691,190 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Audit/Stats views remain similar... */}
+      {activeTab === 'stats' && (
+        <div className="space-y-8 animate-in fade-in">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">Platform Analytics</h3>
+            <button onClick={fetchData} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">
+              Refresh Data
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Stat Card 1 */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl flex items-center justify-center text-2xl">
+                  👥
+                </div>
+              </div>
+              <div>
+                <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.totalUsers}</h4>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Registered</p>
+              </div>
+            </div>
+
+            {/* Stat Card 2 */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-2xl flex items-center justify-center text-2xl">
+                  📈
+                </div>
+              </div>
+              <div>
+                <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.activeLearners}</h4>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Active Learners</p>
+              </div>
+            </div>
+
+            {/* Stat Card 3 */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-2xl flex items-center justify-center text-2xl">
+                  📚
+                </div>
+              </div>
+              <div>
+                <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.totalModules}</h4>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Course Modules</p>
+              </div>
+            </div>
+
+            {/* Stat Card 4 */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-2xl flex items-center justify-center text-2xl">
+                  🎓
+                </div>
+              </div>
+              <div>
+                <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.totalLessons}</h4>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Lessons</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-blue-50 dark:bg-slate-800/50 rounded-[2rem] p-8 border border-blue-100 dark:border-slate-700">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                🎯
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-blue-900 dark:text-blue-100">Engagement Score</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {globalStats.totalUsers > 0
+                    ? Math.round((globalStats.activeLearners / globalStats.totalUsers) * 100)
+                    : 0}% of registered users have completed the placement test and started learning.
+                </p>
+              </div>
+            </div>
+
+            {/* Visual Progress Bar */}
+            <div className="mt-6 w-full bg-white dark:bg-slate-900 h-4 rounded-full overflow-hidden shadow-inner flex">
+              <div
+                className="bg-blue-600 h-full transition-all duration-1000 ease-out"
+                style={{ width: `${globalStats.totalUsers > 0 ? (globalStats.activeLearners / globalStats.totalUsers) * 100 : 0}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'audit' && (
+        <div className="space-y-6 animate-in fade-in">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div>
+              <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">
+                User Conversation Audit
+              </h3>
+              {selectedAuditUser && users.find(u => u.id === selectedAuditUser) && (
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    {users.find(u => u.id === selectedAuditUser)?.full_name}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    ({users.find(u => u.id === selectedAuditUser)?.phone})
+                  </span>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                setActiveTab('users');
+                setSelectedAuditUser(null);
+                setAuditLogs([]);
+              }}
+              className="px-4 py-2 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 rounded-xl text-xs font-black uppercase hover:bg-slate-200 transition-colors"
+            >
+              Back to Users
+            </button>
+          </div>
+
+          {!selectedAuditUser ? (
+            <div className="p-8 text-center text-slate-400 font-bold bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700">
+              Please select a user from the Users tab to view their audit logs.
+            </div>
+          ) : auditLogs.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 font-bold bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700">
+              No chat logs found for this user.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 px-2">
+                Showing last {auditLogs.length} messages
+              </p>
+              {auditLogs.map((log: any, idx: number) => (
+                <div
+                  key={log.id || idx}
+                  className={`p-6 rounded-3xl border shadow-sm ${log.role === 'user'
+                    ? 'bg-blue-50/50 border-blue-100 dark:bg-slate-800/80 dark:border-slate-700 ml-0 md:mr-12'
+                    : 'bg-white border-slate-100 dark:bg-slate-900 dark:border-slate-800 ml-0 md:ml-12'
+                    }`}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${log.role === 'user' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+                      }`}>
+                      {log.role === 'user' ? 'STUDENT' : 'AI COACH'}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {new Date(log.created_at).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <p className="text-slate-800 dark:text-slate-200 font-medium whitespace-pre-wrap">
+                    {log.content}
+                  </p>
+
+                  {(log.correction || log.kannada_guide || log.pronunciation_tip) && (
+                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                      {log.correction && (
+                        <div className="text-sm">
+                          <strong className="text-red-500 font-black uppercase text-[10px] tracking-wider block mb-1">Correction</strong>
+                          <span className="text-red-700 dark:text-red-400 font-medium">{log.correction}</span>
+                        </div>
+                      )}
+                      {log.kannada_guide && (
+                        <div className="text-sm">
+                          <strong className="text-blue-500 font-black uppercase text-[10px] tracking-wider block mb-1">Guide</strong>
+                          <span className="text-blue-700 dark:text-blue-400">{log.kannada_guide}</span>
+                        </div>
+                      )}
+                      {log.pronunciation_tip && (
+                        <div className="text-sm">
+                          <strong className="text-amber-500 font-black uppercase text-[10px] tracking-wider block mb-1">Pronunciation</strong>
+                          <span className="text-amber-700 dark:text-amber-400">{log.pronunciation_tip}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Audit views remain similar... */}
     </div>
   );
 };

@@ -117,9 +117,10 @@ export async function getAdminAuditLogs(userId: string): Promise<any[]> {
   try {
     const { data, error } = await supabase
       .from('chat_history')
-      .select('*, profiles(full_name)')
+      .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
+
     if (error) throw error;
     return data;
   } catch (err) {
