@@ -243,3 +243,32 @@ export async function fetchUserRecordings(userId: string, lessonId: string) {
   }
   return data || [];
 }
+
+/**
+ * Fetches global aggregation stats for the Admin Dashboard.
+ */
+export async function getGlobalStats(): Promise<{ totalUsers: number, activeLearners: number, totalModules: number, totalLessons: number }> {
+  try {
+    const [
+      { count: usersCount },
+      { count: activeCount },
+      { count: modulesCount },
+      { count: lessonsCount }
+    ] = await Promise.all([
+      supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      supabase.from('user_progress').select('*', { count: 'exact', head: true }).not('currentLevel', 'is', null),
+      supabase.from('modules').select('*', { count: 'exact', head: true }),
+      supabase.from('lessons').select('*', { count: 'exact', head: true })
+    ]);
+
+    return {
+      totalUsers: usersCount || 0,
+      activeLearners: activeCount || 0,
+      totalModules: modulesCount || 0,
+      totalLessons: lessonsCount || 0
+    };
+  } catch (error) {
+    console.error("Global stats error:", error);
+    return { totalUsers: 0, activeLearners: 0, totalModules: 0, totalLessons: 0 };
+  }
+}
