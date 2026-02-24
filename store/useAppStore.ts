@@ -63,7 +63,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             const session = profile ?? (rawSession ? {
                 id: rawSession.user.id,
                 name: rawSession.user.user_metadata?.full_name || 'User',
-                role: rawSession.user.user_metadata?.role || UserRole.USER,
+                role: rawSession.user.user_metadata?.role || UserRole.STUDENT,
                 isLoggedIn: true,
                 isRestricted: false,
             } : null);
@@ -82,7 +82,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                     progress: {
                         currentLevel,
                         completedLessons,
-                        role: session?.role || UserRole.USER,
+                        role: session?.role || UserRole.STUDENT,
                         isPlacementDone: data.is_placement_done,
                     }
                 });

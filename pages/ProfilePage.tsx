@@ -35,7 +35,7 @@ const ProfilePage: React.FC = () => {
         avatarUrl: session.avatar_url || ''
       });
 
-      if (session.role === UserRole.USER) {
+      if (session.role === UserRole.STUDENT) {
         const { data } = await supabase
           .from('user_progress')
           .select('*')
@@ -119,8 +119,8 @@ const ProfilePage: React.FC = () => {
         <button
           onClick={() => setIsEditing(!isEditing)}
           className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md ${isEditing
-              ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+            ? 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+            : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
         >
           {isEditing ? 'Cancel' : 'Edit Profile'}
@@ -139,7 +139,7 @@ const ProfilePage: React.FC = () => {
         <div className="lg:col-span-5">
           <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-700 shadow-xl overflow-hidden relative transition-all group">
             {/* Header Stripe */}
-            <div className={`h-24 w-full ${user.role === UserRole.ADMIN ? 'bg-amber-400' : 'bg-blue-800'} relative`}>
+            <div className={`h-24 w-full ${user.role === UserRole.SUPER_ADMIN || user.role === UserRole.MODERATOR ? 'bg-amber-400' : 'bg-blue-800'} relative`}>
               <div className="absolute top-4 right-6 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-black text-white uppercase tracking-widest">
                 Verified {user.role}
               </div>
@@ -170,7 +170,7 @@ const ProfilePage: React.FC = () => {
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Joined</span>
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-300">JAN 2026</span>
                 </div>
-                {user.role === UserRole.USER && (
+                {user.role === UserRole.STUDENT && (
                   <div className="flex justify-between items-center py-3">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Level</span>
                     <span className="text-xs font-black text-orange-500 uppercase tracking-widest">{progress?.current_level || 'BASIC'}</span>
@@ -243,10 +243,10 @@ const ProfilePage: React.FC = () => {
               {/* Role Specific Stats */}
               <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm">
                 <h4 className="text-sm font-black text-blue-900 dark:text-blue-300 uppercase tracking-widest mb-6 border-b pb-4">
-                  {user.role === UserRole.ADMIN ? 'Platform Insights' : 'Learning Achievements'}
+                  {user.role === UserRole.SUPER_ADMIN || user.role === UserRole.MODERATOR ? 'Platform Insights' : 'Learning Achievements'}
                 </h4>
 
-                {user.role === UserRole.ADMIN ? (
+                {user.role === UserRole.SUPER_ADMIN || user.role === UserRole.MODERATOR ? (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl">
                       <p className="text-[9px] font-black text-amber-700 dark:text-amber-500 uppercase">System Status</p>
@@ -292,7 +292,7 @@ const ProfilePage: React.FC = () => {
               {/* Action Buttons */}
               <div className="grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => navigate(user.role === UserRole.ADMIN ? '/admin' : '/dashboard')}
+                  onClick={() => navigate(user.role === UserRole.SUPER_ADMIN || user.role === UserRole.MODERATOR ? '/admin' : '/dashboard')}
                   className="bg-blue-800 text-white p-6 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-lg hover:bg-blue-900 transition-all flex flex-col items-center gap-3"
                 >
                   <span className="text-2xl">📊</span>

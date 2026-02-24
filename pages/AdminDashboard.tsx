@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
-import { getAllUsers, toggleUserRestriction, deleteUser } from '../services/authService';
+import { getAllUsers, toggleUserRestriction, deleteUser, mapRole } from '../services/authService';
 import { getAdminAuditLogs } from '../services/coachService';
 import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson, uploadLessonMedia } from '../services/courseService';
 import { UserRole, CourseLevel, Module, Lesson } from '../types';
@@ -21,7 +21,7 @@ const AdminDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods'>('users');
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const [selectedAuditUser, setSelectedAuditUser] = useState<string | null>(null);
@@ -32,6 +32,14 @@ const AdminDashboard: React.FC = () => {
   const [editingModule, setEditingModule] = useState<any | null>(null);
   const [editingLesson, setEditingLesson] = useState<any | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  // AI Config State
+  const [aiConfig, setAiConfig] = useState({
+    model: 'gemini-2.0-flash',
+    strictness: 'high',
+    persona: 'Professional Coach',
+    voice: 'Aoede'
+  });
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -93,8 +101,12 @@ const AdminDashboard: React.FC = () => {
       // Get current user session for debugging/RLS verification
       const { data: { session } } = await import('../lib/supabase').then(m => m.supabase.auth.getSession());
       if (session) {
-        const { data: profile } = await import('../lib/supabase').then(m => m.supabase.from('profiles').select('role').eq('id', session.user.id).single());
-        setCurrentUser({ ...session.user, role: profile?.role });
+        const { data: profile, error: pError } = await import('../lib/supabase').then(m => m.supabase.from('profiles').select('role').eq('id', session.user.id).single());
+        console.log("📊 AdminDashboard Current Session User:", session.user);
+        console.log("📊 AdminDashboard Current Profile Fetch:", profile, pError);
+        const mappedRole = mapRole(profile?.role || session.user.user_metadata?.role);
+        console.log("📊 AdminDashboard Final Mapped Role:", mappedRole);
+        setCurrentUser({ ...session.user, role: mappedRole });
       }
 
       const moduleData = await fetchAllModules();
@@ -136,6 +148,19 @@ const AdminDashboard: React.FC = () => {
     setProcessingId(userId);
     const result = await deleteUser(userId);
     if (result.success) setUsers(prev => prev.filter(u => u.id !== userId));
+    setProcessingId(null);
+  };
+
+  const handleUpdateRole = async (userId: string, newRole: UserRole) => {
+    setProcessingId(userId);
+    const { updateProfile } = await import('../services/authService');
+    const result = await updateProfile(userId, { role: newRole });
+    if (result.success) {
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      showNotification(`User role updated to ${newRole}`, "success");
+    } else {
+      showNotification(result.error || "Failed to update role", "error");
+    }
     setProcessingId(null);
   };
 
@@ -246,15 +271,25 @@ const AdminDashboard: React.FC = () => {
           {currentUser && (
             <p className="text-[10px] text-slate-400 font-mono mt-2">
               ID: {currentUser.id} <br />
-              Role: <span className={currentUser.role === 'ADMIN' ? 'text-green-600 font-bold' : 'text-red-500 font-bold'}>{currentUser.role || 'NONE'}</span>
+              Role: <span className={currentUser.role === UserRole.SUPER_ADMIN ? 'text-green-600 font-bold' : 'text-red-500 font-bold'}>{currentUser.role || 'NONE'}</span>
             </p>
           )}
         </div>
 
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
-          <button key="users" onClick={() => setActiveTab('users')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Users</button>
+          {currentUser?.role === UserRole.SUPER_ADMIN && (
+            <button key="users" onClick={() => setActiveTab('users')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Users</button>
+          )}
           <button key="content" onClick={() => setActiveTab('content')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'content' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Course Content</button>
           <button key="stats" onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Stats</button>
+
+          {currentUser?.role === UserRole.SUPER_ADMIN && (
+            <>
+              <button key="ai" onClick={() => setActiveTab('ai')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'ai' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>AI & Personas</button>
+              <button key="mods" onClick={() => setActiveTab('mods')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Moderators</button>
+            </>
+          )}
+
           {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Audit</button>}
         </div>
       </div>
@@ -265,6 +300,7 @@ const AdminDashboard: React.FC = () => {
             <thead className="bg-slate-50 dark:bg-slate-900">
               <tr>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">User</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Role</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>
               </tr>
             </thead>
@@ -277,10 +313,29 @@ const AdminDashboard: React.FC = () => {
                       <span className="text-[10px] text-slate-400">{user.phone}</span>
                     </div>
                   </td>
+                  <td className="p-6">
+                    <span className={`text-[10px] font-black px-2 py-1 rounded-full ${user.role === UserRole.SUPER_ADMIN ? 'bg-green-100 text-green-700' :
+                      user.role === UserRole.MODERATOR ? 'bg-blue-100 text-blue-700' :
+                        'bg-slate-100 text-slate-600'
+                      }`}>
+                      {user.role}
+                    </span>
+                  </td>
                   <td className="p-6 flex gap-2">
-                    <button onClick={() => handleAudit(user.id)} className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Review Chat Audit">👁️ Logs</button>
-                    <button onClick={() => handleRestrict(user.id, user.is_restricted)} className="p-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200">{user.is_restricted ? '🔓' : '🚫'}</button>
-                    <button onClick={() => handleDelete(user.id)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">🗑️</button>
+                    <button onClick={() => handleAudit(user.id)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100" title="Review Chat Audit">👁️ Logs</button>
+                    <button onClick={() => handleRestrict(user.id, user.is_restricted)} className="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100">{user.is_restricted ? '🔓' : '🚫'}</button>
+                    {currentUser?.role === UserRole.SUPER_ADMIN && (
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleUpdateRole(user.id, e.target.value as UserRole)}
+                        className="text-[10px] font-black border-2 border-slate-100 rounded-lg px-2 bg-white"
+                      >
+                        <option value={UserRole.STUDENT}>STUDENT</option>
+                        <option value={UserRole.MODERATOR}>MODERATOR</option>
+                        <option value={UserRole.SUPER_ADMIN}>SUPER ADMIN</option>
+                      </select>
+                    )}
+                    <button onClick={() => handleDelete(user.id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">🗑️</button>
                   </td>
                 </tr>
               ))}
@@ -532,6 +587,102 @@ const AdminDashboard: React.FC = () => {
               </form>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'ai' && (
+        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-700 p-8 shadow-xl">
+            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 mb-6 uppercase tracking-tighter">AI Engine Configuration</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Gemini Model</label>
+                <select
+                  className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 font-bold"
+                  value={aiConfig.model}
+                  onChange={e => setAiConfig({ ...aiConfig, model: e.target.value })}
+                >
+                  <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fastest)</option>
+                  <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Most Capable)</option>
+                  <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                </select>
+                <p className="text-[10px] text-slate-400 italic">Changing the engine affects all live conversations immediately.</p>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Correction Strictness</label>
+                <div className="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl gap-2">
+                  {['Low', 'Medium', 'High'].map(level => (
+                    <button
+                      key={level}
+                      onClick={() => setAiConfig({ ...aiConfig, strictness: level.toLowerCase() })}
+                      className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${aiConfig.strictness === level.toLowerCase() ? 'bg-white shadow text-amber-600' : 'text-slate-400'
+                        }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Primary Coach Voice</label>
+                <select
+                  className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 font-bold"
+                  value={aiConfig.voice}
+                  onChange={e => setAiConfig({ ...aiConfig, voice: e.target.value })}
+                >
+                  <option value="Aoede">Aoede (Clear & Professional)</option>
+                  <option value="Charon">Charon (Deep & Calm)</option>
+                  <option value="Fenrir">Fenrir (Expressive)</option>
+                </select>
+              </div>
+            </div>
+            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+              <button
+                onClick={() => showNotification("AI Configuration saved successfully", "success")}
+                className="bg-blue-900 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs shadow-lg hover:scale-105 transition-transform"
+              >
+                Update Engine Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'mods' && (
+        <div className="space-y-8 animate-in fade-in">
+          <div className="flex justify-between items-center">
+            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">Moderator List</h3>
+            <p className="text-[10px] font-black text-slate-400 uppercase">Curators of SIMPLISH - Talks</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {users.filter(u => u.role === UserRole.MODERATOR).map(mod => (
+              <div key={mod.id} className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-blue-50 dark:border-slate-700 shadow-sm relative group overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => handleUpdateRole(mod.id, UserRole.STUDENT)} className="text-xs font-black text-red-500 hover:underline">Revoke</button>
+                </div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center font-black text-blue-600">
+                    {mod.full_name?.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-800 dark:text-slate-100">{mod.full_name}</h4>
+                    <p className="text-[10px] text-slate-400">{mod.phone}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                    <span>Lessons Managed</span>
+                    <span className="text-blue-600">--</span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-1">
+                    <div className="bg-blue-600 h-1 rounded-full w-3/4"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

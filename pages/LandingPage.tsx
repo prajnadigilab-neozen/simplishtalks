@@ -18,7 +18,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
   const handleCTA = () => {
     if (!isLoggedIn) {
       navigate('/placement');
-    } else if (session.role === UserRole.ADMIN) {
+    } else if (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR) {
       navigate('/admin');
     } else {
       navigate('/dashboard');
@@ -28,19 +28,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
   return (
     <div className="relative min-h-full w-full bg-white dark:bg-slate-900 flex flex-col transition-colors duration-300">
       {/* High Contrast Header Section */}
-      <div className="bg-blue-900 dark:bg-slate-950 w-full pt-10 md:pt-16 pb-20 md:pb-24 px-4 md:px-16 text-center flex flex-col items-center border-b-4 md:border-b-8 border-amber-400">
-        <div className="mb-6 md:mb-8 transform hover:scale-105 transition-transform duration-300">
-          <Logo className="w-40 h-40 md:w-64 md:h-64" />
+      <div className="bg-blue-900 dark:bg-slate-950 w-full pt-12 md:pt-20 pb-24 md:pb-32 px-4 md:px-16 text-center flex flex-col items-center border-b-4 md:border-b-8 border-amber-400">
+        <div className="transform hover:scale-105 transition-transform duration-500 drop-shadow-2xl">
+          <Logo className="w-48 h-48 md:w-80 md:h-80" />
         </div>
-
-        <h2 className="text-3xl md:text-7xl text-white tracking-tighter mb-2">
-          <span className="font-black">SIMPLISH</span>
-          <span className="text-amber-400 font-normal"> - </span>
-          <span className="text-amber-400 font-cursive text-5xl md:text-8xl block md:inline">Talks</span>
-        </h2>
-        <p className="text-amber-400/80 font-bold text-sm md:text-2xl uppercase tracking-[0.2em] md:tracking-[0.3em]">
-          {t({ en: 'Listen • Learn • Speak', kn: 'ಕೇಳಿ • ಕಲಿಯಿರಿ • ಮಾತನಾಡಿ' })}
-        </p>
       </div>
 
       {/* Main Action Section - Centered Card */}
@@ -57,7 +48,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
             className="w-full bg-orange-500 text-white py-5 md:py-8 rounded-2xl md:rounded-3xl font-black text-lg md:text-3xl uppercase tracking-widest hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl mb-4 md:mb-6 border-b-4 md:border-b-8 border-orange-700 flex items-center justify-center gap-2 md:gap-4"
           >
             {isLoggedIn
-              ? (session.role === UserRole.ADMIN ? 'Admin Panel' : 'Continue Learning')
+              ? (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR ? 'Admin Panel' : 'Continue Learning')
               : t(TRANSLATIONS.startLearning)}
             <span className="text-xl md:text-3xl">➔</span>
           </button>

@@ -11,13 +11,13 @@ const SettingsPage: React.FC = () => {
   const { t, lang, toggleLang } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [progress, setProgress] = useState<any>(null);
   const [adminStats, setAdminStats] = useState({ totalUsers: 0, completions: 0 });
-  
+
   const [formData, setFormData] = useState({
     fullName: '',
     place: '',
@@ -31,7 +31,7 @@ const SettingsPage: React.FC = () => {
       try {
         const session = await getUserSession();
         if (!mounted) return;
-        
+
         if (!session) {
           navigate('/login');
           return;
@@ -43,19 +43,19 @@ const SettingsPage: React.FC = () => {
           avatarUrl: session.avatar_url || ''
         });
 
-        if (session.role === UserRole.USER) {
+        if (session.role === UserRole.STUDENT) {
           const { data } = await supabase
             .from('user_progress')
             .select('*')
             .eq('user_id', session.id)
             .single();
           if (mounted) setProgress(data);
-        } else if (session.role === UserRole.ADMIN) {
+        } else if (session.role === UserRole.SUPER_ADMIN) {
           const users = await getAllUsers();
           if (mounted) {
             setAdminStats({
               totalUsers: users.length,
-              completions: users.filter(u => u.role === UserRole.USER).length
+              completions: users.filter(u => u.role === UserRole.STUDENT).length
             });
           }
         }
@@ -87,7 +87,7 @@ const SettingsPage: React.FC = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    
+
     setSaving(true);
     setMessage({ type: '', text: '' });
 
@@ -98,9 +98,9 @@ const SettingsPage: React.FC = () => {
     });
 
     if (result.success) {
-      setMessage({ 
-        type: result.error ? 'warning' : 'success', 
-        text: result.error || t({ en: 'Profile updated successfully!', kn: 'ಪ್ರೊಫೈಲ್ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ!' }) 
+      setMessage({
+        type: result.error ? 'warning' : 'success',
+        text: result.error || t({ en: 'Profile updated successfully!', kn: 'ಪ್ರೊಫೈಲ್ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ!' })
       });
     } else {
       setMessage({ type: 'error', text: result.error || 'Update failed' });
@@ -111,9 +111,9 @@ const SettingsPage: React.FC = () => {
   const handleDeleteAccount = async () => {
     if (!user) return;
     const confirmed = window.confirm(
-      t({ 
-        en: "Are you sure you want to delete your account? All your progress will be lost permanently.", 
-        kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ? ನಿಮ್ಮ ಎಲ್ಲಾ ಪ್ರಗತಿಯು ಶಾಶ್ವತವಾಗಿ ಕಳೆದುಹೋಗುತ್ತದೆ." 
+      t({
+        en: "Are you sure you want to delete your account? All your progress will be lost permanently.",
+        kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿದ್ದೀರಾ? ನಿಮ್ಮ ಎಲ್ಲಾ ಪ್ರಗತಿಯು ಶಾಶ್ವತವಾಗಿ ಕಳೆದುಹೋಗುತ್ತದೆ."
       })
     );
 
@@ -144,7 +144,7 @@ const SettingsPage: React.FC = () => {
           </h2>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.4em] mt-2">Personalize your Simplish journey</p>
         </div>
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all dark:text-slate-300"
         >
@@ -153,11 +153,10 @@ const SettingsPage: React.FC = () => {
       </div>
 
       {message.text && (
-        <div className={`mb-8 p-5 rounded-2xl font-bold text-sm flex items-center gap-3 animate-in slide-in-from-top-4 ${
-          message.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100' : 
-          message.type === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100' :
-          'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100'
-        }`}>
+        <div className={`mb-8 p-5 rounded-2xl font-bold text-sm flex items-center gap-3 animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100' :
+            message.type === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100' :
+              'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100'
+          }`}>
           {message.type === 'success' ? '✅' : message.type === 'warning' ? 'ℹ️' : '⚠️'} {message.text}
         </div>
       )}
@@ -182,7 +181,7 @@ const SettingsPage: React.FC = () => {
             </div>
             <h3 className="mt-6 text-2xl font-black text-slate-800 dark:text-slate-100">{formData.fullName || 'New Learner'}</h3>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{user?.phone || 'No Phone'}</p>
-            
+
             <div className="w-full mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 space-y-4">
               <button onClick={toggleTheme} className="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-400 transition-all group">
                 <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Dark Mode</span>
@@ -196,7 +195,7 @@ const SettingsPage: React.FC = () => {
           </div>
 
           <div className="bg-blue-600 p-8 rounded-[3rem] text-white shadow-xl shadow-blue-500/20">
-            {user?.role === UserRole.ADMIN ? (
+            {user?.role === UserRole.SUPER_ADMIN ? (
               <>
                 <h4 className="font-black uppercase tracking-[0.2em] text-xs opacity-70 mb-6">Platform Overview</h4>
                 <div className="grid grid-cols-1 gap-6">
@@ -245,15 +244,15 @@ const SettingsPage: React.FC = () => {
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Keep your details updated</p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-4">
                 <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Full Name', kn: 'ಪೂರ್ಣ ಹೆಸರು' })}</label>
-                <input type="text" className="w-full p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 shadow-sm" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
+                <input type="text" className="w-full p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 shadow-sm" value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
               </div>
               <div className="space-y-4">
                 <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Village / City', kn: 'ಊರು / ನಗರ' })}</label>
-                <input type="text" className="w-full p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 shadow-sm" value={formData.place} onChange={e => setFormData({...formData, place: e.target.value})} />
+                <input type="text" className="w-full p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 shadow-sm" value={formData.place} onChange={e => setFormData({ ...formData, place: e.target.value })} />
               </div>
             </div>
 
@@ -273,12 +272,12 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
             <p className="text-sm text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">
-              {t({ 
-                en: "Deleting your account will remove all your data, progress, and profile information from Simplish permanently.", 
-                kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ಎಲ್ಲಾ ಡೇಟಾ, ಪ್ರಗತಿ ಮತ್ತು ಪ್ರೊಫೈಲ್ ಮಾಹಿತಿಯನ್ನು ಸಿಂಪ್ಲಿಷ್‌ನಿಂದ ಶಾಶ್ವತವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ." 
+              {t({
+                en: "Deleting your account will remove all your data, progress, and profile information from Simplish permanently.",
+                kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ಎಲ್ಲಾ ಡೇಟಾ, ಪ್ರಗತಿ ಮತ್ತು ಪ್ರೊಫೈಲ್ ಮಾಹಿತಿಯನ್ನು ಸಿಂಪ್ಲಿಷ್‌ನಿಂದ ಶಾಶ್ವತವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ."
               })}
             </p>
-            <button 
+            <button
               onClick={handleDeleteAccount}
               disabled={saving}
               className="px-8 py-4 bg-white dark:bg-slate-900 border-2 border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-red-600 hover:text-white transition-all shadow-md active:scale-95 disabled:opacity-50"

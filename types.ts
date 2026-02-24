@@ -2,8 +2,9 @@
 export type Language = 'en' | 'kn';
 
 export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN'
+  STUDENT = 'STUDENT',
+  MODERATOR = 'MODERATOR',
+  SUPER_ADMIN = 'SUPER_ADMIN'
 }
 
 export enum LevelStatus {

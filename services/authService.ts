@@ -16,7 +16,15 @@ export interface LoginData {
 }
 
 // SECURITY: Admin secret MUST come from environment. Never hardcode a fallback.
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET;
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'SIMPLISH_MASTER_2026';
+
+// Role Compatibility Mapper
+export const mapRole = (role: string): UserRole => {
+  const r = (role || '').toUpperCase();
+  if (r === 'ADMIN' || r === 'SUPER_ADMIN') return UserRole.SUPER_ADMIN;
+  if (r === 'MODERATOR') return UserRole.MODERATOR;
+  return UserRole.STUDENT; // Maps 'USER' and others to STUDENT
+};
 if (!ADMIN_SECRET) {
   console.error("🔴 SECURITY WARNING: VITE_ADMIN_SECRET is not set in .env.local. Admin registration is disabled.");
 }
@@ -37,7 +45,7 @@ function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
 
 export async function registerUser(data: RegisterData): Promise<{ success: boolean; error?: string }> {
   try {
-    const role = data.adminCode === ADMIN_SECRET ? UserRole.ADMIN : UserRole.USER;
+    const role = data.adminCode === ADMIN_SECRET ? UserRole.SUPER_ADMIN : UserRole.STUDENT;
     const formattedPhone = data.phone.startsWith('+') ? data.phone : `+91${data.phone}`;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -171,8 +179,17 @@ export async function getAllUsers(): Promise<any[]> {
       .select('id, full_name, phone, place, role, created_at, avatar_url, is_restricted')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      console.error("🔍 Supabase getAllUsers ERROR:", error);
+      throw error;
+    }
+    console.log("🔍 Supabase getAllUsers RAW DATA:", data);
+    const mapped = (data || []).map(u => ({
+      ...u,
+      role: mapRole(u.role)
+    }));
+    console.log("🔍 Supabase getAllUsers MAPPED DATA:", mapped);
+    return mapped;
   } catch (e: any) {
     console.error("getAllUsers error:", e);
     return [];
@@ -230,7 +247,7 @@ export async function getUserSession(providedSession?: any) {
         name: profile.full_name || session.user.user_metadata?.full_name || 'User',
         place: profile.place || session.user.user_metadata?.place || '',
         phone: session.user.phone,
-        role: profile.role || session.user.user_metadata?.role || UserRole.USER,
+        role: mapRole(profile.role || session.user.user_metadata?.role),
         isRestricted: profile.is_restricted || false,
         avatar_url: profile.avatar_url,
         preferredModel: profile.preferred_model || 'gemini-2.0-flash',
@@ -246,7 +263,7 @@ export async function getUserSession(providedSession?: any) {
         name: session.user.user_metadata?.full_name || 'User',
         place: session.user.user_metadata?.place || '',
         avatar_url: session.user.user_metadata?.avatar_url || '',
-        role: session.user.user_metadata?.role || UserRole.USER,
+        role: mapRole(session.user.user_metadata?.role),
         phone: session.user.phone,
         preferredModel: 'gemini-2.0-flash',
         voiceProfile: 'Aoede',

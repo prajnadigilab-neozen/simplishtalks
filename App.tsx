@@ -6,7 +6,7 @@ import { ThemeProvider, useTheme } from './components/ThemeContext';
 import { TRANSLATIONS, INITIAL_MODULES, LEVEL_ORDER } from './constants';
 import { CourseLevel, UserProgress, LevelStatus, Module, UserRole } from './types';
 import { supabase } from './lib/supabase';
-import { signOutUser } from './services/authService';
+import { signOutUser, mapRole } from './services/authService';
 import { fetchAllModules } from './services/courseService';
 import LandingPage from './pages/LandingPage';
 import PlacementTest from './pages/PlacementTest';
@@ -32,7 +32,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isLanding = location.pathname === '/';
-  const userRole = session?.role || UserRole.USER;
+  const userRole = session?.role || UserRole.STUDENT;
   const isLoggedIn = !!session;
 
   return (
@@ -54,7 +54,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
           <NavButton to="/" label={t({ en: 'Home', kn: 'ಮುಖಪುಟ' })} active={location.pathname === '/'} light={isLanding} />
           {isLoggedIn && !session.isRestricted && (
             <>
-              {userRole === UserRole.ADMIN ? (
+              {userRole === UserRole.SUPER_ADMIN || userRole === UserRole.MODERATOR ? (
                 <NavButton to="/admin" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/admin'} light={isLanding} />
               ) : (
                 <NavButton to="/dashboard" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} active={location.pathname === '/dashboard'} light={isLanding} />
@@ -190,7 +190,7 @@ const AppContent: React.FC = () => {
           setSession({
             id: user.id,
             name: user.user_metadata?.full_name || 'User',
-            role: user.user_metadata?.role || UserRole.USER,
+            role: mapRole(user.user_metadata?.role),
             phone: user.phone,
             place: user.user_metadata?.place || '',
             isLoggedIn: true,
@@ -277,7 +277,7 @@ const AppContent: React.FC = () => {
             <Route path="/lesson/:id" element={session ? <ErrorBoundary><LessonView /></ErrorBoundary> : <Navigate to="/login" />} />
             <Route path="/coachchat" element={session ? <ErrorBoundary><CoachChat /></ErrorBoundary> : <Navigate to="/login" />} />
             <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
-            <Route path="/admin" element={session?.role === UserRole.ADMIN ? <ErrorBoundary><AdminDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+            <Route path="/admin" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         )}
@@ -286,7 +286,7 @@ const AppContent: React.FC = () => {
       {session && !session.isRestricted && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t-2 border-slate-100 dark:border-slate-800 flex justify-around items-center px-2 py-4 shadow-[0_-5px_20px_rgba(0,0,0,0.08)]">
           <MobileNavItem icon="🏠" label={t({ en: 'Home', kn: 'ಮುಖಪುಟ' })} to="/" />
-          {session?.role === UserRole.ADMIN ? (
+          {session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? (
             <>
               <MobileNavItem icon="🛡️" label={t({ en: 'Admin', kn: 'ಅಡ್ಮಿನ್' })} to="/admin" />
               <MobileNavItem icon="⚙️" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} to="/settings" />
