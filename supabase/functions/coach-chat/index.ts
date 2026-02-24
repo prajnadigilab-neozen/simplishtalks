@@ -101,10 +101,10 @@ Deno.serve(async (req) => {
         console.error('coach-chat error:', err);
         return new Response(
             JSON.stringify({
-                replyEn: "I'm sorry, I'm having trouble connecting right now. Please try again.",
+                replyEn: `EDGE ERROR: ${err.message}`,
                 kannadaGuide: 'ಕ್ಷಮಿಸಿ, ಸಂಪರ್ಕಿಸಲು ತೊಂದರೆಯಾಗುತ್ತಿದೆ.',
             }),
-            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
     }
 });

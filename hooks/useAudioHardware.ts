@@ -51,6 +51,9 @@ export function useAudioHardware(): UseAudioHardwareReturn {
         const outCtx = getCtxOut();
         if (outCtx.state === 'suspended') await outCtx.resume();
 
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error("Microphone access is not supported in this browser or context (likely an insecure connection). Please use localhost or HTTPS.");
+        }
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         streamRef.current = stream;
 

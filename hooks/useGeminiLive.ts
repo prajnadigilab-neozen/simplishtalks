@@ -109,12 +109,13 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                         }
 
                         // ── Transcriptions ──
+                        const sanitize = (t: string) => t.replace(/<ctrl\d+>/g, '');
                         if (message.serverContent?.outputTranscription) {
-                            const chunk = message.serverContent.outputTranscription.text;
+                            const chunk = sanitize(message.serverContent.outputTranscription.text);
                             outputBuf.current += chunk;
                             callbacks.onTranscription('output', chunk);
                         } else if (message.serverContent?.inputTranscription) {
-                            const chunk = message.serverContent.inputTranscription.text;
+                            const chunk = sanitize(message.serverContent.inputTranscription.text);
                             inputBuf.current += chunk;
                             callbacks.onTranscription('input', chunk);
                         }

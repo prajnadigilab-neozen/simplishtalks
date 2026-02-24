@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { getAllUsers, toggleUserRestriction, deleteUser, mapRole } from '../services/authService';
-import { getAdminAuditLogs } from '../services/coachService';
+import { getAdminAuditLogs, getAllUserUsage, getUserUsageLogs, getPlatformReports } from '../services/coachService';
 import { fetchAllModules, saveModule, deleteModule, saveLesson, deleteLesson, uploadLessonMedia, getGlobalStats } from '../services/courseService';
 import { UserRole, CourseLevel, Module, Lesson } from '../types';
 import { useAppStore } from '../store/useAppStore';
@@ -21,11 +21,15 @@ const AdminDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports'>('users');
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [usageData, setUsageData] = useState<any[]>([]);
+  const [reportsData, setReportsData] = useState<any[]>([]);
 
   const [selectedAuditUser, setSelectedAuditUser] = useState<string | null>(null);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [selectedUsageUser, setSelectedUsageUser] = useState<string | null>(null);
+  const [usageLogs, setUsageLogs] = useState<any[]>([]);
 
   // Content Management State
   const [modules, setModules] = useState<Module[]>([]);
@@ -116,6 +120,12 @@ const AdminDashboard: React.FC = () => {
       const stats = await getGlobalStats();
       setGlobalStats(stats);
 
+      const usage = await getAllUserUsage();
+      setUsageData(usage);
+
+      const reports = await getPlatformReports();
+      setReportsData(reports);
+
     } catch (err: any) {
       setError(err.message || "Could not connect to the database.");
     } finally {
@@ -133,6 +143,15 @@ const AdminDashboard: React.FC = () => {
     const logs = await getAdminAuditLogs(userId);
     setAuditLogs(logs);
     setActiveTab('audit');
+    setProcessingId(null);
+  };
+
+  const handleUsageLogs = async (userId: string) => {
+    setProcessingId(userId);
+    setSelectedUsageUser(userId);
+    const logs = await getUserUsageLogs(userId);
+    setUsageLogs(logs);
+    setActiveTab('usage_history');
     setProcessingId(null);
   };
 
@@ -286,7 +305,8 @@ const AdminDashboard: React.FC = () => {
             <button key="users" onClick={() => setActiveTab('users')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Users</button>
           )}
           <button key="content" onClick={() => setActiveTab('content')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'content' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Course Content</button>
-          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Stats</button>
+          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>General Stats</button>
+          <button key="reports" onClick={() => setActiveTab('reports')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Reports</button>
 
           {currentUser?.role === UserRole.SUPER_ADMIN && (
             <>
@@ -306,6 +326,8 @@ const AdminDashboard: React.FC = () => {
               <tr>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">User</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Role</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Voice Usage</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Chat Usage</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>
               </tr>
             </thead>
@@ -323,11 +345,44 @@ const AdminDashboard: React.FC = () => {
                       user.role === UserRole.MODERATOR ? 'bg-blue-100 text-blue-700' :
                         'bg-slate-100 text-slate-600'
                       }`}>
-                      {user.role}
                     </span>
                   </td>
+                  <td className="p-6">
+                    {(() => {
+                      const usage = usageData.find(u => u.user_id === user.id);
+                      const seconds = usage?.voice_seconds_total || 0;
+                      const mins = Math.floor(seconds / 60);
+                      const secs = seconds % 60;
+                      const isOver = seconds >= 180;
+                      return (
+                        <div className="flex flex-col">
+                          <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-blue-600'}`}>
+                            {mins}:{secs.toString().padStart(2, '0')} / 3:00
+                          </span>
+                          <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
+                            {usage?.chat_tokens_total || 0} tokens used
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </td>
+                  <td className="p-6">
+                    {(() => {
+                      const usage = usageData.find(u => u.user_id === user.id);
+                      const msgs = usage?.chat_messages_total || 0;
+                      const isOver = msgs >= 50;
+                      return (
+                        <div className="flex flex-col">
+                          <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-purple-600'}`}>
+                            {msgs} / 50 msgs
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td className="p-6 flex gap-2">
-                    <button onClick={() => handleAudit(user.id)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100" title="Review Chat Audit">👁️ Logs</button>
+                    <button onClick={() => handleAudit(user.id)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100" title="Review Chat Audit">👁️ Chat</button>
+                    <button onClick={() => handleUsageLogs(user.id)} className="p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100" title="View Usage History">📊 Usage</button>
                     <button onClick={() => handleRestrict(user.id, user.is_restricted)} className="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100">{user.is_restricted ? '🔓' : '🚫'}</button>
                     {currentUser?.role === UserRole.SUPER_ADMIN && (
                       <select
@@ -777,6 +832,30 @@ const AdminDashboard: React.FC = () => {
               ></div>
             </div>
           </div>
+
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-xl">
+            <h4 className="text-xl font-black text-blue-900 dark:text-blue-400 mb-6 uppercase tracking-tighter">Usage Insights</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Total Voice Time</p>
+                <p className="text-3xl font-black text-blue-800 dark:text-blue-300">
+                  {Math.floor(usageData.reduce((acc, curr) => acc + (curr.voice_seconds_total || 0), 0) / 60)}m {usageData.reduce((acc, curr) => acc + (curr.voice_seconds_total || 0), 0) % 60}s
+                </p>
+              </div>
+              <div className="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-2xl">
+                <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">Total AI Tokens</p>
+                <p className="text-3xl font-black text-purple-800 dark:text-purple-300">
+                  {usageData.reduce((acc, curr) => acc + (curr.chat_tokens_total || 0), 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="p-6 bg-orange-50 dark:bg-orange-900/20 rounded-2xl">
+                <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">Total Chat Messages</p>
+                <p className="text-3xl font-black text-orange-800 dark:text-orange-300">
+                  {usageData.reduce((acc, curr) => acc + (curr.chat_messages_total || 0), 0).toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -871,6 +950,136 @@ const AdminDashboard: React.FC = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'usage_history' && (
+        <div className="space-y-6 animate-in fade-in">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div>
+              <h3 className="text-2xl font-black text-purple-900 dark:text-purple-300">
+                Detailed Usage History
+              </h3>
+              {selectedUsageUser && users.find(u => u.id === selectedUsageUser) && (
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    {users.find(u => u.id === selectedUsageUser)?.full_name}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    ({users.find(u => u.id === selectedUsageUser)?.phone})
+                  </span>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                setActiveTab('users');
+                setSelectedUsageUser(null);
+                setUsageLogs([]);
+              }}
+              className="px-4 py-2 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 rounded-xl text-xs font-black uppercase hover:bg-slate-200 transition-colors"
+            >
+              Back to Users
+            </button>
+          </div>
+
+          {!selectedUsageUser ? (
+            <div className="p-8 text-center text-slate-400 font-bold bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700">
+              Please select a user from the Users tab to view their usage history.
+            </div>
+          ) : usageLogs.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 font-bold bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700">
+              No usage logs found for this user.
+            </div>
+          ) : (
+            <div className="overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 shadow-xl">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 dark:bg-slate-800/50">
+                  <tr>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Date & Time</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Type</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount / Duration</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Tokens</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {usageLogs.map((log: any, idx: number) => (
+                    <tr key={log.id || idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td className="p-6 font-mono text-xs text-slate-500">
+                        {new Date(log.created_at).toLocaleString()}
+                      </td>
+                      <td className="p-6">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${log.event_type === 'voice'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                          }`}>
+                          {log.event_type}
+                        </span>
+                      </td>
+                      <td className="p-6 font-bold text-slate-700 dark:text-slate-300">
+                        {log.event_type === 'voice'
+                          ? `${Math.floor(log.amount / 60)}m ${log.amount % 60}s`
+                          : `${log.amount} messages`}
+                      </td>
+                      <td className="p-6 text-slate-400 text-xs text-right whitespace-nowrap">
+                        {log.tokens?.toLocaleString()} tokens
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'reports' && (
+        <div className="space-y-6 animate-in fade-in">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div>
+              <h3 className="text-2xl font-black text-orange-900 dark:text-orange-300">Platform Reports</h3>
+              <p className="text-sm text-slate-500">Daily performance metrics and user activity trends.</p>
+            </div>
+          </div>
+
+          <div className="overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 shadow-xl">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 dark:bg-slate-800/50">
+                <tr>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Date</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Reg. Users</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Active</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Voice Usage</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Chat Msgs</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Deleted</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {reportsData.map((report: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="p-6 font-bold text-slate-700 dark:text-slate-300">
+                      {new Date(report.report_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="p-6 text-blue-600 font-black">
+                      +{report.registered_count}
+                    </td>
+                    <td className="p-6 text-slate-600">
+                      {report.active_count} users
+                    </td>
+                    <td className="p-6 text-slate-600">
+                      {Math.floor(report.voice_seconds / 60)}m {report.voice_seconds % 60}s
+                    </td>
+                    <td className="p-6 text-slate-600">
+                      {report.chat_messages} Msgs
+                    </td>
+                    <td className="p-6 text-red-500 font-bold">
+                      {report.deleted_count > 0 ? `-${report.deleted_count}` : '0'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

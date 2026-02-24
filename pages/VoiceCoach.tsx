@@ -5,7 +5,7 @@ import { useLanguage } from '../components/LanguageContext';
 import { TRANSLATIONS } from '../constants';
 import { CoachMessage } from '../types';
 import { useAppStore } from '../store/useAppStore';
-import { getChatHistory, saveChatMessage, clearUserChatHistory, deleteChatMessage } from '../services/coachService';
+import { getChatHistory, saveChatMessage, clearUserChatHistory, deleteChatMessage, getUserUsage, updateUserUsage } from '../services/coachService';
 import { textToSpeech, getTTSQuotaStatus } from '../services/geminiService';
 import { playPCM } from '../utils/audioUtils';
 import { useGeminiLive, FeedbackData } from '../hooks/useGeminiLive';
@@ -28,6 +28,11 @@ const VoiceCoach: React.FC = () => {
   // ── Phase 2: Streaming Transcription ──
   const [pendingUserText, setPendingUserText] = useState('');
   const [pendingCoachText, setPendingCoachText] = useState('');
+
+  // ── Quota Management ──
+  const [totalVoiceSeconds, setTotalVoiceSeconds] = useState(0);
+  const sessionStartTimeRef = useRef<number | null>(null);
+  const QUOTA_SECONDS = 180; // 3 minutes
 
   // ── Hooks ──
   const audio = useAudioHardware();
@@ -53,7 +58,7 @@ const VoiceCoach: React.FC = () => {
 
     if (userText) {
       const userMsg: CoachMessage = { role: 'user', text: userText, timestamp: Date.now() };
-      const dbId = await saveChatMessage(userId, userMsg);
+      const dbId = await saveChatMessage(userId, userMsg, undefined, 'voice');
       if (dbId) userMsg.dbId = dbId;
       setMessages(prev => [...prev, userMsg]);
     }
@@ -67,7 +72,7 @@ const VoiceCoach: React.FC = () => {
         pronunciationTip: feedback.pronunciationTip,
         timestamp: Date.now(),
       };
-      const dbId = await saveChatMessage(userId, coachMsg);
+      const dbId = await saveChatMessage(userId, coachMsg, undefined, 'voice');
       if (dbId) coachMsg.dbId = dbId;
       setMessages(prev => [...prev, coachMsg]);
     }
@@ -84,8 +89,13 @@ const VoiceCoach: React.FC = () => {
     const loadData = async () => {
       setLoadingHistory(true);
       if (userId) {
-        const history = await getChatHistory(userId);
+        // Fetch history and usage in parallel
+        const [history, usage] = await Promise.all([
+          getChatHistory(userId, undefined, 'voice'),
+          getUserUsage(userId)
+        ]);
         setMessages(history);
+        setTotalVoiceSeconds(usage.voice_seconds_total || 0);
       }
       setLoadingHistory(false);
     };
@@ -107,20 +117,28 @@ const VoiceCoach: React.FC = () => {
 
   // ── Actions ──
   const handleStartSession = async () => {
+    if (totalVoiceSeconds >= QUOTA_SECONDS) return;
+
+    sessionStartTimeRef.current = Date.now();
     const userPrefs = session;
     const customFocus = userPrefs?.systemPromptFocus || "You are a patient English tutor for Kannada-speaking students. Always explain complex concepts in Kannada first.";
     const lastContext = messages.slice(-5).map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.text}`).join('\n');
 
     const baseInstruction = `
-      ${customFocus}
+      Persona: You are "Namma Simplish Meshtru" (Our English Teacher), a patient and encouraging bilingual tutor for rural students in Karnataka.
       
-      General Rules:
-      - Keep conversations simple and natural.
-      - If the user makes a significant mistake or mispronounces a word, call the 'provide_feedback' tool to provide correction and help.
+      CRITICAL RULES:
+      1. STRICT LANGUAGE BOUNDARY: NEVER INCLUDE ANY OTHER LANGUAGE APART FROM KANNADA AND ENGLISH. Strictly avoid Hindi, Telugu, or Tamil.
+      2. MANDATORY TRANSLATION: For EVERY English sentence you speak or write, you MUST provide the Kannada translation in brackets (...) immediately following it.
       
-      Help Guidelines (kannada_guide):
-      Use this format: [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-      Example: ನಿಮ್ಮದು ಯಾವ ಊರು? (Nimmadu yaava ooru?)\nWhich is your hometown?
+      Core Mission: Help students speak English confidently by explaining concepts in Kannada first.
+      
+      Operational Rules:
+      - Use "Kanglish" (Kannada + English) to bridge the gap.
+      - Use rural examples (farming, local festivals, village markets).
+      - Gently correct pronunciation and ask them to try again.
+      - Celebrate wins with "Sakkath!" or "Thumbane olleyadu!".
+      - If the user makes a mistake, call the 'provide_feedback' tool.
     `;
 
     const finalInstruction = lastContext
@@ -133,10 +151,19 @@ const VoiceCoach: React.FC = () => {
     await audio.startMic((pcmBytes) => gemini.sendPcmData(pcmBytes));
   };
 
-  const handleEndSession = () => {
+  const handleEndSession = async () => {
     gemini.disconnect();
     audio.stopMic();
     audio.stopAllAudio();
+
+    if (sessionStartTimeRef.current) {
+      const elapsed = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+      if (elapsed > 0) {
+        await updateUserUsage(userId!, elapsed, 0);
+        setTotalVoiceSeconds(prev => prev + elapsed);
+      }
+      sessionStartTimeRef.current = null;
+    }
   };
 
   const handleCancel = () => {
@@ -148,7 +175,7 @@ const VoiceCoach: React.FC = () => {
     if (!userId) return;
     if (!clearConfirm) { setClearConfirm(true); return; }
     setClearConfirm(false);
-    await clearUserChatHistory(userId);
+    await clearUserChatHistory(userId, undefined, 'voice');
     setMessages([]);
   };
 

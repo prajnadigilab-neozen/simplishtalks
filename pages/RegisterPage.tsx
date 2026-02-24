@@ -166,7 +166,7 @@ const RegisterPage: React.FC = () => {
       const session = useAppStore.getState().session;
 
       setTimeout(() => {
-        if (session?.role === UserRole.ADMIN) {
+        if (session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR) {
           navigate('/admin');
         } else if (session) {
           navigate('/dashboard');
@@ -200,10 +200,10 @@ const RegisterPage: React.FC = () => {
 
         {/* Logo */}
         <div className="relative z-10">
-          <Logo className="w-16 h-16 mb-4" />
-          <h1 className="text-3xl font-black text-white leading-tight tracking-tight">
-            SIMPLISH<br />
-            <span className="text-amber-400">TALKS</span>
+          <Logo symbolOnly className="w-16 h-16 mb-4" />
+          <h1 className="text-3xl font-black text-white leading-tight tracking-tight flex items-baseline gap-2 whitespace-nowrap">
+            SIMPLISH
+            <span className="font-script italic text-amber-400 normal-case text-4xl">Talks</span>
           </h1>
           <p className="mt-3 text-blue-200 dark:text-slate-400 text-sm font-medium leading-relaxed">
             {t({ en: 'Learn English the Kannada way.', kn: 'ಕನ್ನಡದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ಕಲಿಯಿರಿ.' })}
@@ -237,9 +237,9 @@ const RegisterPage: React.FC = () => {
 
         {/* Mobile logo */}
         <div className="lg:hidden flex flex-col items-center mb-8">
-          <Logo className="w-20 h-20 mb-3" />
-          <h1 className="text-2xl font-black text-blue-900 dark:text-white tracking-tight">
-            SIMPLISH <span className="text-amber-500">TALKS</span>
+          <Logo symbolOnly className="w-20 h-20 mb-3" />
+          <h1 className="text-2xl font-black text-blue-900 dark:text-white tracking-tight flex items-center gap-1.5 whitespace-nowrap">
+            SIMPLISH <span className="font-script italic text-amber-500 normal-case text-3xl">Talks</span>
           </h1>
         </div>
 

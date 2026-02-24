@@ -111,11 +111,43 @@ export const useAppStore = create<AppState>((set, get) => ({
                     set({ session: null, progress: null });
                 } else {
                     console.warn("Progress fetch returned no data:", errMsg);
+                    // FAIL-SAFE: If user exists but progress doesn't, initialize default progress 
+                    // to prevent blank page/deadlock.
+                    set({
+                        progress: {
+                            currentLevel: CourseLevel.BASIC,
+                            completedLessons: [],
+                            role: session?.role || UserRole.STUDENT,
+                            isPlacementDone: false,
+                        }
+                    });
                 }
+            } else if (userId && !progressResult?.data) {
+                // Handle the case where result.data is null without an explicit error
+                set({
+                    progress: {
+                        currentLevel: CourseLevel.BASIC,
+                        completedLessons: [],
+                        role: session?.role || UserRole.STUDENT,
+                        isPlacementDone: false,
+                    }
+                });
             }
         } catch (err) {
             console.error("Critical initialization error:", err);
         } finally {
+            // FINAL FAIL-SAFE: If we are logged in but progress is STILL null 
+            // after attempt, set a basic progress object to avoid permanent blank page.
+            if (get().session?.id && !get().progress) {
+                set({
+                    progress: {
+                        currentLevel: CourseLevel.BASIC,
+                        completedLessons: [],
+                        role: get().session?.role || UserRole.STUDENT,
+                        isPlacementDone: false,
+                    }
+                });
+            }
             set({ loading: false });
             console.log("🏁 Initialization complete.");
         }

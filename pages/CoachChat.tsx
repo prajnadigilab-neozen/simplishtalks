@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
-import { chatWithCoach, saveChatMessage, getChatHistory, clearUserChatHistory, deleteChatMessage } from '../services/coachService';
+import { chatWithCoach, saveChatMessage, getChatHistory, clearUserChatHistory, deleteChatMessage, getUserUsage, updateUserUsage } from '../services/coachService';
 import { textToSpeech, getTTSQuotaStatus } from '../services/geminiService';
 import { playPCM, AudioStore } from '../utils/audioUtils';
 import { CoachMessage } from '../types';
@@ -20,6 +20,8 @@ const CoachChat: React.FC = () => {
   const [quotaReached, setQuotaReached] = useState(getTTSQuotaStatus());
   const [historyLoading, setHistoryLoading] = useState(true);
   const [clearConfirm, setClearConfirm] = useState(false); // Fix #13: inline confirm state
+  const [totalChatMessages, setTotalChatMessages] = useState(0);
+  const CHAT_QUOTA = 50;
   const scrollRef = useRef<HTMLDivElement>(null);
   const isSendingRef = useRef(false); // Fix #10: duplicate-send guard
 
@@ -28,14 +30,18 @@ const CoachChat: React.FC = () => {
     window.addEventListener('simplish-quota-exhausted', handleQuota);
 
     // Fix #2: userId now comes from store — just load history directly
-    const loadHistory = async () => {
+    const loadData = async () => {
       if (!userId) { setHistoryLoading(false); return; }
       setHistoryLoading(true);
-      const history = await getChatHistory(userId);
+      const [history, usage] = await Promise.all([
+        getChatHistory(userId, undefined, 'chat'),
+        getUserUsage(userId)
+      ]);
       setMessages(history);
+      setTotalChatMessages(usage.chat_messages_total || 0);
       setHistoryLoading(false);
     };
-    loadHistory();
+    loadData();
 
     return () => window.removeEventListener('simplish-quota-exhausted', handleQuota);
   }, [userId]); // re-run when userId becomes available
@@ -47,6 +53,7 @@ const CoachChat: React.FC = () => {
   }, [messages, isTyping]);
 
   const handleSend = async () => {
+    if (totalChatMessages >= CHAT_QUOTA) return;
     // Fix #10: guard against double sends from rapid clicks or double Enter
     if (isSendingRef.current || !input.trim() || isTyping || !userId) return;
     isSendingRef.current = true;
@@ -62,7 +69,7 @@ const CoachChat: React.FC = () => {
     setIsTyping(true);
 
     // Save user message to DB
-    const dbId = await saveChatMessage(userId, userMsg);
+    const dbId = await saveChatMessage(userId, userMsg, undefined, 'chat');
     setMessages(prev => prev.map(m => m.timestamp === userMsg.timestamp ? { ...m, dbId: dbId || undefined } : m));
 
     // Fix #6: Include correction context in history so AI doesn't repeat already-given corrections
@@ -91,8 +98,12 @@ const CoachChat: React.FC = () => {
     setIsTyping(false);
 
     // Save AI message to DB
-    const coachDbId = await saveChatMessage(userId, coachMsg);
+    const coachDbId = await saveChatMessage(userId, coachMsg, undefined, 'chat');
     setMessages(prev => prev.map(m => m.timestamp === coachMsg.timestamp ? { ...m, dbId: coachDbId || undefined } : m));
+
+    // Update usage
+    await updateUserUsage(userId, 0, 0, 1);
+    setTotalChatMessages(prev => prev + 1);
 
     if (!getTTSQuotaStatus()) {
       prefetchAudio(coachMsg, messages.length + 1);
@@ -104,7 +115,7 @@ const CoachChat: React.FC = () => {
     if (!userId) return;
     if (!clearConfirm) { setClearConfirm(true); return; }
     setClearConfirm(false);
-    await clearUserChatHistory(userId);
+    await clearUserChatHistory(userId, undefined, 'chat');
     setMessages([]);
   };
 
@@ -186,8 +197,8 @@ const CoachChat: React.FC = () => {
         <button
           onClick={handleClearHistory}
           className={`p-3 transition-all rounded-full ${clearConfirm
-              ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 ring-2 ring-red-400 animate-pulse'
-              : 'text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
+            ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 ring-2 ring-red-400 animate-pulse'
+            : 'text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
             }`}
           title={clearConfirm
             ? t({ en: "Tap again to confirm", kn: "ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ" })
@@ -227,8 +238,8 @@ const CoachChat: React.FC = () => {
             className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-2 duration-300 group/msg`}
           >
             <div className={`relative max-w-[85%] rounded-3xl p-4 shadow-sm ${m.role === 'user'
-                ? 'bg-blue-800 text-white rounded-tr-none'
-                : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-slate-700 rounded-tl-none'
+              ? 'bg-blue-800 text-white rounded-tr-none'
+              : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-slate-700 rounded-tl-none'
               }`}>
               <div className="flex justify-between items-start gap-4">
                 <p className="font-bold leading-relaxed flex-1">{m.text}</p>
