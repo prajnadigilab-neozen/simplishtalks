@@ -59,7 +59,7 @@ const ttsQueue = new TTSQueue();
  * Text-to-Speech via Supabase Edge Function.
  * API key lives server-side — never in the browser.
  */
-export async function textToSpeech(text: string, voice: string = 'Kore', retryCount = 0): Promise<string | null> {
+export async function textToSpeech(text: string, voice: string = 'Kore', lowBitrate: boolean = false, retryCount = 0): Promise<string | null> {
   // 1. Check Cache first
   const cached = AudioStore.get(text);
   if (cached) return cached;
@@ -69,7 +69,7 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
   return ttsQueue.add(async () => {
     try {
       const { data, error } = await supabase.functions.invoke('tts', {
-        body: { text, voice },
+        body: { text, voice, lowBitrate },
       });
 
       if (error) throw error;
@@ -96,7 +96,7 @@ export async function textToSpeech(text: string, voice: string = 'Kore', retryCo
         if (retryCount < 1) {
           const delay = 5000;
           await new Promise(r => setTimeout(r, delay));
-          return textToSpeech(text, voice, retryCount + 1);
+          return textToSpeech(text, voice, lowBitrate, retryCount + 1);
         } else {
           isQuotaExhausted = true;
           sessionStorage.setItem('simplish-tts-quota-exhausted', 'true');

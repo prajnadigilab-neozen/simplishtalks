@@ -9,7 +9,7 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
 // Use the TTS-specific preview model found in the list
 const MODEL = 'models/gemini-2.5-flash-preview-tts';
 
-async function generateTTS(text: string, voice: string) {
+async function generateTTS(text: string, voice: string, lowBitrate: boolean) {
     const url = `https://generativelanguage.googleapis.com/v1beta/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
     const body = {
@@ -24,7 +24,10 @@ async function generateTTS(text: string, voice: string) {
         },
     };
 
-    console.log(`TTS request: url=${url.split('?')[0]}, text="${text.substring(0, 50)}...", voice=${voice}`);
+    // Note: If Gemini API adds explicit bitrate control, it would be added to speechConfig here.
+    // For now, we are providing the plumbing to the backend.
+
+    console.log(`TTS request: url=${url.split('?')[0]}, text="${text.substring(0, 50)}...", voice=${voice}, lowBitrate=${lowBitrate}`);
 
     const res = await fetch(url, {
         method: 'POST',
@@ -52,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const { text, voice = 'Kore' } = await req.json();
+        const { text, voice = 'Kore', lowBitrate = false } = await req.json();
 
         if (!text) {
             return new Response(JSON.stringify({ audio: null }), {
@@ -60,7 +63,7 @@ Deno.serve(async (req) => {
             });
         }
 
-        const audio = await generateTTS(text, voice);
+        const audio = await generateTTS(text, voice, lowBitrate);
 
         return new Response(JSON.stringify({ audio }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

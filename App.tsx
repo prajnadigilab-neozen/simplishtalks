@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { HashRouter as Router, Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { LanguageProvider, useLanguage } from './components/LanguageContext';
 import { ThemeProvider, useTheme } from './components/ThemeContext';
@@ -9,17 +9,24 @@ import { supabase } from './lib/supabase';
 import { signOutUser, mapRole } from './services/authService';
 import { fetchAllModules } from './services/courseService';
 import LandingPage from './pages/LandingPage';
-import PlacementTest from './pages/PlacementTest';
-import Dashboard from './pages/Dashboard';
-import LessonView from './pages/LessonView';
-import RegisterPage from './pages/RegisterPage';
-import CoachChat from './pages/CoachChat';
-import VoiceCoach from './pages/VoiceCoach';
-import AdminDashboard from './pages/AdminDashboard';
-import SettingsPage from './pages/SettingsPage';
+// Lazy load major page routes
+const PlacementTest = React.lazy(() => import('./pages/PlacementTest'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const LessonView = React.lazy(() => import('./pages/LessonView'));
+const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
+const CoachChat = React.lazy(() => import('./pages/CoachChat'));
+const VoiceCoach = React.lazy(() => import('./pages/VoiceCoach'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
+const AdminTelemetry = React.lazy(() => import('./pages/AdminTelemetry'));
+const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
+const CourseManagement = React.lazy(() => import('./pages/CourseManagement'));
+
+import { telemetry } from './services/telemetryService';
+
 import Logo from './components/Logo';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useAppStore } from './store/useAppStore';
+import { initSyncAndListen } from './services/syncService';
 
 interface NavigationProps {
   onSignOut: () => void;
@@ -175,6 +182,10 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     initialize();
+    const cleanupSync = initSyncAndListen();
+
+    // Explicitly reference telemetry to ensure it initializes
+    console.log("Telemetry Initialized:", !!telemetry);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (isExitingRef.current) return;
@@ -202,6 +213,7 @@ const AppContent: React.FC = () => {
     });
 
     return () => {
+      cleanupSync();
       subscription.unsubscribe();
     };
   }, []);
@@ -262,24 +274,28 @@ const AppContent: React.FC = () => {
         {session?.isRestricted ? (
           <RestrictedView onSignOut={handleSignOut} />
         ) : (
-          <Routes>
-            <Route path="/" element={<LandingPage session={session} />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<RegisterPage />} />
-            <Route path="/settings" element={session ? <ErrorBoundary><SettingsPage /></ErrorBoundary> : <Navigate to="/login" />} />
-            <Route path="/placement" element={session ? <ErrorBoundary><PlacementTest /></ErrorBoundary> : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={
-              !session ? <Navigate to="/login" /> :
-                progress === null ? null /* still loading — show nothing, avoid redirect */ :
-                  progress.isPlacementDone ? <ErrorBoundary><Dashboard /></ErrorBoundary> :
-                    <Navigate to="/placement" />
-            } />
-            <Route path="/lesson/:id" element={session ? <ErrorBoundary><LessonView /></ErrorBoundary> : <Navigate to="/login" />} />
-            <Route path="/coachchat" element={session ? <ErrorBoundary><CoachChat /></ErrorBoundary> : <Navigate to="/login" />} />
-            <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
-            <Route path="/admin" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+          <Suspense fallback={<div className="flex h-[50vh] items-center justify-center"><div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>}>
+            <Routes>
+              <Route path="/" element={<LandingPage session={session} />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/login" element={<RegisterPage />} />
+              <Route path="/settings" element={session ? <ErrorBoundary><SettingsPage /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/placement" element={session ? <ErrorBoundary><PlacementTest /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/dashboard" element={
+                !session ? <Navigate to="/login" /> :
+                  progress === null ? null /* still loading — show nothing, avoid redirect */ :
+                    progress.isPlacementDone ? <ErrorBoundary><Dashboard /></ErrorBoundary> :
+                      <Navigate to="/placement" />
+              } />
+              <Route path="/lesson/:id" element={session ? <ErrorBoundary><LessonView /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/coachchat" element={session ? <ErrorBoundary><CoachChat /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/admin" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/admin/course" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><CourseManagement /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/admin/telemetry" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminTelemetry /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </Suspense>
         )}
       </main>
 

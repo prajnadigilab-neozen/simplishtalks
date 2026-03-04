@@ -128,3 +128,17 @@ html {
 html {
   overflow-y: scroll;
 }
+
+/* Data Saver Mode - Disable Animations */
+.data-saver-active *,
+.data-saver-active *::before,
+.data-saver-active *::after {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+}
+
+.data-saver-active html {
+    scroll-behavior: auto !important;
+}

@@ -61,27 +61,80 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
     });
 
     if (authError) {
+      // Automatic Fallback: If identity exists in auth.users, try to sign them in seamlessly
       if (authError.message.includes("User already registered") || authError.status === 422) {
-        return { success: false, error: "This phone number is already registered. Please sign in instead." };
+        console.log("Identity exists. Seamlessly falling back to login flow...");
+        const { data: signinData, error: signinError } = await supabase.auth.signInWithPassword({
+          phone: formattedPhone,
+          password: data.password,
+        });
+
+        if (signinError) {
+          return { success: false, error: "Account exists, but password was incorrect. Please switch to Sign In and try again or reset your password." };
+        }
+
+        // Ensure profile exists for the gracefully logged-in user
+        if (signinData.user) {
+          const { error: profileError } = await supabase.from('profiles').update({
+            full_name: data.fullName,
+            place: data.place
+          }).eq('id', signinData.user.id);
+
+          if (profileError && !profileError.message.includes('row-level')) {
+            await supabase.from('profiles').insert([{
+              id: signinData.user.id,
+              full_name: data.fullName,
+              phone: formattedPhone,
+              place: data.place,
+              role: role
+            }]);
+            await supabase.from('user_progress').upsert([{ user_id: signinData.user.id }], { onConflict: 'user_id' });
+          }
+        }
+        return { success: true };
       }
-      throw authError;
+
+      console.error("Signup Auth Error:", authError);
+      return { success: false, error: authError.message };
     }
 
     if (authData.user) {
+      // If a Postgres trigger handles creation, `.insert` will fail with RLS.
+      // We will first try to let the trigger do its job, then do an `.upsert` or `.update()`.
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert([
-          {
-            id: authData.user.id,
-            full_name: data.fullName,
-            phone: formattedPhone,
-            place: data.place,
-            role: role
-          }
-        ]);
+        .update({
+          full_name: data.fullName,
+          phone: formattedPhone,
+          place: data.place,
+          role: role
+        })
+        .eq('id', authData.user.id);
 
-      if (profileError) return { success: false, error: `Profile Creation Failed: ${profileError.message}` };
-      await supabase.from('user_progress').insert([{ user_id: authData.user.id }]);
+      if (profileError && profileError.message.includes('row-level security')) {
+        console.warn("Profile update failed due to RLS. A DB trigger likely created the profile automatically.");
+      } else if (profileError) {
+        // Try insert if update failed for other reasons (like row not existing)
+        const { error: insertError } = await supabase.from('profiles').insert([{
+          id: authData.user.id,
+          full_name: data.fullName,
+          phone: formattedPhone,
+          place: data.place,
+          role: role
+        }]);
+        if (insertError && !insertError.message.includes('row-level')) {
+          console.error("Profile generic insert failed:", insertError);
+        }
+      }
+
+      // Similarly for user_progress
+      const { error: progressError } = await supabase
+        .from('user_progress')
+        .upsert([{ user_id: authData.user.id }], { onConflict: 'user_id' });
+
+      if (progressError && !progressError.message.includes('row-level')) {
+        console.warn("Progress object creation issue:", progressError);
+      }
     }
 
     return { success: true };

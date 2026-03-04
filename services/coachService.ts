@@ -1,15 +1,77 @@
-
 import { supabase } from "../lib/supabase";
 import { CoachMessage } from "../types";
+
+/**
+ * Common grammar error patterns and their fast-track corrections.
+ * Used for instant feedback before calling the heavy AI model.
+ */
+const FAST_TRACK_PATTERNS = [
+  {
+    regex: /\b(I|me) (is|am not|aint) (\w+)\b/i,
+    test: (text: string) => /\bI is\b/i.test(text),
+    fix: (match: any) => `I am ${match[3]}`,
+    correction: "In English, we use 'I am' instead of 'I is'."
+  },
+  {
+    regex: /\b(he|she|it) (don't|dont) (\w+)\b/i,
+    test: (text: string) => /\b(he|she|it) (don't|dont)\b/i.test(text),
+    fix: (match: any) => `${match[1]} doesn't ${match[3]}`,
+    correction: "Remember to use 'doesn't' for he/she/it."
+  },
+  {
+    regex: /\b(you|we|they) (was) (\w+)\b/i,
+    test: (text: string) => /\b(you|we|they) was\b/i.test(text),
+    fix: (match: any) => `${match[1]} were ${match[3]}`,
+    correction: "Use 'were' for plural subjects and 'you'."
+  }
+];
+
+function getFastTrackResponse(message: string) {
+  for (const pattern of FAST_TRACK_PATTERNS) {
+    if (pattern.test(message)) {
+      const match = message.match(pattern.regex);
+      if (match) {
+        return {
+          replyEn: `I noticed a small error. You should say: "${pattern.fix(match)}".`,
+          kannadaGuide: "ಸಣ್ಣ ತಪ್ಪು ಗಮನಿಸಿದೆ. (Sanna tappu gamaniside.)\nNotice a small mistake.",
+          correction: pattern.correction,
+          isFastTrack: true
+        };
+      }
+    }
+  }
+  return null;
+}
+
+function compressHistory(history: { role: 'user' | 'model', parts: { text: string }[] }[]) {
+  // Keep only the last 5 turns (10 messages) to reduce payload
+  const maxTurns = 5;
+  const compressed = history.slice(-(maxTurns * 2));
+
+  // Strip long corrections from previous turns to save tokens
+  return compressed.map(turn => ({
+    ...turn,
+    parts: turn.parts.map(p => ({
+      text: p.text.length > 300 ? p.text.substring(0, 300) + "..." : p.text
+    }))
+  }));
+}
 
 /**
  * Chat with the AI coach via Supabase Edge Function.
  * The API key lives server-side — never in the browser bundle.
  */
 export async function chatWithCoach(message: string, history: { role: 'user' | 'model', parts: { text: string }[] }[] = []) {
+  // 1. Fast-Track check
+  const fastTrack = getFastTrackResponse(message);
+  if (fastTrack) return fastTrack;
+
+  // 2. Compress history
+  const compressedHistory = compressHistory(history);
+
   try {
     const { data, error } = await supabase.functions.invoke('coach-chat', {
-      body: { message, history },
+      body: { message, history: compressedHistory },
     });
 
     if (error) throw error;

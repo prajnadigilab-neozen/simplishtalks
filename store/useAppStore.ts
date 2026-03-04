@@ -5,6 +5,8 @@ import { getUserSession } from '../services/authService';
 import { fetchAllModules } from '../services/courseService';
 import { supabase } from '../lib/supabase';
 import { LEVEL_ORDER } from '../constants';
+import { db } from '../lib/db';
+import { syncUp } from '../services/syncService';
 
 interface AppState {
     session: any | null;
@@ -12,6 +14,7 @@ interface AppState {
     modules: Module[];
     loading: boolean;
     initialized: boolean;
+    dataSaverMode: boolean;
 
     // Actions
     initialize: (forceRefresh?: boolean) => Promise<void>;
@@ -20,6 +23,7 @@ interface AppState {
     unlockNextLevel: (currentLevel: CourseLevel) => Promise<void>;
     setPlacementResult: (level: CourseLevel) => Promise<void>;
     refreshModules: () => Promise<void>;
+    setDataSaverMode: (enabled: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -28,11 +32,20 @@ export const useAppStore = create<AppState>((set, get) => ({
     modules: [],
     loading: true,
     initialized: false,
+    dataSaverMode: (() => {
+        const enabled = localStorage.getItem('dataSaverMode') === 'true';
+        if (enabled) document.documentElement.classList.add('data-saver-active');
+        return enabled;
+    })(),
 
     setSession: (session) => set({ session }),
 
     initialize: async (forceRefresh?: boolean) => {
         if (get().initialized && !forceRefresh) return;
+
+        if (get().dataSaverMode) {
+            document.documentElement.classList.add('data-saver-active');
+        }
 
         set({ loading: true });
         console.log("🚀 Starting App Initialization...");
@@ -55,7 +68,17 @@ export const useAppStore = create<AppState>((set, get) => ({
                     return [];
                 }),
                 userId
-                    ? supabase.from('user_progress').select('*').eq('user_id', userId).single()
+                    ? (async () => {
+                        let localProg = await db.user_progress.get(userId);
+                        if (!localProg && navigator.onLine) {
+                            const res = await supabase.from('user_progress').select('*').eq('user_id', userId).maybeSingle();
+                            if (res.data) {
+                                await db.user_progress.put(res.data);
+                                localProg = res.data;
+                            }
+                        }
+                        return { data: localProg, error: null };
+                    })()
                     : Promise.resolve({ data: null, error: null })
             ]);
 
@@ -200,11 +223,17 @@ export const useAppStore = create<AppState>((set, get) => ({
         });
 
         try {
-            await supabase.from('user_progress').upsert({
+            const payload = {
                 user_id: session.id,
                 completed_lessons: newCompleted,
+                current_level: progress.currentLevel,
+                is_placement_done: progress.isPlacementDone || false,
                 updated_at: new Date().toISOString()
-            });
+            };
+
+            await db.user_progress.put(payload);
+            await db.sync_queue.add({ action: 'UPSERT_PROGRESS', payload, created_at: Date.now() });
+            syncUp();
 
             const currentModule = updatedModules.find(m => m.level === level);
             if (currentModule) {
@@ -214,7 +243,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                 }
             }
         } catch (e) {
-            console.error("Error updating progress in DB", e);
+            console.error("Error updating progress in local DB", e);
         }
     },
 
@@ -234,7 +263,16 @@ export const useAppStore = create<AppState>((set, get) => ({
                 progress: { ...progress, currentLevel: nextLevel },
                 modules: updatedModules
             });
-            await supabase.from('user_progress').update({ current_level: nextLevel }).eq('user_id', session.id);
+            const payload = {
+                user_id: session.id,
+                completed_lessons: progress.completedLessons,
+                current_level: nextLevel,
+                is_placement_done: progress.isPlacementDone || false,
+                updated_at: new Date().toISOString()
+            };
+            await db.user_progress.put(payload);
+            await db.sync_queue.add({ action: 'UPSERT_PROGRESS', payload, created_at: Date.now() });
+            syncUp();
         } else {
             set({
                 modules: modules.map(m =>
@@ -266,11 +304,25 @@ export const useAppStore = create<AppState>((set, get) => ({
         });
         set({ modules: updatedModules });
 
-        await supabase.from('user_progress').upsert({
+        const payload = {
             user_id: session.id,
             current_level: level,
+            completed_lessons: [],
             is_placement_done: true,
             updated_at: new Date().toISOString()
-        });
-    }
+        };
+        await db.user_progress.put(payload);
+        await db.sync_queue.add({ action: 'UPSERT_PROGRESS', payload, created_at: Date.now() });
+        syncUp();
+    },
+
+    setDataSaverMode: (enabled: boolean) => {
+        localStorage.setItem('dataSaverMode', String(enabled));
+        set({ dataSaverMode: enabled });
+        if (enabled) {
+            document.documentElement.classList.add('data-saver-active');
+        } else {
+            document.documentElement.classList.remove('data-saver-active');
+        }
+    },
 }));

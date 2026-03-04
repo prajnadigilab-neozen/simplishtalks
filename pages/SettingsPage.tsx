@@ -6,6 +6,7 @@ import { useTheme } from '../components/ThemeContext';
 import { getUserSession, updateProfile, getAllUsers, deleteUser } from '../services/authService';
 import { UserRole } from '../types';
 import { supabase } from '../lib/supabase';
+import { useAppStore } from '../store/useAppStore';
 
 const SettingsPage: React.FC = () => {
   const { t, lang, toggleLang } = useLanguage();
@@ -154,8 +155,8 @@ const SettingsPage: React.FC = () => {
 
       {message.text && (
         <div className={`mb-8 p-5 rounded-2xl font-bold text-sm flex items-center gap-3 animate-in slide-in-from-top-4 ${message.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100' :
-            message.type === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100' :
-              'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100'
+          message.type === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100' :
+            'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100'
           }`}>
           {message.type === 'success' ? '✅' : message.type === 'warning' ? 'ℹ️' : '⚠️'} {message.text}
         </div>
@@ -190,6 +191,18 @@ const SettingsPage: React.FC = () => {
               <button onClick={toggleLang} className="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-400 transition-all group">
                 <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Language</span>
                 <span className="text-xs font-black text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">{lang === 'en' ? 'ENGLISH' : 'ಕನ್ನಡ'}</span>
+              </button>
+              <button
+                onClick={() => useAppStore.getState().setDataSaverMode(!useAppStore.getState().dataSaverMode)}
+                className="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-400 transition-all group"
+              >
+                <div className="flex flex-col items-start">
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Data Saver</span>
+                  <span className="text-[9px] font-bold text-slate-400 lowercase">Lowers data usage</span>
+                </div>
+                <div className={`w-10 h-5 rounded-full relative transition-colors ${useAppStore.getState().dataSaverMode ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                  <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${useAppStore.getState().dataSaverMode ? 'left-6' : 'left-1'}`} />
+                </div>
               </button>
             </div>
           </div>
@@ -286,8 +299,8 @@ const SettingsPage: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

@@ -6,12 +6,13 @@ import { chatWithCoach, saveChatMessage, getChatHistory, clearUserChatHistory, d
 import { textToSpeech, getTTSQuotaStatus } from '../services/geminiService';
 import { playPCM, AudioStore } from '../utils/audioUtils';
 import { CoachMessage } from '../types';
-import { useAppStore } from '../store/useAppStore'; // Fix #2: use store, not getUserSession
+import { useAppStore } from '../store/useAppStore';
+import { supabase } from '../lib/supabase';
 
 const CoachChat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session } = useAppStore(); // Fix #2: session from store — no async call needed
+  const { session, dataSaverMode } = useAppStore(); // Fix #2: session from store — no async call needed
   const userId = session?.id ?? null;
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [input, setInput] = useState('');
@@ -52,9 +53,10 @@ const CoachChat: React.FC = () => {
     }
   }, [messages, isTyping]);
 
+  const [streamingText, setStreamingText] = useState('');
+
   const handleSend = async () => {
     if (totalChatMessages >= CHAT_QUOTA) return;
-    // Fix #10: guard against double sends from rapid clicks or double Enter
     if (isSendingRef.current || !input.trim() || isTyping || !userId) return;
     isSendingRef.current = true;
 
@@ -67,47 +69,101 @@ const CoachChat: React.FC = () => {
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsTyping(true);
+    setStreamingText('');
 
     // Save user message to DB
     const dbId = await saveChatMessage(userId, userMsg, undefined, 'chat');
     setMessages(prev => prev.map(m => m.timestamp === userMsg.timestamp ? { ...m, dbId: dbId || undefined } : m));
 
-    // Fix #6: Include correction context in history so AI doesn't repeat already-given corrections
+    // Compression and Fast-Track handled in coachService
     const historyForAI = messages.slice(-10).map(m => ({
       role: m.role === 'user' ? 'user' as const : 'model' as const,
       parts: [{
         text: m.role === 'coach' && m.correction
-          ? `${m.text} [Correction previously given: ${m.correction}]`
+          ? `${m.text} [Correction: ${m.correction}]`
           : m.text
       }]
     }));
 
-    const result = await chatWithCoach(input, historyForAI);
+    try {
+      // 1. Invoke function
+      const { data, error } = await supabase.functions.invoke('coach-chat', {
+        body: { message: input, history: historyForAI },
+      });
+
+      if (error) throw error;
+
+      // 2. Handle Streaming or Fast-Track
+      if (data && data.isFastTrack) {
+        // Handle immediate Fast-Track response
+        const coachMsg: CoachMessage = {
+          role: 'coach',
+          text: data.replyEn,
+          kannadaGuide: data.kannadaGuide,
+          correction: data.correction,
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, coachMsg]);
+        setIsTyping(false);
+      } else if (data instanceof ReadableStream) {
+        // Handle Streaming
+        const reader = data.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          fullContent += chunk;
+          setStreamingText(fullContent);
+        }
+
+        // Cleanup and parse final metadata
+        setIsTyping(false);
+        setStreamingText('');
+        isSendingRef.current = false;
+
+        try {
+          const result = JSON.parse(fullContent);
+          const coachMsg: CoachMessage = {
+            role: 'coach',
+            text: result.replyEn,
+            kannadaGuide: result.kannadaGuide,
+            correction: result.correction,
+            pronunciationTip: result.pronunciationTip,
+            timestamp: Date.now()
+          };
+          setMessages(prev => [...prev, coachMsg]);
+
+          // Final save and prefetch
+          const coachDbId = await saveChatMessage(userId, coachMsg, undefined, 'chat');
+          setMessages(prev => prev.map(m => m.timestamp === coachMsg.timestamp ? { ...m, dbId: coachDbId || undefined } : m));
+          if (!getTTSQuotaStatus()) prefetchAudio(coachMsg, messages.length + 1);
+        } catch (e) {
+          console.error("Failed to parse final JSON", e);
+        }
+      } else {
+        // Fallback for non-streaming or parsed response
+        const coachMsg: CoachMessage = {
+          role: 'coach',
+          text: data.replyEn,
+          kannadaGuide: data.kannadaGuide,
+          correction: data.correction,
+          pronunciationTip: data.pronunciationTip,
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, coachMsg]);
+        setIsTyping(false);
+      }
+    } catch (err) {
+      console.error("Coach Interaction Error:", err);
+      setIsTyping(false);
+    }
+
     isSendingRef.current = false;
-
-    const coachMsg: CoachMessage = {
-      role: 'coach',
-      text: result.replyEn,
-      kannadaGuide: result.kannadaGuide,
-      correction: result.correction,
-      pronunciationTip: result.pronunciationTip,
-      timestamp: Date.now()
-    };
-
-    setMessages(prev => [...prev, coachMsg]);
-    setIsTyping(false);
-
-    // Save AI message to DB
-    const coachDbId = await saveChatMessage(userId, coachMsg, undefined, 'chat');
-    setMessages(prev => prev.map(m => m.timestamp === coachMsg.timestamp ? { ...m, dbId: coachDbId || undefined } : m));
-
-    // Update usage
     await updateUserUsage(userId, 0, 0, 1);
     setTotalChatMessages(prev => prev + 1);
-
-    if (!getTTSQuotaStatus()) {
-      prefetchAudio(coachMsg, messages.length + 1);
-    }
   };
 
   // Fix #13: inline confirm instead of window.confirm()
@@ -129,7 +185,7 @@ const CoachChat: React.FC = () => {
     if (getTTSQuotaStatus()) return;
 
     if (msg.text) {
-      textToSpeech(msg.text).then(audio => {
+      textToSpeech(msg.text, 'Aoede', dataSaverMode).then(audio => {
         if (audio) {
           setMessages(prev => {
             const updated = [...prev];
@@ -141,7 +197,7 @@ const CoachChat: React.FC = () => {
     }
 
     if (msg.pronunciationTip) {
-      textToSpeech(`Pronunciation tip: ${msg.pronunciationTip}`).then(audio => {
+      textToSpeech(`Pronunciation tip: ${msg.pronunciationTip}`, 'Aoede', dataSaverMode).then(audio => {
         if (audio) {
           setMessages(prev => {
             const updated = [...prev];
@@ -169,7 +225,7 @@ const CoachChat: React.FC = () => {
       if (cachedAudio) {
         await playPCM(cachedAudio, textToConvert);
       } else {
-        const audio = await textToSpeech(textToConvert);
+        const audio = await textToSpeech(textToConvert, 'Aoede', dataSaverMode);
         if (audio) await playPCM(audio, textToConvert);
       }
     } catch (e) {
@@ -315,7 +371,7 @@ const CoachChat: React.FC = () => {
           </div>
         ))}
 
-        {isTyping && (
+        {isTyping && !streamingText && (
           <div className="flex items-start gap-2 animate-pulse">
             <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none border border-slate-100 dark:border-slate-700">
               <div className="flex gap-1">
@@ -323,6 +379,27 @@ const CoachChat: React.FC = () => {
                 <div className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-[bounce_0.8s_infinite]"></div>
                 <div className="w-1.5 h-1.5 bg-blue-300 rounded-full animate-[bounce_0.7s_infinite]"></div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {streamingText && (
+          <div className="flex items-start gap-2 animate-in fade-in duration-300">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-3xl rounded-tl-none border border-blue-100 dark:border-slate-700 shadow-sm max-w-[85%]">
+              <p className="font-bold leading-relaxed text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
+                {/* Try to show only replyEn if it's partially parsed JSON, otherwise show raw */}
+                {(() => {
+                  try {
+                    // Very simple partial JSON detection (if it looks like JSON)
+                    if (streamingText.startsWith('{')) {
+                      const match = streamingText.match(/"replyEn":\s*"([^"]*)"/);
+                      return match ? match[1] : "...";
+                    }
+                    return streamingText;
+                  } catch (e) { return streamingText; }
+                })()}
+                <span className="w-1.5 h-4 bg-blue-500 inline-block ml-1 animate-pulse" />
+              </p>
             </div>
           </div>
         )}

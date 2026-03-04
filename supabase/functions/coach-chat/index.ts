@@ -7,47 +7,25 @@ const corsHeaders = {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
 const PRIMARY_MODEL = 'gemini-2.0-flash';
-const FALLBACK_MODEL = 'gemini-1.5-flash';
 
 const COACH_SYSTEM_INSTRUCTION = `
 You are a patient English tutor for Kannada-speaking students. Always explain complex concepts in Kannada first.
-Task: Act as a bilingual English Coach. You receive messages in English, Kannada, or Kanglish.
-
-Operational Logic:
-1. Persona: You are Kore, a warm and encouraging teacher.
-2. Kannada-First: If a user asks a question or if you are explaining a new concept, provide the Kannada explanation BEFORE or ALONGSIDE the English response.
-3. Help Formatting (kannadaGuide): 
-    * Use this exact format: [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-4. Feedback Loop: 
-    * Identify grammatical errors in the user's English.
-    * Provide a "Correction" field in your response.
-    * Provide a "Pronunciation Tip" if the word used is a common phonetic pitfall for Kannada speakers.
-
 Return your response in a strict JSON format with these fields:
 - replyEn (required): The coach's reply in English
-- kannadaGuide: Formatted Kannada translation/explanation (Priority: Kannada first)
+- kannadaGuide: Formatted Kannada translation/explanation
 - correction: Grammatical correction of user's input if needed
 - pronunciationTip: Phonetic tip for Kannada speakers
+IMPORTANT: Respond ONLY with the JSON object. No markdown, no pre-amble.
 `;
 
-async function callGemini(model: string, contents: any, systemInstruction: string) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+async function* streamGemini(model: string, contents: any, systemInstruction: string) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${GEMINI_API_KEY}&alt=sse`;
 
     const body = {
         contents,
         systemInstruction: { parts: [{ text: systemInstruction }] },
         generationConfig: {
             responseMimeType: 'application/json',
-            responseSchema: {
-                type: 'OBJECT',
-                properties: {
-                    replyEn: { type: 'STRING', description: "The coach's reply in English" },
-                    kannadaGuide: { type: 'STRING', description: 'Formatted Kannada translation/explanation' },
-                    correction: { type: 'STRING', description: "Grammatical correction of user's input if needed" },
-                    pronunciationTip: { type: 'STRING', description: 'Phonetic tip for Kannada speakers' },
-                },
-                required: ['replyEn'],
-            },
         },
     };
 
@@ -57,16 +35,38 @@ async function callGemini(model: string, contents: any, systemInstruction: strin
         body: JSON.stringify(body),
     });
 
-    const data = await res.json();
-
     if (!res.ok) {
-        console.error(`Gemini ${model} error ${res.status}:`, JSON.stringify(data, null, 2));
-        throw new Error(`Gemini ${model} error ${res.status}: ${data.error?.message || 'Unknown error'}`);
+        throw new Error(`Gemini streaming error ${res.status}`);
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Empty response from Gemini');
-    return text;
+    const reader = res.body?.getReader();
+    if (!reader) throw new Error('No stream available');
+
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                const jsonText = line.substring(6);
+                if (jsonText.trim() === '[DONE]') break;
+                try {
+                    const data = JSON.parse(jsonText);
+                    const chunk = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (chunk) yield chunk;
+                } catch (e) {
+                    // Ignore transient parse errors on chunk boundaries
+                }
+            }
+        }
+    }
 }
 
 Deno.serve(async (req) => {
@@ -81,21 +81,30 @@ Deno.serve(async (req) => {
             { role: 'user', parts: [{ text: message }] },
         ];
 
-        let result: string;
-        try {
-            result = await callGemini(PRIMARY_MODEL, contents, COACH_SYSTEM_INSTRUCTION);
-        } catch (err: any) {
-            const msg = err.message?.toLowerCase() || '';
-            if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
-                console.warn(`Primary model failed, using fallback: ${err.message}`);
-                result = await callGemini(FALLBACK_MODEL, contents, COACH_SYSTEM_INSTRUCTION);
-            } else {
-                throw err;
-            }
-        }
+        const stream = streamGemini(PRIMARY_MODEL, contents, COACH_SYSTEM_INSTRUCTION);
 
-        return new Response(result, {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        const { readable, writable } = new TransformStream();
+        const writer = writable.getWriter();
+        const encoder = new TextEncoder();
+
+        (async () => {
+            try {
+                for await (const chunk of stream) {
+                    await writer.write(encoder.encode(chunk));
+                }
+                await writer.close();
+            } catch (err) {
+                console.error('Streaming error:', err);
+                try { await writer.abort(err); } catch (e) { }
+            }
+        })();
+
+        return new Response(readable, {
+            headers: {
+                ...corsHeaders,
+                'Content-Type': 'text/plain; charset=utf-8',
+                'X-Content-Type-Options': 'nosniff'
+            },
         });
     } catch (err: any) {
         console.error('coach-chat error:', err);

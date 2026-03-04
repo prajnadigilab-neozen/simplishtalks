@@ -17,7 +17,7 @@ type TabType = 'watch' | 'study' | 'speak' | 'practice';
 const TAB_ORDER: TabType[] = ['watch', 'study', 'speak', 'practice'];
 
 const LessonView: React.FC = () => {
-  const { modules, session, updateProgress: onComplete } = useAppStore();
+  const { modules, session, updateProgress: onComplete, dataSaverMode } = useAppStore();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
@@ -173,15 +173,42 @@ const LessonView: React.FC = () => {
             <>
               {lesson.videoUrl ? (
                 <div className="aspect-video">
-                  {getYouTubeEmbedUrl(lesson.videoUrl) ? (
-                    <iframe
-                      src={getYouTubeEmbedUrl(lesson.videoUrl)!}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
+                  {dataSaverMode ? (
+                    <div className="w-full h-full bg-slate-800 flex flex-col items-center justify-center p-6 text-center gap-4">
+                      <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/30">
+                        <span className="text-3xl">🎚️</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-black text-sm uppercase tracking-widest">Data Saver Active</p>
+                        <p className="text-slate-400 text-[10px] mt-1">Video hidden to save data</p>
+                      </div>
+                      {lesson.audioUrl ? (
+                        <audio src={lesson.audioUrl} controls className="w-full max-w-xs h-10" />
+                      ) : (
+                        <div className="px-4 py-2 bg-slate-700 rounded-lg text-slate-300 text-[10px] font-bold">
+                          No audio-only version available
+                        </div>
+                      )}
+                      <button
+                        onClick={() => useAppStore.getState().setDataSaverMode(false)}
+                        className="mt-2 text-[10px] font-black text-blue-400 underline decoration-2 underline-offset-4"
+                      >
+                        Disable to watch video
+                      </button>
+                    </div>
                   ) : (
-                    <video src={lesson.videoUrl} controls className="w-full h-full" poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" />
+                    <>
+                      {getYouTubeEmbedUrl(lesson.videoUrl) ? (
+                        <iframe
+                          src={getYouTubeEmbedUrl(lesson.videoUrl)!}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <video src={lesson.videoUrl} controls className="w-full h-full" poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" />
+                      )}
+                    </>
                   )}
                 </div>
               ) : lesson.audioUrl ? (

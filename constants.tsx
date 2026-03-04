@@ -12,7 +12,7 @@ export const TRANSLATIONS: TranslationStrings = {
   appName: { en: 'SIMPLISH - Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ - ಟಾಕ್ಸ್' },
   tagline: { en: 'English for Kannada Speakers', kn: 'ಕನ್ನಡಿಗರಿಗಾಗಿ ಇಂಗ್ಲಿಷ್' },
   startLearning: { en: 'Start Learning', kn: 'ಕಲಿಯಲು ಪ್ರಾರಂಭಿಸಿ' },
-  placementTest: { en: 'Placement Test', kn: 'ಪ್ರವೇಶ ಪರೀಕ್ಷೆ' },
+  placementTest: { en: 'Placement Test (ಪ್ರವೇಶ ಪರೀಕ್ಷೆ)', kn: 'Placement Test (ಪ್ರವೇಶ ಪರೀಕ್ಷೆ)' },
   dashboard: { en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' },
   basic: { en: 'Basic', kn: 'ಮೂಲ ಹಂತ' },
   intermediate: { en: 'Intermediate', kn: 'ಮಧ್ಯಂತರ ಹಂತ' },

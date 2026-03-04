@@ -143,7 +143,7 @@ const PlacementTest: React.FC = () => {
       <div className="flex justify-between items-center mb-10">
         <div>
           <h2 className="text-3xl font-black text-blue-900 dark:text-slate-100 tracking-tighter">
-            {step === 5 ? 'Your Result' : 'Placement Test'}
+            {step === 5 ? 'Your Result' : 'Placement Test (ಪ್ರವೇಶ ಪರೀಕ್ಷೆ)'}
           </h2>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Step {step} of 5</p>
         </div>
@@ -159,7 +159,7 @@ const PlacementTest: React.FC = () => {
           <div className="space-y-6">
             <div className="bg-blue-50 dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-blue-100 dark:border-slate-700">
               <p className="text-blue-900 dark:text-blue-300 font-bold text-sm leading-relaxed">
-                {t({ en: "Welcome! Let's find the best starting point for your English journey.", kn: "ಸ್ವಾಗತ! ನಿಮ್ಮ ಇಂಗ್ಲಿಷ್ ಕಲಿಕೆಯ ಪ್ರಯಾಣಕ್ಕೆ ಉತ್ತಮ ಆರಂಭಿಕ ಹಂತವನ್ನು ಕಂಡುಹಿಡಿಯೋಣ." })}
+                Welcome! Let's find the best starting point for your English journey. (ಸ್ವಾಗತ! ನಿಮ್ಮ ಇಂಗ್ಲಿಷ್ ಕಲಿಕೆಯ ಪ್ರಯಾಣಕ್ಕೆ ಉತ್ತಮ ಆರಂಭಿಕ ಹಂತವನ್ನು ಕಂಡುಹಿಡಿಯೋಣ.)
               </p>
             </div>
             <div className="space-y-4">
@@ -173,8 +173,8 @@ const PlacementTest: React.FC = () => {
               </div>
             </div>
             <div className="flex gap-4">
-              <button onClick={() => setStep(2)} className="flex-1 py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-900/20">Next: Quick Quiz</button>
-              <button onClick={() => setStep(2)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later</button>
+              <button onClick={() => setStep(2)} className="flex-1 py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-900/20">Next: Quick Quiz (ಮುಂದೆ: ರಸಪ್ರಶ್ನೆ)</button>
+              <button onClick={() => setStep(2)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
             </div>
           </div>
         )}
@@ -187,7 +187,7 @@ const PlacementTest: React.FC = () => {
                 <div key={q.id} className="space-y-4">
                   <p className="font-bold text-slate-800 dark:text-slate-200">
                     <span className="text-orange-500 mr-2">{idx + 1}.</span>
-                    {t(q.question)}
+                    {q.question.en} ({q.question.kn})
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {q.options.map((opt, oIdx) => (
@@ -204,8 +204,8 @@ const PlacementTest: React.FC = () => {
               ))}
             </div>
             <div className="flex gap-4">
-              <button onClick={() => setStep(3)} className="flex-1 py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-900/20">Next: Speaking Test</button>
-              <button onClick={() => setStep(3)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later</button>
+              <button onClick={() => setStep(3)} className="flex-1 py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-900/20">Next: Speaking Test (ಮುಂದೆ: ಮಾತನಾಡುವ ಪರೀಕ್ಷೆ)</button>
+              <button onClick={() => setStep(3)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
             </div>
           </div>
         )}
@@ -215,14 +215,14 @@ const PlacementTest: React.FC = () => {
             <div className="bg-amber-50 dark:bg-amber-900/20 p-6 rounded-[2rem] border-2 border-amber-100 dark:border-amber-800">
               <h4 className="font-black text-amber-900 dark:text-amber-400 uppercase text-xs tracking-widest mb-2">Reading Task</h4>
               <p className="text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic">
-                "{t(READING_PARAGRAPH)}"
+                "{READING_PARAGRAPH.en}" ({READING_PARAGRAPH.kn})
               </p>
             </div>
             <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[3rem] border-2 border-slate-100 dark:border-slate-700 text-center">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Click to Record & Read Aloud</p>
               <AudioRecorder onRecordingComplete={handleAudioComplete} />
             </div>
-            <button onClick={() => setStep(4)} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later</button>
+            <button onClick={() => setStep(4)} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
           </div>
         )}
 
@@ -231,7 +231,7 @@ const PlacementTest: React.FC = () => {
             <h3 className="text-xl font-black text-blue-900 dark:text-slate-100">One final thing...</h3>
             <div className="space-y-4">
               <label className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                {t({ en: "Why do you want to learn English?", kn: "ನೀವು ಇಂಗ್ಲಿಷ್ ಕಲಿಯಲು ಯಾಕೆ ಇಷ್ಟಪಡುತ್ತೀರಿ?" })}
+                Why do you want to learn English? (ನೀವು ಇಂಗ್ಲಿಷ್ ಕಲಿಯಲು ಯಾಕೆ ಇಷ್ಟಪಡುತ್ತೀರಿ?)
               </label>
               <textarea
                 className="w-full p-6 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-[2.5rem] h-40 focus:border-blue-500 outline-none font-medium"
@@ -242,10 +242,10 @@ const PlacementTest: React.FC = () => {
             </div>
             <div className="flex flex-col gap-3">
               <button onClick={runFinalEvaluation} className="w-full py-5 bg-orange-600 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-orange-600/20 flex items-center justify-center gap-3">
-                ✨ Get AI Evaluation
+                ✨ Get AI Evaluation (AI ಮೌಲ್ಯಮಾಪನ ಪಡೆಯಿರಿ)
               </button>
               <button onClick={runFinalEvaluation} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                Skip / Later
+                Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)
               </button>
             </div>
           </div>
@@ -274,7 +274,7 @@ const PlacementTest: React.FC = () => {
               <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed">{evaluationResult.reasoningKn}</p>
             </div>
 
-            <button onClick={handleFinish} className="w-full py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl hover:bg-black transition-all">Start My Journey</button>
+            <button onClick={handleFinish} className="w-full py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl hover:bg-black transition-all">Start My Journey (ನನ್ನ ಕಲಿಕೆ ಪ್ರಾರಂಭಿಸಿ)</button>
           </div>
         )}
       </div>

@@ -15,7 +15,7 @@ import AudioVisualizer from '../components/AudioVisualizer';
 const VoiceCoach: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session } = useAppStore();
+  const { session, dataSaverMode } = useAppStore();
   const userId = session?.id ?? null;
 
   // ── Chat History ──
@@ -190,7 +190,7 @@ const VoiceCoach: React.FC = () => {
     setPlayingTipId(id);
     try {
       const text = `Pronunciation tip: ${tip}`;
-      const audioData = await textToSpeech(text);
+      const audioData = await textToSpeech(text, 'Aoede', dataSaverMode);
       if (audioData) await playPCM(audioData, text);
     } catch (e) {
       console.error(e);

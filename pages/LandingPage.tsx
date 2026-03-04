@@ -57,7 +57,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
             <span className="w-2 h-2 md:w-3 md:h-3 bg-green-500 rounded-full animate-pulse"></span>
             {isLoggedIn
               ? t({ en: 'Dashboard Enabled', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಸಕ್ರಿಯವಾಗಿದೆ' })
-              : t({ en: 'Free AI Placement Test', kn: 'ಉಚಿತ AI ಪರೀಕ್ಷೆ' })}
+              : 'Placement Test (ಪ್ರವೇಶ ಪರೀಕ್ಷೆ)'}
           </div>
         </div>
       </div>
