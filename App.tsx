@@ -1,4 +1,4 @@
-
+/** V 1.0 */
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { HashRouter as Router, Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { LanguageProvider, useLanguage } from './components/LanguageContext';
@@ -17,7 +17,7 @@ const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
 const CoachChat = React.lazy(() => import('./pages/CoachChat'));
 const VoiceCoach = React.lazy(() => import('./pages/VoiceCoach'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
-const AdminTelemetry = React.lazy(() => import('./pages/AdminTelemetry'));
+const AdminTelemetry = React.lazy(() => import('@/pages/AdminTelemetry'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const CourseManagement = React.lazy(() => import('./pages/CourseManagement'));
 

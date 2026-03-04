@@ -1,7 +1,7 @@
 {
-  "name": "simplish---talks:-english-for-kannada-speakers",
+  "name": "simplish-talks",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

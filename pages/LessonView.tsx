@@ -1,4 +1,4 @@
-
+/** V 1.0 */
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';

@@ -1,4 +1,4 @@
-
+/** V 1.0 */
 import { TranslationStrings, Lesson, CourseLevel } from './types';
 
 export const LEVEL_ORDER: CourseLevel[] = [

@@ -1,4 +1,5 @@
 
+/** V 1.0 */
 import { create } from 'zustand';
 import { CourseLevel, UserProgress, Module, UserRole, LevelStatus } from '../types';
 import { getUserSession } from '../services/authService';

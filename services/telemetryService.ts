@@ -1,4 +1,4 @@
-
+/** V 1.0 */
 import { supabase } from '../lib/supabase';
 
 interface TelemetryData {

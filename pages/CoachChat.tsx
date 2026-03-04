@@ -1,4 +1,4 @@
-
+/** V 1.0 */
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
@@ -12,7 +12,7 @@ import { supabase } from '../lib/supabase';
 const CoachChat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session, dataSaverMode } = useAppStore(); // Fix #2: session from store — no async call needed
+  const { session, dataSaverMode } = useAppStore();
   const userId = session?.id ?? null;
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [input, setInput] = useState('');
@@ -20,17 +20,17 @@ const CoachChat: React.FC = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [quotaReached, setQuotaReached] = useState(getTTSQuotaStatus());
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [clearConfirm, setClearConfirm] = useState(false); // Fix #13: inline confirm state
+  const [clearConfirm, setClearConfirm] = useState(false);
   const [totalChatMessages, setTotalChatMessages] = useState(0);
   const CHAT_QUOTA = 50;
   const scrollRef = useRef<HTMLDivElement>(null);
-  const isSendingRef = useRef(false); // Fix #10: duplicate-send guard
+  const isSendingRef = useRef(false);
 
   useEffect(() => {
     const handleQuota = () => setQuotaReached(true);
     window.addEventListener('simplish-quota-exhausted', handleQuota);
 
-    // Fix #2: userId now comes from store — just load history directly
+    // Initialize data from store and fetch history
     const loadData = async () => {
       if (!userId) { setHistoryLoading(false); return; }
       setHistoryLoading(true);
@@ -166,7 +166,7 @@ const CoachChat: React.FC = () => {
     setTotalChatMessages(prev => prev + 1);
   };
 
-  // Fix #13: inline confirm instead of window.confirm()
+  // Inline confirm instead of window.confirm()
   const handleClearHistory = async () => {
     if (!userId) return;
     if (!clearConfirm) { setClearConfirm(true); return; }

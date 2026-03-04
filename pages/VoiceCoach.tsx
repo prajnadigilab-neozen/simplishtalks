@@ -1,4 +1,4 @@
-
+/** V 1.0 */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
@@ -25,7 +25,7 @@ const VoiceCoach: React.FC = () => {
   const [clearConfirm, setClearConfirm] = useState(false);
   const historyScrollRef = useRef<HTMLDivElement>(null);
 
-  // ── Phase 2: Streaming Transcription ──
+  // ── Streaming Transcription ──
   const [pendingUserText, setPendingUserText] = useState('');
   const [pendingCoachText, setPendingCoachText] = useState('');
 
@@ -307,7 +307,7 @@ const VoiceCoach: React.FC = () => {
             </div>
           ))}
 
-          {/* Phase 2: Streaming ghost bubbles */}
+          {/* Streaming ghost bubbles */}
           {pendingUserText && (
             <div className="flex flex-col items-end animate-in slide-in-from-bottom-2">
               <div className="relative max-w-[85%] p-4 rounded-3xl shadow-sm bg-blue-600/20 border border-blue-400/10 text-white/70 rounded-tr-none">

@@ -1,6 +1,7 @@
 
 export type Language = 'en' | 'kn';
 
+/** V 1.0 */
 export enum UserRole {
   STUDENT = 'STUDENT',
   MODERATOR = 'MODERATOR',

@@ -18,3 +18,10 @@ All notable features implemented and issues fixed for **SIMPLISH Talks** will be
 - **Registration Ghost Error**: Patched `authService.ts` to aggressively bypass and gracefully handle the 422 "User already registered" error (caused by orphaned auth identities) by falling back to auto-login.
 - **RLS Profile Creation**: Fixed Row-Level Security failures on profile registration by letting Supabase Database functions handle inserts or gracefully ignoring RLS blocks.
 - **Vite 500 Errors**: Resolved broken React module imports that were crashing the dev server.
+- **App.tsx Resolution**: Fixed module resolution for `AdminTelemetry` using path aliases.
+
+## [V 1.0] - 2026-03-04
+### Standardized 💎
+- **Official Version**: Standardized as V 1.0 across all project files (`package.json`, headers, etc.).
+- **Clean Registry**: Removed development-only "Fix #", "Phase X", and "Step X" comments for production readiness.
+- **Git Migration**: Transitioned to the new official repository `prajnadigilab-neozen/simplishtalks.git` and removed legacy contributors from remote references.
