@@ -30,8 +30,10 @@ export interface Lesson {
   pdfUrl?: string;        // Study: PDF file
   textUrl?: string;       // Study: text file
   textContent?: string;   // Long-form text content
+  studyTextContent?: string; // Generated study content
   speakPdfUrl?: string;   // SPEAK: PDF file for reading practice
   speakTextUrl?: string;  // SPEAK: text file for reading practice
+  speakTextContent?: string; // Generated speak content
   notes: Record<Language, string>;
   isCompleted: boolean;
   scenario?: {
@@ -40,6 +42,7 @@ export interface Lesson {
     systemInstruction: string;
     initialMessage: string;
   };
+  order_index: number;
 }
 
 export interface Module {

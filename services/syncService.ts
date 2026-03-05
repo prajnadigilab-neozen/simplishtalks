@@ -1,7 +1,7 @@
 import { db } from '../lib/db';
 import { supabase } from '../lib/supabase';
 
-export async function syncDown() {
+export async function syncDown(onComplete?: () => void) {
     if (!navigator.onLine) return; // Only sync when online
 
     console.log("⬇️ Starting Sync Down...");
@@ -15,9 +15,11 @@ export async function syncDown() {
         ]);
 
         if (modulesRes.data) {
+            await db.modules.clear();
             await db.modules.bulkPut(modulesRes.data);
         }
         if (lessonsRes.data) {
+            await db.lessons.clear();
             await db.lessons.bulkPut(lessonsRes.data);
         }
 
@@ -35,6 +37,7 @@ export async function syncDown() {
             }
         }
         console.log("✅ Sync Down Complete.");
+        if (onComplete) onComplete();
     } catch (error) {
         console.error("❌ Sync down error:", error);
     }
@@ -71,8 +74,8 @@ export async function syncUp() {
             if (item.id) {
                 await db.sync_queue.delete(item.id);
             }
-        } catch (err) {
-            console.error(`❌ Failed to sync item ${item.id}:`, err);
+        } catch (err: any) {
+            console.error(`❌ Failed to sync item ${item.id} (action: ${item.action}):`, err?.message || err);
             // Stop syncing to keep chronological ordering intact for dependent mutations
             break;
         }
@@ -80,13 +83,13 @@ export async function syncUp() {
     console.log("✅ Sync Up Complete.");
 }
 
-export function initSyncAndListen() {
+export function initSyncAndListen(onSyncComplete?: () => void) {
     // Sync immediately
-    syncUp().then(() => syncDown());
+    syncUp().then(() => syncDown(onSyncComplete));
 
     // Listen for online events
     const handleOnline = () => {
-        syncUp().then(() => syncDown());
+        syncUp().then(() => syncDown(onSyncComplete));
     };
 
     window.addEventListener('online', handleOnline);

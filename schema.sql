@@ -19,6 +19,9 @@ CREATE TABLE public.profiles (
   role TEXT DEFAULT 'USER', -- 'USER' or 'ADMIN'
   is_restricted BOOLEAN DEFAULT FALSE,
   avatar_url TEXT,
+  preferred_model TEXT DEFAULT 'gemini-2.0-flash',
+  voice_profile TEXT DEFAULT 'Aoede',
+  system_prompt_focus TEXT DEFAULT '',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -36,6 +39,9 @@ CREATE TABLE public.user_progress (
   is_placement_done BOOLEAN DEFAULT FALSE,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Index for upsert performance
+CREATE INDEX IF NOT EXISTS idx_user_progress_user_id ON public.user_progress(user_id);
 
 -- 3. Chat History Table (For AI Coach & Audit)
 CREATE TABLE public.chat_history (
@@ -71,6 +77,10 @@ CREATE TABLE public.lessons (
   audio_url TEXT,
   pdf_url TEXT,
   text_content TEXT,
+  study_text_content TEXT,
+  speak_pdf_url TEXT,
+  speak_text_url TEXT,
+  speak_text_content TEXT,
   scenario JSONB, -- { character: {en, kn}, objective: {en, kn}, systemInstruction, initialMessage }
   order_index INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -94,19 +104,23 @@ ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
 CREATE POLICY "Admins can update all profiles" ON public.profiles FOR UPDATE USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
 CREATE POLICY "Admins can delete profiles" ON public.profiles FOR DELETE USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
 
 -- User Progress
-CREATE POLICY "Users can manage own progress" ON public.user_progress FOR ALL USING (auth.uid() = user_id);
+-- Supabase UPSERT needs INSERT + UPDATE + SELECT permissions
+CREATE POLICY "Users can insert own progress" ON public.user_progress FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own progress" ON public.user_progress FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can view own progress" ON public.user_progress FOR SELECT USING (auth.uid() = user_id);
+
 CREATE POLICY "Admins can view progress" ON public.user_progress FOR SELECT USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  public.get_my_role() IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
 
 -- Chat History
@@ -116,16 +130,93 @@ CREATE POLICY "Users can see visible chat" ON public.chat_history FOR SELECT USI
 CREATE POLICY "Users can insert chat" ON public.chat_history FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can hide chat" ON public.chat_history FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "Admins can audit all chat" ON public.chat_history FOR SELECT USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
 
 -- Content (Modules/Lessons)
 CREATE POLICY "Anyone can view modules" ON public.modules FOR SELECT USING (true);
 CREATE POLICY "Admins manage modules" ON public.modules FOR ALL USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
 
 CREATE POLICY "Anyone can view lessons" ON public.lessons FOR SELECT USING (true);
 CREATE POLICY "Admins manage lessons" ON public.lessons FOR ALL USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+);
+
+-- ==========================================
+-- AI INSTRUCTIONS
+-- ==========================================
+DROP TABLE IF EXISTS public.ai_instructions;
+DROP TABLE IF EXISTS public.ai_instructions_history;
+
+-- 6. AI Instructions (Current Configuration)
+CREATE TABLE public.ai_instructions (
+  id INTEGER PRIMARY KEY DEFAULT 1, -- Singleton pattern
+  content TEXT NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_by uuid REFERENCES public.profiles(id)
+);
+-- Ensure only one row exists
+ALTER TABLE public.ai_instructions ADD CONSTRAINT singleton_chk CHECK (id = 1);
+
+-- 7. AI Instructions History
+CREATE TABLE public.ai_instructions_history (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_by uuid REFERENCES public.profiles(id)
+);
+
+-- RLS for AI Instructions
+ALTER TABLE public.ai_instructions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ai_instructions_history ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view AI Instructions" ON public.ai_instructions FOR SELECT USING (true);
+CREATE POLICY "Admins manage AI Instructions" ON public.ai_instructions FOR ALL USING (
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+);
+
+CREATE POLICY "Admins view AI Instructions History" ON public.ai_instructions_history FOR SELECT USING (
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+);
+CREATE POLICY "Admins manage AI Instructions History" ON public.ai_instructions_history FOR ALL USING (
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+);
+-- 8. User Lesson Recordings (Audio Practice)
+CREATE TABLE public.user_lesson_recordings (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  lesson_id uuid NOT NULL, -- Logical link to lesson
+  audio_url TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.user_lesson_recordings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage own recordings" ON public.user_lesson_recordings FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Admins can view all recordings" ON public.user_lesson_recordings FOR SELECT USING (
+  public.get_my_role() IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+);
+
+-- 9. Telemetry Table
+CREATE TABLE IF NOT EXISTS public.telemetry (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  page_path TEXT,
+  ect TEXT,
+  downlink NUMERIC,
+  rtt NUMERIC,
+  tti NUMERIC,
+  zip_code TEXT,
+  region TEXT,
+  is_dropped BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.telemetry ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can insert own telemetry" ON public.telemetry FOR INSERT WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
+CREATE POLICY "Admins can view telemetry" ON public.telemetry FOR SELECT USING (
+  public.get_my_role() IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );

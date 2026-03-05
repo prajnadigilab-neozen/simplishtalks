@@ -35,13 +35,6 @@ const AdminDashboard: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [globalStats, setGlobalStats] = useState({ totalUsers: 0, activeLearners: 0, totalModules: 0, totalLessons: 0 });
 
-  // AI Config State
-  const [aiConfig, setAiConfig] = useState({
-    model: 'gemini-2.0-flash',
-    strictness: 'high',
-    persona: 'Professional Coach',
-    voice: 'Aoede'
-  });
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -193,23 +186,30 @@ const AdminDashboard: React.FC = () => {
           >
             <span>📚</span> Course Content
           </button>
+          {currentUser?.role === UserRole.SUPER_ADMIN && (
+            <button
+              onClick={() => navigate('/admin/ai-instructions')}
+              className="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-purple-700 transition-all flex items-center gap-2"
+            >
+              <span>🤖</span> AI Instructions
+            </button>
+          )}
         </div>
 
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
           {currentUser?.role === UserRole.SUPER_ADMIN && (
-            <button key="users" onClick={() => setActiveTab('users')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Users</button>
+            <button key="users" onClick={() => setActiveTab('users')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Users</button>
           )}
-          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>General Stats</button>
-          <button key="reports" onClick={() => setActiveTab('reports')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Reports</button>
+          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>General Stats</button>
+          <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Reports</button>
 
           {currentUser?.role === UserRole.SUPER_ADMIN && (
             <>
-              <button key="ai" onClick={() => setActiveTab('ai')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'ai' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>AI & Personas</button>
-              <button key="mods" onClick={() => setActiveTab('mods')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Moderators</button>
+              <button key="mods" onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Moderators</button>
             </>
           )}
 
-          {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Audit</button>}
+          {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Audit</button>}
         </div>
       </div>
 
@@ -299,65 +299,6 @@ const AdminDashboard: React.FC = () => {
       )}
 
 
-      {activeTab === 'ai' && (
-        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-          <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-700 p-8 shadow-xl">
-            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 mb-6 uppercase tracking-tighter">AI Engine Configuration</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Gemini Model</label>
-                <select
-                  className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 font-bold"
-                  value={aiConfig.model}
-                  onChange={e => setAiConfig({ ...aiConfig, model: e.target.value })}
-                >
-                  <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fastest)</option>
-                  <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (Most Capable)</option>
-                  <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                </select>
-                <p className="text-[10px] text-slate-400 italic">Changing the engine affects all live conversations immediately.</p>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Correction Strictness</label>
-                <div className="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl gap-2">
-                  {['Low', 'Medium', 'High'].map(level => (
-                    <button
-                      key={level}
-                      onClick={() => setAiConfig({ ...aiConfig, strictness: level.toLowerCase() })}
-                      className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${aiConfig.strictness === level.toLowerCase() ? 'bg-white shadow text-amber-600' : 'text-slate-400'
-                        }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Primary Coach Voice</label>
-                <select
-                  className="w-full p-4 border rounded-2xl bg-slate-50 dark:bg-slate-900 font-bold"
-                  value={aiConfig.voice}
-                  onChange={e => setAiConfig({ ...aiConfig, voice: e.target.value })}
-                >
-                  <option value="Aoede">Aoede (Clear & Professional)</option>
-                  <option value="Charon">Charon (Deep & Calm)</option>
-                  <option value="Fenrir">Fenrir (Expressive)</option>
-                </select>
-              </div>
-            </div>
-            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 flex justify-end">
-              <button
-                onClick={() => showNotification("AI Configuration saved successfully", "success")}
-                className="bg-blue-900 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs shadow-lg hover:scale-105 transition-transform"
-              >
-                Update Engine Settings
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {activeTab === 'mods' && (
         <div className="space-y-8 animate-in fade-in">

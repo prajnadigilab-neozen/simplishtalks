@@ -178,3 +178,78 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
     };
   }
 }
+
+/**
+ * Generate Curriculum Lesson via Supabase Edge Function.
+ * Extracts the real error from FunctionsHttpError.context (a Response object).
+ */
+export async function generateLessonWithAI(promptText: string) {
+  const { data: result, error } = await supabase.functions.invoke('evaluate', {
+    body: { type: 'generate_lesson', promptText },
+  });
+
+  // supabase-js wraps non-2xx in a FunctionsHttpError where .context is a Response object
+  if (error) {
+    console.error("Lesson Generation Edge Function Error:", error);
+
+    // Step 1: Extract the REAL error message from the Response body
+    let realErrorMsg = '';
+    try {
+      if ((error as any).context) {
+        const body = await (error as any).context.json();
+        console.error("Edge Function Error Body:", body);
+        realErrorMsg = body?.error || body?.message || JSON.stringify(body);
+      }
+    } catch {
+      // context might already be consumed or not JSON
+      realErrorMsg = (error as any)?.message || String(error);
+    }
+
+    if (!realErrorMsg) {
+      realErrorMsg = (error as any)?.message || String(error);
+    }
+
+    const msg = realErrorMsg.toLowerCase();
+
+    // Step 2: Classify the error for a user-friendly message
+    if (msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted')) {
+      throw new Error('⏳ API quota exhausted. Please wait a few minutes and try again, or check your Google AI billing.');
+    }
+    if (msg.includes('api_key') || msg.includes('401') || msg.includes('unauthorized') || msg.includes('api key')) {
+      throw new Error('🔑 Invalid GEMINI_API_KEY. Please verify the API key in your Supabase Edge Function secrets.');
+    }
+    if (msg.includes('403') || msg.includes('forbidden') || msg.includes('permission')) {
+      throw new Error('🚫 API access forbidden. The Gemini API key may not have the required permissions.');
+    }
+    if (msg.includes('not found') || msg.includes('404') || msg.includes('not_found')) {
+      throw new Error('🔍 AI model not found. The configured Gemini model may be unavailable.');
+    }
+    if (msg.includes('gemini_api_key is missing') || msg.includes('not set')) {
+      throw new Error('⚙️ GEMINI_API_KEY is not configured. Please add it to your Supabase Edge Function secrets.');
+    }
+
+    // Fallback: show the raw error from the Edge Function
+    throw new Error(`AI Error: ${realErrorMsg}`);
+  }
+
+  // Handle case where data contains an error field (old 200-status error responses)
+  if (result && typeof result === 'object' && result.error) {
+    console.error("Lesson Generation returned error in body:", result.error);
+    throw new Error(`AI Error: ${result.error}`);
+  }
+
+  // Parse the result
+  try {
+    const parsed = typeof result === 'string' ? JSON.parse(result) : result;
+    if (!parsed || (!parsed.titleStr && !parsed.textContent)) {
+      throw new Error('AI returned an empty or incomplete lesson. Please refine your prompt and try again.');
+    }
+    return parsed;
+  } catch (parseError: any) {
+    if (parseError.message.includes('AI ')) throw parseError;
+    console.error("Failed to parse AI response:", result);
+    throw new Error('AI returned an invalid response format. Please try again.');
+  }
+}
+
+

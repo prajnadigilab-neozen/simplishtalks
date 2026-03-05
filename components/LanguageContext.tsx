@@ -26,6 +26,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Implementation already handles objects, but interface was too restrictive.
   // We use any here to allow the flexibility of the mapping logic.
   const t = (textMap: any) => {
+    if (!textMap) return '';
     if (typeof textMap === 'string') return textMap;
     return textMap[lang] || textMap['en'] || '';
   };

@@ -75,8 +75,8 @@ export async function fetchAllModules(): Promise<Module[]> {
     }
 
     if (localModules.length === 0) {
-      console.warn("⚠️ DATABASE EMPTY. Falling back to static content.");
-      return INITIAL_MODULES as Module[];
+      console.warn("⚠️ No modules found in local DB or Supabase. Returning empty list.");
+      return [];
     }
 
     return localModules.map(m => ({
@@ -96,8 +96,10 @@ export async function fetchAllModules(): Promise<Module[]> {
           pdfUrl: l.pdf_url,
           textUrl: l.text_url,
           textContent: l.text_content,
+          studyTextContent: l.study_text_content,
           speakPdfUrl: l.speak_pdf_url,
           speakTextUrl: l.speak_text_url,
+          speakTextContent: l.speak_text_content,
           notes: l.notes,
           scenario: l.scenario,
           isCompleted: false
@@ -105,7 +107,7 @@ export async function fetchAllModules(): Promise<Module[]> {
     }));
   } catch (error) {
     console.error("Fetch Modules Error:", error);
-    return INITIAL_MODULES as Module[];
+    return [];
   }
 }
 
@@ -118,8 +120,7 @@ export async function saveModule(adminInput: { id?: string, level: string, title
     level,
     title: splitBilingual(titleStr),
     description: splitBilingual(descStr),
-    order_index,
-    updated_at: new Date().toISOString()
+    order_index
   };
 
   await db.modules.put(payload);
@@ -146,8 +147,10 @@ export async function saveLesson(adminInput: {
   pdf_url?: string,
   text_url?: string,
   text_content?: string,
+  study_text_content?: string,
   speak_pdf_url?: string,
   speak_text_url?: string,
+  speak_text_content?: string,
   scenario?: any,
   order_index: number
 }) {
@@ -164,11 +167,12 @@ export async function saveLesson(adminInput: {
     pdf_url: rest.pdf_url || null,
     text_url: rest.text_url || null,
     text_content: rest.text_content || null,
+    study_text_content: rest.study_text_content || null,
     speak_pdf_url: rest.speak_pdf_url || null,
     speak_text_url: rest.speak_text_url || null,
+    speak_text_content: rest.speak_text_content || null,
     scenario: rest.scenario || null,
-    order_index: rest.order_index,
-    updated_at: new Date().toISOString()
+    order_index: rest.order_index
   };
 
   console.log("📥 Saving Lesson Locally:", payload);

@@ -20,6 +20,8 @@ const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const AdminTelemetry = React.lazy(() => import('@/pages/AdminTelemetry'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const CourseManagement = React.lazy(() => import('./pages/CourseManagement'));
+const AiInstructions = React.lazy(() => import('./pages/AiInstructions'));
+const LessonEditor = React.lazy(() => import('./pages/LessonEditor'));
 
 import { telemetry } from './services/telemetryService';
 
@@ -182,7 +184,10 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     initialize();
-    const cleanupSync = initSyncAndListen();
+    const cleanupSync = initSyncAndListen(() => {
+      console.log("🔄 Sync completed, refreshing store modules...");
+      useAppStore.getState().refreshModules();
+    });
 
     // Explicitly reference telemetry to ensure it initializes
     console.log("Telemetry Initialized:", !!telemetry);
@@ -292,7 +297,9 @@ const AppContent: React.FC = () => {
               <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/admin" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/admin/course" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><CourseManagement /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/admin/course/lesson/:moduleId/:lessonId?" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><LessonEditor /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/admin/telemetry" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminTelemetry /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/admin/ai-instructions" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AiInstructions /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Suspense>

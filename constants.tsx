@@ -31,7 +31,7 @@ export const TRANSLATIONS: TranslationStrings = {
   talkingAiDesc: { en: 'Practice real-time English conversation with your AI coach.', kn: 'ನಿಮ್ಮ AI ಕೋಚ್‌ನೊಂದಿಗೆ ನೈಜ-ಸಮಯದ ಇಂಗ್ಲಿಷ್ ಸಂಭಾಷಣೆಯನ್ನು ಅಭ್ಯಾಸ ಮಾಡಿ.' },
   connecting: { en: 'Connecting to Coach...', kn: 'ಕೋಚ್‌ನೊಂದಿಗೆ ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ...' },
   stopTalk: { en: 'End Session', kn: 'ಸಂಭಾಷಣೆ ಮುಗಿಸಿ' },
-  practice: { en: 'Practice', kn: 'ಅಭ್ಯಾಸ' },
+  practice: { en: 'Interact', kn: 'ಸಂವಾದ' },
   scenarioTitle: { en: 'Scenario Roleplay', kn: 'ಸನ್ನಿವೇಶದ ಪಾತ್ರಾಭಿನಯ' },
   scenarioDesc: { en: "Use what you learned to complete the conversation objective. It's safe to make mistakes here!", kn: "ಸಂಭಾಷಣೆಯ ಉದ್ದೇಶವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ನೀವು ಕಲಿತದ್ದನ್ನು ಬಳಸಿ. ಇಲ್ಲಿ ತಪ್ಪುನ ಮಾಡಲು ಭಯಪಡಬೇಡಿ!" },
 };
