@@ -284,7 +284,7 @@ export async function getUserSession(providedSession?: any) {
     const profileQuery = Promise.resolve(
       supabase
         .from('profiles')
-        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, system_prompt_focus')
+        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, system_prompt_focus, package_type, package_status, package_start_date, package_end_date, agent_credits, streak_count, last_streak_date, total_messages_sent, total_talk_time')
         .eq('id', session.user.id)
         .single()
     );
@@ -306,6 +306,15 @@ export async function getUserSession(providedSession?: any) {
         preferredModel: profile.preferred_model || 'gemini-2.0-flash',
         voiceProfile: profile.voice_profile || 'Aoede',
         systemPromptFocus: profile.system_prompt_focus || '',
+        packageType: profile.package_type || 'NONE',
+        packageStatus: profile.package_status || 'INACTIVE',
+        packageStartDate: profile.package_start_date || null,
+        packageEndDate: profile.package_end_date || null,
+        agentCredits: profile.agent_credits || 0,
+        streakCount: profile.streak_count || 0,
+        lastStreakDate: profile.last_streak_date || null,
+        totalMessagesSent: profile.total_messages_sent || 0,
+        totalTalkTime: profile.total_talk_time || 0,
         isLoggedIn: true
       };
     } else {
@@ -321,6 +330,11 @@ export async function getUserSession(providedSession?: any) {
         preferredModel: 'gemini-2.0-flash',
         voiceProfile: 'Aoede',
         systemPromptFocus: '',
+        packageType: 'NONE',
+        packageStatus: 'INACTIVE',
+        packageStartDate: null,
+        packageEndDate: null,
+        agentCredits: 0,
         isLoggedIn: true,
         isRestricted: false
       };

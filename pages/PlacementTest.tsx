@@ -5,8 +5,9 @@ import { useLanguage } from '../components/LanguageContext';
 import { TRANSLATIONS } from '../constants';
 import AudioRecorder from '../components/AudioRecorder';
 import { evaluatePlacement, evaluateSpeech } from '../services/geminiService';
-import { CourseLevel } from '../types';
+import { CourseLevel, PackageType, PackageStatus } from '../types';
 import { useAppStore } from '../store/useAppStore';
+import { supabase } from '../lib/supabase';
 
 const MCQ_QUESTIONS = [
   {
@@ -117,10 +118,53 @@ const PlacementTest: React.FC = () => {
     }
   };
 
-  const handleFinish = async () => {
-    if (evaluationResult) {
-      await setPlacementResult(evaluationResult.suggestedLevel);
+  const handlePackageSelection = async (selectedPackage: PackageType) => {
+    if (!session?.id) return;
+    setLoading(true);
+    try {
+      const updates = {
+        package_type: selectedPackage,
+        package_status: PackageStatus.ACTIVE,
+        package_start_date: new Date().toISOString(),
+        package_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days mockup
+        agent_credits: selectedPackage === PackageType.AI_MESHTRU ? 60 : 0 // Give 60 minutes for AI_MESHTRU
+      };
+
+      const { error } = await supabase.from('profiles').update(updates).eq('id', session.id);
+      if (error) console.error("Error updating profile package:", error);
+
+      // Force a re-fetch of the session to get the new package details in global state
+      await useAppStore.getState().initialize(true);
+
+      if (evaluationResult) {
+        await setPlacementResult(evaluationResult.suggestedLevel);
+      }
       navigate('/dashboard');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFinish = async () => {
+    if (!session?.id || !evaluationResult) return;
+    setLoading(true);
+    try {
+      // Save suggested level to user_progress
+      await setPlacementResult(evaluationResult.suggestedLevel);
+
+      // Also save the score to profiles for recommendation logic on dashboard
+      await supabase
+        .from('profiles')
+        .update({ system_prompt_focus: `Placement Score: ${evaluationResult.score}` }) // Using an existing field for metadata or I could have added a score field.
+        .eq('id', session.id);
+
+      navigate('/dashboard');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -143,7 +187,7 @@ const PlacementTest: React.FC = () => {
       <div className="flex justify-between items-center mb-10">
         <div>
           <h2 className="text-3xl font-black text-blue-900 dark:text-slate-100 tracking-tighter">
-            {step === 5 ? 'Your Result' : 'Placement Test (ಪ್ರವೇಶ ಪರೀಕ್ಷೆ)'}
+            {step === 5 ? 'Your Result' : step === 6 ? 'Choose Your Package' : 'Placement Test (ಪ್ರವೇಶ ಪರೀಕ್ಷೆ)'}
           </h2>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Step {step} of 5</p>
         </div>
@@ -274,9 +318,11 @@ const PlacementTest: React.FC = () => {
               <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed">{evaluationResult.reasoningKn}</p>
             </div>
 
-            <button onClick={handleFinish} className="w-full py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl hover:bg-black transition-all">Start My Journey (ನನ್ನ ಕಲಿಕೆ ಪ್ರಾರಂಭಿಸಿ)</button>
+            <button onClick={handleFinish} className="w-full py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl hover:bg-black transition-all">Continue to Packages (ಮುಂದಿನ ಹಂತಕ್ಕೆ)</button>
           </div>
         )}
+
+
       </div>
     </div>
   );

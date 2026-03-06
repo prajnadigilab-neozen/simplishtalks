@@ -15,6 +15,18 @@ export enum LevelStatus {
   COMPLETED = 'COMPLETED'
 }
 
+export enum PackageType {
+  NONE = 'NONE',
+  TALKS = 'TALKS',
+  AI_MESHTRU = 'AI_MESHTRU'
+}
+
+export enum PackageStatus {
+  INACTIVE = 'INACTIVE',
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED'
+}
+
 export enum CourseLevel {
   BASIC = 'BASIC',
   INTERMEDIATE = 'INTERMEDIATE',
@@ -61,6 +73,15 @@ export interface UserProgress {
   name?: string;
   role: UserRole;
   isPlacementDone: boolean;
+  packageType?: PackageType;
+  packageStatus?: PackageStatus;
+  packageStartDate?: string | null;
+  packageEndDate?: string | null;
+  agentCredits?: number | null;
+  streakCount?: number;
+  lastStreakDate?: string | null;
+  totalMessagesSent?: number;
+  totalTalkTime?: number;
 }
 
 export interface TranslationStrings {
@@ -75,6 +96,7 @@ export interface CoachMessage {
   kannadaGuide?: string;
   pronunciationTip?: string;
   timestamp: number;
+  audioUrl?: string; // Link to recorded audio
   audioEn?: string; // Pre-fetched audio for main reply
   audioTip?: string; // Pre-fetched audio for pronunciation tip
 }

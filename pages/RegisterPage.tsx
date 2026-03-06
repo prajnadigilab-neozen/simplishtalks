@@ -160,18 +160,9 @@ const RegisterPage: React.FC = () => {
 
     if (result.success) {
       setSuccess(true);
-
-      // Force store to fetch the logged in user's progress and modules
+      // Force store to fetch the logged in user's progress and modules.
+      // App.tsx will detect the session change and navigate accordingly.
       await useAppStore.getState().initialize(true);
-      const session = useAppStore.getState().session;
-
-      setTimeout(() => {
-        if (session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR) {
-          navigate('/admin');
-        } else if (session) {
-          navigate('/dashboard');
-        }
-      }, 600);
     } else {
       setGlobalError(result.error || 'Something went wrong. Please try again.');
     }

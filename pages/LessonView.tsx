@@ -488,9 +488,9 @@ const LessonView: React.FC = () => {
         <button
           onClick={() => navigate('/dashboard')}
           disabled={isFinishing}
-          className="flex-1 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest disabled:opacity-50"
+          className="flex-1 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest disabled:opacity-50 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
         >
-          {t({ en: 'Back', kn: 'ಹಿಂದಕ್ಕೆ' })}
+          🏠 <span className="hidden sm:inline">{t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })}</span>
         </button>
 
         {

@@ -22,6 +22,15 @@ CREATE TABLE public.profiles (
   preferred_model TEXT DEFAULT 'gemini-2.0-flash',
   voice_profile TEXT DEFAULT 'Aoede',
   system_prompt_focus TEXT DEFAULT '',
+  package_type TEXT DEFAULT 'NONE', -- 'NONE', 'TALKS', 'AI_MESHTRU'
+  package_status TEXT DEFAULT 'INACTIVE', -- 'INACTIVE', 'ACTIVE', 'EXPIRED'
+  package_start_date TIMESTAMP WITH TIME ZONE,
+  package_end_date TIMESTAMP WITH TIME ZONE,
+  agent_credits INTEGER DEFAULT 0, -- Credits (e.g. minutes) for AI_MESHTRU Package
+  streak_count INTEGER DEFAULT 0,
+  last_streak_date DATE,
+  total_messages_sent INTEGER DEFAULT 0,
+  total_talk_time INTEGER DEFAULT 0, -- in seconds
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -53,6 +62,7 @@ CREATE TABLE public.chat_history (
   correction TEXT,
   kannada_guide TEXT,
   pronunciation_tip TEXT,
+  audio_url TEXT,
   is_hidden_from_user BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

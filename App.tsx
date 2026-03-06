@@ -72,7 +72,14 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
                   <NavButton to="/quota" label={t({ en: 'Guardrail', kn: 'ಗಾರ್ಡ್‌ರೈಲ್' })} active={location.pathname === '/quota'} light={isLanding} />
                 </>
               ) : (
-                <NavButton to="/dashboard" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} active={location.pathname === '/dashboard'} light={isLanding} />
+                <>
+                  {session?.packageType !== 'AI_MESHTRU' && (
+                    <NavButton to="/dashboard" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} active={location.pathname === '/dashboard'} light={isLanding} />
+                  )}
+                  {session?.packageType === 'AI_MESHTRU' && (
+                    <NavButton to="/dashboard" label={t({ en: 'Meshtru', kn: 'ಮೇಷ್ಟ್ರು' })} active={location.pathname === '/dashboard'} light={isLanding} />
+                  )}
+                </>
               )}
               <NavButton to="/settings" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} active={location.pathname === '/settings'} light={isLanding} />
             </>
@@ -215,6 +222,7 @@ const AppContent: React.FC = () => {
             role: mapRole(user.user_metadata?.role),
             phone: user.phone,
             place: user.user_metadata?.place || '',
+            packageType: 'NONE', // Fallback, will be replaced by actual fetch
             isLoggedIn: true,
             isRestricted: false,
           });
@@ -288,8 +296,18 @@ const AppContent: React.FC = () => {
           <Suspense fallback={<div className="flex h-[50vh] items-center justify-center"><div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div></div>}>
             <Routes>
               <Route path="/" element={<LandingPage session={session} />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/login" element={<RegisterPage />} />
+              <Route path="/register" element={
+                session ? (
+                  session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR ?
+                    <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />
+                ) : <RegisterPage />
+              } />
+              <Route path="/login" element={
+                session ? (
+                  session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR ?
+                    <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />
+                ) : <RegisterPage />
+              } />
               <Route path="/settings" element={session ? <ErrorBoundary><SettingsPage /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/placement" element={session ? <ErrorBoundary><PlacementTest /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/dashboard" element={
@@ -316,7 +334,9 @@ const AppContent: React.FC = () => {
 
       {session && !session.isRestricted && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t-2 border-slate-100 dark:border-slate-800 flex justify-around items-center px-2 py-4 shadow-[0_-5px_20px_rgba(0,0,0,0.08)]">
-          <MobileNavItem icon="🏠" label={t({ en: 'Home', kn: 'ಮುಖಪುಟ' })} to="/" />
+          {session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? (
+            <MobileNavItem icon="🏠" label={t({ en: 'Home', kn: 'ಮುಖಪುಟ' })} to="/" />
+          ) : null}
           {session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? (
             <>
               <MobileNavItem icon="🛡️" label={t({ en: 'Admin', kn: 'ಅಡ್ಮಿನ್' })} to="/admin" />
@@ -325,9 +345,18 @@ const AppContent: React.FC = () => {
             </>
           ) : (
             <>
-              <MobileNavItem icon="📚" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} to="/dashboard" />
-              <MobileNavItem icon="🎙️" label={t({ en: 'Voice Practice', kn: 'ಧ್ವನಿ ಅಭ್ಯಾಸ' })} to="/talk" />
-              <MobileNavItem icon="💬" label={t({ en: 'Bilingual Chat', kn: 'AI ಚಾಟ್' })} to="/coachchat" />
+              {session?.packageType !== 'AI_MESHTRU' && (
+                <>
+                  <MobileNavItem icon="📚" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} to="/dashboard" />
+                  <MobileNavItem icon="💬" label={t({ en: 'Chat', kn: 'ಚಾಟ್' })} to="/coachchat" />
+                </>
+              )}
+              {session?.packageType !== 'TALKS' && (
+                <MobileNavItem icon="🎙️" label={t({ en: 'Meshtru', kn: 'ಮೇಷ್ಟ್ರು' })} to="/talk" />
+              )}
+              {session?.packageType === 'AI_MESHTRU' && (
+                <MobileNavItem icon="📊" label={t({ en: 'Usage', kn: 'ಬಳಕೆ' })} to="/dashboard" />
+              )}
               <MobileNavItem icon="⚙️" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} to="/settings" />
             </>
           )}

@@ -53,7 +53,7 @@ export async function fetchAllModules(): Promise<Module[]> {
     let localLessons = await db.lessons.orderBy('order_index').toArray();
 
     // Hydrate local cache if empty and online
-    if (localModules.length === 0 && navigator.onLine) {
+    if (localModules.length === 0 && typeof navigator !== 'undefined' && navigator.onLine) {
       console.log("⬇️ Local DB empty. Fetching modules from Supabase...");
       const modulesQuery = supabase.from('modules').select('*, lessons(*)').order('order_index', { ascending: true });
       const { data: modulesData, error } = await modulesQuery;
@@ -102,7 +102,8 @@ export async function fetchAllModules(): Promise<Module[]> {
           speakTextContent: l.speak_text_content,
           notes: l.notes,
           scenario: l.scenario,
-          isCompleted: false
+          isCompleted: false,
+          order_index: l.order_index || 0
         }))
     }));
   } catch (error) {

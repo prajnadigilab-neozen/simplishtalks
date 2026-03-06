@@ -106,7 +106,8 @@ export async function saveChatMessage(userId: string, msg: Partial<CoachMessage>
       content: msg.text,
       correction: msg.correction,
       kannada_guide: msg.kannadaGuide,
-      pronunciation_tip: msg.pronunciationTip
+      pronunciation_tip: msg.pronunciationTip,
+      audio_url: msg.audioUrl
     }).select('id').single();
 
     if (error) throw error;
@@ -158,6 +159,7 @@ export async function getChatHistory(userId: string, lessonId?: string, sessionT
       correction: m.correction,
       kannadaGuide: m.kannada_guide,
       pronunciationTip: m.pronunciation_tip,
+      audioUrl: m.audio_url,
       timestamp: new Date(m.created_at).getTime()
     }));
   } catch (err) {

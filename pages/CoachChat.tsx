@@ -240,10 +240,11 @@ const CoachChat: React.FC = () => {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 p-4 border-b-2 border-blue-100 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/dashboard')} className="p-2 text-blue-900 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 p-2 text-blue-900 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full transition-colors group">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5 group-hover:-translate-x-1 transition-transform">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
+            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Dashboard</span>
           </button>
           <div>
             <h2 className="font-black text-blue-900 dark:text-slate-100 text-sm uppercase tracking-widest">Simplish Coach</h2>

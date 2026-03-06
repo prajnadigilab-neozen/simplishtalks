@@ -11,6 +11,7 @@ import { playPCM } from '../utils/audioUtils';
 import { useGeminiLive, FeedbackData } from '../hooks/useGeminiLive';
 import { useAudioHardware } from '../hooks/useAudioHardware';
 import AudioVisualizer from '../components/AudioVisualizer';
+import { supabase } from '../lib/supabase';
 
 const VoiceCoach: React.FC = () => {
   const { t } = useLanguage();
@@ -95,7 +96,8 @@ const VoiceCoach: React.FC = () => {
           getUserUsage(userId)
         ]);
         setMessages(history);
-        setTotalVoiceSeconds(usage.voice_seconds_total || 0);
+        // We now rely on session.agentCredits instead of a fixed 180 quota.
+        // But we still track local session duration.
       }
       setLoadingHistory(false);
     };
@@ -117,7 +119,11 @@ const VoiceCoach: React.FC = () => {
 
   // ── Actions ──
   const handleStartSession = async () => {
-    if (totalVoiceSeconds >= QUOTA_SECONDS) return;
+    const currentCredits = session?.agentCredits || 0;
+    if (session?.packageType === 'AI_MESHTRU' && currentCredits <= 0) {
+      alert("You have run out of AI Meshtru credits. Please recharge."); // In a real app, show a nice modal
+      return;
+    }
 
     sessionStartTimeRef.current = Date.now();
     const userPrefs = session;
@@ -157,10 +163,24 @@ const VoiceCoach: React.FC = () => {
     audio.stopAllAudio();
 
     if (sessionStartTimeRef.current) {
-      const elapsed = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
-      if (elapsed > 0) {
-        await updateUserUsage(userId!, elapsed, 0);
-        setTotalVoiceSeconds(prev => prev + elapsed);
+      const elapsedSeconds = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+      if (elapsedSeconds > 0) {
+        await updateUserUsage(userId!, elapsedSeconds, 0);
+
+        // Convert elapsed seconds to minutes spent (rounding up for simple billing mock)
+        const minutesSpent = Math.ceil(elapsedSeconds / 60);
+
+        if (session?.packageType === 'AI_MESHTRU' && session.agentCredits !== undefined) {
+          const newCredits = Math.max(0, session.agentCredits - minutesSpent);
+
+          // Optimistically update local store
+          useAppStore.setState({
+            session: { ...session, agentCredits: newCredits }
+          });
+
+          // Sync to DB
+          await supabase.from('profiles').update({ agent_credits: newCredits }).eq('id', userId);
+        }
       }
       sessionStartTimeRef.current = null;
     }
@@ -205,35 +225,35 @@ const VoiceCoach: React.FC = () => {
 
       {/* Top Navigation */}
       <div className="p-4 flex items-center justify-between border-b border-white/10 shrink-0">
-        <button onClick={handleCancel} className="p-2 text-white/70 hover:text-white transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+        <button onClick={handleCancel} className="flex items-center gap-2 p-2 text-white/70 hover:text-white transition-colors group">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5 group-hover:-translate-x-1 transition-transform">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
+          <span className="text-[10px] font-black uppercase tracking-widest">Dashboard</span>
         </button>
         <div className="flex flex-col items-center">
-          <span className="font-black text-xs uppercase tracking-[0.3em]">{t(TRANSLATIONS.liveTalk)}</span>
+          <span className="font-black text-xs uppercase tracking-[0.3em] font-serif">{t(TRANSLATIONS.liveTalk)}</span>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <div className={`w-2 h-2 rounded-full ${gemini.isConnected ? 'bg-green-400 animate-pulse' : gemini.isReconnecting ? 'bg-yellow-400 animate-pulse' : 'bg-red-500'}`}></div>
-            <span className="text-[10px] font-bold text-white/50 uppercase">
-              {gemini.isConnected ? 'Online' : gemini.isReconnecting ? 'Reconnecting' : 'Offline'}
+            <div className={`w-2 h-2 rounded-full ${gemini.isConnected ? 'bg-green-400' : gemini.isReconnecting ? 'bg-yellow-400 animate-pulse' : 'bg-red-500'}`}></div>
+            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+              {gemini.isConnected ? 'Live' : gemini.isReconnecting ? 'Reconnecting' : 'Offline'}
             </span>
           </div>
         </div>
-        <button
-          onClick={handleClearHistory}
-          className={`p-2 rounded-full transition-colors ${clearConfirm
-            ? 'text-red-400 bg-red-500/20 ring-1 ring-red-400 animate-pulse'
-            : 'text-white/40 hover:text-red-400 hover:bg-red-500/10'
-            }`}
-          title={clearConfirm
-            ? t({ en: 'Tap again to confirm', kn: 'ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ' })
-            : "Clear session history"}
-          onBlur={() => setClearConfirm(false)}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.34 6.65m-2.86 0L11.26 9m4.105-3.04a.5.5 0 0 1 .124-.128A48.543 48.543 0 0 0 16.5 4.5h-9a48.543 48.543 0 0 0-1.011 1.432.5.5 0 0 1-.124.128M15.5 12.5a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h7Z" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleClearHistory}
+            className={`p-2 rounded-xl transition-colors ${clearConfirm
+              ? 'text-red-400 bg-red-500/20 ring-1 ring-red-400 animate-pulse'
+              : 'text-white/40 hover:text-red-400 hover:bg-red-500/10'
+              }`}
+            title="Clear History"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Main Experience */}
@@ -348,6 +368,11 @@ const VoiceCoach: React.FC = () => {
                 >
                   {t(TRANSLATIONS.startLearning)}
                 </button>
+                {session?.packageType === 'AI_MESHTRU' && (
+                  <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-orange-400">
+                    {session.agentCredits > 0 ? `${session.agentCredits} Minutes Available` : '0 Minutes - Please Recharge'}
+                  </p>
+                )}
               </div>
             )}
 
