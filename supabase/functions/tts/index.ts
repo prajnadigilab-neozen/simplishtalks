@@ -43,10 +43,12 @@ async function generateTTS(text: string, voice: string, lowBitrate: boolean) {
     }
 
     const audio = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    const usage = data.usageMetadata;
+
     if (!audio) {
         console.warn('Gemini returned OK but no audio data in response. Response:', JSON.stringify(data, null, 2));
     }
-    return audio || null;
+    return { audio, usage };
 }
 
 Deno.serve(async (req) => {
@@ -63,9 +65,13 @@ Deno.serve(async (req) => {
             });
         }
 
-        const audio = await generateTTS(text, voice, lowBitrate);
+        const { audio, usage } = await generateTTS(text, voice, lowBitrate);
 
-        return new Response(JSON.stringify({ audio }), {
+        return new Response(JSON.stringify({
+            audio,
+            usage,
+            model: MODEL
+        }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     } catch (err: any) {

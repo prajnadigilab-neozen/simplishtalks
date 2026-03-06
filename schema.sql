@@ -220,3 +220,22 @@ CREATE POLICY "Users can insert own telemetry" ON public.telemetry FOR INSERT WI
 CREATE POLICY "Admins can view telemetry" ON public.telemetry FOR SELECT USING (
   public.get_my_role() IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
 );
+
+-- 10. API Usage Table
+CREATE TABLE IF NOT EXISTS public.api_usage (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  api_type TEXT NOT NULL, -- 'chat', 'voice', 'tts'
+  model_name TEXT,
+  input_units NUMERIC DEFAULT 0, -- tokens for chat, seconds for voice
+  output_units NUMERIC DEFAULT 0,
+  total_units NUMERIC DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.api_usage ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can insert own usage" ON public.api_usage FOR INSERT WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
+CREATE POLICY "Admins can view usage" ON public.api_usage FOR SELECT USING (
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+);

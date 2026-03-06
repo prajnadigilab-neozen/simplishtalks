@@ -2,6 +2,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
 import { encodeBase64 } from '../utils/audioUtils';
+import { telemetry } from '../services/telemetryService';
 
 // ─── Tool Declaration ───────────────────────────────────────────
 const provideFeedbackTool: FunctionDeclaration = {
@@ -62,6 +63,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
     const lastConfigRef = useRef<{ instruction: string; voice: string } | null>(null);
     const reconnectAttemptsRef = useRef(0);
     const MAX_RECONNECTS = 3;
+    const sessionStartTimeRef = useRef<number | null>(null);
 
     const clearError = useCallback(() => setError(null), []);
 
@@ -88,6 +90,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                         setIsConnecting(false);
                         setIsReconnecting(false);
                         reconnectAttemptsRef.current = 0;
+                        sessionStartTimeRef.current = Date.now();
                     },
 
                     onmessage: async (message: LiveServerMessage) => {
@@ -187,6 +190,19 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
     }, [callbacks]);
 
     const cleanupInternal = useCallback(() => {
+        // Log duration before clearing
+        if (sessionStartTimeRef.current) {
+            const durationSeconds = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);
+            if (durationSeconds > 0) {
+                telemetry.logUsage({
+                    api_type: 'voice',
+                    model_name: 'gemini-live',
+                    total_units: durationSeconds
+                });
+            }
+            sessionStartTimeRef.current = null;
+        }
+
         sessionRef.current = null;
         setIsConnected(false);
         setIsConnecting(false);

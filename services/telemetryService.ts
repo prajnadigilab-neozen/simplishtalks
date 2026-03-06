@@ -90,6 +90,26 @@ class TelemetryService {
             console.error('Failed to log telemetry:', err);
         }
     }
+
+    public async logUsage(usage: {
+        api_type: 'chat' | 'voice' | 'tts';
+        model_name?: string;
+        input_units?: number;
+        output_units?: number;
+        total_units?: number;
+    }) {
+        try {
+            const { data: session } = await supabase.auth.getSession();
+            const user = session?.session?.user;
+
+            await supabase.from('api_usage').insert({
+                user_id: user?.id || null,
+                ...usage
+            });
+        } catch (err) {
+            console.error('Failed to log API usage:', err);
+        }
+    }
 }
 
 export const telemetry = new TelemetryService();

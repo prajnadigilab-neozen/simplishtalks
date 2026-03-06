@@ -34,12 +34,14 @@ async function callGemini(model: string, contents: any, config: any) {
         }
 
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const usage = data.usageMetadata;
+
         if (!text) {
             console.error(`Gemini ${model} returned empty response:`, JSON.stringify(data, null, 2));
             throw new Error(`Gemini ${model} returned an empty or invalid response structure.`);
         }
 
-        return text;
+        return { text, usage };
     } catch (err: any) {
         console.error(`Fetch/Parse error in callGemini (${model}):`, err.message);
         throw err;
@@ -221,7 +223,7 @@ Deno.serve(async (req) => {
             throw new Error('GEMINI_API_KEY environment variable is not set');
         }
 
-        let result: string;
+        let result: any;
         if (type === 'placement') {
             result = await handlePlacement(body);
         } else if (type === 'speech') {
@@ -235,7 +237,12 @@ Deno.serve(async (req) => {
             });
         }
 
-        return new Response(result, {
+        // result is now { text, usage } from callGemini
+        return new Response(JSON.stringify({
+            data: typeof result.text === 'string' ? JSON.parse(result.text) : result.text,
+            usage: result.usage,
+            model: PRIMARY_MODEL // explicitly return model used
+        }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     } catch (err: any) {

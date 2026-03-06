@@ -22,6 +22,8 @@ const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const CourseManagement = React.lazy(() => import('./pages/CourseManagement'));
 const AiInstructions = React.lazy(() => import('./pages/AiInstructions'));
 const LessonEditor = React.lazy(() => import('./pages/LessonEditor'));
+const APIAnalytics = React.lazy(() => import('./pages/APIAnalytics'));
+const QuotaDashboard = React.lazy(() => import('./pages/QuotaDashboard'));
 
 import { telemetry } from './services/telemetryService';
 
@@ -64,7 +66,11 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
           {isLoggedIn && !session.isRestricted && (
             <>
               {userRole === UserRole.SUPER_ADMIN || userRole === UserRole.MODERATOR ? (
-                <NavButton to="/admin" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/admin'} light={isLanding} />
+                <>
+                  <NavButton to="/admin" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/admin'} light={isLanding} />
+                  <NavButton to="/analytics" label={t({ en: 'Analytics', kn: 'ವಿಶ್ಲೇಷಣೆ' })} active={location.pathname === '/analytics'} light={isLanding} />
+                  <NavButton to="/quota" label={t({ en: 'Guardrail', kn: 'ಗಾರ್ಡ್‌ರೈಲ್' })} active={location.pathname === '/quota'} light={isLanding} />
+                </>
               ) : (
                 <NavButton to="/dashboard" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} active={location.pathname === '/dashboard'} light={isLanding} />
               )}
@@ -300,6 +306,8 @@ const AppContent: React.FC = () => {
               <Route path="/admin/course/lesson/:moduleId/:lessonId?" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><LessonEditor /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/admin/telemetry" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminTelemetry /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/admin/ai-instructions" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AiInstructions /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/analytics" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><APIAnalytics /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/quota" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><QuotaDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Suspense>
@@ -312,6 +320,7 @@ const AppContent: React.FC = () => {
           {session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? (
             <>
               <MobileNavItem icon="🛡️" label={t({ en: 'Admin', kn: 'ಅಡ್ಮಿನ್' })} to="/admin" />
+              <MobileNavItem icon="🛡️" label={t({ en: 'Quota', kn: 'ಕೋಟಾ' })} to="/quota" />
               <MobileNavItem icon="⚙️" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} to="/settings" />
             </>
           ) : (
