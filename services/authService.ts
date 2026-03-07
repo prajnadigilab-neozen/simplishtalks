@@ -21,8 +21,8 @@ const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'SIMPLISH_MASTER_2026'
 // Role Compatibility Mapper
 export const mapRole = (role: string): UserRole => {
   const r = (role || '').toUpperCase();
-  if (r === 'ADMIN' || r === 'SUPER_ADMIN') return UserRole.SUPER_ADMIN;
-  if (r === 'MODERATOR') return UserRole.MODERATOR;
+  if (r === 'SUPER_ADMIN') return UserRole.SUPER_ADMIN;
+  if (r === 'MODERATOR' || r === 'ADMIN') return UserRole.MODERATOR;
   return UserRole.STUDENT; // Maps 'USER' and others to STUDENT
 };
 if (!ADMIN_SECRET) {
@@ -101,7 +101,7 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
     if (authData.user) {
       // If a Postgres trigger handles creation, `.insert` will fail with RLS.
       // We will first try to let the trigger do its job, then do an `.upsert` or `.update()`.
-      const { error: profileError } = await supabase
+      const { data: updatedRows, error: profileError } = await supabase
         .from('profiles')
         .update({
           full_name: data.fullName,
@@ -109,12 +109,13 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
           place: data.place,
           role: role
         })
-        .eq('id', authData.user.id);
+        .eq('id', authData.user.id)
+        .select();
 
       if (profileError && profileError.message.includes('row-level security')) {
         console.warn("Profile update failed due to RLS. A DB trigger likely created the profile automatically.");
-      } else if (profileError) {
-        // Try insert if update failed for other reasons (like row not existing)
+      } else if (!updatedRows || updatedRows.length === 0) {
+        // Try insert if update failed to affect any rows (meaning row doesn't exist)
         const { error: insertError } = await supabase.from('profiles').insert([{
           id: authData.user.id,
           full_name: data.fullName,
@@ -225,11 +226,16 @@ export async function signOutUser() {
   cachedProfile = null;
 }
 
+export function clearProfileCache() {
+  cachedProfile = null;
+  lastCacheTime = 0;
+}
+
 export async function getAllUsers(): Promise<any[]> {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, phone, place, role, created_at, avatar_url, is_restricted')
+      .select('id, full_name, phone, place, role, created_at, avatar_url, is_restricted, package_type, package_status')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -286,7 +292,7 @@ export async function getUserSession(providedSession?: any) {
         .from('profiles')
         .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, system_prompt_focus, package_type, package_status, package_start_date, package_end_date, agent_credits, streak_count, last_streak_date, total_messages_sent, total_talk_time')
         .eq('id', session.user.id)
-        .single()
+        .maybeSingle()
     );
 
     const { data: profile, error } = await withTimeout(profileQuery, 5000).catch(e => {
@@ -318,6 +324,20 @@ export async function getUserSession(providedSession?: any) {
         isLoggedIn: true
       };
     } else {
+      if (!error && !profile) {
+        console.warn("Profile not found in DB. Auto-healing by creating...");
+        try {
+          await supabase.from('profiles').upsert([{
+            id: session.user.id,
+            full_name: session.user.user_metadata?.full_name || 'User',
+            phone: session.user.phone,
+            place: session.user.user_metadata?.place || '',
+            role: session.user.user_metadata?.role || 'STUDENT'
+          }]);
+        } catch (healErr) {
+          console.warn("Auto-heal failed (likely RLS). Continuing with fallback.", healErr);
+        }
+      }
       // Fallback if profile fetch fails (e.g. REST 406 or Timeout) but session exists
       console.warn("Falling back to session metadata for profile.");
       cachedProfile = {

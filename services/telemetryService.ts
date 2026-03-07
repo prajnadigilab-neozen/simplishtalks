@@ -66,7 +66,7 @@ class TelemetryService {
                     .from('profiles')
                     .select('place')
                     .eq('id', user.id)
-                    .single();
+                    .maybeSingle();
 
                 if (profile) {
                     // Assume 'place' might contains something like "Bangalore, 560001"
@@ -79,15 +79,31 @@ class TelemetryService {
                 }
             }
 
-            await supabase.from('telemetry').insert({
+            const { error: insertError } = await supabase.from('telemetry').insert({
                 user_id: user?.id || null,
                 page_path: window.location.hash || '/',
                 ...connectionInfo,
                 ...locationInfo,
                 ...data
             });
+
+            if (insertError) {
+                if (insertError.code === '23503') {
+                    // Foreign Key violation: user exists in Auth but not in Profiles yet
+                    // Retry anonymously so we don't lose the telemetry
+                    await supabase.from('telemetry').insert({
+                        user_id: null,
+                        page_path: window.location.hash || '/',
+                        ...connectionInfo,
+                        ...locationInfo,
+                        ...data
+                    });
+                } else {
+                    throw insertError;
+                }
+            }
         } catch (err) {
-            console.error('Failed to log telemetry:', err);
+            console.warn('Telemetry logged anonymously due to profile sync delay.');
         }
     }
 

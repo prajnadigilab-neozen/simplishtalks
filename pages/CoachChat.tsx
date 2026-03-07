@@ -170,9 +170,31 @@ const CoachChat: React.FC = () => {
   const handleClearHistory = async () => {
     if (!userId) return;
     if (!clearConfirm) { setClearConfirm(true); return; }
-    setClearConfirm(false);
-    await clearUserChatHistory(userId, undefined, 'chat');
     setMessages([]);
+  };
+
+  const handleDownloadHistory = () => {
+    if (messages.length === 0) return;
+    const headers = ['Role', 'Text', 'Correction', 'Kannada Guide', 'Timestamp'];
+    const csvContent = [
+      headers.join(','),
+      ...messages.map(m => [
+        m.role,
+        `"${m.text.replace(/"/g, '""')}"`,
+        `"${(m.correction || '').replace(/"/g, '""')}"`,
+        `"${(m.kannadaGuide || '').replace(/"/g, '""')}"`,
+        new Date(m.timestamp).toLocaleString()
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `simplish_chat_history_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleDeleteMessage = async (msg: CoachMessage) => {
@@ -251,21 +273,32 @@ const CoachChat: React.FC = () => {
             <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter">Bilingual Training</p>
           </div>
         </div>
-        <button
-          onClick={handleClearHistory}
-          className={`p-3 transition-all rounded-full ${clearConfirm
-            ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 ring-2 ring-red-400 animate-pulse'
-            : 'text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
-            }`}
-          title={clearConfirm
-            ? t({ en: "Tap again to confirm", kn: "ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ" })
-            : t({ en: "Clear All History", kn: "ಹಿಸ್ಟರಿ ಅಳಿಸಿ" })}
-          onBlur={() => setClearConfirm(false)}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.34 6.65m-2.86 0L11.26 9m4.105-3.04a.5.5 0 0 1 .124-.128A48.543 48.543 0 0 0 16.5 4.5h-9a48.543 48.543 0 0 0-1.011 1.432.5.5 0 0 1-.124.128M15.5 12.5a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h7Z" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDownloadHistory}
+            className="p-3 text-slate-300 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-full transition-all"
+            title="Download History (CSV)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </button>
+          <button
+            onClick={handleClearHistory}
+            className={`p-3 transition-all rounded-full ${clearConfirm
+              ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 ring-2 ring-red-400 animate-pulse'
+              : 'text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10'
+              }`}
+            title={clearConfirm
+              ? t({ en: "Tap again to confirm", kn: "ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ" })
+              : t({ en: "Clear All History", kn: "ಹಿಸ್ಟರಿ ಅಳಿಸಿ" })}
+            onBlur={() => setClearConfirm(false)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.34 6.65m-2.86 0L11.26 9m4.105-3.04a.5.5 0 0 1 .124-.128A48.543 48.543 0 0 0 16.5 4.5h-9a48.543 48.543 0 0 0-1.011 1.432.5.5 0 0 1-.124.128M15.5 12.5a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2.5a.5.5 0 0 1 .5-.5h7Z" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Chat Area */}

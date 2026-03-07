@@ -5,7 +5,7 @@ import { useLanguage } from '../components/LanguageContext';
 import { getAllUsers, toggleUserRestriction, deleteUser, mapRole } from '../services/authService';
 import { getAdminAuditLogs, getAllUserUsage, getUserUsageLogs, getPlatformReports } from '../services/coachService';
 import { getGlobalStats } from '../services/courseService';
-import { UserRole } from '../types';
+import { UserRole, PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
 
 interface Notification {
@@ -33,7 +33,15 @@ const AdminDashboard: React.FC = () => {
 
   // Platform Stats State
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [globalStats, setGlobalStats] = useState({ totalUsers: 0, activeLearners: 0, totalModules: 0, totalLessons: 0 });
+  const [globalStats, setGlobalStats] = useState({
+    totalUsers: 0,
+    activeLearners: 0,
+    totalModules: 0,
+    totalLessons: 0,
+    totalRevenue: 0,
+    talksCount: 0,
+    sangaathiCount: 0
+  });
 
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -64,7 +72,32 @@ const AdminDashboard: React.FC = () => {
       }
 
       const stats = await getGlobalStats();
-      setGlobalStats(stats);
+
+      // Calculate Revenue and Package Counts from users list
+      let totalRevenue = 0;
+      let talksCount = 0;
+      let sangaathiCount = 0;
+
+      userData.forEach(u => {
+        if (u.package_type === PackageType.TALKS) {
+          totalRevenue += 299;
+          talksCount++;
+        } else if (u.package_type === PackageType.SANGAATHI) {
+          totalRevenue += 499;
+          sangaathiCount++;
+        } else if (u.package_type === PackageType.BOTH) {
+          totalRevenue += (299 + 499);
+          talksCount++;
+          sangaathiCount++;
+        }
+      });
+
+      setGlobalStats({
+        ...stats,
+        totalRevenue,
+        talksCount,
+        sangaathiCount
+      });
 
       const usage = await getAllUserUsage();
       setUsageData(usage);
@@ -346,6 +379,22 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Revenue Card (New) - SUPER ADMIN ONLY */}
+            {currentUser?.role === UserRole.SUPER_ADMIN && (
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-green-100 dark:border-green-900 shadow-sm flex flex-col justify-between">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-2xl flex items-center justify-center text-2xl">
+                    💰
+                  </div>
+                  <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg uppercase tracking-wider">Revenue</span>
+                </div>
+                <div>
+                  <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">₹{globalStats.totalRevenue.toLocaleString()}</h4>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Account Recieved</p>
+                </div>
+              </div>
+            )}
+
             {/* Stat Card 1 */}
             <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
               <div className="flex justify-between items-start mb-4">
@@ -424,13 +473,15 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-xl">
-            <h4 className="text-xl font-black text-blue-900 dark:text-blue-400 mb-6 uppercase tracking-tighter">Usage Insights</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <h4 className="text-xl font-black text-blue-900 dark:text-blue-400 mb-6 uppercase tracking-tighter">Package Distribution</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
-                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Total Voice Time</p>
-                <p className="text-3xl font-black text-blue-800 dark:text-blue-300">
-                  {Math.floor(usageData.reduce((acc, curr) => acc + (curr.voice_seconds_total || 0), 0) / 60)}m {usageData.reduce((acc, curr) => acc + (curr.voice_seconds_total || 0), 0) % 60}s
-                </p>
+                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Talks Active</p>
+                <p className="text-3xl font-black text-blue-800 dark:text-blue-300">{globalStats.talksCount}</p>
+              </div>
+              <div className="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl">
+                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Sangaathi Active</p>
+                <p className="text-3xl font-black text-indigo-800 dark:text-indigo-300">{globalStats.sangaathiCount}</p>
               </div>
               <div className="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-2xl">
                 <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">Total AI Tokens</p>
@@ -639,8 +690,10 @@ const AdminDashboard: React.FC = () => {
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Date</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Reg. Users</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Active</th>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Voice Usage</th>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Chat Msgs</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Talks/Sangaathi</th>
+                  {currentUser?.role === UserRole.SUPER_ADMIN && (
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Revenue</th>
+                  )}
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Deleted</th>
                 </tr>
               </thead>
@@ -656,12 +709,14 @@ const AdminDashboard: React.FC = () => {
                     <td className="p-6 text-slate-600">
                       {report.active_count} users
                     </td>
-                    <td className="p-6 text-slate-600">
-                      {Math.floor(report.voice_seconds / 60)}m {report.voice_seconds % 60}s
+                    <td className="p-6 text-slate-600 font-black">
+                      <span className="text-blue-500">T: {report.talks_sold}</span> / <span className="text-indigo-500">S: {report.sangaathi_sold}</span>
                     </td>
-                    <td className="p-6 text-slate-600">
-                      {report.chat_messages} Msgs
-                    </td>
+                    {currentUser?.role === UserRole.SUPER_ADMIN && (
+                      <td className="p-6 text-green-600 font-bold">
+                        ₹{report.daily_revenue?.toLocaleString()}
+                      </td>
+                    )}
                     <td className="p-6 text-red-500 font-bold">
                       {report.deleted_count > 0 ? `-${report.deleted_count}` : '0'}
                     </td>

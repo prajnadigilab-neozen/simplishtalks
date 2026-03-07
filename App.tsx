@@ -4,7 +4,7 @@ import { HashRouter as Router, Routes, Route, useNavigate, Navigate, useLocation
 import { LanguageProvider, useLanguage } from './components/LanguageContext';
 import { ThemeProvider, useTheme } from './components/ThemeContext';
 import { TRANSLATIONS, INITIAL_MODULES, LEVEL_ORDER } from './constants';
-import { CourseLevel, UserProgress, LevelStatus, Module, UserRole } from './types';
+import { CourseLevel, UserProgress, LevelStatus, Module, UserRole, PackageType } from './types';
 import { supabase } from './lib/supabase';
 import { signOutUser, mapRole } from './services/authService';
 import { fetchAllModules } from './services/courseService';
@@ -22,6 +22,8 @@ const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const CourseManagement = React.lazy(() => import('./pages/CourseManagement'));
 const AiInstructions = React.lazy(() => import('./pages/AiInstructions'));
 const LessonEditor = React.lazy(() => import('./pages/LessonEditor'));
+const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
+const PackageSelection = React.lazy(() => import('./pages/PackageSelection'));
 const APIAnalytics = React.lazy(() => import('./pages/APIAnalytics'));
 const QuotaDashboard = React.lazy(() => import('./pages/QuotaDashboard'));
 
@@ -68,17 +70,17 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
               {userRole === UserRole.SUPER_ADMIN || userRole === UserRole.MODERATOR ? (
                 <>
                   <NavButton to="/admin" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/admin'} light={isLanding} />
-                  <NavButton to="/analytics" label={t({ en: 'Analytics', kn: 'ವಿಶ್ಲೇಷಣೆ' })} active={location.pathname === '/analytics'} light={isLanding} />
-                  <NavButton to="/quota" label={t({ en: 'Guardrail', kn: 'ಗಾರ್ಡ್‌ರೈಲ್' })} active={location.pathname === '/quota'} light={isLanding} />
+                  {userRole === UserRole.SUPER_ADMIN && (
+                    <>
+                      <NavButton to="/analytics" label={t({ en: 'Analytics', kn: 'ವಿಶ್ಲೇಷಣೆ' })} active={location.pathname === '/analytics'} light={isLanding} />
+                      <NavButton to="/quota" label={t({ en: 'Guardrail', kn: 'ಗಾರ್ಡ್‌ರೈಲ್' })} active={location.pathname === '/quota'} light={isLanding} />
+                    </>
+                  )}
                 </>
               ) : (
                 <>
-                  {session?.packageType !== 'AI_MESHTRU' && (
-                    <NavButton to="/dashboard" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} active={location.pathname === '/dashboard'} light={isLanding} />
-                  )}
-                  {session?.packageType === 'AI_MESHTRU' && (
-                    <NavButton to="/dashboard" label={t({ en: 'Meshtru', kn: 'ಮೇಷ್ಟ್ರು' })} active={location.pathname === '/dashboard'} light={isLanding} />
-                  )}
+                  <NavButton to="/dashboard" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/dashboard'} light={isLanding} />
+                  <NavButton to="/packages" label={t({ en: 'Product', kn: 'ಉತ್ಪನ್ನ' })} active={location.pathname === '/packages'} light={isLanding} />
                 </>
               )}
               <NavButton to="/settings" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} active={location.pathname === '/settings'} light={isLanding} />
@@ -216,15 +218,20 @@ const AppContent: React.FC = () => {
         // Use the session object from the event directly — no redundant getSession() call
         if (session) {
           const { user } = session;
+          const currentSession = useAppStore.getState().session;
+
           setSession({
+            ...currentSession,
             id: user.id,
-            name: user.user_metadata?.full_name || 'User',
-            role: mapRole(user.user_metadata?.role),
-            phone: user.phone,
-            place: user.user_metadata?.place || '',
-            packageType: 'NONE', // Fallback, will be replaced by actual fetch
+            name: user.user_metadata?.full_name || currentSession?.name || 'User',
+            role: mapRole(user.user_metadata?.role) || currentSession?.role,
+            phone: user.phone || currentSession?.phone,
+            place: user.user_metadata?.place || currentSession?.place || '',
+            // CRITICAL: Preserve the actual packageType fetched from the database
+            // INSTEAD of overwriting it to 'NONE', which kicks users out of the Dashboard
+            packageType: currentSession?.packageType || 'NONE',
             isLoggedIn: true,
-            isRestricted: false,
+            isRestricted: currentSession?.isRestricted || false,
           });
         }
       }
@@ -309,6 +316,8 @@ const AppContent: React.FC = () => {
                 ) : <RegisterPage />
               } />
               <Route path="/settings" element={session ? <ErrorBoundary><SettingsPage /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/payment" element={session ? <ErrorBoundary><PaymentPage /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/packages" element={session ? <ErrorBoundary><PackageSelection /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/placement" element={session ? <ErrorBoundary><PlacementTest /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/dashboard" element={
                 !session ? <Navigate to="/login" /> :
@@ -324,8 +333,8 @@ const AppContent: React.FC = () => {
               <Route path="/admin/course/lesson/:moduleId/:lessonId?" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><LessonEditor /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/admin/telemetry" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AdminTelemetry /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/admin/ai-instructions" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AiInstructions /></ErrorBoundary> : <Navigate to="/dashboard" />} />
-              <Route path="/analytics" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><APIAnalytics /></ErrorBoundary> : <Navigate to="/dashboard" />} />
-              <Route path="/quota" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><QuotaDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/analytics" element={session?.role === UserRole.SUPER_ADMIN ? <ErrorBoundary><APIAnalytics /></ErrorBoundary> : <Navigate to="/dashboard" />} />
+              <Route path="/quota" element={session?.role === UserRole.SUPER_ADMIN ? <ErrorBoundary><QuotaDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </Suspense>
@@ -340,23 +349,18 @@ const AppContent: React.FC = () => {
           {session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? (
             <>
               <MobileNavItem icon="🛡️" label={t({ en: 'Admin', kn: 'ಅಡ್ಮಿನ್' })} to="/admin" />
-              <MobileNavItem icon="🛡️" label={t({ en: 'Quota', kn: 'ಕೋಟಾ' })} to="/quota" />
+              {session?.role === UserRole.SUPER_ADMIN && (
+                <MobileNavItem icon="🛡️" label={t({ en: 'Quota', kn: 'ಕೋಟಾ' })} to="/quota" />
+              )}
               <MobileNavItem icon="⚙️" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} to="/settings" />
             </>
           ) : (
             <>
-              {session?.packageType !== 'AI_MESHTRU' && (
-                <>
-                  <MobileNavItem icon="📚" label={t({ en: 'Path', kn: 'ಹಾದಿ' })} to="/dashboard" />
-                  <MobileNavItem icon="💬" label={t({ en: 'Chat', kn: 'ಚಾಟ್' })} to="/coachchat" />
-                </>
+              <MobileNavItem icon="📚" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} to="/dashboard" />
+              {(session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH) && (
+                <MobileNavItem icon="💬" label={t({ en: 'Chat', kn: 'ಚಾಟ್' })} to="/coachchat" />
               )}
-              {session?.packageType !== 'TALKS' && (
-                <MobileNavItem icon="🎙️" label={t({ en: 'Meshtru', kn: 'ಮೇಷ್ಟ್ರು' })} to="/talk" />
-              )}
-              {session?.packageType === 'AI_MESHTRU' && (
-                <MobileNavItem icon="📊" label={t({ en: 'Usage', kn: 'ಬಳಕೆ' })} to="/dashboard" />
-              )}
+              <MobileNavItem icon="🛍️" label={t({ en: 'Product', kn: 'ಉತ್ಪನ್ನ' })} to="/packages" />
               <MobileNavItem icon="⚙️" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} to="/settings" />
             </>
           )}

@@ -118,34 +118,7 @@ const PlacementTest: React.FC = () => {
     }
   };
 
-  const handlePackageSelection = async (selectedPackage: PackageType) => {
-    if (!session?.id) return;
-    setLoading(true);
-    try {
-      const updates = {
-        package_type: selectedPackage,
-        package_status: PackageStatus.ACTIVE,
-        package_start_date: new Date().toISOString(),
-        package_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days mockup
-        agent_credits: selectedPackage === PackageType.AI_MESHTRU ? 60 : 0 // Give 60 minutes for AI_MESHTRU
-      };
 
-      const { error } = await supabase.from('profiles').update(updates).eq('id', session.id);
-      if (error) console.error("Error updating profile package:", error);
-
-      // Force a re-fetch of the session to get the new package details in global state
-      await useAppStore.getState().initialize(true);
-
-      if (evaluationResult) {
-        await setPlacementResult(evaluationResult.suggestedLevel);
-      }
-      navigate('/dashboard');
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleFinish = async () => {
     if (!session?.id || !evaluationResult) return;

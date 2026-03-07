@@ -271,7 +271,7 @@ export async function getUserUsageLogs(userId: string): Promise<any[]> {
 
 export async function getPlatformReports(): Promise<any[]> {
   try {
-    const { data, error } = await supabase.rpc('get_platform_reports');
+    const { data, error } = await supabase.rpc('get_platform_reports_v2');
     if (error) throw error;
     return data || [];
   } catch (err) {

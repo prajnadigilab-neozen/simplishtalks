@@ -42,6 +42,7 @@ const LessonView: React.FC = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [feedback, setFeedback] = useState<any>(null);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [quotaReached, setQuotaReached] = useState(getTTSQuotaStatus());
 
   // Study tab content
@@ -117,7 +118,27 @@ const LessonView: React.FC = () => {
       setIsFinishing(true);
       try {
         await onComplete(lesson.id, module.level);
-        navigate('/dashboard');
+
+        // Find next lesson
+        const currentLessonIndex = module.lessons.findIndex(l => l.id === id);
+        const nextLesson = module.lessons[currentLessonIndex + 1];
+
+        if (nextLesson) {
+          navigate(`/lesson/${nextLesson.id}`);
+          setActiveTab('watch'); // Reset to first tab for new lesson
+        } else {
+          // If no next lesson in current module, check if there is a next module
+          const currentModuleIndex = modules.findIndex(m => m.id === module.id);
+          const nextModule = modules[currentModuleIndex + 1];
+
+          if (nextModule) {
+            // Module completed, go to dashboard as requested
+            navigate('/dashboard');
+          } else {
+            // End of the course!
+            setShowCompletionModal(true);
+          }
+        }
       } catch (e) {
         console.error("Failed to finish lesson", e);
       } finally {
@@ -182,6 +203,25 @@ const LessonView: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 relative transition-colors duration-300">
+      {showCompletionModal && (
+        <div className="fixed inset-0 z-[100] bg-blue-900/90 backdrop-blur-xl flex items-center justify-center p-6 animate-in zoom-in duration-500">
+          <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-500 via-blue-500 to-green-500"></div>
+            <div className="text-6xl mb-6 scale-125 animate-bounce">🏆</div>
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 leading-tight">Course Completed!</h2>
+            <p className="text-slate-500 dark:text-slate-400 font-bold text-sm mb-8">ನಮ್ಮ ಅಭಿನಂದನೆಗಳು! ನೀವು ಈ ಹಂತದ ಎಲ್ಲಾ ಪಾಠಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ.</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-black transition-all"
+              >
+                Back to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {feedback && (
         <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
           <div className="w-full max-w-lg">
@@ -485,13 +525,15 @@ const LessonView: React.FC = () => {
 
       {/* Footer Nav */}
       < div className="fixed bottom-[68px] md:bottom-0 left-0 right-0 max-w-[720px] mx-auto p-4 md:p-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 flex gap-3 md:gap-4 z-[40]" >
-        <button
-          onClick={() => navigate('/dashboard')}
-          disabled={isFinishing}
-          className="flex-1 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest disabled:opacity-50 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
-        >
-          🏠 <span className="hidden sm:inline">{t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })}</span>
-        </button>
+        {activeTab !== 'watch' && (
+          <button
+            onClick={() => navigate(-1)}
+            disabled={isFinishing}
+            className="flex-1 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl font-black text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+          >
+            ← <span className="hidden sm:inline">{t({ en: 'Back', kn: 'ಹಿಂದೆ' })}</span>
+          </button>
+        )}
 
         {
           isLastTab ? (

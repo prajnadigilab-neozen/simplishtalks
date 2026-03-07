@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { TRANSLATIONS } from '../constants';
-import { CoachMessage } from '../types';
+import { CoachMessage, PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { getChatHistory, saveChatMessage, clearUserChatHistory, deleteChatMessage, getUserUsage, updateUserUsage } from '../services/coachService';
 import { textToSpeech, getTTSQuotaStatus } from '../services/geminiService';
@@ -120,8 +120,8 @@ const VoiceCoach: React.FC = () => {
   // ── Actions ──
   const handleStartSession = async () => {
     const currentCredits = session?.agentCredits || 0;
-    if (session?.packageType === 'AI_MESHTRU' && currentCredits <= 0) {
-      alert("You have run out of AI Meshtru credits. Please recharge."); // In a real app, show a nice modal
+    if (session?.packageType === PackageType.SANGAATHI && currentCredits <= 0) {
+      alert("You have run out of Simplish Sangaathi credits. Please recharge."); // In a real app, show a nice modal
       return;
     }
 
@@ -170,7 +170,7 @@ const VoiceCoach: React.FC = () => {
         // Convert elapsed seconds to minutes spent (rounding up for simple billing mock)
         const minutesSpent = Math.ceil(elapsedSeconds / 60);
 
-        if (session?.packageType === 'AI_MESHTRU' && session.agentCredits !== undefined) {
+        if (session?.packageType === PackageType.SANGAATHI && session.agentCredits !== undefined) {
           const newCredits = Math.max(0, session.agentCredits - minutesSpent);
 
           // Optimistically update local store
@@ -194,9 +194,32 @@ const VoiceCoach: React.FC = () => {
   const handleClearHistory = async () => {
     if (!userId) return;
     if (!clearConfirm) { setClearConfirm(true); return; }
-    setClearConfirm(false);
-    await clearUserChatHistory(userId, undefined, 'voice');
     setMessages([]);
+  };
+
+  const handleDownloadHistory = () => {
+    if (messages.length === 0) return;
+    const headers = ['Role', 'Text', 'Correction', 'Kannada Guide', 'Pronunciation Tip', 'Timestamp'];
+    const csvContent = [
+      headers.join(','),
+      ...messages.map(m => [
+        m.role,
+        `"${m.text.replace(/"/g, '""')}"`,
+        `"${(m.correction || '').replace(/"/g, '""')}"`,
+        `"${(m.kannadaGuide || '').replace(/"/g, '""')}"`,
+        `"${(m.pronunciationTip || '').replace(/"/g, '""')}"`,
+        new Date(m.timestamp).toLocaleString()
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `simplish_voice_history_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleDeleteMessage = async (msg: CoachMessage) => {
@@ -241,6 +264,15 @@ const VoiceCoach: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleDownloadHistory}
+            className="p-2 text-white/40 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors"
+            title="Download History (CSV)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </button>
           <button
             onClick={handleClearHistory}
             className={`p-2 rounded-xl transition-colors ${clearConfirm
@@ -368,7 +400,7 @@ const VoiceCoach: React.FC = () => {
                 >
                   {t(TRANSLATIONS.startLearning)}
                 </button>
-                {session?.packageType === 'AI_MESHTRU' && (
+                {session?.packageType === PackageType.SANGAATHI && (
                   <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-orange-400">
                     {session.agentCredits > 0 ? `${session.agentCredits} Minutes Available` : '0 Minutes - Please Recharge'}
                   </p>

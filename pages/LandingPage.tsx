@@ -26,7 +26,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
 
   return (
     <div className="relative min-h-screen w-full bg-slate-50 dark:bg-slate-900 flex flex-col font-sans transition-colors duration-300">
-      
+
       {/* 1. Hero Section */}
       <section className="relative px-6 pt-24 pb-20 md:pt-32 md:pb-32 flex flex-col items-center text-center overflow-hidden">
         {/* Subtle background decoration */}
@@ -47,9 +47,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
         </h1>
 
         <p className="text-lg md:text-2xl text-slate-600 dark:text-slate-300 mb-10 max-w-3xl leading-relaxed">
-          {t({ 
-            en: "Break the 'elite' barrier. Learn to speak English with clarity and confidence using localized Kannada support. Because eloquence is a tool for everyone—not just the privileged few.", 
-            kn: "'ಎಲೈಟ್' ತಡೆಗೋಡೆಯನ್ನು ಒಡೆಯಿರಿ. ಸ್ಥಳೀಯ ಕನ್ನಡ ಬೆಂಬಲದೊಂದಿಗೆ ಸ್ಪಷ್ಟತೆ ಮತ್ತು ವಿಶ್ವಾಸದಿಂದ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡಲು ಕಲಿಯಿರಿ. ಏಕೆಂದರೆ ವಾಕ್ಚಾತುರ್ಯ ಎಲ್ಲರಿಗೂ ಸೇರಿದ್ದು-ಕೇವಲ ಕೆಲವು ಸವಲತ್ತುಳ್ಳವರಿಗಲ್ಲ." 
+          {t({
+            en: "Break the 'elite' barrier. Learn to speak English with clarity and confidence using localized Kannada support. Because eloquence is a tool for everyone—not just the privileged few.",
+            kn: "'ಎಲೈಟ್' ತಡೆಗೋಡೆಯನ್ನು ಒಡೆಯಿರಿ. ಸ್ಥಳೀಯ ಕನ್ನಡ ಬೆಂಬಲದೊಂದಿಗೆ ಸ್ಪಷ್ಟತೆ ಮತ್ತು ವಿಶ್ವಾಸದಿಂದ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡಲು ಕಲಿಯಿರಿ. ಏಕೆಂದರೆ ವಾಕ್ಚಾತುರ್ಯ ಎಲ್ಲರಿಗೂ ಸೇರಿದ್ದು-ಕೇವಲ ಕೆಲವು ಸವಲತ್ತುಳ್ಳವರಿಗಲ್ಲ."
           })}
         </p>
 
@@ -154,7 +154,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
           </div>
 
           <div className="mt-16 flex justify-center">
-             <button
+            <button
               onClick={handleCTA}
               className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors shadow-lg flex items-center gap-3"
             >
