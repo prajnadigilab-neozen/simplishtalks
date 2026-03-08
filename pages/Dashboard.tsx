@@ -8,7 +8,7 @@ import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
 
 const Dashboard: React.FC = () => {
-  const { session, modules, progress, loading } = useAppStore();
+  const { session, modules, progress, loading, initialized } = useAppStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [voiceHistory, setVoiceHistory] = useState<any[]>([]);
@@ -143,10 +143,11 @@ const Dashboard: React.FC = () => {
 
   // 1. Don't redirect while still loading session data
   useEffect(() => {
-    if (!loading && (!session?.packageType || session.packageType === PackageType.NONE)) {
+    if (initialized && !loading && (!session?.packageType || session.packageType === PackageType.NONE)) {
       navigate('/packages', { replace: true });
     }
-  }, [session?.packageType, loading, navigate]);
+  }, [session?.packageType, loading, initialized, navigate]);
+
 
   // Show nothing while loading or if no package
   if (loading) {
@@ -452,5 +453,3 @@ const ShortcutButton: React.FC<{ icon: string; label: string; color: string; onC
     <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center max-w-[80px]">{label}</span>
   </button>
 );
-
-

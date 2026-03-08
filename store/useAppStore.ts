@@ -83,14 +83,28 @@ export const useAppStore = create<AppState>((set, get) => ({
                     : Promise.resolve({ data: null, error: null })
             ]);
 
+            const currentSession = get().session;
+
             // Fallback: build a minimal session from raw jwt data if profile fetch failed
-            const session = profile ?? (rawSession ? {
+            const fetchedSession = profile ?? (rawSession ? {
                 id: rawSession.user.id,
                 name: rawSession.user.user_metadata?.full_name || 'User',
                 role: rawSession.user.user_metadata?.role || UserRole.STUDENT,
+                packageType: rawSession.user.user_metadata?.package_type || 'NONE',
+                packageStatus: rawSession.user.user_metadata?.package_status || 'INACTIVE',
                 isLoggedIn: true,
                 isRestricted: false,
             } : null);
+
+            // CRITICAL: Merge speculatively to preserve package info if the fetch was partial 
+            // or if we are in the middle of a post-payment re-refetch.
+            const session = fetchedSession ? {
+                ...currentSession,
+                ...fetchedSession,
+                // Hard-preserve package if currentSession already has it but fetched one says NONE (stale Auth metadata)
+                packageType: (fetchedSession.packageType !== 'NONE') ? fetchedSession.packageType : (currentSession?.packageType || 'NONE'),
+                packageStatus: (fetchedSession.packageStatus !== 'INACTIVE') ? fetchedSession.packageStatus : (currentSession?.packageStatus || 'INACTIVE'),
+            } : null;
 
             set({ session, modules: modules || [], initialized: true });
             console.log("✅ Core state set. Session:", !!session, "Modules:", modules?.length);

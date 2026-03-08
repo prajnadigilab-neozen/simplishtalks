@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-changelog": "node scripts/update-changelog.js",
+    "update-tracker": "node scripts/update-dev-tracker.js"
   },
   "dependencies": {
     "@google/genai": "^1.40.0",

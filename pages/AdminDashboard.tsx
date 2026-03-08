@@ -7,6 +7,7 @@ import { getAdminAuditLogs, getAllUserUsage, getUserUsageLogs, getPlatformReport
 import { getGlobalStats } from '../services/courseService';
 import { UserRole, PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
+import { clearAllRecordings } from '../utils/recordingStore';
 
 interface Notification {
   id: string;
@@ -25,6 +26,8 @@ const AdminDashboard: React.FC = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [usageData, setUsageData] = useState<any[]>([]);
   const [reportsData, setReportsData] = useState<any[]>([]);
+  const [reportsStartDate, setReportsStartDate] = useState<string>('');
+  const [reportsEndDate, setReportsEndDate] = useState<string>('');
 
   const [selectedAuditUser, setSelectedAuditUser] = useState<string | null>(null);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -165,6 +168,76 @@ const AdminDashboard: React.FC = () => {
     }
     setProcessingId(null);
   };
+
+  // --- Reports Filtering and Download ---
+  const filteredReports = reportsData.filter(report => {
+    if (!reportsStartDate && !reportsEndDate) return true;
+
+    // Create Date objects. Report dates are typically 'YYYY-MM-DD' or full ISO strings
+    const rDate = new Date(report.report_date);
+    rDate.setHours(0, 0, 0, 0);
+
+    if (reportsStartDate) {
+      const sDate = new Date(reportsStartDate);
+      sDate.setHours(0, 0, 0, 0);
+      if (rDate < sDate) return false;
+    }
+
+    if (reportsEndDate) {
+      const eDate = new Date(reportsEndDate);
+      eDate.setHours(0, 0, 0, 0);
+      if (rDate > eDate) return false;
+    }
+
+    return true;
+  });
+
+  const handleDownloadCSV = () => {
+    if (filteredReports.length === 0) {
+      showNotification("No data available to download.", "info");
+      return;
+    }
+
+    const isSuperAdmin = currentUser?.role === UserRole.SUPER_ADMIN;
+
+    // Define headers based on role
+    const headers = [
+      "Date",
+      "Reg. Users",
+      "Active Users",
+      "Talks Sold",
+      "Sangaathi Sold",
+      ...(isSuperAdmin ? ["Revenue (INR)"] : []),
+      "Deleted Users"
+    ];
+
+    // Build CSV content
+    let csvContent = headers.map(h => `"${h}"`).join(",") + "\n";
+
+    filteredReports.forEach(r => {
+      const row = [
+        `"${new Date(r.report_date).toISOString().split('T')[0]}"`,
+        `"${r.registered_count || 0}"`,
+        `"${r.active_count || 0}"`,
+        `"${r.talks_sold || 0}"`,
+        `"${r.sangaathi_sold || 0}"`,
+        ...(isSuperAdmin ? [`"${r.daily_revenue || 0}"`] : []),
+        `"${r.deleted_count || 0}"`
+      ];
+      csvContent += row.join(",") + "\n";
+    });
+
+    // Download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `platform_reports_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   if (loading) {
     return (
@@ -681,6 +754,45 @@ const AdminDashboard: React.FC = () => {
               <h3 className="text-2xl font-black text-orange-900 dark:text-orange-300">Platform Reports</h3>
               <p className="text-sm text-slate-500">Daily performance metrics and user activity trends.</p>
             </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center">
+              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="flex flex-col">
+                  <label className="text-[8px] font-black uppercase text-slate-400 px-1">Start Date</label>
+                  <input
+                    type="date"
+                    value={reportsStartDate}
+                    onChange={(e) => setReportsStartDate(e.target.value)}
+                    className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
+                  />
+                </div>
+                <span className="text-slate-300 font-bold">-</span>
+                <div className="flex flex-col">
+                  <label className="text-[8px] font-black uppercase text-slate-400 px-1">End Date</label>
+                  <input
+                    type="date"
+                    value={reportsEndDate}
+                    onChange={(e) => setReportsEndDate(e.target.value)}
+                    className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
+                  />
+                </div>
+                {(reportsStartDate || reportsEndDate) && (
+                  <button
+                    onClick={() => { setReportsStartDate(''); setReportsEndDate(''); }}
+                    className="ml-2 w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 flex items-center justify-center text-xs text-slate-500"
+                    title="Clear Filters"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={handleDownloadCSV}
+                className="px-4 py-3 bg-orange-100 hover:bg-orange-200 text-orange-700 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 dark:text-orange-400 rounded-xl text-xs font-black uppercase transition-colors flex items-center gap-2 border border-orange-200 dark:border-orange-800 shadow-sm"
+              >
+                <span>📥</span> Download CSV
+              </button>
+            </div>
           </div>
 
           <div className="overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 shadow-xl">
@@ -698,30 +810,38 @@ const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {reportsData.map((report: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="p-6 font-bold text-slate-700 dark:text-slate-300">
-                      {new Date(report.report_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                    </td>
-                    <td className="p-6 text-blue-600 font-black">
-                      +{report.registered_count}
-                    </td>
-                    <td className="p-6 text-slate-600">
-                      {report.active_count} users
-                    </td>
-                    <td className="p-6 text-slate-600 font-black">
-                      <span className="text-blue-500">T: {report.talks_sold}</span> / <span className="text-indigo-500">S: {report.sangaathi_sold}</span>
-                    </td>
-                    {currentUser?.role === UserRole.SUPER_ADMIN && (
-                      <td className="p-6 text-green-600 font-bold">
-                        ₹{report.daily_revenue?.toLocaleString()}
-                      </td>
-                    )}
-                    <td className="p-6 text-red-500 font-bold">
-                      {report.deleted_count > 0 ? `-${report.deleted_count}` : '0'}
+                {filteredReports.length === 0 ? (
+                  <tr>
+                    <td colSpan={currentUser?.role === UserRole.SUPER_ADMIN ? 6 : 5} className="p-8 text-center text-slate-400 font-bold">
+                      No reports found for the selected date range.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredReports.map((report: any, idx: number) => (
+                    <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td className="p-6 font-bold text-slate-700 dark:text-slate-300">
+                        {new Date(report.report_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="p-6 text-blue-600 font-black">
+                        +{report.registered_count}
+                      </td>
+                      <td className="p-6 text-slate-600">
+                        {report.active_count} users
+                      </td>
+                      <td className="p-6 text-slate-600 font-black">
+                        <span className="text-blue-500">T: {report.talks_sold}</span> / <span className="text-indigo-500">S: {report.sangaathi_sold}</span>
+                      </td>
+                      {currentUser?.role === UserRole.SUPER_ADMIN && (
+                        <td className="p-6 text-green-600 font-bold">
+                          ₹{report.daily_revenue?.toLocaleString()}
+                        </td>
+                      )}
+                      <td className="p-6 text-red-500 font-bold">
+                        {report.deleted_count > 0 ? `-${report.deleted_count}` : '0'}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

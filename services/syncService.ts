@@ -24,7 +24,7 @@ export async function syncDown(onComplete?: () => void) {
         }
 
         if (userId) {
-            const { data: progress } = await supabase.from('user_progress').select('*').eq('user_id', userId).single();
+            const { data: progress } = await supabase.from('user_progress').select('*').eq('user_id', userId).maybeSingle();
             if (progress) {
                 const localProg = await db.user_progress.get(userId);
                 // Resolve conflict: prioritize latest updated_at
@@ -46,6 +46,10 @@ export async function syncDown(onComplete?: () => void) {
 export async function syncUp() {
     if (!navigator.onLine) return;
 
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    if (!userId) return;
+
     const queue = await db.sync_queue.orderBy('created_at').toArray();
     if (queue.length === 0) return;
 
@@ -53,6 +57,15 @@ export async function syncUp() {
 
     for (const item of queue) {
         try {
+            // SECURITY: Ensure the item belongs to the current user to avoid RLS 403 violations
+            // and getting the sync cycle "stuck" on a stale record from another session.
+            const itemUserId = item.payload?.user_id;
+            if (itemUserId && itemUserId !== userId) {
+                console.warn(`🧹 Purging orphan sync item ${item.id} belonging to user ${itemUserId}`);
+                if (item.id) await db.sync_queue.delete(item.id);
+                continue;
+            }
+
             if (item.action === 'UPSERT_PROGRESS') {
                 const { error } = await supabase.from('user_progress').upsert(item.payload, { onConflict: 'user_id' });
                 if (error) throw error;
@@ -75,8 +88,17 @@ export async function syncUp() {
                 await db.sync_queue.delete(item.id);
             }
         } catch (err: any) {
-            console.error(`❌ Failed to sync item ${item.id} (action: ${item.action}):`, err?.message || err);
-            // Stop syncing to keep chronological ordering intact for dependent mutations
+            const errMsg = err?.message || String(err);
+            console.error(`❌ Failed to sync item ${item.id} (action: ${item.action}):`, errMsg);
+
+            // If it's an RLS violation (403), it's likely permanently broken for this session
+            if (errMsg.includes('row-level security') || errMsg.includes('403')) {
+                console.warn(`🗑️ Deleting RLS-violating item ${item.id} to unblock sync queue.`);
+                if (item.id) await db.sync_queue.delete(item.id);
+                continue;
+            }
+
+            // Stop syncing for other errors to keep chronological ordering intact
             break;
         }
     }

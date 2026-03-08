@@ -13,9 +13,10 @@ import {
 interface AudioRecorderProps {
   onRecordingComplete: (blob: Blob) => void;
   lessonId?: string;
+  hideHistory?: boolean;
 }
 
-const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, lessonId }) => {
+const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, lessonId, hideHistory }) => {
   const { t } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -191,7 +192,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
         </div>
       )}
 
-      {savedPractices.length > 0 && (
+      {!hideHistory && savedPractices.length > 0 && (
         <div className="w-full mt-4 space-y-3">
           <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] border-b border-slate-100 dark:border-slate-700 pb-2">
             {t({ en: 'Recent Practices', kn: 'ಹಿಂದಿನ ಅಭ್ಯಾಸಗಳು' })}

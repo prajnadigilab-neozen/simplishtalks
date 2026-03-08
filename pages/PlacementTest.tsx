@@ -237,7 +237,7 @@ const PlacementTest: React.FC = () => {
             </div>
             <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[3rem] border-2 border-slate-100 dark:border-slate-700 text-center">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Click to Record & Read Aloud</p>
-              <AudioRecorder onRecordingComplete={handleAudioComplete} />
+              <AudioRecorder onRecordingComplete={handleAudioComplete} hideHistory={true} />
             </div>
             <button onClick={() => setStep(4)} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
           </div>

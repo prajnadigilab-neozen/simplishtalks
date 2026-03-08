@@ -118,3 +118,17 @@ export async function migrateFromLocalStorage(): Promise<void> {
         console.error('Migration parse error:', e);
     }
 }
+
+/** Clear all recordings from IndexedDB */
+export async function clearAllRecordings(): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).clear();
+        tx.oncomplete = () => {
+            console.log('✅ All local recordings cleared.');
+            resolve();
+        };
+        tx.onerror = () => reject(tx.error);
+    });
+}
