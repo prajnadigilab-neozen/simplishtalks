@@ -149,13 +149,11 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
     setGlobalError('');
 
-    const phoneWithCode = `+91${formData.phone}`;
-
     let result;
     if (isLoginMode) {
-      result = await loginUser({ phone: phoneWithCode, password: formData.password });
+      result = await loginUser({ phone: formData.phone, password: formData.password });
     } else {
-      result = await registerUser({ ...formData, phone: phoneWithCode });
+      result = await registerUser({ ...formData, phone: formData.phone });
     }
 
     if (result.success) {
@@ -315,7 +313,6 @@ const RegisterPage: React.FC = () => {
               type="tel"
               autoComplete="tel"
               placeholder="98765 43210"
-              prefix="+91"
               value={formData.phone}
               onChange={handlePhoneChange}
               error={fieldErrors.phone}

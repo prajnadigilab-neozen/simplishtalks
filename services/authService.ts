@@ -46,10 +46,9 @@ function withTimeout<T>(promise: Promise<T>, ms = 4000): Promise<T> {
 export async function registerUser(data: RegisterData): Promise<{ success: boolean; error?: string }> {
   try {
     const role = data.adminCode === ADMIN_SECRET ? UserRole.SUPER_ADMIN : UserRole.STUDENT;
-    const formattedPhone = data.phone.startsWith('+') ? data.phone : `+91${data.phone}`;
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      phone: formattedPhone,
+      phone: data.phone,
       password: data.password,
       options: {
         data: {
@@ -65,7 +64,7 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
       if (authError.message.includes("User already registered") || authError.status === 422) {
         console.log("Identity exists. Seamlessly falling back to login flow...");
         const { data: signinData, error: signinError } = await supabase.auth.signInWithPassword({
-          phone: formattedPhone,
+          phone: data.phone,
           password: data.password,
         });
 
@@ -84,7 +83,7 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
             await supabase.from('profiles').insert([{
               id: signinData.user.id,
               full_name: data.fullName,
-              phone: formattedPhone,
+              phone: data.phone,
               place: data.place,
               role: role
             }]);
@@ -105,7 +104,7 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
         .from('profiles')
         .update({
           full_name: data.fullName,
-          phone: formattedPhone,
+          phone: data.phone,
           place: data.place,
           role: role
         })
@@ -119,7 +118,7 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
         const { error: insertError } = await supabase.from('profiles').insert([{
           id: authData.user.id,
           full_name: data.fullName,
-          phone: formattedPhone,
+          phone: data.phone,
           place: data.place,
           role: role
         }]);
@@ -200,10 +199,9 @@ export async function toggleUserRestriction(id: string, isRestricted: boolean): 
 
 export async function loginUser(data: LoginData): Promise<{ success: boolean; error?: string }> {
   try {
-    const formattedPhone = data.phone.startsWith('+') ? data.phone : `+91${data.phone}`;
-    console.log("🔐 Attempting login for:", formattedPhone);
+    console.log("🔐 Attempting login for:", data.phone);
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      phone: formattedPhone,
+      phone: data.phone,
       password: data.password,
     });
 
@@ -309,7 +307,7 @@ export async function getUserSession(providedSession?: any) {
         role: mapRole(profile.role || session.user.user_metadata?.role),
         isRestricted: profile.is_restricted || false,
         avatar_url: profile.avatar_url,
-        preferredModel: profile.preferred_model || 'gemini-2.0-flash',
+        preferredModel: profile.preferred_model || 'gemini-3-flash-preview',
         voiceProfile: profile.voice_profile || 'Aoede',
         systemPromptFocus: profile.system_prompt_focus || '',
         packageType: profile.package_type || 'NONE',
@@ -347,7 +345,7 @@ export async function getUserSession(providedSession?: any) {
         avatar_url: session.user.user_metadata?.avatar_url || '',
         role: mapRole(session.user.user_metadata?.role),
         phone: session.user.phone,
-        preferredModel: 'gemini-2.0-flash',
+        preferredModel: 'gemini-3-flash-preview',
         voiceProfile: 'Aoede',
         systemPromptFocus: '',
         packageType: 'NONE',

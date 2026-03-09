@@ -155,7 +155,7 @@ export async function evaluatePlacement(data: {
   try {
     // Quota Guardrail
     const prompt = JSON.stringify(data);
-    const guard = await quotaGuard('gemini-2.0-flash', prompt, 'chat');
+    const guard = await quotaGuard('gemini-3-flash-preview', prompt, 'chat');
     if (!guard.isAllowed) throw new Error(guard.message);
     if (guard.mockData) return guard.mockData.data;
 
@@ -163,7 +163,19 @@ export async function evaluatePlacement(data: {
       body: { type: 'placement', ...data },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error("Placement Evaluation Edge Function Error:", error);
+      let realErrorMsg = '';
+      try {
+        if ((error as any).context) {
+          const body = await (error as any).context.json();
+          realErrorMsg = body?.error || body?.message || JSON.stringify(body);
+        }
+      } catch {
+        realErrorMsg = (error as any)?.message || String(error);
+      }
+      throw new Error(realErrorMsg || 'Unknown error in placement evaluation');
+    }
     const result = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
 
     // Log real usage
@@ -207,7 +219,7 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
     const audioBase64 = await base64Promise;
 
     // Quota Guardrail
-    const guard = await quotaGuard('gemini-2.0-flash', targetText, 'chat');
+    const guard = await quotaGuard('gemini-3-flash-preview', targetText, 'chat');
     if (!guard.isAllowed) throw new Error(guard.message);
     if (guard.mockData) return guard.mockData.data;
 
@@ -215,7 +227,19 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
       body: { type: 'speech', audioBase64, targetText },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error("Speech Evaluation Edge Function Error:", error);
+      let realErrorMsg = '';
+      try {
+        if ((error as any).context) {
+          const body = await (error as any).context.json();
+          realErrorMsg = body?.error || body?.message || JSON.stringify(body);
+        }
+      } catch {
+        realErrorMsg = (error as any)?.message || String(error);
+      }
+      throw new Error(realErrorMsg || 'Unknown error');
+    }
     const result = typeof data === 'string' ? JSON.parse(data) : data;
 
     // Log real usage

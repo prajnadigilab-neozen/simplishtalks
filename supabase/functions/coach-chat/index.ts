@@ -6,7 +6,8 @@ const corsHeaders = {
 };
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
-const PRIMARY_MODEL = 'gemini-2.0-flash';
+const PRIMARY_MODEL = 'gemini-3-flash-preview';
+const FALLBACK_MODEL = 'gemini-flash-latest';
 
 const COACH_SYSTEM_INSTRUCTION = `
 You are a patient English tutor for Kannada-speaking students. Always explain complex concepts in Kannada first.
@@ -108,6 +109,19 @@ Deno.serve(async (req) => {
         });
     } catch (err: any) {
         console.error('coach-chat error:', err);
+        const msg = err.message?.toLowerCase() || '';
+
+        // System instruction mandate: Return a message instead of a generic error if model is deprecated
+        if (msg.includes('not found') || msg.includes('404')) {
+            return new Response(
+                JSON.stringify({
+                    replyEn: "The selected AI model is deprecated constraint. Please update your model selection in the settings.",
+                    kannadaGuide: "ಆಯ್ಕೆಮಾಡಿದ AI ಮಾದರಿ ಸ್ಥಗಿತಗೊಂಡಿದೆ. ದಯವಿಟ್ಟು ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.",
+                }),
+                { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
         return new Response(
             JSON.stringify({
                 replyEn: `EDGE ERROR: ${err.message}`,

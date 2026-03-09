@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
-const PRIMARY_MODEL = 'gemini-2.0-flash';
-const FALLBACK_MODEL = 'gemini-1.5-flash';
+const PRIMARY_MODEL = 'gemini-3-flash-preview';
+const FALLBACK_MODEL = 'gemini-flash-latest';
 
 async function callGemini(model: string, contents: any, config: any) {
     if (!GEMINI_API_KEY) {
@@ -30,6 +30,12 @@ async function callGemini(model: string, contents: any, config: any) {
             console.error(`Gemini ${model} API Error (Status ${res.status}):`, JSON.stringify(data, null, 2));
             const errorMessage = data.error?.message || 'Unknown Gemini API Error';
             const errorReason = data.error?.status || 'UNKNOWN';
+
+            // Check if it's a model deprecation error to pass back up cleanly
+            if (res.status === 404 && errorMessage.toLowerCase().includes('not found')) {
+                throw new Error(`MODEL_DEPRECATED: The selected AI model ${model} is not available. Please update your AI settings.`);
+            }
+
             throw new Error(`Gemini ${model} ${errorReason}: ${errorMessage}`);
         }
 
@@ -106,6 +112,7 @@ async function handleSpeech(body: any) {
     const { audioBase64, targetText } = body;
 
     const contents = {
+        role: 'user',
         parts: [
             {
                 inlineData: {

@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
-const PRIMARY_MODEL = 'gemini-2.0-flash';
-const FALLBACK_MODEL = 'gemini-1.5-flash';
+const PRIMARY_MODEL = 'gemini-3-flash-preview';
+const FALLBACK_MODEL = 'gemini-flash-latest';
 
 async function callGemini(model: string, contents: any, systemInstruction: string) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
@@ -74,7 +74,22 @@ Deno.serve(async (req) => {
             result = await callGemini(PRIMARY_MODEL, contents, fullInstruction);
         } catch (err: any) {
             const msg = err.message?.toLowerCase() || '';
-            if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            if (msg.includes('not found') || msg.includes('404')) {
+                // If primary is deprecated, try fallback
+                try {
+                    result = await callGemini(FALLBACK_MODEL, contents, fullInstruction);
+                } catch (fallbackErr: any) {
+                    const failMsg = fallbackErr.message?.toLowerCase() || '';
+                    if (failMsg.includes('not found') || failMsg.includes('404')) {
+                        // System instruction mandate: Return a message instead of a generic error
+                        return new Response(JSON.stringify({
+                            reply: "The selected AI model is deprecated constraint. Please update your model selection in the settings.",
+                            kannadaHelp: "ಆಯ್ಕೆಮಾಡಿದ AI ಮಾದರಿ ಸ್ಥಗಿತಗೊಂಡಿದೆ. ದಯವಿಟ್ಟು ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ."
+                        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+                    }
+                    throw fallbackErr;
+                }
+            } else if (msg.includes('503')) {
                 result = await callGemini(FALLBACK_MODEL, contents, fullInstruction);
             } else {
                 throw err;

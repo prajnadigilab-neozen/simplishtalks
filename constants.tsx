@@ -46,7 +46,7 @@ export const INITIAL_MODULES = [
     description: { en: 'Daily routine, family, and simple present tense.', kn: 'ದೈನಂದಿನ ಚಟುವಟಿಕೆಗಳು ಮತ್ತು ಸರಳ ವರ್ತಮಾನ ಕಾಲ.' },
     lessons: [
       {
-        id: 'b1',
+        id: 'b1111111-1111-4111-a111-111111111111',
         title: { en: 'Introduction to Greetings', kn: 'ಶುಭಾಶಯಗಳ ಪರಿಚಯ' },
         videoUrl: undefined,
         pdfUrl: undefined,
@@ -59,7 +59,7 @@ export const INITIAL_MODULES = [
           initialMessage: "Hello! I saw you moving in today. I'm Ravi, your neighbor. What's your name?"
         }
       },
-      { id: 'b2', title: { en: 'Family Members', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರು' }, notes: { en: 'Names for family members in English.', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರ ಹೆಸರುಗಳು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ.' }, isCompleted: false },
+      { id: 'b2222222-2222-4222-a222-222222222222', title: { en: 'Family Members', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರು' }, notes: { en: 'Names for family members in English.', kn: 'ಕುಟುಂಬದ ಸದಸ್ಯರ ಹೆಸರುಗಳು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ.' }, isCompleted: false },
     ]
   },
   {
@@ -68,7 +68,7 @@ export const INITIAL_MODULES = [
     description: { en: 'Everyday situations like hospitals or shops.', kn: 'ಆಸ್ಪತ್ರೆ ಅಥವಾ ಅಂಗಡಿಗಳಂತಹ ದೈನಂದಿನ ಸನ್ನಿವೇಶಗಳು.' },
     lessons: [
       {
-        id: 'i1',
+        id: 'e1111111-1111-4111-a111-111111111111',
         title: { en: 'Ordering Food', kn: 'ಆಹಾರ ಆರ್ಡರ್ ಮಾಡುವುದು' },
         notes: { en: 'How to order at a restaurant.', kn: 'ರೆಸ್ಟೋರೆಂಟ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡುವುದು ಹೇಗೆ.' },
         isCompleted: false,
@@ -86,7 +86,7 @@ export const INITIAL_MODULES = [
     title: { en: 'Fluency', kn: 'ನಿರರ್ಗಳತೆ' },
     description: { en: 'Complex sentences, modals, and emails.', kn: 'ಸಂಕೀರ್ಣ ವಾಕ್ಯಗಳು ಮತ್ತು ಇಮೇಲ್ ಬರಹ.' },
     lessons: [
-      { id: 'a1', title: { en: 'Professional Emails', kn: 'ವೃತ್ತಿಪರ ಇಮೇಲ್‌ಗಳು' }, notes: { en: 'Writing business emails.', kn: 'ವ್ಯಾಪಾರ ಇಮೇಲ್‌ಗಳನ್ನು ಬರೆಯುವುದು.' }, isCompleted: false },
+      { id: 'a1111111-1111-4111-a111-111111111111', title: { en: 'Professional Emails', kn: 'ವೃತ್ತಿಪರ ಇಮೇಲ್‌ಗಳು' }, notes: { en: 'Writing business emails.', kn: 'ವ್ಯಾಪಾರ ಇಮೇಲ್‌ಗಳನ್ನು ಬರೆಯುವುದು.' }, isCompleted: false },
     ]
   },
   {
@@ -94,7 +94,7 @@ export const INITIAL_MODULES = [
     title: { en: 'Professionalism', kn: 'ವೃತ್ತಿಪರತೆ' },
     description: { en: 'Interviews, presentations, and resumes.', kn: 'ಸಂದರ್ಶನಗಳು ಮತ್ತು ರೆಸ್ಯೂಮ್ ತಯಾರಿಕೆ.' },
     lessons: [
-      { id: 'e1', title: { en: 'Cracking Interviews', kn: 'ಸಂದರ್ಶನ ಎದುರಿಸುವುದು' }, notes: { en: 'Common interview questions.', kn: 'ಸಾಮಾನ್ಯ ಸಂದರ್ಶನ ಪ್ರಶ್ನೆಗಳು.' }, isCompleted: false },
+      { id: 'f1111111-1111-4111-a111-111111111111', title: { en: 'Cracking Interviews', kn: 'ಸಂದರ್ಶನ ಎದುರಿಸುವುದು' }, notes: { en: 'Common interview questions.', kn: 'ಸಾಮಾನ್ಯ ಸಂದರ್ಶನ ಪ್ರಶ್ನೆಗಳು.' }, isCompleted: false },
     ]
   },
 ];

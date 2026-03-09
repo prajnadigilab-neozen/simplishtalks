@@ -41,7 +41,7 @@ const DEFAULT_INSTRUCTIONS = {
         { key: "Agentic Rules", val: "Any AI generating frontend code must stick to React + Tailwind CSS (vanilla), following the 'mobile-first' and 'responsive redesign' approach of Simplish." }
     ],
     aiConfig: {
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3-flash-preview',
         strictness: 0.7,
         voice: 'en-US-Neural2-F'
     },
@@ -49,7 +49,8 @@ const DEFAULT_INSTRUCTIONS = {
         "1. Always stay on topic.",
         "2. Gently redirect the user if they deviate from the lesson scenario.",
         "3. Be professional yet encouraging.",
-        "4. Use **double asterisks** to wrap key vocabulary or important words (e.g., **Hello**, **Welcome**) so they appear bold in the UI."
+        "4. Use **double asterisks** to wrap key vocabulary or important words (e.g., **Hello**, **Welcome**) so they appear bold in the UI.",
+        "5. If the model is unable to generate content, it must automatically generate a system message to change the model if they are deprecated."
     ],
     instructions: `Act as a professional English Language Coach, specializing in helping Kannada speakers improve their English fluency. Your primary goal is to facilitate natural conversation, build confidence, and provide targeted support.
 
@@ -191,9 +192,8 @@ const AiInstructions: React.FC = () => {
                                     value={editFormData.model}
                                     onChange={e => setEditFormData({ ...editFormData, model: e.target.value })}
                                 >
-                                    <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                                    <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro</option>
-                                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                                    <option value="gemini-3-flash-preview">Gemini 3 Flash Preview</option>
+                                    <option value="gemini-flash-latest">Gemini Flash Latest</option>
                                 </select>
                             </div>
                             <div className="space-y-4">
@@ -227,7 +227,7 @@ const AiInstructions: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Active Logic</span>
-                                <span className="text-sm font-black text-blue-900 dark:text-blue-100">{data.aiConfig?.model || 'Gemini 2.0 Flash'}</span>
+                                <span className="text-sm font-black text-blue-900 dark:text-blue-100">{data.aiConfig?.model || 'Gemini 3 Flash Preview'}</span>
                             </div>
                             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Correction Strictness</span>

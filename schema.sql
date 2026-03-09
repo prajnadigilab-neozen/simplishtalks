@@ -19,7 +19,7 @@ CREATE TABLE public.profiles (
   role TEXT DEFAULT 'USER', -- 'USER' or 'ADMIN'
   is_restricted BOOLEAN DEFAULT FALSE,
   avatar_url TEXT,
-  preferred_model TEXT DEFAULT 'gemini-2.0-flash',
+  preferred_model TEXT DEFAULT 'gemini-3-flash-preview',
   voice_profile TEXT DEFAULT 'Aoede',
   system_prompt_focus TEXT DEFAULT '',
   package_type TEXT DEFAULT 'NONE', -- 'NONE', 'TALKS', 'AI_MESHTRU'
@@ -183,15 +183,32 @@ ALTER TABLE public.ai_instructions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_instructions_history ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Anyone can view AI Instructions" ON public.ai_instructions FOR SELECT USING (true);
+
 CREATE POLICY "Admins manage AI Instructions" ON public.ai_instructions FOR ALL USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  OR 
+  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+)
+WITH CHECK (
+  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  OR 
+  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
 );
 
 CREATE POLICY "Admins view AI Instructions History" ON public.ai_instructions_history FOR SELECT USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  OR 
+  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
 );
 CREATE POLICY "Admins manage AI Instructions History" ON public.ai_instructions_history FOR ALL USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  OR 
+  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+)
+WITH CHECK (
+  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
+  OR 
+  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
 );
 -- 8. User Lesson Recordings (Audio Practice)
 CREATE TABLE public.user_lesson_recordings (

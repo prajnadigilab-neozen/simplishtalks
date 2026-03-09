@@ -5,9 +5,8 @@ import BillingWallet from '../components/BillingWallet';
 import { getUsageStatus } from '../utils/QuotaMiddleware';
 
 const MODELS = [
-    { id: 'gemini-1.5-flash', label: 'FLASH (1.5)' },
-    { id: 'gemini-2.0-flash', label: 'FLASH (2.0)' },
-    { id: 'gemini-2.0-pro', label: 'PRO (2.0)' },
+    { id: 'gemini-3-flash-preview', label: 'FLASH (3.0 Preview)' },
+    { id: 'gemini-flash-latest', label: 'FLASH LATEST' },
 ];
 
 const QuotaDashboard: React.FC = () => {
@@ -123,11 +122,11 @@ const QuotaDashboard: React.FC = () => {
                     <div className="p-8 bg-blue-600/10 rounded-3xl border border-blue-500/20">
                         <div className="flex items-center mb-4">
                             <Zap className="h-6 w-6 text-blue-400 mr-3" />
-                            <h3 className="text-xl font-black text-white italic">PRO TIP: GEMINI 1.5 FLASH</h3>
+                            <h3 className="text-xl font-black text-white italic">PRO TIP: GEMINI FLASH LATEST</h3>
                         </div>
                         <p className="text-slate-300 leading-relaxed font-medium">
-                            For development and simple translation logic, use <span className="text-white font-bold">Gemini 1.5 Flash</span>.
-                            It offers <span className="text-emerald-400 font-bold">4x higher daily limits</span> (1,000 RPD) while maintaining
+                            For development and simple translation logic, use <span className="text-white font-bold">Gemini Flash Latest</span>.
+                            It offers <span className="text-emerald-400 font-bold">6x higher daily limits</span> (1,500 RPD) while maintaining
                             near-parity for most SIMPLISH coaching tasks.
                         </p>
                     </div>

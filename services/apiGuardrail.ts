@@ -6,13 +6,12 @@ export interface ModelQuota {
 }
 
 export const MODEL_QUOTAS: Record<string, ModelQuota> = {
-    'gemini-2.0-flash': { rpm: 10, tpm: 250000, rpd: 250 },
-    'gemini-2.0-pro': { rpm: 5, tpm: 250000, rpd: 100 },
-    'gemini-1.5-flash': { rpm: 15, tpm: 250000, rpd: 1000 },
+    'gemini-3-flash-preview': { rpm: 10, tpm: 250000, rpd: 250 },
+    'gemini-flash-latest': { rpm: 15, tpm: 1000000, rpd: 1500 },
 };
 
 export const getModelQuota = (model: string): ModelQuota => {
-    return MODEL_QUOTAS[model] || MODEL_QUOTAS['gemini-2.0-flash']; // Default to Flash
+    return MODEL_QUOTAS[model] || MODEL_QUOTAS['gemini-3-flash-preview']; // Default to Flash
 };
 
 /**

@@ -212,12 +212,14 @@ export async function getUserUsage(userId: string) {
       .from('user_usage')
       .select('voice_seconds_total, chat_tokens_total, chat_messages_total')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') throw error;
 
     return {
-      voice_seconds_total: data.voice_seconds_total || 0,
-      chat_tokens_total: data.chat_tokens_total || 0,
-      chat_messages_total: data.chat_messages_total || 0
+      voice_seconds_total: data?.voice_seconds_total || 0,
+      chat_tokens_total: data?.chat_tokens_total || 0,
+      chat_messages_total: data?.chat_messages_total || 0
     };
   } catch (err) {
     console.error("Failed to fetch user usage:", err);

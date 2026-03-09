@@ -83,7 +83,19 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Scenario Edge Function Error:", error);
+        let errorMsg = 'AI is unavailable right now.';
+        try {
+          if ((error as any).context) {
+            const body = await (error as any).context.json();
+            errorMsg = body?.error || body?.reply || errorMsg;
+          }
+        } catch {
+          errorMsg = error.message || errorMsg;
+        }
+        throw new Error(errorMsg);
+      }
 
       const result = typeof data === 'string' ? JSON.parse(data) : data;
       const coachMsg: CoachMessage = {
@@ -95,8 +107,14 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
 
       setMessages(prev => [...prev, coachMsg]);
       saveChatMessage(userId, coachMsg, lessonId);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Scenario AI Error:", error);
+      const errorMsg: CoachMessage = {
+        role: 'coach',
+        text: error.message || "I'm having trouble connecting. Please check your internet or try logging in again.",
+        timestamp: Date.now()
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsTyping(false);
       isSendingRef.current = false;
@@ -146,8 +164,8 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
         <button
           onClick={handleReset}
           className={`p-2 transition-colors rounded-full ${resetConfirm
-              ? 'text-orange-500 bg-orange-100 dark:bg-orange-900/20 ring-2 ring-orange-400 animate-pulse'
-              : 'text-slate-300 hover:text-orange-500'
+            ? 'text-orange-500 bg-orange-100 dark:bg-orange-900/20 ring-2 ring-orange-400 animate-pulse'
+            : 'text-slate-300 hover:text-orange-500'
             }`}
           title={resetConfirm ? t({ en: "Tap again to confirm", kn: "ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಒತ್ತಿ" }) : "Reset scenario"}
           onBlur={() => setResetConfirm(false)}

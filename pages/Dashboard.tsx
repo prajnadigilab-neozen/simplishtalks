@@ -125,14 +125,25 @@ const Dashboard: React.FC = () => {
   const getSmartRedirectPath = () => {
     if (session?.packageType === PackageType.SANGAATHI) return '/talk';
 
+    // Fallback if no modules are loaded yet
+    if (!modules || modules.length === 0) {
+      console.warn("No modules found in store. Redirecting to dashboard.");
+      return '/dashboard';
+    }
+
     // Find first uncompleted lesson across all available modules
     for (const module of modules) {
-      const firstUncompleted = module.lessons.find(l => !l.isCompleted);
+      const firstUncompleted = (module.lessons || []).find(l => !l.isCompleted);
       if (firstUncompleted) return `/lesson/${firstUncompleted.id}`;
     }
+
     // If all completed, return to the very first lesson for review
-    const firstLessonId = modules[0]?.lessons[0]?.id;
-    return firstLessonId ? `/lesson/${firstLessonId}` : '/dashboard';
+    const firstLessonId = modules[0]?.lessons?.[0]?.id;
+    if (!firstLessonId) {
+      console.warn("No lessons found in modules. Redirecting to dashboard.");
+      return '/dashboard';
+    }
+    return `/lesson/${firstLessonId}`;
   };
 
   // Handle Package Activation (Navigate to Payment)
@@ -225,7 +236,17 @@ const Dashboard: React.FC = () => {
             <PackageCardCompact type={PackageType.TALKS} isActive={isTalksActive}>
               {isTalksActive && (
                 <button
-                  onClick={() => navigate(getSmartRedirectPath())}
+                  onClick={() => {
+                    const path = getSmartRedirectPath();
+                    if (path === '/dashboard') {
+                      alert(t({
+                        en: 'No lessons found for your level yet. Please check back later!',
+                        kn: 'ನಿಮ್ಮ ಹಂತಕ್ಕೆ ಇನ್ನು ಯಾವುದೇ ಪಾಠಗಳು ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪರಿಶೀಲಿಸಿ!'
+                      }));
+                    } else {
+                      navigate(path);
+                    }
+                  }}
                   className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95"
                 >
                   {completedLessons === 0 ? 'Go to Talks' : 'Continue Talks'}
