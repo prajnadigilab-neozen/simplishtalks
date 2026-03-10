@@ -12,12 +12,13 @@ import { supabase } from '../lib/supabase';
 const CoachChat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session, dataSaverMode } = useAppStore();
+  const { session, dataSaverMode, syncUsage } = useAppStore();
   const userId = session?.id ?? null;
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [fetchingId, setFetchingId] = useState<string | null>(null);
   const [quotaReached, setQuotaReached] = useState(getTTSQuotaStatus());
   const [historyLoading, setHistoryLoading] = useState(true);
   const [clearConfirm, setClearConfirm] = useState(false);
@@ -74,6 +75,11 @@ const CoachChat: React.FC = () => {
     // Save user message to DB
     const dbId = await saveChatMessage(userId, userMsg, undefined, 'chat');
     setMessages(prev => prev.map(m => m.timestamp === userMsg.timestamp ? { ...m, dbId: dbId || undefined } : m));
+
+    // Update usage and sync UI
+    const { updateUserUsage } = await import('../services/coachService');
+    updateUserUsage(userId, 0, 0, 1);
+    syncUsage('chat', 1);
 
     // Compression and Fast-Track handled in coachService
     const historyForAI = messages.slice(-10).map(m => ({
@@ -242,16 +248,20 @@ const CoachChat: React.FC = () => {
     if (quotaReached && !isCached) return;
 
     setPlayingId(uniqueId);
+    setFetchingId(uniqueId);
 
     try {
       if (cachedAudio) {
+        setFetchingId(null);
         await playPCM(cachedAudio, textToConvert);
       } else {
         const audio = await textToSpeech(textToConvert, 'Aoede', dataSaverMode);
+        setFetchingId(null);
         if (audio) await playPCM(audio, textToConvert);
       }
     } catch (e) {
       console.error("Playback failed", e);
+      setFetchingId(null);
     } finally {
       setPlayingId(null);
     }
@@ -269,7 +279,14 @@ const CoachChat: React.FC = () => {
             <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Dashboard</span>
           </button>
           <div>
-            <h2 className="font-black text-blue-900 dark:text-slate-100 text-sm uppercase tracking-widest">Simplish Coach</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-black text-blue-900 dark:text-slate-100 text-sm uppercase tracking-widest">Simplish Coach</h2>
+              <div className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-800">
+                <span className="text-[10px] font-black text-blue-700 dark:text-blue-400 tabular-nums">
+                  {totalChatMessages}/{CHAT_QUOTA}
+                </span>
+              </div>
+            </div>
             <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter">Bilingual Training</p>
           </div>
         </div>
@@ -340,11 +357,15 @@ const CoachChat: React.FC = () => {
                       disabled={quotaReached && !m.audioEn && !AudioStore.has(m.text)}
                       className={`shrink-0 p-2 rounded-xl transition-all 
                         ${(quotaReached && !m.audioEn && !AudioStore.has(m.text)) ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-blue-50 dark:bg-slate-900 text-blue-600 dark:text-blue-400 hover:scale-110 active:scale-95'}
-                        ${playingId === `${idx}-main` ? 'bg-blue-600 text-white animate-pulse shadow-inner' : ''}`}
+                        ${playingId === `${idx}-main` ? 'bg-blue-600 text-white animate-pulse shadow-inner' : fetchingId === `${idx}-main` ? 'bg-blue-100 text-blue-600' : ''}`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
-                      </svg>
+                      {fetchingId === `${idx}-main` ? (
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
+                        </svg>
+                      )}
                     </button>
                   )}
                   {m.dbId && (
@@ -388,11 +409,15 @@ const CoachChat: React.FC = () => {
                         disabled={quotaReached && !m.audioTip && !AudioStore.has(`Pronunciation tip: ${m.pronunciationTip}`)}
                         className={`shrink-0 p-2 rounded-lg transition-all 
                           ${(quotaReached && !m.audioTip && !AudioStore.has(`Pronunciation tip: ${m.pronunciationTip}`)) ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-400 hover:scale-105 active:scale-95'}
-                          ${playingId === `${idx}-tip` ? 'bg-green-600 text-white animate-pulse shadow-inner' : ''}`}
+                          ${playingId === `${idx}-tip` ? 'bg-green-600 text-white animate-pulse shadow-inner' : fetchingId === `${idx}-tip` ? 'bg-green-100 text-green-600' : ''}`}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
-                        </svg>
+                        {fetchingId === `${idx}-tip` ? (
+                          <div className="w-3.5 h-3.5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
+                          </svg>
+                        )}
                       </button>
                     </div>
                   )}

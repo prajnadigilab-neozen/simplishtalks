@@ -16,7 +16,7 @@ const PaymentPage: React.FC = () => {
     const [paymentStep, setPaymentStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
 
     const selectedPackage = searchParams.get('package') as PackageType;
-    const packageLabel = selectedPackage === PackageType.TALKS ? 'SIMPLISH - TALKS' : 'Simplish SANGAATHI';
+    const packageLabel = selectedPackage === PackageType.TALKS ? 'SIMPLISH - TALKS' : 'SIMPLISH SNEHI';
     const packagePrice = selectedPackage === PackageType.TALKS ? '₹299' : '₹499';
 
     useEffect(() => {
@@ -39,15 +39,15 @@ const PaymentPage: React.FC = () => {
             let newPackageType = selectedPackage;
             // Upgrade logic to BOTH
             if (
-                (session?.packageType === PackageType.TALKS && selectedPackage === PackageType.SANGAATHI) ||
-                (session?.packageType === PackageType.SANGAATHI && selectedPackage === PackageType.TALKS) ||
+                (session?.packageType === PackageType.TALKS && selectedPackage === PackageType.SNEHI) ||
+                (session?.packageType === PackageType.SNEHI && selectedPackage === PackageType.TALKS) ||
                 session?.packageType === PackageType.BOTH
             ) {
                 newPackageType = PackageType.BOTH;
             }
 
             const currentCredits = session?.agentCredits || 0;
-            const addedCredits = selectedPackage === PackageType.SANGAATHI ? 60 : 0;
+            const addedCredits = selectedPackage === PackageType.SNEHI ? 60 : 0;
 
             const updates = {
                 package_type: newPackageType,

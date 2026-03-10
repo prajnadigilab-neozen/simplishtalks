@@ -26,7 +26,7 @@ const PackageSelection: React.FC = () => {
 
     // Determine what they already own (and is currently active)
     const hasTalks = !isExpired && (session.packageType === PackageType.TALKS || session.packageType === PackageType.BOTH);
-    const hasSangaathi = !isExpired && (session.packageType === PackageType.SANGAATHI || session.packageType === PackageType.BOTH);
+    const hasSnehi = !isExpired && (session.packageType === PackageType.SNEHI || session.packageType === PackageType.BOTH);
     const hasBoth = !isExpired && session.packageType === PackageType.BOTH;
 
     // Handle Package Activation (Navigate to Payment)
@@ -40,7 +40,7 @@ const PackageSelection: React.FC = () => {
 
             {/* Header logic */}
             <div className="max-w-4xl w-full text-center mb-10">
-                {!hasTalks && !hasSangaathi ? (
+                {!hasTalks && !hasSnehi ? (
                     <div className="inline-block px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                         Step 2: Activation
                     </div>
@@ -62,7 +62,7 @@ const PackageSelection: React.FC = () => {
                     {hasBoth ? "You've unlocked the complete Namma Simplish ecosystem. Great job!" : `Based on your placement score (${score}/10), we've identified the best learning models for your current level.`}
                 </p>
 
-                {(hasTalks || hasSangaathi) && (
+                {(hasTalks || hasSnehi) && (
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-sm hover:shadow-md transition-all mb-4"
@@ -82,11 +82,11 @@ const PackageSelection: React.FC = () => {
                     onSelect={() => handleActivatePackage(PackageType.TALKS)}
                 />
                 <PackageCard
-                    type={PackageType.SANGAATHI}
+                    type={PackageType.SNEHI}
                     isRecommended={!hasBoth && isAdvanced}
-                    isActive={hasSangaathi}
-                    disabled={hasSangaathi}
-                    onSelect={() => handleActivatePackage(PackageType.SANGAATHI)}
+                    isActive={hasSnehi}
+                    disabled={hasSnehi}
+                    onSelect={() => handleActivatePackage(PackageType.SNEHI)}
                 />
             </div>
         </div>
@@ -134,7 +134,7 @@ const PackageCard: React.FC<{ type: PackageType; isRecommended: boolean; isActiv
                     </div>
                 </div>
 
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{isTalks ? 'SIMPLISH - TALKS' : 'Simplish SANGAATHI'}</h3>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{isTalks ? 'SIMPLISH - TALKS' : 'SIMPLISH SNEHI'}</h3>
                 <p className="text-slate-500 dark:text-slate-400 text-xs font-bold mb-8 leading-relaxed">
                     {isTalks ? 'Structural English path with gated levels and bilingual chat support.' : 'Direct voice practice with AI personas. Focus on fluency.'}
                 </p>

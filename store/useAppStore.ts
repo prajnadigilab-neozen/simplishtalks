@@ -1,7 +1,7 @@
 
 /** V 1.0 */
 import { create } from 'zustand';
-import { CourseLevel, UserProgress, Module, UserRole, LevelStatus } from '../types';
+import { CourseLevel, UserProgress, Module, UserRole, LevelStatus, PackageType } from '../types';
 import { getUserSession } from '../services/authService';
 import { fetchAllModules } from '../services/courseService';
 import { supabase } from '../lib/supabase';
@@ -25,6 +25,8 @@ interface AppState {
     setPlacementResult: (level: CourseLevel) => Promise<void>;
     refreshModules: () => Promise<void>;
     setDataSaverMode: (enabled: boolean) => void;
+    syncUsage: (type: 'voice' | 'chat', amount: number) => void;
+    refreshSession: () => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -338,6 +340,40 @@ export const useAppStore = create<AppState>((set, get) => ({
             document.documentElement.classList.add('data-saver-active');
         } else {
             document.documentElement.classList.remove('data-saver-active');
+        }
+    },
+
+    syncUsage: (type, amount) => {
+        const { session } = get();
+        if (!session) return;
+
+        const updatedSession = { ...session };
+        if (type === 'voice') {
+            updatedSession.totalTalkTime = (updatedSession.totalTalkTime || 0) + amount;
+            // Also decrement credits if applicable
+            if (session.packageType === PackageType.SNEHI && session.agentCredits !== undefined) {
+                const mins = Math.ceil(amount / 60);
+                updatedSession.agentCredits = Math.max(0, session.agentCredits - mins);
+            }
+        } else {
+            updatedSession.totalMessagesSent = (updatedSession.totalMessagesSent || 0) + amount;
+        }
+
+        set({ session: updatedSession });
+    },
+
+    refreshSession: async () => {
+        const profile = await getUserSession();
+        if (profile) {
+            const currentSession = get().session;
+            set({
+                session: {
+                    ...currentSession,
+                    ...profile,
+                    packageType: (profile.packageType !== 'NONE') ? profile.packageType : (currentSession?.packageType || 'NONE'),
+                    packageStatus: (profile.packageStatus !== 'INACTIVE') ? profile.packageStatus : (currentSession?.packageStatus || 'INACTIVE'),
+                }
+            });
         }
     },
 }));

@@ -243,7 +243,8 @@ export async function getAllUsers(): Promise<any[]> {
     console.log("🔍 Supabase getAllUsers RAW DATA:", data);
     const mapped = (data || []).map(u => ({
       ...u,
-      role: mapRole(u.role)
+      role: mapRole(u.role),
+      package_type: u.package_type === 'SANGAATHI' ? 'SNEHI' : u.package_type
     }));
     console.log("🔍 Supabase getAllUsers MAPPED DATA:", mapped);
     return mapped;
@@ -310,7 +311,7 @@ export async function getUserSession(providedSession?: any) {
         preferredModel: profile.preferred_model || 'gemini-3-flash-preview',
         voiceProfile: profile.voice_profile || 'Aoede',
         systemPromptFocus: profile.system_prompt_focus || '',
-        packageType: profile.package_type || 'NONE',
+        packageType: (profile.package_type === 'SANGAATHI' ? 'SNEHI' : (profile.package_type || 'NONE')),
         packageStatus: profile.package_status || 'INACTIVE',
         packageStartDate: profile.package_start_date || null,
         packageEndDate: profile.package_end_date || null,

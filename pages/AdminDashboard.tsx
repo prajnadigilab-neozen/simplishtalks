@@ -43,7 +43,7 @@ const AdminDashboard: React.FC = () => {
     totalLessons: 0,
     totalRevenue: 0,
     talksCount: 0,
-    sangaathiCount: 0
+    snehiCount: 0
   });
 
 
@@ -79,19 +79,19 @@ const AdminDashboard: React.FC = () => {
       // Calculate Revenue and Package Counts from users list
       let totalRevenue = 0;
       let talksCount = 0;
-      let sangaathiCount = 0;
+      let snehiCount = 0;
 
       userData.forEach(u => {
         if (u.package_type === PackageType.TALKS) {
           totalRevenue += 299;
           talksCount++;
-        } else if (u.package_type === PackageType.SANGAATHI) {
+        } else if (u.package_type === PackageType.SNEHI) {
           totalRevenue += 499;
-          sangaathiCount++;
+          snehiCount++;
         } else if (u.package_type === PackageType.BOTH) {
           totalRevenue += (299 + 499);
           talksCount++;
-          sangaathiCount++;
+          snehiCount++;
         }
       });
 
@@ -99,7 +99,7 @@ const AdminDashboard: React.FC = () => {
         ...stats,
         totalRevenue,
         talksCount,
-        sangaathiCount
+        snehiCount
       });
 
       const usage = await getAllUserUsage();
@@ -206,7 +206,7 @@ const AdminDashboard: React.FC = () => {
       "Reg. Users",
       "Active Users",
       "Talks Sold",
-      "Sangaathi Sold",
+      "Snehi Sold",
       ...(isSuperAdmin ? ["Revenue (INR)"] : []),
       "Deleted Users"
     ];
@@ -220,7 +220,7 @@ const AdminDashboard: React.FC = () => {
         `"${r.registered_count || 0}"`,
         `"${r.active_count || 0}"`,
         `"${r.talks_sold || 0}"`,
-        `"${r.sangaathi_sold || 0}"`,
+        `"${r.snehi_sold || 0}"`,
         ...(isSuperAdmin ? [`"${r.daily_revenue || 0}"`] : []),
         `"${r.deleted_count || 0}"`
       ];
@@ -553,8 +553,8 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-3xl font-black text-blue-800 dark:text-blue-300">{globalStats.talksCount}</p>
               </div>
               <div className="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl">
-                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Sangaathi Active</p>
-                <p className="text-3xl font-black text-indigo-800 dark:text-indigo-300">{globalStats.sangaathiCount}</p>
+                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Snehi Active</p>
+                <p className="text-3xl font-black text-indigo-800 dark:text-indigo-300">{globalStats.snehiCount}</p>
               </div>
               <div className="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-2xl">
                 <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">Total AI Tokens</p>
@@ -802,7 +802,7 @@ const AdminDashboard: React.FC = () => {
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Date</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Reg. Users</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Active</th>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Talks/Sangaathi</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Talks/Snehi</th>
                   {currentUser?.role === UserRole.SUPER_ADMIN && (
                     <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Revenue</th>
                   )}
@@ -829,7 +829,7 @@ const AdminDashboard: React.FC = () => {
                         {report.active_count} users
                       </td>
                       <td className="p-6 text-slate-600 font-black">
-                        <span className="text-blue-500">T: {report.talks_sold}</span> / <span className="text-indigo-500">S: {report.sangaathi_sold}</span>
+                        <span className="text-blue-500">T: {report.talks_sold}</span> / <span className="text-indigo-500">S: {report.snehi_sold}</span>
                       </td>
                       {currentUser?.role === UserRole.SUPER_ADMIN && (
                         <td className="p-6 text-green-600 font-bold">

@@ -86,6 +86,7 @@ CREATE TABLE public.lessons (
   video_url TEXT,
   audio_url TEXT,
   pdf_url TEXT,
+  text_url TEXT,
   text_content TEXT,
   study_text_content TEXT,
   speak_pdf_url TEXT,
@@ -105,6 +106,14 @@ ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
+
+-- ==========================================
+-- FUNCTIONS
+-- ==========================================
+CREATE OR REPLACE FUNCTION public.get_my_role()
+RETURNS TEXT AS $$
+  SELECT role FROM public.profiles WHERE id = auth.uid();
+$$ LANGUAGE sql SECURITY DEFINER;
 
 -- ==========================================
 -- POLICIES

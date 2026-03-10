@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
-import { INITIAL_MODULES, TRANSLATIONS } from '../constants';
+import { TRANSLATIONS } from '../constants';
 import { Module, LevelStatus, PackageType, CourseLevel, PackageStatus, UserRole } from '../types';
 
 import { useAppStore } from '../store/useAppStore';
@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
-    if (session?.id && session.packageType === PackageType.SANGAATHI) {
+    if (session?.id && session.packageType === PackageType.SNEHI) {
       const fetchVoiceHistory = async () => {
         setLoadingHistory(true);
         try {
@@ -55,13 +55,13 @@ const Dashboard: React.FC = () => {
         <div className="hidden lg:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/50 p-1 rounded-2xl border border-slate-200 dark:border-slate-700">
           <button
             onClick={() => navigate('/dashboard')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${(!window.location.pathname.includes('/talk') && (session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH)) ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
           >
             Study Lessons
           </button>
           <button
             onClick={() => navigate('/talk')}
-            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${session?.packageType === PackageType.SANGAATHI || session?.packageType === PackageType.BOTH ? 'bg-white dark:bg-slate-700 text-orange-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${(window.location.pathname.includes('/talk') && (session?.packageType === PackageType.SNEHI || session?.packageType === PackageType.BOTH)) ? 'bg-white dark:bg-slate-700 text-orange-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
           >
             Voice Practice
           </button>
@@ -123,24 +123,27 @@ const Dashboard: React.FC = () => {
   const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   const getSmartRedirectPath = () => {
-    if (session?.packageType === PackageType.SANGAATHI) return '/talk';
+    if (session?.packageType === PackageType.SNEHI) return '/talk';
 
-    // Fallback if no modules are loaded yet
-    if (!modules || modules.length === 0) {
-      console.warn("No modules found in store. Redirecting to dashboard.");
+    // Filter modules based on user's current level
+    const currentLevel = progress?.currentLevel || CourseLevel.BASIC;
+    const levelModules = modules.filter(m => m.level === currentLevel);
+
+    if (levelModules.length === 0) {
+      console.warn(`No modules found for level: ${currentLevel}`);
       return '/dashboard';
     }
 
-    // Find first uncompleted lesson across all available modules
-    for (const module of modules) {
+    // Find first uncompleted lesson in the user's current level
+    for (const module of levelModules) {
       const firstUncompleted = (module.lessons || []).find(l => !l.isCompleted);
       if (firstUncompleted) return `/lesson/${firstUncompleted.id}`;
     }
 
-    // If all completed, return to the very first lesson for review
-    const firstLessonId = modules[0]?.lessons?.[0]?.id;
+    // If all current level lessons completed, return the first one for review
+    const firstLessonId = levelModules[0]?.lessons?.[0]?.id;
     if (!firstLessonId) {
-      console.warn("No lessons found in modules. Redirecting to dashboard.");
+      console.warn("No lessons found in modules.");
       return '/dashboard';
     }
     return `/lesson/${firstLessonId}`;
@@ -174,7 +177,7 @@ const Dashboard: React.FC = () => {
   }
 
   const isTalksActive = session.packageType === PackageType.TALKS || session.packageType === PackageType.BOTH;
-  const isSangaathiActive = session.packageType === PackageType.SANGAATHI || session.packageType === PackageType.BOTH;
+  const isSnehiActive = session.packageType === PackageType.SNEHI || session.packageType === PackageType.BOTH;
   const isBoth = session.packageType === PackageType.BOTH;
 
   // 2. Active Dashboard (Unified)
@@ -254,14 +257,14 @@ const Dashboard: React.FC = () => {
               )}
             </PackageCardCompact>
           </div>
-          <div className={`transition-all duration-500 ${!isSangaathiActive ? 'opacity-40 grayscale pointer-events-none scale-[0.98]' : 'scale-100'}`}>
-            <PackageCardCompact type={PackageType.SANGAATHI} isActive={isSangaathiActive}>
-              {isSangaathiActive && (
+          <div className={`transition-all duration-500 ${!isSnehiActive ? 'opacity-40 grayscale pointer-events-none scale-[0.98]' : 'scale-100'}`}>
+            <PackageCardCompact type={PackageType.SNEHI} isActive={isSnehiActive}>
+              {isSnehiActive && (
                 <button
                   onClick={() => navigate('/talk')}
                   className="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg active:scale-95"
                 >
-                  Go to SANGAATHI
+                  Go to SNEHI
                 </button>
               )}
             </PackageCardCompact>
@@ -289,7 +292,7 @@ const Dashboard: React.FC = () => {
             <div>
               <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-1">Active Subscription</h3>
               <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-4">
-                {isBoth ? 'SIMPLISH - TALKS & Simplish SANGAATHI' : (isTalksActive ? 'SIMPLISH - TALKS' : 'Simplish SANGAATHI')}
+                {isBoth ? 'SIMPLISH - TALKS & Simplish SNEHI' : (isTalksActive ? 'SIMPLISH - TALKS' : 'Simplish SNEHI')}
               </h2>
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
@@ -355,7 +358,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              {(INITIAL_MODULES.find(m => m.level === (progress?.currentLevel || CourseLevel.BASIC))?.lessons?.slice(0, 5) || []).map((l, i) => {
+              {(modules.find(m => m.level === (progress?.currentLevel || CourseLevel.BASIC))?.lessons?.slice(0, 5) || []).map((l, i) => {
                 const isCompleted = progress?.completedLessons.includes(l.id);
                 return (
                   <div key={l.id} className={`flex items-center gap-4 p-4 rounded-2xl border ${isCompleted ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
@@ -372,12 +375,14 @@ const Dashboard: React.FC = () => {
                   </div>
                 );
               })}
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="w-full py-3 mt-4 text-[10px] font-black text-blue-500 uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
-              >
-                Keep Practicing To Unlock More →
-              </button>
+              {progressPercentage < 100 && (
+                <button
+                  onClick={() => navigate(getSmartRedirectPath())}
+                  className="w-full py-3 mt-4 text-[10px] font-black text-blue-500 uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
+                >
+                  Keep Practicing To Unlock More →
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -387,7 +392,7 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-black text-slate-900 dark:text-white">Recent Activity</h3>
             <button
-              onClick={() => navigate(session.packageType === PackageType.SANGAATHI ? '/talk' : '/coachchat')}
+              onClick={() => navigate(session.packageType === PackageType.SNEHI ? '/talk' : '/coachchat')}
               className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-500"
             >
               View All
@@ -395,7 +400,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex-1 space-y-4">
-            {isSangaathiActive ? (
+            {isSnehiActive ? (
               loadingHistory ? (
                 <div className="py-10 text-center opacity-30 animate-pulse">Loading sessions...</div>
               ) : voiceHistory.length === 0 ? (
@@ -436,14 +441,16 @@ const Dashboard: React.FC = () => {
 
 const PackageCardCompact: React.FC<{ type: PackageType; isActive: boolean; children?: React.ReactNode }> = ({ type, isActive, children }) => {
   const isTalks = type === PackageType.TALKS;
+  const activeClass = isTalks ? 'bg-white dark:bg-slate-900 border-blue-500 shadow-xl shadow-blue-900/5' : 'bg-white dark:bg-slate-900 border-orange-500 shadow-xl shadow-orange-900/5';
+
   return (
-    <div className={`relative p-6 rounded-[2rem] border-2 flex flex-col gap-4 ${isActive ? 'bg-white dark:bg-slate-900 border-blue-500 shadow-xl shadow-blue-900/5' : 'bg-slate-100 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 opacity-60'}`}>
+    <div className={`relative p-6 rounded-[2rem] border-2 flex flex-col gap-4 ${isActive ? activeClass : 'bg-slate-100 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 opacity-60'}`}>
       <div className="flex items-center gap-6">
         <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl ${isTalks ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-orange-50 dark:bg-orange-900/30'}`}>
           {isTalks ? '📚' : '🎙️'}
         </div>
         <div className="flex-1">
-          <h4 className="text-base font-black text-slate-900 dark:text-white leading-tight">{isTalks ? 'SIMPLISH - TALKS' : 'Simplish SANGAATHI'}</h4>
+          <h4 className="text-base font-black text-slate-900 dark:text-white leading-tight">{isTalks ? 'SIMPLISH - TALKS' : 'SIMPLISH SNEHI'}</h4>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
             {isActive ? 'Current Active Package' : 'Inactive Package'}
           </p>

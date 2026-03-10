@@ -18,7 +18,7 @@ export enum LevelStatus {
 export enum PackageType {
   NONE = 'NONE',
   TALKS = 'TALKS',
-  SANGAATHI = 'SANGAATHI',
+  SNEHI = 'SNEHI',
   BOTH = 'BOTH'
 }
 

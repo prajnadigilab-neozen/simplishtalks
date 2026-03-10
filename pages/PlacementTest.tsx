@@ -191,7 +191,7 @@ const PlacementTest: React.FC = () => {
             </div>
             <div className="flex gap-4">
               <button onClick={() => setStep(2)} className="flex-1 py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-900/20">Next: Quick Quiz (ಮುಂದೆ: ರಸಪ್ರಶ್ನೆ)</button>
-              <button onClick={() => setStep(2)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
+              <button onClick={() => setStep(2)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip (ನಂತರ )</button>
             </div>
           </div>
         )}
@@ -222,7 +222,7 @@ const PlacementTest: React.FC = () => {
             </div>
             <div className="flex gap-4">
               <button onClick={() => setStep(3)} className="flex-1 py-5 bg-blue-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-900/20">Next: Speaking Test (ಮುಂದೆ: ಮಾತನಾಡುವ ಪರೀಕ್ಷೆ)</button>
-              <button onClick={() => setStep(3)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
+              <button onClick={() => setStep(3)} className="px-8 py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip (ನಂತರ )</button>
             </div>
           </div>
         )}
@@ -239,7 +239,7 @@ const PlacementTest: React.FC = () => {
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Click to Record & Read Aloud</p>
               <AudioRecorder onRecordingComplete={handleAudioComplete} hideHistory={true} />
             </div>
-            <button onClick={() => setStep(4)} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)</button>
+            <button onClick={() => setStep(4)} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Skip (ನಂತರ )</button>
           </div>
         )}
 
@@ -262,7 +262,7 @@ const PlacementTest: React.FC = () => {
                 ✨ Get AI Evaluation (AI ಮೌಲ್ಯಮಾಪನ ಪಡೆಯಿರಿ)
               </button>
               <button onClick={runFinalEvaluation} className="w-full py-5 border-2 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 rounded-3xl font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                Skip / Later (ಅಳಿಸು / ಆಮೇಲೆ)
+                Skip (ನಂತರ )
               </button>
             </div>
           </div>

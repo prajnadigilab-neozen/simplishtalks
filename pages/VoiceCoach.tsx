@@ -16,13 +16,14 @@ import { supabase } from '../lib/supabase';
 const VoiceCoach: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session, dataSaverMode } = useAppStore();
+  const { session, dataSaverMode, syncUsage } = useAppStore();
   const userId = session?.id ?? null;
 
   // ── Chat History ──
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [playingTipId, setPlayingTipId] = useState<string | null>(null);
+  const [fetchingTipId, setFetchingTipId] = useState<string | null>(null);
   const [clearConfirm, setClearConfirm] = useState(false);
   const historyScrollRef = useRef<HTMLDivElement>(null);
 
@@ -120,8 +121,8 @@ const VoiceCoach: React.FC = () => {
   // ── Actions ──
   const handleStartSession = async () => {
     const currentCredits = session?.agentCredits || 0;
-    if (session?.packageType === PackageType.SANGAATHI && currentCredits <= 0) {
-      alert("You have run out of Simplish Sangaathi credits. Please recharge."); // In a real app, show a nice modal
+    if (session?.packageType === PackageType.SNEHI && currentCredits <= 0) {
+      alert("You have run out of SIMPLISH SNEHI credits. Please recharge."); // In a real app, show a nice modal
       return;
     }
 
@@ -166,11 +167,12 @@ const VoiceCoach: React.FC = () => {
       const elapsedSeconds = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
       if (elapsedSeconds > 0) {
         await updateUserUsage(userId!, elapsedSeconds, 0);
+        syncUsage('voice', elapsedSeconds);
 
         // Convert elapsed seconds to minutes spent (rounding up for simple billing mock)
         const minutesSpent = Math.ceil(elapsedSeconds / 60);
 
-        if (session?.packageType === PackageType.SANGAATHI && session.agentCredits !== undefined) {
+        if (session?.packageType === PackageType.SNEHI && session.agentCredits !== undefined) {
           const newCredits = Math.max(0, session.agentCredits - minutesSpent);
 
           // Optimistically update local store
@@ -229,16 +231,18 @@ const VoiceCoach: React.FC = () => {
   };
 
   const handleSpeakTip = async (tip: string, id: string) => {
-    if (playingTipId || getTTSQuotaStatus()) return;
-    setPlayingTipId(id);
+    if (playingTipId || fetchingTipId || getTTSQuotaStatus()) return;
+    setFetchingTipId(id);
     try {
       const text = `Pronunciation tip: ${tip}`;
       const audioData = await textToSpeech(text, 'Aoede', dataSaverMode);
+      setFetchingTipId(null);
       if (audioData) await playPCM(audioData, text);
     } catch (e) {
       console.error(e);
+      setFetchingTipId(null);
     } finally {
-      setPlayingTipId(null);
+      setPlayingTipId(null); // Note: playing state isn't explicitly used for 'playing' color in this file besides the pulse, but good to keep clear
     }
   };
 
@@ -256,11 +260,21 @@ const VoiceCoach: React.FC = () => {
         </button>
         <div className="flex flex-col items-center">
           <span className="font-black text-xs uppercase tracking-[0.3em] font-serif">{t(TRANSLATIONS.liveTalk)}</span>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <div className={`w-2 h-2 rounded-full ${gemini.isConnected ? 'bg-green-400' : gemini.isReconnecting ? 'bg-yellow-400 animate-pulse' : 'bg-red-500'}`}></div>
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-              {gemini.isConnected ? 'Live' : gemini.isReconnecting ? 'Reconnecting' : 'Offline'}
-            </span>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-1.5">
+              <div className={`w-1.5 h-1.5 rounded-full ${gemini.isConnected ? 'bg-green-400' : gemini.isReconnecting ? 'bg-yellow-400 animate-pulse' : 'bg-red-500'}`}></div>
+              <span className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">
+                {gemini.isConnected ? 'Live' : gemini.isReconnecting ? 'Re-Sync' : 'Offline'}
+              </span>
+            </div>
+            {session?.agentCredits !== undefined && (
+              <div className="h-3 w-px bg-white/10 mx-1"></div>
+            )}
+            {session?.agentCredits !== undefined && (
+              <span className="text-[8px] font-black text-orange-400 uppercase tracking-widest leading-none bg-orange-500/10 px-1.5 py-0.5 rounded-md border border-orange-500/20">
+                {session.agentCredits} Min
+              </span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -345,11 +359,15 @@ const VoiceCoach: React.FC = () => {
                         <p className="text-[10px] text-green-400 font-black flex-1">Tip: {m.pronunciationTip}</p>
                         <button
                           onClick={() => handleSpeakTip(m.pronunciationTip!, `tip-${idx}`)}
-                          className={`p-1.5 rounded-lg transition-all ${playingTipId === `tip-${idx}` ? 'bg-green-600 animate-pulse' : 'bg-white/10 text-white/60 hover:text-white'}`}
+                          className={`p-1.5 rounded-lg transition-all ${playingTipId === `tip-${idx}` ? 'bg-green-600 animate-pulse' : fetchingTipId === `tip-${idx}` ? 'bg-white/20' : 'bg-white/10 text-white/60 hover:text-white'}`}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
-                          </svg>
+                          {fetchingTipId === `tip-${idx}` ? (
+                            <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
+                            </svg>
+                          )}
                         </button>
                       </div>
                     )}
@@ -400,7 +418,7 @@ const VoiceCoach: React.FC = () => {
                 >
                   {t(TRANSLATIONS.startLearning)}
                 </button>
-                {session?.packageType === PackageType.SANGAATHI && (
+                {session?.packageType === PackageType.SNEHI && (
                   <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-orange-400">
                     {session.agentCredits > 0 ? `${session.agentCredits} Minutes Available` : '0 Minutes - Please Recharge'}
                   </p>

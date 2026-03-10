@@ -22,6 +22,7 @@ async function callGemini(model: string, contents: any, systemInstruction: strin
                 properties: {
                     reply: { type: 'STRING', description: "The character's reply in English" },
                     kannadaHelp: { type: 'STRING', description: 'Kannada guide for understanding' },
+                    pronunciationTip: { type: 'STRING', description: 'Brief pronunciation tip for the student' },
                 },
                 required: ['reply'],
             },
@@ -65,8 +66,9 @@ Deno.serve(async (req) => {
       2. Keep responses short and simple.
       3. If the student makes a big mistake, gently correct them in English.
       4. If needed for understanding, provide a Kannada guide in the 'kannadaHelp' field.
-      5. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
-      6. Return JSON format.
+      5. If the student's message has English pronunciation or grammar issues that can be improved, provide a short 'pronunciationTip'.
+      6. FORMAT for 'kannadaHelp': [Kannada Text] ([Transliterated Kannada]) followed by a new line with the English translation.
+      7. Return JSON format.
     `;
 
         let result: string;

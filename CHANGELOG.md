@@ -2,6 +2,12 @@
 
 All notable features implemented and issues fixed for **SIMPLISH Talks** will be documented in this file. 
 
+## [2026-03-09]
+
+### General Updates 🔄
+- V 7.0 AI enabled
+
+
 ## [2026-03-07]
 
 ### General Updates 🔄

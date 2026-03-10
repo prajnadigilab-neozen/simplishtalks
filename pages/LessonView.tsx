@@ -203,6 +203,23 @@ const LessonView: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 relative transition-colors duration-300">
+      {/* Top Header Navigation */}
+      <div className="bg-white dark:bg-slate-900 px-4 py-3 border-b-2 border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 z-[50] shrink-0">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2 px-3 py-1.5 text-blue-900 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-full transition-colors group"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5 group-hover:-translate-x-1 transition-transform">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+          <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Dashboard</span>
+        </button>
+        <h1 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] line-clamp-1 flex-1 text-center px-4">
+          {t(lesson.title)}
+        </h1>
+        <div className="w-10"></div> {/* Spacer for symmetry */}
+      </div>
+
       {showCompletionModal && (
         <div className="fixed inset-0 z-[100] bg-blue-900/90 backdrop-blur-xl flex items-center justify-center p-6 animate-in zoom-in duration-500">
           <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -609,13 +626,24 @@ const SpeakButton: React.FC<{ text: string; small?: boolean }> = ({ text, small 
         const audio = await textToSpeech(text);
         if (audio) await playPCM(audio, text);
       }
-    } catch (e) { console.error("Speak error:", e); } finally { setLoading(false); }
+    } catch (e) {
+      console.error("Speak error:", e);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
-    <button onClick={handleSpeak} className={`${small ? 'p-1' : 'p-2'} rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ${loading ? 'animate-pulse' : ''}`}>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
-      </svg>
+    <button
+      onClick={handleSpeak}
+      className={`${small ? 'p-1' : 'p-2'} rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 transition-all active:scale-95`}
+    >
+      {loading ? (
+        <div className={`${small ? 'w-4 h-4' : 'w-5 h-5'} border-2 border-blue-600 border-t-transparent rounded-full animate-spin`}></div>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={small ? "w-4 h-4" : "w-5 h-5"}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
+        </svg>
+      )}
     </button>
   );
 };

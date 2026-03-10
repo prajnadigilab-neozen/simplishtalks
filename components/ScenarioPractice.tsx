@@ -21,13 +21,14 @@ interface ScenarioPracticeProps {
 const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
   const { id: lessonId } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
-  const { session } = useAppStore();
+  const { session, syncUsage } = useAppStore();
   const userId = session?.id ?? null;
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [fetchingId, setFetchingId] = useState<string | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isSendingRef = useRef(false);
@@ -69,6 +70,11 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
 
     saveChatMessage(userId, userMsg, lessonId);
 
+    // Update usage and sync UI
+    const { updateUserUsage } = await import('../services/coachService');
+    updateUserUsage(userId, 0, 0, 1);
+    syncUsage('chat', 1);
+
     try {
       const historyForAI = messages.map(m => ({
         role: m.role === 'user' ? 'user' as const : 'model' as const,
@@ -102,6 +108,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
         role: 'coach',
         text: result.reply,
         kannadaGuide: result.kannadaHelp,
+        pronunciationTip: result.pronunciationTip,
         timestamp: Date.now()
       };
 
@@ -122,13 +129,16 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
   };
 
   const handleSpeak = async (text: string, id: string) => {
-    if (playingId || getTTSQuotaStatus()) return;
-    setPlayingId(id);
+    if (playingId || fetchingId || getTTSQuotaStatus()) return;
+    setFetchingId(id);
     try {
       const audio = await textToSpeech(text);
+      setFetchingId(null);
+      setPlayingId(id);
       if (audio) await playPCM(audio, text);
     } catch (e) {
       console.error(e);
+      setFetchingId(null);
     } finally {
       setPlayingId(null);
     }
@@ -177,7 +187,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 shadow-inner">
         {loading ? (
           <div className="flex justify-center py-20 opacity-20"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div></div>
         ) : (
@@ -192,22 +202,51 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
                   {m.role === 'coach' && (
                     <button
                       onClick={() => handleSpeak(m.text, `msg-${idx}`)}
-                      className={`p-1.5 rounded-lg transition-all ${playingId === `msg-${idx}` ? 'bg-blue-600 text-white animate-pulse' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}
+                      className={`shrink-0 p-1.5 rounded-lg transition-all ${playingId === `msg-${idx}` ? 'bg-blue-600 text-white animate-pulse' : fetchingId === `msg-${idx}` ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'}`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
-                      </svg>
+                      {fetchingId === `msg-${idx}` ? (
+                        <div className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
+                        </svg>
+                      )}
                     </button>
                   )}
                 </div>
-                {m.kannadaGuide && (
-                  <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                    <p className="text-[10px] text-blue-500 font-black uppercase tracking-tighter mb-1">
-                      {t({ en: 'ಸಹಾಯ (Help)', kn: 'ಸಹಾಯ (Help)' })}
-                    </p>
-                    <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 whitespace-pre-line leading-relaxed">
-                      {m.kannadaGuide}
-                    </div>
+                {m.role === 'coach' && (m.kannadaGuide || m.pronunciationTip) && (
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-2">
+                    {m.kannadaGuide && (
+                      <div>
+                        <p className="text-[10px] text-blue-500 font-black uppercase tracking-tighter mb-1">
+                          {t({ en: 'ಸಹಾಯ (Help)', kn: 'ಸಹಾಯ (Help)' })}
+                        </p>
+                        <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 whitespace-pre-line leading-relaxed">
+                          {m.kannadaGuide}
+                        </div>
+                      </div>
+                    )}
+                    {m.pronunciationTip && (
+                      <div className="bg-green-50 dark:bg-green-900/20 p-2.5 rounded-2xl border border-green-100 dark:border-green-900/50 flex justify-between items-start gap-2">
+                        <div className="flex-1">
+                          <p className="text-[9px] font-black text-green-700 dark:text-green-400 mb-1 uppercase tracking-tighter">Pronunciation Tip 🎙️</p>
+                          <p className="text-[11px] font-bold text-green-900 dark:text-green-200 leading-tight">{m.pronunciationTip}</p>
+                        </div>
+                        <button
+                          onClick={() => handleSpeak(`Pronunciation tip: ${m.pronunciationTip}`, `tip-${idx}`)}
+                          className={`shrink-0 p-1.5 rounded-lg transition-all 
+                            ${playingId === `tip-${idx}` ? 'bg-green-600 text-white animate-pulse' : fetchingId === `tip-${idx}` ? 'bg-green-100 text-green-600' : 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-400'}`}
+                        >
+                          {fetchingId === `tip-${idx}` ? (
+                            <div className="w-3 h-3 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.707-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24Z" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
