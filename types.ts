@@ -83,6 +83,7 @@ export interface UserProgress {
   lastStreakDate?: string | null;
   totalMessagesSent?: number;
   totalTalkTime?: number;
+  voiceGender?: 'MAN' | 'WOMAN';
 }
 
 export interface TranslationStrings {

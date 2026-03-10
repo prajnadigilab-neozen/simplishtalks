@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
 // Use the TTS-specific preview model found in the list
-const MODEL = 'models/gemini-2.5-flash-preview-tts';
+const MODEL = 'gemini-3-flash-preview';
 
 async function generateTTS(text: string, voice: string, lowBitrate: boolean) {
     const url = `https://generativelanguage.googleapis.com/v1beta/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;

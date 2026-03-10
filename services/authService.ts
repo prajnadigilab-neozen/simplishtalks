@@ -315,6 +315,7 @@ export async function getUserSession(providedSession?: any) {
         packageStatus: profile.package_status || 'INACTIVE',
         packageStartDate: profile.package_start_date || null,
         packageEndDate: profile.package_end_date || null,
+        voiceGender: profile.voice_gender || 'WOMAN',
         agentCredits: profile.agent_credits || 0,
         streakCount: profile.streak_count || 0,
         lastStreakDate: profile.last_streak_date || null,

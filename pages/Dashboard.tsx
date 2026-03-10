@@ -8,7 +8,7 @@ import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
 
 const Dashboard: React.FC = () => {
-  const { session, modules, progress, loading, initialized } = useAppStore();
+  const { session, modules, progress, evaluationHistory, loading, initialized } = useAppStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [voiceHistory, setVoiceHistory] = useState<any[]>([]);
@@ -349,7 +349,7 @@ const Dashboard: React.FC = () => {
 
       {/* Content Tabs (Curriculum vs History) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        {/* Curriculum Preview (Always visible if TALKS or just to show what's coming) */}
+        {/* Curriculum Preview */}
         {isTalksActive && (
           <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
             <div className="flex justify-between items-center mb-6">
@@ -387,43 +387,66 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Activity / History */}
+        {/* AI Evaluation & Retake */}
         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-black text-slate-900 dark:text-white">Recent Activity</h3>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white">AI Evaluation Score 📈</h3>
             <button
-              onClick={() => navigate(session.packageType === PackageType.SNEHI ? '/talk' : '/coachchat')}
-              className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-500"
+              onClick={() => navigate('/placement')}
+              className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
             >
-              View All
+              <span>Retake Test</span>
+              <span className="text-xs">🔄</span>
             </button>
           </div>
 
           <div className="flex-1 space-y-4">
-            {isSnehiActive ? (
-              loadingHistory ? (
-                <div className="py-10 text-center opacity-30 animate-pulse">Loading sessions...</div>
-              ) : voiceHistory.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center py-10 opacity-40">
-                  <span className="text-4xl mb-4">🎙️</span>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-center">No recordings yet.<br />Start practicing fluency!</p>
-                </div>
-              ) : (
-                voiceHistory.slice(0, 4).map((m, idx) => (
-                  <div key={m.dbId || idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:border-orange-200 dark:hover:border-orange-900 border border-transparent transition-all group">
-                    <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-lg">🎙️</div>
-                    <div className="flex-1 overflow-hidden">
-                      <div className="text-xs font-black text-slate-800 dark:text-slate-200 truncate">{m.text}</div>
-                      <div className="text-[10px] font-bold text-slate-400">{new Date(m.timestamp).toLocaleDateString()}</div>
-                    </div>
-                    <button onClick={() => navigate('/talk')} className="p-2 text-orange-500 font-black uppercase text-[10px]">Play</button>
-                  </div>
-                ))
-              )
-            ) : (
+            {evaluationHistory.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center py-10 opacity-40">
-                <span className="text-4xl mb-4">💬</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-center">Chat history and streaks<br />will appear here as you learn.</p>
+                <span className="text-4xl mb-4">🧠</span>
+                <p className="text-[10px] font-black uppercase tracking-widest text-center">No evaluation data yet.<br />Take the test to see your level!</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Latest Score Card */}
+                {evaluationHistory[0] && (
+                  <div className="p-5 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl text-white shadow-lg relative overflow-hidden group">
+                    <div className="absolute -right-4 -bottom-4 text-6xl opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">🎯</div>
+                    <div className="relative z-10">
+                      <div className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-2">Current Proficiency Level</div>
+                      <div className="flex items-end gap-3 mb-2">
+                        <span className="text-3xl font-black">{evaluationHistory[0].score}/100</span>
+                        <span className="text-[10px] font-black bg-white/20 px-3 py-1 rounded-full mb-1 uppercase tracking-widest">
+                          {evaluationHistory[0].level}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-blue-100 font-medium leading-relaxed italic line-clamp-2">
+                        "{evaluationHistory[0].reasoning}"
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Last 5 History List */}
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Performance History</h4>
+                  {evaluationHistory.map((ev: any) => (
+                    <div key={ev.id} className="flex items-center gap-4 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-900/50 transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-700 flex flex-col items-center justify-center shadow-sm">
+                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 leading-none">{ev.score}</span>
+                        <div className="w-6 h-[1px] bg-slate-100 dark:bg-slate-600 my-0.5"></div>
+                        <span className="text-[8px] font-bold text-slate-400 uppercase leading-none">Pts</span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tight">{ev.level}</div>
+                        <div className="text-[9px] font-bold text-slate-400">
+                          {new Date(ev.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-black text-slate-300">#{ev.id.slice(0, 4)}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

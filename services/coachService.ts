@@ -59,6 +59,69 @@ function compressHistory(history: { role: 'user' | 'model', parts: { text: strin
 }
 
 /**
+ * Robust fetch wrapper for Supabase Edge Functions (matching geminiService pattern)
+ */
+async function invokeCoachFunction(name: string, body: any): Promise<any> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error("Missing Supabase configuration.");
+  }
+
+  let lastError: any = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      let token = session?.access_token;
+
+      // Proactive refresh
+      if (session) {
+        const expiresAt = session.expires_at ?? 0;
+        if (Math.floor(Date.now() / 1000) + 300 > expiresAt) {
+          const { data: { session: refreshed } } = await supabase.auth.refreshSession();
+          token = refreshed?.access_token || token;
+        }
+      }
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/${name}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseAnonKey,
+          'x-client-info': 'supabase-js/2.39.7',
+          'Authorization': `Bearer ${token || supabaseAnonKey}`
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (response.status === 401) {
+        console.warn(`Coach Edge Function 401 on attempt ${attempt}.`);
+        if (attempt === 1) {
+          await supabase.auth.refreshSession();
+          continue; // Retry with fresh session
+        }
+        throw new Error("Invalid JWT: Unauthorized (401). Please try logging out and back in.");
+      }
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || data.message || `Edge Function Error (${response.status})`);
+      }
+
+      return response.json();
+    } catch (err: any) {
+      lastError = err;
+      if (attempt === 1 && (err.message?.includes('JWT') || err.message?.includes('401'))) {
+        continue;
+      }
+      break;
+    }
+  }
+  throw lastError;
+}
+
+/**
  * Chat with the AI coach via Supabase Edge Function.
  * The API key lives server-side — never in the browser bundle.
  */
@@ -71,24 +134,15 @@ export async function chatWithCoach(message: string, history: { role: 'user' | '
   const compressedHistory = compressHistory(history);
 
   try {
-    const { data, error } = await supabase.functions.invoke('coach-chat', {
-      body: { message, history: compressedHistory },
-    });
-
-    if (error) throw error;
-
-    // Edge function returns JSON string or parsed object
-    return typeof data === 'string' ? JSON.parse(data) : data;
+    const data = await invokeCoachFunction('coach-chat', { message, history: compressedHistory });
+    // result is already JSON
+    return data;
   } catch (error: any) {
     console.error("Coach API Error Details:", error);
-    if (error.context) {
-      // Supabase FunctionsHttpError often hides the body in context
-      try {
-        const body = await error.context.json();
-        console.error("Coach API Error Body:", body);
-        if (body.replyEn) return body;
-      } catch (e) { /* ignore */ }
-    }
+
+    // Attempt to extract helpful error from direct fetch response object
+    if (error.replyEn) return error;
+
     return {
       replyEn: "I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.",
       kannadaGuide: "ಕ್ಷಮಿಸಿ, ಸಂಪರ್ಕಿಸಲು ತೊಂದರೆಯಾಗುತ್ತಿದೆ. (Kshamisi, samparkisalu tondareyaguttide.)\nSorry, there is trouble connecting.",
@@ -238,6 +292,24 @@ export async function updateUserUsage(userId: string, addSeconds: number = 0, ad
     if (error) throw error;
   } catch (err) {
     console.error("Failed to update user usage:", err);
+  }
+}
+
+/**
+ * Mirror usage increments directly into profiles table so the Dashboard
+ * always reflects up-to-date stats without requiring a re-login.
+ */
+export async function syncUsageToProfiles(userId: string, addSeconds: number = 0, addMessages: number = 0) {
+  try {
+    const { error } = await supabase.rpc('increment_profile_usage', {
+      p_user_id: userId,
+      p_add_seconds: addSeconds,
+      p_add_messages: addMessages
+    });
+    if (error) throw error;
+  } catch (err) {
+    // Silently fail — this is a best-effort mirror, not critical
+    console.warn("Failed to sync usage to profiles:", err);
   }
 }
 

@@ -3,6 +3,110 @@ import { AudioStore } from "../utils/audioUtils";
 import { telemetry } from "./telemetryService";
 import { quotaGuard, reportRealUsage } from "../utils/QuotaMiddleware";
 
+/**
+ * Ensures we always have a fresh, valid JWT before calling Supabase Edge Functions.
+ * Returns the fresh access_token.
+ */
+async function getValidToken(): Promise<string | null> {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+
+    if (error) {
+      console.warn("Session fetch error:", error);
+      const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+      return refreshedSession?.access_token || null;
+    }
+
+    if (!session) {
+      console.debug("No active session found. Attempting refresh...");
+      const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+      return refreshedSession?.access_token || null;
+    }
+
+    const expiresAt = session.expires_at ?? 0;
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+
+    // If token expires within 5 mins, or is already expired
+    if (expiresAt - nowInSeconds < 300) {
+      console.debug("Token near expiry or expired. Refreshing...");
+      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+        // If refresh failed but we have a session, return the current token
+        return session.access_token;
+      }
+      return refreshedSession?.access_token || session.access_token;
+    }
+
+    return session.access_token;
+  } catch (err) {
+    console.error("Critical error in token management:", err);
+    return null;
+  }
+}
+
+/**
+ * Robust fetch wrapper for Supabase Edge Functions
+ */
+async function invokeFunction(name: string, body: any): Promise<any> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error("Missing Supabase configuration in environment variables.");
+  }
+
+  let lastError: any = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      // CRITICAL: Fetch token INSIDE the loop so retry gets a fresh one
+      const token = await getValidToken();
+      const bearerToken = token || supabaseAnonKey;
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'apikey': supabaseAnonKey,
+        'x-client-info': 'supabase-js/2.39.7',
+        'Authorization': `Bearer ${bearerToken}`
+      };
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/${name}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      });
+
+      if (response.status === 401) {
+        console.warn(`Edge Function 401 on attempt ${attempt}. Token length: ${token?.length || 0}`);
+        if (attempt === 1) {
+          console.info("Attempting session refresh and retry...");
+          await supabase.auth.refreshSession();
+          continue; // Force retry with new token
+        }
+        throw new Error("Invalid JWT: Unauthorized (401). Please try logging out and back in.");
+      }
+
+      const data = await response.json();
+      if (!response.ok) {
+        // Check for 404/503 (often Gemini availability issues)
+        if (response.status === 404 || response.status === 503 || response.status === 504) {
+          throw new Error(data.error || data.message || `AI Service Temporary Error (${response.status})`);
+        }
+        throw new Error(data.error || data.message || `Edge Function Error (${response.status})`);
+      }
+      return data;
+    } catch (err: any) {
+      lastError = err;
+      // Retry once on auth or timeout errors
+      if (attempt === 1 && (err.message?.includes('JWT') || err.message?.includes('401') || err.message?.includes('fetch'))) {
+        continue;
+      }
+      break;
+    }
+  }
+  throw lastError;
+}
+
 // Use sessionStorage to persist quota status across page refreshes during the session
 let isQuotaExhausted = sessionStorage.getItem('simplish-tts-quota-exhausted') === 'true';
 let quotaResetTimer: ReturnType<typeof setTimeout> | null = null;
@@ -62,7 +166,6 @@ const ttsQueue = new TTSQueue();
 
 /**
  * Text-to-Speech via Supabase Edge Function.
- * API key lives server-side — never in the browser.
  */
 export async function textToSpeech(text: string, voice: string = 'Kore', lowBitrate: boolean = false, retryCount = 0): Promise<string | null> {
   // 1. Check Cache first
@@ -81,13 +184,7 @@ export async function textToSpeech(text: string, voice: string = 'Kore', lowBitr
 
   return ttsQueue.add(async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('tts', {
-        body: { text, voice, lowBitrate },
-      });
-
-      if (error) throw error;
-
-      const result = typeof data === 'string' ? JSON.parse(data) : data;
+      const result = await invokeFunction('tts', { text, voice, lowBitrate });
 
       if (result.isQuota) throw { status: 'RESOURCE_EXHAUSTED', message: '429' };
 
@@ -159,24 +256,9 @@ export async function evaluatePlacement(data: {
     if (!guard.isAllowed) throw new Error(guard.message);
     if (guard.mockData) return guard.mockData.data;
 
-    const { data: rawData, error } = await supabase.functions.invoke('evaluate', {
-      body: { type: 'placement', ...data },
-    });
+    const result = await invokeFunction('evaluate', { type: 'placement', ...data });
 
-    if (error) {
-      console.error("Placement Evaluation Edge Function Error:", error);
-      let realErrorMsg = '';
-      try {
-        if ((error as any).context) {
-          const body = await (error as any).context.json();
-          realErrorMsg = body?.error || body?.message || JSON.stringify(body);
-        }
-      } catch {
-        realErrorMsg = (error as any)?.message || String(error);
-      }
-      throw new Error(realErrorMsg || 'Unknown error in placement evaluation');
-    }
-    const result = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+    // Result from invokeFunction is already the parsed JSON { data, usage, model }
 
     // Log real usage
     if (result.usage) {
@@ -223,24 +305,7 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
     if (!guard.isAllowed) throw new Error(guard.message);
     if (guard.mockData) return guard.mockData.data;
 
-    const { data, error } = await supabase.functions.invoke('evaluate', {
-      body: { type: 'speech', audioBase64, targetText },
-    });
-
-    if (error) {
-      console.error("Speech Evaluation Edge Function Error:", error);
-      let realErrorMsg = '';
-      try {
-        if ((error as any).context) {
-          const body = await (error as any).context.json();
-          realErrorMsg = body?.error || body?.message || JSON.stringify(body);
-        }
-      } catch {
-        realErrorMsg = (error as any)?.message || String(error);
-      }
-      throw new Error(realErrorMsg || 'Unknown error');
-    }
-    const result = typeof data === 'string' ? JSON.parse(data) : data;
+    const result = await invokeFunction('evaluate', { type: 'speech', audioBase64, targetText });
 
     // Log real usage
     if (result.usage) {
@@ -267,7 +332,6 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
 
 /**
  * Generate Curriculum Lesson via Supabase Edge Function.
- * Extracts the real error from FunctionsHttpError.context (a Response object).
  */
 export async function generateLessonWithAI(promptText: string) {
   // Quota Guardrail
@@ -275,93 +339,52 @@ export async function generateLessonWithAI(promptText: string) {
   if (!guard.isAllowed) throw new Error(guard.message);
   if (guard.mockData) return guard.mockData.data;
 
-  const { data: result, error } = await supabase.functions.invoke('evaluate', {
-    body: { type: 'generate_lesson', promptText },
-  });
+  try {
+    const result = await invokeFunction('evaluate', { type: 'generate_lesson', promptText });
 
-  if (error) {
-    console.error("Lesson Generation Edge Function Error:", error);
+    // Log usage
+    if (result && result.usage) {
+      let inputUnits = result.usage.promptTokenCount;
 
-    // Step 1: Extract the REAL error message from the Response body
-    let realErrorMsg = '';
-    try {
-      if ((error as any).context) {
-        const body = await (error as any).context.json();
-        console.error("Edge Function Error Body:", body);
-        realErrorMsg = body?.error || body?.message || JSON.stringify(body);
+      // Simulate Context Caching optimization (90% reduction for repeated system instructions)
+      const contextKey = 'coaching-rules'; // simplified for demo
+      if (CACHED_CONTEXTS.has(contextKey)) {
+        inputUnits = Math.ceil(inputUnits * 0.1);
+        console.log("🚀 Context Cache Hit! TPM usage reduced by 90%.");
+      } else {
+        CACHED_CONTEXTS.add(contextKey);
+        setTimeout(() => CACHED_CONTEXTS.delete(contextKey), CACHE_EXPIRY_MS);
       }
-    } catch {
-      // context might already be consumed or not JSON
-      realErrorMsg = (error as any)?.message || String(error);
+
+      telemetry.logUsage({
+        api_type: 'chat',
+        model_name: result.model || 'gemini-lesson-gen',
+        input_units: inputUnits,
+        output_units: result.usage.candidatesTokenCount,
+        total_units: inputUnits + result.usage.candidatesTokenCount
+      });
+
+      // Also report to local guardrail
+      reportRealUsage(inputUnits + result.usage.candidatesTokenCount);
     }
 
-    if (!realErrorMsg) {
-      realErrorMsg = (error as any)?.message || String(error);
+    // Parse and return the actual lesson data
+    const lessonData = result.data;
+    if (!lessonData || (!lessonData.titleStr && !lessonData.textContent)) {
+      throw new Error('AI returned an empty or incomplete lesson. Please refine your prompt and try again.');
+    }
+    return lessonData;
+  } catch (error: any) {
+    console.error("Lesson Generation Error:", error);
+    const msg = (error.message || "").toLowerCase();
+
+    if (msg.includes('429') || msg.includes('quota')) {
+      throw new Error('⏳ API quota exhausted. Please wait a few minutes.');
+    }
+    if (msg.includes('401') || msg.includes('jwt')) {
+      throw new Error('🔑 Authentication error. Please try logging out and back in.');
     }
 
-    const msg = realErrorMsg.toLowerCase();
-
-    // Step 2: Classify the error for a user-friendly message
-    if (msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted')) {
-      throw new Error('⏳ API quota exhausted. Please wait a few minutes and try again, or check your Google AI billing.');
-    }
-    if (msg.includes('api_key') || msg.includes('401') || msg.includes('unauthorized') || msg.includes('api key')) {
-      throw new Error('🔑 Invalid GEMINI_API_KEY. Please verify the API key in your Supabase Edge Function secrets.');
-    }
-    if (msg.includes('403') || msg.includes('forbidden') || msg.includes('permission')) {
-      throw new Error('🚫 API access forbidden. The Gemini API key may not have the required permissions.');
-    }
-    if (msg.includes('not found') || msg.includes('404') || msg.includes('not_found')) {
-      throw new Error('🔍 AI model not found. The configured Gemini model may be unavailable.');
-    }
-    if (msg.includes('gemini_api_key is missing') || msg.includes('not set')) {
-      throw new Error('⚙️ GEMINI_API_KEY is not configured. Please add it to your Supabase Edge Function secrets.');
-    }
-
-    // Fallback: show the raw error from the Edge Function
-    throw new Error(`AI Error: ${realErrorMsg}`);
+    throw error;
   }
-
-  // result already contains data from the invoke call at line 225
-
-  // Handle case where data contains an error field (old 200-status error responses)
-  if (result && typeof result === 'object' && result.error) {
-    console.error("Lesson Generation returned error in body:", result.error);
-    throw new Error(`AI Error: ${result.error}`);
-  }
-
-  // result is now the object { data, usage, model } from the Edge Function
-  if (result && result.usage) {
-    let inputUnits = result.usage.promptTokenCount;
-
-    // Simulate Context Caching optimization (90% reduction for repeated system instructions)
-    const contextKey = 'coaching-rules'; // simplified for demo
-    if (CACHED_CONTEXTS.has(contextKey)) {
-      inputUnits = Math.ceil(inputUnits * 0.1);
-      console.log("🚀 Context Cache Hit! TPM usage reduced by 90%.");
-    } else {
-      CACHED_CONTEXTS.add(contextKey);
-      setTimeout(() => CACHED_CONTEXTS.delete(contextKey), CACHE_EXPIRY_MS);
-    }
-
-    telemetry.logUsage({
-      api_type: 'chat',
-      model_name: result.model || 'gemini-lesson-gen',
-      input_units: inputUnits,
-      output_units: result.usage.candidatesTokenCount,
-      total_units: inputUnits + result.usage.candidatesTokenCount
-    });
-
-    // Also report to local guardrail
-    reportRealUsage(inputUnits + result.usage.candidatesTokenCount);
-  }
-
-  // Parse and return the actual lesson data
-  const lessonData = result.data;
-  if (!lessonData || (!lessonData.titleStr && !lessonData.textContent)) {
-    throw new Error('AI returned an empty or incomplete lesson. Please refine your prompt and try again.');
-  }
-  return lessonData;
 }
-
-

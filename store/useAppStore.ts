@@ -16,13 +16,15 @@ interface AppState {
     loading: boolean;
     initialized: boolean;
     dataSaverMode: boolean;
+    evaluationHistory: any[];
 
     // Actions
     initialize: (forceRefresh?: boolean) => Promise<void>;
     setSession: (session: any) => void;
     updateProgress: (lessonId: string, level: CourseLevel) => Promise<void>;
     unlockNextLevel: (currentLevel: CourseLevel) => Promise<void>;
-    setPlacementResult: (level: CourseLevel) => Promise<void>;
+    setPlacementResult: (result: { suggestedLevel: CourseLevel, score: number, reasoning: string, reasoningKn: string }) => Promise<void>;
+    fetchEvaluationHistory: () => Promise<void>;
     refreshModules: () => Promise<void>;
     setDataSaverMode: (enabled: boolean) => void;
     syncUsage: (type: 'voice' | 'chat', amount: number) => void;
@@ -33,6 +35,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     session: null,
     progress: null,
     modules: [],
+    evaluationHistory: [],
     loading: true,
     initialized: false,
     dataSaverMode: (() => {
@@ -110,6 +113,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
             set({ session, modules: modules || [], initialized: true });
             console.log("✅ Core state set. Session:", !!session, "Modules:", modules?.length);
+
+            if (userId) {
+                get().fetchEvaluationHistory();
+            }
 
             // STEP 3: Process user progress if available
             if (progressResult?.data) {
@@ -299,14 +306,16 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
     },
 
-    setPlacementResult: async (level) => {
+    setPlacementResult: async (result) => {
         const { session } = get();
         if (!session?.id || session.isRestricted) return;
 
-        const targetIndex = LEVEL_ORDER.indexOf(level);
+        const { suggestedLevel, score, reasoning, reasoningKn } = result;
+        const targetIndex = LEVEL_ORDER.indexOf(suggestedLevel);
+
         set({
             progress: {
-                currentLevel: level,
+                currentLevel: suggestedLevel,
                 completedLessons: [],
                 isPlacementDone: true,
                 role: session.role
@@ -323,14 +332,39 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         const payload = {
             user_id: session.id,
-            current_level: level,
+            current_level: suggestedLevel,
             completed_lessons: [],
             is_placement_done: true,
             updated_at: new Date().toISOString()
         };
         await db.user_progress.put(payload);
+
+        // Save to evaluations history
+        await supabase.from('ai_evaluations').insert({
+            user_id: session.id,
+            level: suggestedLevel,
+            score,
+            reasoning,
+            reasoning_kn: reasoningKn
+        });
+
         await db.sync_queue.add({ action: 'UPSERT_PROGRESS', payload, created_at: Date.now() });
         syncUp();
+        get().fetchEvaluationHistory();
+    },
+
+    fetchEvaluationHistory: async () => {
+        const { session } = get();
+        if (!session?.id) return;
+        const { data, error } = await supabase
+            .from('ai_evaluations')
+            .select('*')
+            .eq('user_id', session.id)
+            .order('created_at', { ascending: false })
+            .limit(5);
+        if (!error && data) {
+            set({ evaluationHistory: data });
+        }
     },
 
     setDataSaverMode: (enabled: boolean) => {

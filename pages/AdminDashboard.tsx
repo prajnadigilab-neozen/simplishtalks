@@ -345,6 +345,7 @@ const AdminDashboard: React.FC = () => {
                       user.role === UserRole.MODERATOR ? 'bg-blue-100 text-blue-700' :
                         'bg-slate-100 text-slate-600'
                       }`}>
+                      {user.role || 'STUDENT'}
                     </span>
                   </td>
                   <td className="p-6">
@@ -357,10 +358,10 @@ const AdminDashboard: React.FC = () => {
                       return (
                         <div className="flex flex-col">
                           <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-blue-600'}`}>
-                            {mins}:{secs.toString().padStart(2, '0')} / 3:00
+                            🎙️ {mins}:{secs.toString().padStart(2, '0')} / 3:00
                           </span>
                           <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
-                            {usage?.chat_tokens_total || 0} tokens used
+                            Live Talk Time
                           </span>
                         </div>
                       );
@@ -370,11 +371,15 @@ const AdminDashboard: React.FC = () => {
                     {(() => {
                       const usage = usageData.find(u => u.user_id === user.id);
                       const msgs = usage?.chat_messages_total || 0;
+                      const tokens = usage?.chat_tokens_total || 0;
                       const isOver = msgs >= 50;
                       return (
                         <div className="flex flex-col">
                           <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-purple-600'}`}>
-                            {msgs} / 50 msgs
+                            💬 {msgs} / 50 msgs
+                          </span>
+                          <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
+                            {tokens.toLocaleString()} tokens
                           </span>
                         </div>
                       );
@@ -557,16 +562,23 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-3xl font-black text-indigo-800 dark:text-indigo-300">{globalStats.snehiCount}</p>
               </div>
               <div className="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-2xl">
-                <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">Total AI Tokens</p>
+                <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1">💬 Total Chat Tokens</p>
                 <p className="text-3xl font-black text-purple-800 dark:text-purple-300">
                   {usageData.reduce((acc, curr) => acc + (curr.chat_tokens_total || 0), 0).toLocaleString()}
                 </p>
+                <p className="text-[8px] text-slate-400 mt-1">{usageData.reduce((acc, curr) => acc + (curr.chat_messages_total || 0), 0).toLocaleString()} messages</p>
               </div>
-              <div className="p-6 bg-orange-50 dark:bg-orange-900/20 rounded-2xl">
-                <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">Total Chat Messages</p>
-                <p className="text-3xl font-black text-orange-800 dark:text-orange-300">
-                  {usageData.reduce((acc, curr) => acc + (curr.chat_messages_total || 0), 0).toLocaleString()}
+              <div className="p-6 bg-sky-50 dark:bg-sky-900/20 rounded-2xl">
+                <p className="text-[10px] font-black text-sky-400 uppercase tracking-widest mb-1">🎙️ Total Voice Time</p>
+                <p className="text-3xl font-black text-sky-800 dark:text-sky-300">
+                  {(() => {
+                    const totalSecs = usageData.reduce((acc, curr) => acc + (curr.voice_seconds_total || 0), 0);
+                    const m = Math.floor(totalSecs / 60);
+                    const s = totalSecs % 60;
+                    return `${m}m ${s}s`;
+                  })()}
                 </p>
+                <p className="text-[8px] text-slate-400 mt-1">Live Talk across all users</p>
               </div>
             </div>
           </div>

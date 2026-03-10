@@ -124,13 +124,13 @@ const PlacementTest: React.FC = () => {
     if (!session?.id || !evaluationResult) return;
     setLoading(true);
     try {
-      // Save suggested level to user_progress
-      await setPlacementResult(evaluationResult.suggestedLevel);
+      // Save full evaluation metadata to history and update level
+      await setPlacementResult(evaluationResult);
 
-      // Also save the score to profiles for recommendation logic on dashboard
+      // Record recommendation logic metadata
       await supabase
         .from('profiles')
-        .update({ system_prompt_focus: `Placement Score: ${evaluationResult.score}` }) // Using an existing field for metadata or I could have added a score field.
+        .update({ system_prompt_focus: `Placement Score: ${evaluationResult.score} (${evaluationResult.suggestedLevel})` })
         .eq('id', session.id);
 
       navigate('/dashboard');

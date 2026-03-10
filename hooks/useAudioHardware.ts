@@ -26,6 +26,7 @@ export function useAudioHardware(): UseAudioHardwareReturn {
     const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
     const nextStartTimeRef = useRef(0);
     const workletLoadedRef = useRef(false);
+    const isAiTalkingRef = useRef(false); // Used to gate mic during AI speech
 
     // ── Get or create singleton AudioContexts ──
     const getCtxIn = useCallback(() => {
@@ -71,13 +72,17 @@ export function useAudioHardware(): UseAudioHardwareReturn {
 
         workletNode.port.onmessage = (event) => {
             if (event.data.type === 'pcm') {
-                onPcmData(new Uint8Array(event.data.data));
+                // ⚡ CRITICAL: Do NOT send mic audio while AI is talking.
+                // This prevents the AI from hearing its own voice and looping.
+                if (!isAiTalkingRef.current) {
+                    onPcmData(new Uint8Array(event.data.data));
+                }
             }
-            // Volume messages are ignored here — the visualizer reads from the analyser directly
         };
 
         source.connect(workletNode);
-        workletNode.connect(ctx.destination);
+        // NOTE: Do NOT connect workletNode to ctx.destination — that would route
+        // mic audio to the speaker and cause an acoustic feedback loop.
     }, [getCtxIn, getCtxOut]);
 
     // ── Stop Microphone ──
@@ -110,6 +115,7 @@ export function useAudioHardware(): UseAudioHardwareReturn {
         if (outCtx.state === 'suspended') await outCtx.resume();
 
         setIsAiTalking(true);
+        isAiTalkingRef.current = true; // Gate mic while AI talks
         nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outCtx.currentTime);
 
         const audioBuffer = await decodeAudioData(decodeBase64(base64), outCtx, 24000, 1);
@@ -129,6 +135,7 @@ export function useAudioHardware(): UseAudioHardwareReturn {
             sourcesRef.current.delete(source);
             if (sourcesRef.current.size === 0) {
                 setIsAiTalking(false);
+                isAiTalkingRef.current = false; // Re-enable mic
             }
         };
 
@@ -145,6 +152,7 @@ export function useAudioHardware(): UseAudioHardwareReturn {
         sourcesRef.current.clear();
         nextStartTimeRef.current = 0;
         setIsAiTalking(false);
+        isAiTalkingRef.current = false; // Always re-enable mic on explicit stop
     }, []);
 
     return {
