@@ -23,7 +23,7 @@ export async function getAiInstructions(): Promise<string> {
         .from('ai_instructions')
         .select('content')
         .eq('id', 1)
-        .single();
+        .maybeSingle();
 
     if (error || !data) {
         if (error && error.code !== 'PGRST116') {
@@ -45,7 +45,7 @@ export async function updateAiInstructions(newContent: string, userId: string): 
             .from('ai_instructions')
             .select('content')
             .eq('id', 1)
-            .single();
+            .maybeSingle();
 
         if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
 

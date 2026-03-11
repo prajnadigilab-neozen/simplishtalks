@@ -6,6 +6,7 @@ import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../components/LanguageContext';
 import { clearProfileCache } from '../services/authService';
+import { getSystemConfig } from '../services/systemConfigService';
 
 const PaymentPage: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -14,6 +15,13 @@ const PaymentPage: React.FC = () => {
     const { t } = useLanguage();
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentStep, setPaymentStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
+    const [costPerMinute, setCostPerMinute] = useState<number>(2.0); // Default fallback
+
+    useEffect(() => {
+        getSystemConfig().then(cfg => {
+            if (cfg) setCostPerMinute(cfg.cost_per_minute);
+        });
+    }, []);
 
     const selectedPackage = searchParams.get('package') as PackageType;
     const packageLabel = selectedPackage === PackageType.TALKS ? 'SIMPLISH - TALKS' : 'SIMPLISH SNEHI';
@@ -47,7 +55,8 @@ const PaymentPage: React.FC = () => {
             }
 
             const currentCredits = session?.agentCredits || 0;
-            const addedCredits = selectedPackage === PackageType.SNEHI ? 60 : 0;
+            const price = selectedPackage === PackageType.SNEHI ? 499 : 0; // In a real app, this would also come from DB config
+            const addedCredits = selectedPackage === PackageType.SNEHI ? Math.floor(price / costPerMinute) : 0;
 
             const updates = {
                 package_type: newPackageType,
@@ -80,13 +89,13 @@ const PaymentPage: React.FC = () => {
 
             // Also clear cache and trigger a background re-fetch for full sync
             clearProfileCache();
-            useAppStore.getState().initialize(true); // No await - runs in background
+            useAppStore.getState().refreshSession(); // No await - runs in background without setting global loading=true
 
             setPaymentStep('success');
 
             // Redirect after success message
             setTimeout(() => {
-                navigate('/dashboard');
+                navigate('/dashboard', { replace: true });
             }, 2000);
 
         } catch (err) {

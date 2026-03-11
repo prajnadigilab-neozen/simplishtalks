@@ -4,6 +4,26 @@ import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } f
 import { encodeBase64 } from '../utils/audioUtils';
 import { telemetry } from '../services/telemetryService';
 
+// ─── Transliteration Utility ────────────────────────────────────
+// Forces Indian scripts (Devanagari, Bengali, Telugu, Tamil, Malayalam) into Kannada script
+// based on standard ISCII Unicode block alignments.
+const forceKannadaScript = (text: string): string => {
+    return text.split('').map(char => {
+        const code = char.charCodeAt(0);
+        // Devanagari (Hindi/Marathi) block -> Kannada
+        if (code >= 0x0900 && code <= 0x097F) return String.fromCharCode(code + 0x0380);
+        // Bengali block -> Kannada
+        if (code >= 0x0980 && code <= 0x09FF) return String.fromCharCode(code + 0x0300);
+        // Telugu block -> Kannada
+        if (code >= 0x0C00 && code <= 0x0C7F) return String.fromCharCode(code + 0x0080);
+        // Tamil block -> Kannada
+        if (code >= 0x0B80 && code <= 0x0BFF) return String.fromCharCode(code + 0x0100);
+        // Malayalam block -> Kannada
+        if (code >= 0x0D00 && code <= 0x0D7F) return String.fromCharCode(code - 0x0080);
+        return char;
+    }).join('');
+};
+
 // ─── Tool Declaration ───────────────────────────────────────────
 const provideFeedbackTool: FunctionDeclaration = {
     name: 'provide_feedback',
@@ -53,6 +73,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
     const sessionRef = useRef<any>(null);
     const activeIdRef = useRef<number>(0);
     const userInitiatedCloseRef = useRef(false);
+    const canSendRef = useRef(false); // Blocks sendPcmData during teardown
 
     // Transcription buffers — accumulated per turn, flushed on turnComplete
     const inputBuf = useRef('');
@@ -74,6 +95,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
         setIsConnecting(true);
         setError(null);
         userInitiatedCloseRef.current = false;
+        canSendRef.current = false; // Will be enabled in onopen
         lastConfigRef.current = { instruction: systemInstruction, voice: voiceName };
 
         const connectionId = Date.now();
@@ -86,6 +108,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                 model: 'gemini-2.5-flash-native-audio-latest',
                 callbacks: {
                     onopen: () => {
+                        canSendRef.current = true; // Gate open: now safe to send PCM
                         setIsConnected(true);
                         setIsConnecting(false);
                         setIsReconnecting(false);
@@ -118,7 +141,9 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                             outputBuf.current += chunk;
                             callbacks.onTranscription('output', chunk);
                         } else if (message.serverContent?.inputTranscription) {
-                            const chunk = sanitize(message.serverContent.inputTranscription.text);
+                            // Enforce Kannada script on STT inputs to prevent Devanagari/Bengali
+                            const rawChunk = sanitize(message.serverContent.inputTranscription.text);
+                            const chunk = forceKannadaScript(rawChunk);
                             inputBuf.current += chunk;
                             callbacks.onTranscription('input', chunk);
                         }
@@ -177,7 +202,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                         voiceConfig: { prebuiltVoiceConfig: { voiceName } },
                     },
                     systemInstruction,
-                },
+                } as any,
             });
 
             sessionRef.current = await sessionPromise;
@@ -209,7 +234,9 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
     }, []);
 
     const disconnect = useCallback(() => {
+        // CRITICAL: Set flags BEFORE closing session to avoid race with onclose callback
         userInitiatedCloseRef.current = true;
+        canSendRef.current = false; // Immediately block all pending PCM sends
         reconnectAttemptsRef.current = MAX_RECONNECTS; // Prevent auto-reconnect
         if (sessionRef.current) {
             try { sessionRef.current.close(); } catch (e) { console.debug('Error closing session:', e); }
@@ -248,7 +275,8 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
     }, [connect]);
 
     const sendPcmData = useCallback((pcmBytes: Uint8Array) => {
-        if (!sessionRef.current) return;
+        // Guard: do not attempt to send if we are in teardown or not connected
+        if (!canSendRef.current || !sessionRef.current) return;
         try {
             sessionRef.current.sendRealtimeInput({
                 media: {
@@ -256,7 +284,12 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                     mimeType: 'audio/pcm;rate=16000',
                 },
             });
-        } catch (e) {
+        } catch (e: any) {
+            // Silently ignore expected socket closing errors during teardown
+            if (e?.message?.includes('CLOSING') || e?.message?.includes('CLOSED')) {
+                canSendRef.current = false; // Ensure flag stays off
+                return;
+            }
             console.debug('Failed to send PCM:', e);
         }
     }, []);

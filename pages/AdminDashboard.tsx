@@ -8,12 +8,15 @@ import { getGlobalStats } from '../services/courseService';
 import { UserRole, PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { clearAllRecordings } from '../utils/recordingStore';
+import { getSystemConfig, updateSystemConfig, SystemConfig } from '../services/systemConfigService';
 
 interface Notification {
   id: string;
   message: string;
   type: 'success' | 'error' | 'info';
 }
+
+const Spin = ({ c = 'border-white' }: { c?: string }) => <div className={`w-5 h-5 border-2 ${c} border-t-transparent rounded-full animate-spin`} />;
 
 const AdminDashboard: React.FC = () => {
   const { t } = useLanguage();
@@ -22,7 +25,9 @@ const AdminDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config'>('users');
+  const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
+  const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [usageData, setUsageData] = useState<any[]>([]);
   const [reportsData, setReportsData] = useState<any[]>([]);
@@ -62,6 +67,9 @@ const AdminDashboard: React.FC = () => {
     try {
       const userData = await getAllUsers();
       setUsers(userData);
+
+      const config = await getSystemConfig();
+      setSystemConfig(config);
 
       // Get current user session for debugging/RLS verification
       const { data: { session } } = await import('../lib/supabase').then(m => m.supabase.auth.getSession());
@@ -111,6 +119,19 @@ const AdminDashboard: React.FC = () => {
       setError(err.message || "Could not connect to the database.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!systemConfig || !currentUser?.id) return;
+    setIsUpdatingConfig(true);
+    const { success, error } = await updateSystemConfig(systemConfig, currentUser.id);
+    setIsUpdatingConfig(false);
+    if (success) {
+      showNotification('Global settings updated successfully', 'success');
+    } else {
+      showNotification(`Update failed: ${error}`, 'error');
     }
   };
 
@@ -306,20 +327,23 @@ const AdminDashboard: React.FC = () => {
           )}
         </div>
 
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
-          {currentUser?.role === UserRole.SUPER_ADMIN && (
-            <button key="users" onClick={() => setActiveTab('users')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Users', kn: 'ಬಳಕೆದಾರರು' })}</button>
-          )}
-          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'General Stats', kn: 'ಅಂಕಿಅಂಶಗಳು' })}</button>
-          <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Reports', kn: 'ವರದಿಗಳು' })}</button>
+        <div className="w-full overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl shadow-inner w-max min-w-full">
+            {currentUser?.role === UserRole.SUPER_ADMIN && (
+              <button key="users" onClick={() => setActiveTab('users')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Users', kn: 'ಬಳಕೆದಾರರು' })}</button>
+            )}
+            <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'General Stats', kn: 'ಅಂಕಿಅಂಶಗಳು' })}</button>
+            <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Reports', kn: 'ವರದಿಗಳು' })}</button>
  
-          {currentUser?.role === UserRole.SUPER_ADMIN && (
-            <>
-              <button key="mods" onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Moderators', kn: 'ಮಾಡರೇಟರ್‌ಗಳು' })}</button>
-            </>
-          )}
+            {currentUser?.role === UserRole.SUPER_ADMIN && (
+              <>
+                <button key="mods" onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Moderators', kn: 'ಮಾಡರೇಟರ್‌ಗಳು' })}</button>
+                <button key="config" onClick={() => setActiveTab('config')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'config' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Global Settings', kn: 'ಜಾಗತಿಕ ಸೆಟ್ಟಿಂಗ್‌ಗಳು' })}</button>
+              </>
+            )}
  
-          {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Audit', kn: 'ತಪಾಸಣೆ' })}</button>}
+            {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Audit', kn: 'ತಪಾಸಣೆ' })}</button>}
+          </div>
         </div>
       </div>
 
@@ -330,6 +354,7 @@ const AdminDashboard: React.FC = () => {
               <tr>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'User', kn: 'ಬಳಕೆದಾರರು' })}</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Role', kn: 'ಪಾತ್ರ' })}</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Package', kn: 'ಪ್ಯಾಕೇಜ್' })}</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
                 <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Actions', kn: 'ಕ್ರಮಗಳು' })}</th>
@@ -364,16 +389,41 @@ const AdminDashboard: React.FC = () => {
                     </span>
                   </td>
                   <td className="p-6">
+                    <div className="flex flex-col">
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full w-fit ${
+                        user.package_type === PackageType.BOTH ? 'bg-purple-100 text-purple-700' :
+                        user.package_type === PackageType.SNEHI ? 'bg-indigo-100 text-indigo-700' :
+                        user.package_type === PackageType.TALKS ? 'bg-blue-100 text-blue-700' :
+                        'bg-slate-100 text-slate-500'
+                      }`}>
+                        {user.package_type || 'NONE'}
+                      </span>
+                      <span className={`text-[8px] font-bold uppercase mt-1 ${
+                        user.package_status === 'ACTIVE' ? 'text-green-600' : 
+                        user.package_status === 'EXPIRED' ? 'text-red-500' : 
+                        'text-slate-400'
+                      }`}>
+                        ● {user.package_status || 'INACTIVE'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-6">
                     {(() => {
                       const usage = usageData.find(u => u.user_id === user.id);
                       const seconds = usage?.voice_seconds_total || 0;
                       const mins = Math.floor(seconds / 60);
                       const secs = seconds % 60;
-                      const isOver = seconds >= 180;
+                      
+                      const freeLimitMins = Math.ceil((systemConfig?.universal_free_seconds || 180) / 60);
+                      const agentCredits = user.package_type === PackageType.SNEHI ? (user.agent_credits || 0) : 0;
+                      const maxTotalMins = freeLimitMins + agentCredits;
+                      
+                      const isOver = mins >= maxTotalMins;
+                      
                       return (
                         <div className="flex flex-col">
                            <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-blue-600'}`}>
-                            🎙️ {mins}:{secs.toString().padStart(2, '0')} / 3:00
+                            🎙️ {mins}:{secs.toString().padStart(2, '0')} / {maxTotalMins}:00
                           </span>
                           <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
                             {t({ en: 'Live Talk Time', kn: 'ಲೈವ್ ಟಾಕ್ ಸಮಯ' })}
@@ -911,6 +961,96 @@ const AdminDashboard: React.FC = () => {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'config' && currentUser?.role === UserRole.SUPER_ADMIN && (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl">
+             <div className="flex justify-between items-start mb-10">
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t({ en: 'Global System Settings', kn: 'ಜಾಗತಿಕ ಸಿಸ್ಟಮ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು' })}</h3>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest text-[10px]">{t({ en: 'Configure universal free limits and pricing defaults.', kn: 'ಯೂನಿವರ್ಸಲ್ ಉಚಿತ ಮಿತಿಗಳು ಮತ್ತು ಬೆಲೆಗಳನ್ನು ಕಾನ್ಫಿಗರ್ ಮಾಡಿ.' })}</p>
+              </div>
+              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
+                <span className="text-2xl">⚙️</span>
+              </div>
+             </div>
+
+             {systemConfig ? (
+               <form onSubmit={handleUpdateConfig} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Universal Free Seconds', kn: 'ಯೂನಿವರ್ಸಲ್ ಉಚಿತ ಸಮಯ (ಸೆಕೆಂಡ್‌ಗಳು)' })}</label>
+                    <input 
+                      type="number"
+                      value={systemConfig.universal_free_seconds}
+                      onChange={e => setSystemConfig({...systemConfig, universal_free_seconds: parseInt(e.target.value)})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                    />
+                    <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Free time given to every user (e.g. 180 = 3 mins).</p>
+                 </div>
+
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Cost Per Minute (₹)', kn: 'ನಿಮಿಷಕ್ಕೆ ಬೆಲೆ (₹)' })}</label>
+                    <input 
+                      type="number" step="0.1"
+                      value={systemConfig.cost_per_minute}
+                      onChange={e => setSystemConfig({...systemConfig, cost_per_minute: parseFloat(e.target.value)})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                    />
+                    <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Basis for credit calculation (Price / Cost = Minutes).</p>
+                 </div>
+
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Snehi Package Price (₹)', kn: 'ಸ್ನೇಹಿ ಪ್ಯಾಕೇಜ್ ಬೆಲೆ (₹)' })}</label>
+                    <input 
+                      type="number"
+                      value={systemConfig.price_snehi}
+                      onChange={e => setSystemConfig({...systemConfig, price_snehi: parseFloat(e.target.value)})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                    />
+                 </div>
+
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Talks Package Price (₹)', kn: 'ಟಾಕ್ಸ್ ಪ್ಯಾಕೇಜ್ ಬೆಲೆ (₹)' })}</label>
+                    <input 
+                      type="number"
+                      value={systemConfig.price_talks}
+                      onChange={e => setSystemConfig({...systemConfig, price_talks: parseFloat(e.target.value)})}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                    />
+                 </div>
+
+                 <div className="md:col-span-2 pt-6">
+                    <button 
+                      type="submit"
+                      disabled={isUpdatingConfig}
+                      className="w-full py-5 bg-blue-600 dark:bg-blue-500 text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    >
+                      {isUpdatingConfig ? <Spin /> : '💾'} {t({ en: 'Save Configuration', kn: 'ಕಾನ್ಫಿಗರೇಶನ್ ಉಳಿಸಿ' })}
+                    </button>
+                 </div>
+               </form>
+             ) : (
+               <div className="flex flex-col items-center justify-center py-20 opacity-50">
+                 <Spin c="border-slate-400" />
+                 <p className="text-[10px] font-black uppercase tracking-widest mt-4">Loading system config...</p>
+               </div>
+             )}
+          </div>
+
+          {/* Calculated Examples for verification */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-white dark:border-slate-800 shadow-sm">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Example Calculation</span>
+                <div className="font-black text-slate-900 dark:text-white text-xl">
+                  ₹{systemConfig?.price_snehi} / ₹{systemConfig?.cost_per_minute}/min
+                </div>
+                <div className="text-blue-600 font-black text-2xl mt-1">
+                  = {systemConfig ? Math.floor(systemConfig.price_snehi / systemConfig.cost_per_minute) : 0} Minutes
+                </div>
+             </div>
           </div>
         </div>
       )}

@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
+import { getSystemConfig, SystemConfig } from '../services/systemConfigService';
 
 const PackageSelection: React.FC = () => {
     const { session } = useAppStore();
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const [sysConfig, setSysConfig] = React.useState<SystemConfig | null>(null);
+
+    useEffect(() => {
+        getSystemConfig().then(setSysConfig);
+    }, []);
 
     // If there's no session, they shouldn't be here
     useEffect(() => {
@@ -18,16 +24,23 @@ const PackageSelection: React.FC = () => {
 
     if (!session) return null;
 
+    const isExpired = session?.packageEndDate && new Date(session.packageEndDate) < new Date();
+    const hasBoth = !isExpired && session.packageType === PackageType.BOTH;
+
+    useEffect(() => {
+        // If they navigate manually to /packages but already have BOTH active, push to dashboard
+        if (hasBoth) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [hasBoth, navigate]);
+
     const scoreMatch = session?.systemPromptFocus?.match(/Placement Score: (\d+)/);
     const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
     const isAdvanced = score >= 7;
 
-    const isExpired = session?.packageEndDate && new Date(session.packageEndDate) < new Date();
-
     // Determine what they already own (and is currently active)
     const hasTalks = !isExpired && (session.packageType === PackageType.TALKS || session.packageType === PackageType.BOTH);
     const hasSnehi = !isExpired && (session.packageType === PackageType.SNEHI || session.packageType === PackageType.BOTH);
-    const hasBoth = !isExpired && session.packageType === PackageType.BOTH;
 
     // Handle Package Activation (Navigate to Payment)
     const handleActivatePackage = (selectedPackage: PackageType) => {
@@ -79,6 +92,7 @@ const PackageSelection: React.FC = () => {
                     isRecommended={!hasBoth && !isAdvanced}
                     isActive={hasTalks}
                     disabled={hasTalks}
+                    price={sysConfig?.price_talks || 299}
                     onSelect={() => handleActivatePackage(PackageType.TALKS)}
                 />
                 <PackageCard
@@ -86,6 +100,7 @@ const PackageSelection: React.FC = () => {
                     isRecommended={!hasBoth && isAdvanced}
                     isActive={hasSnehi}
                     disabled={hasSnehi}
+                    price={sysConfig?.price_snehi || 499}
                     onSelect={() => handleActivatePackage(PackageType.SNEHI)}
                 />
             </div>
@@ -95,7 +110,14 @@ const PackageSelection: React.FC = () => {
 
 export default PackageSelection;
 
-const PackageCard: React.FC<{ type: PackageType; isRecommended: boolean; isActive: boolean; disabled: boolean; onSelect: () => void }> = ({ type, isRecommended, isActive, disabled, onSelect }) => {
+const PackageCard: React.FC<{ 
+    type: PackageType; 
+    isRecommended: boolean; 
+    isActive: boolean; 
+    disabled: boolean; 
+    price: number;
+    onSelect: () => void 
+}> = ({ type, isRecommended, isActive, disabled, price, onSelect }) => {
     const isTalks = type === PackageType.TALKS;
 
     // Visual tweaks for disabled cards
@@ -129,7 +151,7 @@ const PackageCard: React.FC<{ type: PackageType; isRecommended: boolean; isActiv
                             </span>
                         )}
                         <span className="font-black text-slate-900 dark:text-white text-lg">
-                            {isTalks ? '₹299' : '₹499'} <span className="text-[9px] text-slate-400">/mo</span>
+                            ₹{price} <span className="text-[9px] text-slate-400">/mo</span>
                         </span>
                     </div>
                 </div>

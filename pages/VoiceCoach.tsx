@@ -11,6 +11,8 @@ import { playPCM } from '../utils/audioUtils';
 import { useGeminiLive, FeedbackData } from '../hooks/useGeminiLive';
 import { useAudioHardware } from '../hooks/useAudioHardware';
 import { supabase } from '../lib/supabase';
+import { getAiInstructions } from '../services/aiInstructionsService';
+import { getSystemConfig, SystemConfig } from '../services/systemConfigService';
 
 /* ─── Inline SVG Icons (zero bundle cost) ──────────────────────────────────── */
 const IcoBack = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>;
@@ -33,25 +35,124 @@ const VoiceCoach: React.FC = () => {
   const [clearConfirm, setClearConfirm] = useState(false);
   const [pendingUserText, setPendingUserText] = useState('');
   const [pendingCoachText, setPendingCoachText] = useState('');
+  const [sessionError, setSessionError] = useState<{ type: 'TECHNICAL' | 'IDLE' | 'NONE', msg: string }>({ type: 'NONE', msg: '' });
+  const [sysConfig, setSysConfig] = useState<SystemConfig | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const startRef = useRef<number | null>(null);
+  const responseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const audio = useAudioHardware();
+  const resetIdleTimerRef = useRef<() => void>(() => {});
 
   /* Gemini callbacks */
   const onAudioChunk = useCallback((b: string) => audio.playAudioChunk(b), [audio]);
-  const onTranscription = useCallback((t: 'input' | 'output', txt: string) => t === 'input' ? setPendingUserText(p => p + txt) : setPendingCoachText(p => p + txt), []);
+  const onTranscription = useCallback((mode: 'input' | 'output', txt: string) => {
+    resetIdleTimerRef.current();
+    if (mode === 'input') {
+      setPendingUserText(p => p + txt);
+      // Reset response timeout on every user speaking chunk
+      if (responseTimeoutRef.current) clearTimeout(responseTimeoutRef.current);
+      responseTimeoutRef.current = setTimeout(() => {
+        setSessionError({ 
+          type: 'TECHNICAL', 
+          msg: t({ en: 'Technical issue: No response from coach. Please restart.', kn: 'ತಾಂತ್ರಿಕ ತೊಂದರೆ: ಕೋಚ್‌ರಿಂದ ಯಾವುದೇ ಪ್ರತಿಕ್ರಿಯೆ ಇಲ್ಲ. ದಯವಿಟ್ಟು ಮರುಪ್ರಾರಂಭಿಸಿ.' }) 
+        });
+      }, 30000); 
+    } else {
+      setPendingCoachText(p => p + txt);
+      // Clear timeout as soon as coach starts responding
+      if (responseTimeoutRef.current) {
+        clearTimeout(responseTimeoutRef.current);
+        responseTimeoutRef.current = null;
+      }
+    }
+  }, [t]); // resetIdleTimerRef is stable, and resetIdleTimer value is accessed via ref.current
+
   const onTurnComplete = useCallback(async (uTxt: string, cTxt: string, fb: FeedbackData) => {
     setPendingUserText(''); setPendingCoachText('');
+    if (responseTimeoutRef.current) {
+      clearTimeout(responseTimeoutRef.current);
+      responseTimeoutRef.current = null;
+    }
     if (!userId) return;
     if (uTxt) { const m: CoachMessage = { role: 'user', text: uTxt, timestamp: Date.now() }; const id = await saveChatMessage(userId, m, undefined, 'voice'); if (id) m.dbId = id; setMessages(p => [...p, m]); }
     if (cTxt) { const m: CoachMessage = { role: 'coach', text: cTxt, correction: fb.correction, kannadaGuide: fb.kannadaGuide, pronunciationTip: fb.pronunciationTip, timestamp: Date.now() }; const id = await saveChatMessage(userId, m, undefined, 'voice'); if (id) m.dbId = id; setMessages(p => [...p, m]); }
   }, [userId]);
-  const onInterrupted = useCallback(() => audio.stopAllAudio(), [audio]);
+
+  const onInterrupted = useCallback(() => {
+    resetIdleTimerRef.current();
+    audio.stopAllAudio();
+  }, [audio]);
+
   const gemini = useGeminiLive({ onAudioChunk, onTranscription, onTurnComplete, onInterrupted });
 
-  /* Load history */
+  /* Actions */
+  const handleStop = useCallback(async () => {
+    if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+    if (responseTimeoutRef.current) clearTimeout(responseTimeoutRef.current);
+    responseTimeoutRef.current = null;
+    
+    gemini.disconnect(); audio.stopMic(); audio.stopAllAudio();
+    if (startRef.current && userId) {
+      const s = Math.floor((Date.now() - startRef.current) / 1000);
+      if (s > 0) {
+        await updateUserUsage(userId, s, 0); syncUsageToProfiles(userId, s, 0); syncUsage('voice', s);
+        
+        // Dynamic Allotment Logic
+        if (session) {
+          const totalAfter = (session.totalTalkTime || 0) + s;
+          const freeLimit = sysConfig?.universal_free_seconds ?? 180;
+          
+          let billableSeconds = 0;
+          if ((session.totalTalkTime || 0) >= freeLimit) {
+            billableSeconds = s;
+          } else if (totalAfter > freeLimit) {
+            billableSeconds = totalAfter - freeLimit;
+          }
+
+          if (billableSeconds > 0 && session.packageType === PackageType.SNEHI && session.agentCredits !== undefined) {
+            // agent_credits are in MINUTES as per previous implementation
+            const billableMinutes = Math.ceil(billableSeconds / 60);
+            const nc = Math.max(0, session.agentCredits - billableMinutes);
+            useAppStore.setState({ session: { ...session, agentCredits: nc, totalTalkTime: totalAfter } });
+            await supabase.from('profiles').update({ agent_credits: nc, total_talk_time: totalAfter }).eq('id', userId);
+          } else {
+            // Just update total talk time for free tier
+            useAppStore.setState({ session: { ...session, totalTalkTime: totalAfter } });
+            await supabase.from('profiles').update({ total_talk_time: totalAfter }).eq('id', userId);
+          }
+        }
+      }
+      startRef.current = null;
+    }
+  }, [userId, gemini, session, syncUsage]);
+
+  const resetIdleTimer = useCallback(() => {
+    if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+    if (gemini.isConnected) {
+      idleTimeoutRef.current = setTimeout(() => {
+        handleStop();
+        setSessionError({ 
+          type: 'IDLE', 
+          msg: t({ en: 'Session terminated due to inactivity.', kn: 'ನಿಷ್ಕ್ರಿಯತೆಯಿಂದಾಗಿ ಸೆಷನ್ ಮುಕ್ತಾಯಗೊಂಡಿದೆ.' }) 
+        });
+      }, 300000); // 5 minutes
+    }
+  }, [gemini.isConnected, t, handleStop]);
+
   useEffect(() => {
-    (async () => { setLoadingHistory(true); if (userId) setMessages(await getChatHistory(userId, undefined, 'voice')); setLoadingHistory(false); })();
+    resetIdleTimerRef.current = resetIdleTimer;
+  }, [resetIdleTimer]);
+
+  /* Load history and config */
+  useEffect(() => {
+    (async () => { 
+      setLoadingHistory(true); 
+      if (userId) setMessages(await getChatHistory(userId, undefined, 'voice')); 
+      const cfg = await getSystemConfig();
+      setSysConfig(cfg);
+      setLoadingHistory(false); 
+    })();
     return () => { gemini.disconnect(); audio.stopMic(); audio.stopAllAudio(); };
   }, [userId]);
 
@@ -60,28 +161,42 @@ const VoiceCoach: React.FC = () => {
 
   /* Actions */
   const handleStart = async () => {
+    setSessionError({ type: 'NONE', msg: '' });
     if (session?.packageType === PackageType.SNEHI && (session.agentCredits ?? 0) <= 0) { alert('No credits left.'); return; }
     startRef.current = Date.now();
-    const ctx = messages.slice(-5).map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.text}`).join('\n');
-    const inst = `Persona: "Namma Simplish Meshtru", patient bilingual English tutor for Karnataka.\nRULES: Only Kannada+English. Provide Kannada translation in brackets for every English sentence. Use rural examples. Celebrate wins. Call 'provide_feedback' on mistakes.${ctx ? `\n\nContext:\n${ctx}` : ''}`;
-    await gemini.connect(inst, session?.voiceGender === 'MAN' ? 'Puck' : 'Aoede');
-    await audio.startMic(pcm => gemini.sendPcmData(pcm));
-  };
-
-  const handleStop = async () => {
-    gemini.disconnect(); audio.stopMic(); audio.stopAllAudio();
-    if (startRef.current && userId) {
-      const s = Math.floor((Date.now() - startRef.current) / 1000);
-      if (s > 0) {
-        await updateUserUsage(userId, s, 0); syncUsageToProfiles(userId, s, 0); syncUsage('voice', s);
-        if (session?.packageType === PackageType.SNEHI && session.agentCredits !== undefined) {
-          const nc = Math.max(0, session.agentCredits - Math.ceil(s / 60));
-          useAppStore.setState({ session: { ...session, agentCredits: nc } });
-          await supabase.from('profiles').update({ agent_credits: nc }).eq('id', userId);
+    
+    // Fetch latest AI instructions from DB or fallback
+    const rawInst = await getAiInstructions();
+    let inst = "";
+    if (rawInst) {
+      try {
+        const parsed = JSON.parse(rawInst);
+        inst = parsed.instructions || "";
+        if (parsed.aiVoice && Array.isArray(parsed.aiVoice)) {
+          inst += "\n\nSpecific Voice Rules:\n" + parsed.aiVoice.join("\n");
         }
+      } catch (e) {
+        inst = rawInst; // Fallback if it's plain text
       }
-      startRef.current = null;
     }
+
+    if (!inst) {
+      inst = `Persona: "Namma Simplish Meshtru", patient bilingual English tutor for Karnataka.
+      STRICT RULE: Use ONLY Kannada for translations and support. Never use Telugu or Hindi.
+      RULES: Only Kannada+English. Provide Kannada translation in brackets for every English sentence. Use rural examples. Celebrate wins. Call 'provide_feedback' on mistakes.`;
+    }
+
+    const ctx = messages.slice(-5).map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.text}`).join('\n');
+    const finalInst = `${inst}
+IMPORTANT TRANSCRIPTION RULE: When you transcribe or summarize the student's speech, you MUST transcribe Kannada words exclusively in the Kannada script. NEVER use Devanagari (Hindi) or Bengali scripts in your transcriptions or output. Always produce authentic Kannada script for Kannada words.
+${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
+    
+    await gemini.connect(finalInst, session?.voiceGender === 'MAN' ? 'Puck' : 'Aoede');
+    await audio.startMic(pcm => {
+      gemini.sendPcmData(pcm);
+      resetIdleTimerRef.current();
+    });
+    resetIdleTimerRef.current();
   };
 
   const setGender = async (g: 'MAN' | 'WOMAN') => { if (!userId) return; useAppStore.setState({ session: { ...session, voiceGender: g } }); await supabase.from('profiles').update({ voice_gender: g }).eq('id', userId); };
@@ -205,21 +320,39 @@ const VoiceCoach: React.FC = () => {
               <p className="text-[9px] text-white/40 uppercase tracking-widest">{stText}</p>
             </div>
 
-            <div className="shrink-0 md:w-full">
-              {!live ? (
-                <button onClick={handleStart} className="bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-black uppercase tracking-[0.15em] shadow-lg transition-all rounded-xl text-[10px] px-5 py-2.5 md:w-full md:py-3.5 md:text-xs">
-                  {t(TRANSLATIONS.startLearning)}
-                </button>
-              ) : (
-                <button onClick={handleStop} className="bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black uppercase tracking-[0.15em] shadow-lg transition-all rounded-xl text-[10px] px-5 py-2.5 md:w-full md:py-3.5 md:text-xs">
-                  {t(TRANSLATIONS.stopTalk)}
-                </button>
-              )}
-            </div>
+            {(() => {
+              const freeLimit = sysConfig?.universal_free_seconds ?? 180;
+              const usedSeconds = session?.totalTalkTime || 0;
+              const remainingFreeMinutes = Math.ceil(Math.max(0, freeLimit - usedSeconds) / 60);
+              const agentCredits = session?.packageType === PackageType.SNEHI ? (session.agentCredits || 0) : 0;
+              const totalAvailableMinutes = remainingFreeMinutes + agentCredits;
+              
+              const isTimeExhausted = totalAvailableMinutes <= 0;
 
-            <p className="hidden md:block text-[9px] font-black text-orange-400 uppercase tracking-widest text-center mt-2">
-              {session?.packageType === PackageType.SNEHI ? t({ en: `${session.agentCredits || 0} MIN AVAILABLE`, kn: `${session.agentCredits || 0} ನಿಮಿಷಗಳು ಬಾಕಿ ಇವೆ` }) : t({ en: 'Unlimited ACCESS', kn: 'ಅನಿಯಮಿತ ಪ್ರವೇಶ' })}
-            </p>
+              return (
+                <div className="flex flex-col gap-2">
+                  <div className="shrink-0 md:w-full">
+                    {!live ? (
+                      <button 
+                        onClick={handleStart} 
+                        disabled={isTimeExhausted}
+                        className={`font-black uppercase tracking-[0.15em] shadow-lg transition-all rounded-xl text-[10px] px-5 py-2.5 md:w-full md:py-3.5 md:text-xs text-white
+                          ${isTimeExhausted ? 'bg-slate-500 opacity-50 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600 active:scale-95'}`}
+                      >
+                        {isTimeExhausted ? t({ en: 'Time Exhausted', kn: 'ಸಮಯ ಮುಗಿದಿದೆ' }) : t(TRANSLATIONS.startLearning)}
+                      </button>
+                    ) : (
+                      <button onClick={handleStop} className="bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black uppercase tracking-[0.15em] shadow-lg transition-all rounded-xl text-[10px] px-5 py-2.5 md:w-full md:py-3.5 md:text-xs">
+                        {t(TRANSLATIONS.stopTalk)}
+                      </button>
+                    )}
+                  </div>
+                  <p className="hidden md:block text-[9px] font-black text-orange-400 uppercase tracking-widest text-center mt-2">
+                    {t({ en: `${totalAvailableMinutes} MIN AVAILABLE`, kn: `${totalAvailableMinutes} ನಿಮಿಷಗಳು ಬಾಕಿ ಇವೆ` })}
+                  </p>
+                </div>
+              );
+            })()}
           </aside>
 
           {/* ────── RIGHT: Chat Box ────── */}
@@ -303,6 +436,32 @@ const VoiceCoach: React.FC = () => {
               <div className="absolute bottom-24 left-4 right-4 p-3.5 bg-red-950 border border-red-500/30 rounded-xl flex items-center justify-between shadow-2xl z-30">
                 <p className="text-xs text-red-100 font-medium flex-1">{gemini.error}</p>
                 <button onClick={gemini.clearError} className="px-3 py-1.5 text-[9px] font-black uppercase text-red-300 border border-red-500/20 rounded-md">Dismiss</button>
+              </div>
+            )}
+
+            {sessionError.type !== 'NONE' && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-500">
+                <div className="bg-[#1a2f7a] border-2 border-white/20 p-8 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center space-y-6">
+                  <div className="text-5xl">{sessionError.type === 'IDLE' ? '😴' : '⚠️'}</div>
+                  <h3 className="text-xl font-black uppercase tracking-tight">
+                    {sessionError.type === 'IDLE' ? t({ en: 'Idle User', kn: 'ನಿಷ್ಕ್ರಿಯ ಬಳಕೆದಾರ' }) : t({ en: 'Technical Issue', kn: 'ತಾಂತ್ರಿಕ ತೊಂದರೆ' })}
+                  </h3>
+                  <p className="text-sm text-white/70 leading-relaxed font-medium">
+                    {sessionError.msg}
+                  </p>
+                  <button 
+                    onClick={handleStart}
+                    className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-lg active:scale-95 transition-all"
+                  >
+                    {t({ en: 'Start Over', kn: 'ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ' })}
+                  </button>
+                  <button 
+                    onClick={() => { setSessionError({ type: 'NONE', msg: '' }); navigate('/dashboard'); }}
+                    className="w-full py-3 text-white/40 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors"
+                  >
+                    {t({ en: 'Go to Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹೋಗಿ' })}
+                  </button>
+                </div>
               </div>
             )}
           </section>

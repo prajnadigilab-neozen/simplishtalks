@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { useTheme } from '../components/ThemeContext';
-import { getUserSession, updateProfile, getAllUsers, deleteUser } from '../services/authService';
+import { getUserSession, updateProfile, getAllUsers, deleteUser, deleteOwnAccount } from '../services/authService';
 import { UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAppStore } from '../store/useAppStore';
+import { getSystemConfig } from '../services/systemConfigService';
+import { clearProfileCache } from '../services/authService';
 
 const SettingsPage: React.FC = () => {
   const { t, lang, toggleLang } = useLanguage();
@@ -25,6 +27,9 @@ const SettingsPage: React.FC = () => {
     avatarUrl: ''
   });
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [costPerMinute, setCostPerMinute] = useState(2.0);
+  const [topUpAmount, setTopUpAmount] = useState<number>(0);
+  const [isTopUpProcessing, setIsTopUpProcessing] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -67,8 +72,45 @@ const SettingsPage: React.FC = () => {
       }
     };
     init();
+
+    getSystemConfig().then(cfg => {
+        if (cfg) setCostPerMinute(cfg.cost_per_minute);
+    });
+
     return () => { mounted = false; };
   }, [navigate]);
+
+  const handleTopUp = async () => {
+    if (!user || topUpAmount <= 0) return;
+    setIsTopUpProcessing(true);
+    
+    // Mock Payment Step
+    await new Promise(r => setTimeout(r, 1500));
+    
+    const addedMinutes = Math.floor(topUpAmount / costPerMinute);
+    const currentCredits = user.agent_credits || 0;
+    const newCredits = currentCredits + addedMinutes;
+    
+    const { error } = await supabase
+        .from('profiles')
+        .update({ agent_credits: newCredits })
+        .eq('id', user.id);
+        
+    if (!error) {
+        setMessage({ type: 'success', text: t({ en: `Successfully added ${addedMinutes} minutes!`, kn: `${addedMinutes} ನಿಮಿಷಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ!` }) });
+        setUser({ ...user, agent_credits: newCredits });
+        // Update store
+        const sess = useAppStore.getState().session;
+        if (sess) {
+            useAppStore.getState().setSession({ ...sess, agentCredits: newCredits });
+        }
+        clearProfileCache();
+    } else {
+        setMessage({ type: 'error', text: t({ en: 'Top-up failed. Please try again.', kn: 'ಟಾಪ್-ಅಪ್ ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.' }) });
+    }
+    setIsTopUpProcessing(false);
+    setTopUpAmount(0);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -120,7 +162,7 @@ const SettingsPage: React.FC = () => {
 
     if (confirmed) {
       setSaving(true);
-      const result = await deleteUser(user.id);
+      const result = await deleteOwnAccount();
       if (result.success) {
         navigate('/');
       } else {
@@ -278,6 +320,48 @@ const SettingsPage: React.FC = () => {
             </div>
           </form>
 
+          {/* Voice Time Top-up Section */}
+          <div className="mt-12 bg-blue-50 dark:bg-blue-900/10 p-10 md:p-14 rounded-[4rem] border-2 border-blue-100 dark:border-blue-900/30">
+            <div className="flex items-center gap-4 mb-8">
+              <span className="text-4xl bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">🎙️</span>
+              <div>
+                <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Voice Time Top-up', kn: 'ಧ್ವನಿ ಸಮಯ ಟಾಪ್-ಅಪ್' })}</h3>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Add custom voice practice minutes', kn: 'ಹೆಚ್ಚುವರಿ ಧ್ವನಿ ಅಭ್ಯಾಸದ ನಿಮಿಷಗಳನ್ನು ಸೇರಿಸಿ' })}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+              <div className="space-y-4">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Enter Amount (₹)', kn: 'ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ (₹)' })}</label>
+                <div className="relative">
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-black text-slate-400">₹</span>
+                    <input 
+                      type="number" 
+                      value={topUpAmount || ''} 
+                      onChange={e => setTopUpAmount(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-full p-6 pl-12 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-black text-2xl text-slate-800 dark:text-slate-100 shadow-sm" 
+                      placeholder="0"
+                    />
+                </div>
+              </div>
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 flex flex-col justify-center">
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t({ en: 'Estimated Time', kn: 'ಅಂದಾಜು ಸಮಯ' })}</p>
+                 <p className="text-3xl font-black text-blue-600 dark:text-blue-400">
+                   {Math.floor(topUpAmount / costPerMinute)} <span className="text-sm uppercase tracking-tighter opacity-60">Min</span>
+                 </p>
+                 <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">@ ₹{costPerMinute}/minute</p>
+              </div>
+            </div>
+
+            <button 
+                onClick={handleTopUp}
+                disabled={isTopUpProcessing || topUpAmount <= 0}
+                className="w-full mt-8 bg-blue-600 text-white py-6 rounded-[2rem] font-black text-xl uppercase tracking-widest shadow-xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+            >
+              {isTopUpProcessing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '💳'} {t({ en: 'Buy Minutes Now', kn: 'ನಿಮಿಷಗಳನ್ನು ಈಗಲೇ ಖರೀದಿಸಿ' })}
+            </button>
+          </div>
+
           <div className="mt-12 p-10 bg-red-50 dark:bg-red-900/10 rounded-[4rem] border-2 border-red-100 dark:border-red-900/30">
             <div className="flex items-center gap-4 mb-6">
               <span className="text-3xl">⚠️</span>
@@ -288,8 +372,8 @@ const SettingsPage: React.FC = () => {
             </div>
             <p className="text-sm text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">
               {t({
-                en: "Deleting your account will remove all your data, progress, and profile information from Simplish permanently.",
-                kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ಎಲ್ಲಾ ಡೇಟಾ, ಪ್ರಗತಿ ಮತ್ತು ಪ್ರೊಫೈಲ್ ಮಾಹಿತಿಯನ್ನು ಸಿಂಪ್ಲಿಷ್‌ನಿಂದ ಶಾಶ್ವತವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ."
+                en: "Deleting your account will remove your personal progress, profile, and chat messages. Note: Your initial registration date, revenue, and total usage time will be retained for platform reports. Your chat/voice messages will be archived for AI training purposes. You can re-register with the same phone number at any time.",
+                kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಪ್ರಗತಿ, ಪ್ರೊಫೈಲ್ ಮತ್ತು ಚಾಟ್ ಸಂದೇಶಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ. ಗಮನಿಸಿ: ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ವರದಿಗಳಿಗಾಗಿ ನಿಮ್ಮ ಆರಂಭಿಕ ನೋಂದಣಿ ದಿನಾಂಕ, ಆದಾಯ ಮತ್ತು ಒಟ್ಟು ಬಳಕೆಯ ಸಮಯವನ್ನು ಉಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಚಾಟ್/ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು AI ತರಬೇತಿ ಉದ್ದೇಶಗಳಿಗಾಗಿ ಆರ್ಕೈವ್ ಮಾಡಲಾಗುತ್ತದೆ. ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಅದೇ ಫೋನ್ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಮರು-ನೋಂದಾಯಿಸಿಕೊಳ್ಳಬಹುದು."
               })}
             </p>
             <button

@@ -187,6 +187,21 @@ export async function deleteUser(id: string): Promise<{ success: boolean; error?
   }
 }
 
+export async function deleteOwnAccount(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.rpc('delete_own_account');
+    if (error) throw error;
+    
+    // Sign out locally
+    await signOutUser();
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Self-delete error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function toggleUserRestriction(id: string, isRestricted: boolean): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await supabase.from('profiles').update({ is_restricted: isRestricted }).eq('id', id);
