@@ -121,25 +121,25 @@ const CourseManagement: React.FC = () => {
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
-                    <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">Curriculum Management</h2>
-                    <p className="text-[10px] text-slate-400 font-mono mt-2 tracking-widest">ADD MODULES & LESSONS</p>
+                    <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">{t({ en: 'Curriculum Management', kn: 'ಪಠ್ಯಕ್ರಮ ನಿರ್ವಹಣೆ' })}</h2>
+                    <p className="text-[10px] text-slate-400 font-mono mt-2 tracking-widest">{t({ en: 'ADD MODULES & LESSONS', kn: 'ಮಾಡ್ಯೂಲ್‌ಗಳು ಮತ್ತು ಪಾಠಗಳನ್ನು ಸೇರಿಸಿ' })}</p>
                 </div>
                 <button
                     onClick={() => navigate('/admin')}
                     className="px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all dark:text-slate-300"
                 >
-                    Back to Admin
+                    {t({ en: 'Back to Admin', kn: 'ಅಡ್ಮಿನ್ ಹಿಂದಕ್ಕೆ' })}
                 </button>
             </div>
 
             <div className="space-y-8 animate-in fade-in">
                 <div className="flex justify-between items-center">
-                    <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">Curriculum Editor</h3>
+                    <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">{t({ en: 'Curriculum Editor', kn: 'ಪಠ್ಯಕ್ರಮ ಸಂಪಾದಕ' })}</h3>
                     <button
                         onClick={() => setEditingModule({ level: CourseLevel.BASIC, titleStr: '', descStr: '', order_index: modules.length })}
                         className="bg-blue-800 text-white px-6 py-2 rounded-xl text-xs font-black uppercase shadow-lg hover:scale-105 transition-transform"
                     >
-                        + Add Module
+                        {t({ en: '+ Add Module', kn: '+ ಮಾಡ್ಯೂಲ್ ಸೇರಿಸಿ' })}
                     </button>
                 </div>
 
@@ -170,12 +170,12 @@ const CourseManagement: React.FC = () => {
 
                             <div className="p-6 space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                                    <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lessons</h5>
+                                    <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Lessons', kn: 'ಪಾಠಗಳು' })}</h5>
                                     <button
                                         onClick={() => navigate(`/admin/course/lesson/${mod.id}`)}
                                         className="text-[10px] font-black text-blue-600 uppercase cursor-pointer hover:underline"
                                     >
-                                        + Add Lesson
+                                        {t({ en: '+ Add Lesson', kn: '+ ಪಾಠ ಸೇರಿಸಿ' })}
                                     </button>
                                 </div>
                                 <div className="space-y-2">
@@ -203,7 +203,9 @@ const CourseManagement: React.FC = () => {
                 {editingModule && (
                     <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
                         <form onSubmit={handleSaveModule} className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] w-full max-w-lg space-y-6 shadow-2xl shadow-blue-500/10">
-                            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{editingModule.id ? 'Edit Module' : 'Add Module'}</h3>
+                            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">
+                                {editingModule.id ? t({ en: 'Edit Module', kn: 'ಮಾಡ್ಯೂಲ್ ಸಂಪಾದಿಸಿ' }) : t({ en: 'Add Module', kn: 'ಮಾಡ್ಯೂಲ್ ಸೇರಿಸಿ' })}
+                            </h3>
 
                             <div className="space-y-4">
                                 <div>
@@ -223,8 +225,12 @@ const CourseManagement: React.FC = () => {
                             </div>
 
                             <div className="flex gap-4 pt-4">
-                                <button type="button" onClick={() => setEditingModule(null)} className="flex-1 p-4 bg-slate-100 dark:bg-slate-700 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:bg-slate-200 dark:hover:bg-slate-600">Cancel</button>
-                                <button type="submit" className="flex-1 p-4 bg-blue-800 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all">Save Module</button>
+                                <button type="button" onClick={() => setEditingModule(null)} className="flex-1 p-4 bg-slate-100 dark:bg-slate-700 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:bg-slate-200 dark:hover:bg-slate-600">
+                                    {t({ en: 'Cancel', kn: 'ರದ್ದುಗೊಳಿಸಿ' })}
+                                </button>
+                                <button type="submit" className="flex-1 p-4 bg-blue-800 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all">
+                                    {t({ en: 'Save Module', kn: 'ಮಾಡ್ಯೂಲ್ ಉಳಿಸಿ' })}
+                                </button>
                             </div>
                         </form>
                     </div>

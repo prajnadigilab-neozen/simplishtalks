@@ -197,11 +197,11 @@ const VoiceCoach: React.FC = () => {
 
             <div className="hidden md:flex flex-col items-center text-center gap-1">
               <h2 className="text-base font-black text-white">{t({ en: 'Speak with Kore', kn: 'ಕೋರ್ ಜೊತೆ ಮಾತನಾಡಿ' })}</h2>
-              <p className="text-[10px] text-white/50 leading-relaxed px-2">Practice naturally and improve your fluency instantly.</p>
+              <p className="text-[10px] text-white/50 leading-relaxed px-2">{t({ en: 'Practice naturally and improve your fluency instantly.', kn: 'ನೈಸರ್ಗಿಕವಾಗಿ ಅಭ್ಯಾಸ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ನಿರರ್ಗಳತೆಯನ್ನು ತಕ್ಷಣವೇ ಸುಧಾರಿಸಿ.' })}</p>
             </div>
 
             <div className="flex-1 md:hidden">
-              <p className="text-xs font-black text-white">Speak with Kore</p>
+              <p className="text-xs font-black text-white">{t({ en: 'Speak with Kore', kn: 'ಕೋರ್ ಜೊತೆ ಮಾತನಾಡಿ' })}</p>
               <p className="text-[9px] text-white/40 uppercase tracking-widest">{stText}</p>
             </div>
 
@@ -218,7 +218,7 @@ const VoiceCoach: React.FC = () => {
             </div>
 
             <p className="hidden md:block text-[9px] font-black text-orange-400 uppercase tracking-widest text-center mt-2">
-              {session?.packageType === PackageType.SNEHI ? `${session.agentCredits || 0} MIN AVAILABLE` : 'Unlimited ACCESS'}
+              {session?.packageType === PackageType.SNEHI ? t({ en: `${session.agentCredits || 0} MIN AVAILABLE`, kn: `${session.agentCredits || 0} ನಿಮಿಷಗಳು ಬಾಕಿ ಇವೆ` }) : t({ en: 'Unlimited ACCESS', kn: 'ಅನಿಯಮಿತ ಪ್ರವೇಶ' })}
             </p>
           </aside>
 
@@ -233,7 +233,7 @@ const VoiceCoach: React.FC = () => {
                 {messages.length === 0 && !pendingUserText && !pendingCoachText && (
                   <div className="h-full flex flex-col items-center justify-center opacity-15 text-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3Z" /></svg>
-                    <p className="text-[10px] font-bold uppercase tracking-widest">Your session history starts here</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest">{t({ en: 'Your session history starts here', kn: 'ನಿಮ್ಮ ಸೆಷನ್ ಇತಿಹಾಸ ಇಲ್ಲಿ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ' })}</p>
                   </div>
                 )}
 
@@ -250,17 +250,17 @@ const VoiceCoach: React.FC = () => {
 
                         {m.role === 'coach' && (m.correction || m.kannadaGuide || m.pronunciationTip) && (
                           <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
-                            {m.correction && <p className="text-[11px] text-amber-400 font-semibold italic">Correction: <span className="text-amber-300 font-bold">{m.correction}</span></p>}
+                            {m.correction && <p className="text-[11px] text-amber-400 font-semibold italic">{t({ en: 'Correction:', kn: 'ತಿದ್ದುಪಡಿ:' })} <span className="text-amber-300 font-bold">{m.correction}</span></p>}
                             {m.kannadaGuide && (
                               <div className="bg-blue-900/40 rounded-xl px-3.5 py-2.5">
-                                <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1.5">ಸಹಾಯ (HELP)</p>
+                                <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1.5">{t({ en: 'ಸಹಾಯ (HELP)', kn: 'ಸಹಾಯ (HELP)' })}</p>
                                 <p className="text-[11px] text-blue-100 font-medium whitespace-pre-line leading-relaxed">{m.kannadaGuide}</p>
                               </div>
                             )}
                             {m.pronunciationTip && (
                               <div className="flex items-center justify-between gap-3 bg-emerald-900/30 rounded-xl px-3.5 py-3 border border-emerald-500/10">
                                 <div className="flex-1">
-                                  <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1">Coach's Tip 🎙️</p>
+                                  <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1">{t({ en: "Coach's Tip 🎙️", kn: "ಕೋಚ್ ಸಲಹೆ 🎙️" })}</p>
                                   <p className="text-[11px] text-emerald-100 font-medium leading-relaxed">{m.pronunciationTip}</p>
                                 </div>
                                 <button onClick={() => speakTip(m.pronunciationTip!, `v-${idx}`)} className="p-2.5 rounded-lg border border-white/10 hover:bg-white/10 active:scale-90 transition-all shrink-0">

@@ -229,6 +229,47 @@ export function clearProfileCache() {
   lastCacheTime = 0;
 }
 
+// ─── Forgot Password / OTP Flow ────────────────────────────────────────────────
+export async function sendPasswordResetOTP(phone: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+    });
+    if (error) throw error;
+    return { success: true };
+  } catch (error: any) {
+    console.error("sendPasswordResetOTP Error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function verifyOTPAndResetPassword(phone: string, token: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    // 1. Verify the OTP to log the user in temporarily
+    const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms'
+    });
+    if (verifyError) throw verifyError;
+    if (!verifyData.session) throw new Error("Verification succeeded but no session returned.");
+
+    // 2. Since the user is now authenticated via OTP, update their password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+    
+    if (updateError) throw updateError;
+    
+    cachedProfile = null;
+    return { success: true };
+  } catch (error: any) {
+    console.error("verifyOTPAndResetPassword Error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+// ───────────────────────────────────────────────────────────────────────────────
+
 export async function getAllUsers(): Promise<any[]> {
   try {
     const { data, error } = await supabase
@@ -244,7 +285,7 @@ export async function getAllUsers(): Promise<any[]> {
     const mapped = (data || []).map(u => ({
       ...u,
       role: mapRole(u.role),
-      package_type: u.package_type === 'SANGAATHI' ? 'SNEHI' : u.package_type
+      package_type: u.package_type === 'SANGAATHI' || u.package_type === 'SNEHI' ? 'SNEHI' : u.package_type
     }));
     console.log("🔍 Supabase getAllUsers MAPPED DATA:", mapped);
     return mapped;

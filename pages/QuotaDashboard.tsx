@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Shield, Zap, Info, Timer, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { useLanguage } from '../components/LanguageContext';
 import QuotaCard from '../components/QuotaCard';
 import BillingWallet from '../components/BillingWallet';
 import { getUsageStatus } from '../utils/QuotaMiddleware';
@@ -10,6 +11,7 @@ const MODELS = [
 ];
 
 const QuotaDashboard: React.FC = () => {
+    const { t } = useLanguage();
     const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
     const [status, setStatus] = useState(getUsageStatus(selectedModel));
     const [timeRemaining, setTimeRemaining] = useState('');
@@ -44,9 +46,9 @@ const QuotaDashboard: React.FC = () => {
 
     const getValidity = () => {
         const usagePercent = (status.rpd / status.rpdLimit) * 100;
-        if (usagePercent >= 100) return { label: 'Quota Exhausted', color: 'text-red-500', icon: XCircle, bg: 'bg-red-500/10' };
-        if (usagePercent >= 80) return { label: 'Rate Limited / Cooling Down', color: 'text-yellow-500', icon: AlertTriangle, bg: 'bg-yellow-500/10' };
-        return { label: 'Active', color: 'text-emerald-500', icon: CheckCircle, bg: 'bg-emerald-500/10' };
+        if (usagePercent >= 100) return { label: t({ en: 'Quota Exhausted', kn: 'ಕೋಟಾ ಮುಗಿದಿದೆ' }), color: 'text-red-500', icon: XCircle, bg: 'bg-red-500/10' };
+        if (usagePercent >= 80) return { label: t({ en: 'Rate Limited / Cooling Down', kn: 'ವೇಗ ಮಿತಿ / ಕೂಲಿಂಗ್ ಡೌನ್' }), color: 'text-yellow-500', icon: AlertTriangle, bg: 'bg-yellow-500/10' };
+        return { label: t({ en: 'Active', kn: 'ಸಕ್ರಿಯ' }), color: 'text-emerald-500', icon: CheckCircle, bg: 'bg-emerald-500/10' };
     };
 
     const validity = getValidity();
@@ -58,9 +60,9 @@ const QuotaDashboard: React.FC = () => {
                 <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
                     <div>
                         <h1 className="text-4xl font-black tracking-tighter text-white flex items-center">
-                            <Shield className="mr-3 h-8 w-8 text-blue-500" /> API GUARDRAIL
+                            <Shield className="mr-3 h-8 w-8 text-blue-500" /> {t({ en: 'API GUARDRAIL', kn: 'API ರಕ್ಷಣೆ' })}
                         </h1>
-                        <p className="mt-2 text-slate-400 font-medium">Model-Specific Quotas & Real-Time Monitoring</p>
+                        <p className="mt-2 text-slate-400 font-medium">{t({ en: 'Model-Specific Quotas & Real-Time Monitoring', kn: 'ಮಾದರಿ-ನಿರ್ದಿಷ್ಟ ಮಿತಿಗಳು ಮತ್ತು ನೈಜ-ಸಮಯದ ಮೇಲ್ವಿಚಾರಣೆ' })}</p>
                     </div>
 
                     <div className="flex flex-col items-end">

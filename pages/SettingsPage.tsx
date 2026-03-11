@@ -74,7 +74,7 @@ const SettingsPage: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 1024 * 1024) {
-        setMessage({ type: 'error', text: 'Image too large (Max 1MB)' });
+        setMessage({ type: 'error', text: t({ en: 'Image too large (Max 1MB)', kn: 'ಚಿತ್ರ ತುಂಬಾ ದೊಡ್ಡದಿದೆ (ಗರಿಷ್ಠ 1MB)' }) });
         return;
       }
       const reader = new FileReader();
@@ -104,7 +104,7 @@ const SettingsPage: React.FC = () => {
         text: result.error || t({ en: 'Profile updated successfully!', kn: 'ಪ್ರೊಫೈಲ್ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್‌ಡೇಟ್ ಆಗಿದೆ!' })
       });
     } else {
-      setMessage({ type: 'error', text: result.error || 'Update failed' });
+      setMessage({ type: 'error', text: result.error || t({ en: 'Update failed', kn: 'ಅಪ್‌ಡೇಟ್ ವಿಫಲವಾಗಿದೆ' }) });
     }
     setSaving(false);
   };
@@ -124,7 +124,7 @@ const SettingsPage: React.FC = () => {
       if (result.success) {
         navigate('/');
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to delete account' });
+        setMessage({ type: 'error', text: result.error || t({ en: 'Failed to delete account', kn: 'ಖಾತೆ ಅಳಿಸಲು ವಿಫಲವಾಗಿದೆ' }) });
         setSaving(false);
       }
     }
@@ -143,7 +143,9 @@ const SettingsPage: React.FC = () => {
           <h2 className="text-5xl font-black text-blue-900 dark:text-slate-100 uppercase tracking-tighter">
             {t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })}
           </h2>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.4em] mt-2">Personalize your Simplish journey</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.4em] mt-2">
+            {t({ en: 'Personalize your Simplish journey', kn: 'ನಿಮ್ಮ ಸಿಂಪ್ಲಿಷ್ ಪ್ರಯಾಣವನ್ನು ವೈಯಕ್ತೀಕರಿಸಿ' })}
+          </p>
         </div>
         <button
           onClick={() => navigate(-1)}
@@ -180,16 +182,16 @@ const SettingsPage: React.FC = () => {
                 <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
               </label>
             </div>
-            <h3 className="mt-6 text-2xl font-black text-slate-800 dark:text-slate-100">{formData.fullName || 'New Learner'}</h3>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{user?.phone || 'No Phone'}</p>
+            <h3 className="mt-6 text-2xl font-black text-slate-800 dark:text-slate-100">{formData.fullName || t({ en: 'New Learner', kn: 'ಹೊಸ ವಿದ್ಯಾರ್ಥಿ' })}</h3>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{user?.phone || t({ en: 'No Phone', kn: 'ಫೋನ್ ಇಲ್ಲ' })}</p>
 
             <div className="w-full mt-8 pt-8 border-t border-slate-100 dark:border-slate-700 space-y-4">
               <button onClick={toggleTheme} className="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-400 transition-all group">
-                <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Dark Mode</span>
+                <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{t({ en: 'Dark Mode', kn: 'ಡಾರ್ಕ್ ಮೋಡ್' })}</span>
                 <span className="text-xl group-hover:scale-125 transition-transform">{theme === 'light' ? '🌙' : '☀️'}</span>
               </button>
               <button onClick={toggleLang} className="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-400 transition-all group">
-                <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Language</span>
+                <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{t({ en: 'Language', kn: 'ಭಾಷೆ' })}</span>
                 <span className="text-xs font-black text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">{lang === 'en' ? 'ENGLISH' : 'ಕನ್ನಡ'}</span>
               </button>
               <button
@@ -197,8 +199,8 @@ const SettingsPage: React.FC = () => {
                 className="w-full flex justify-between items-center p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-blue-400 transition-all group"
               >
                 <div className="flex flex-col items-start">
-                  <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Data Saver</span>
-                  <span className="text-[9px] font-bold text-slate-400 lowercase">Lowers data usage</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{t({ en: 'Data Saver', kn: 'ಡೇಟಾ ಉಳಿತಾಯ' })}</span>
+                  <span className="text-[9px] font-bold text-slate-400 lowercase">{t({ en: 'Lowers data usage', kn: 'ಡೇಟಾ ಬಳಕೆಯನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತದೆ' })}</span>
                 </div>
                 <div className={`w-10 h-5 rounded-full relative transition-colors ${useAppStore.getState().dataSaverMode ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}>
                   <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${useAppStore.getState().dataSaverMode ? 'left-6' : 'left-1'}`} />
@@ -210,32 +212,32 @@ const SettingsPage: React.FC = () => {
           <div className="bg-blue-600 p-8 rounded-[3rem] text-white shadow-xl shadow-blue-500/20">
             {user?.role === UserRole.SUPER_ADMIN ? (
               <>
-                <h4 className="font-black uppercase tracking-[0.2em] text-xs opacity-70 mb-6">Platform Overview</h4>
+                <h4 className="font-black uppercase tracking-[0.2em] text-xs opacity-70 mb-6">{t({ en: 'Platform Overview', kn: 'ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅವಲೋಕನ' })}</h4>
                 <div className="grid grid-cols-1 gap-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold opacity-80">Total Users</span>
+                    <span className="text-sm font-bold opacity-80">{t({ en: 'Total Users', kn: 'ಒಟ್ಟು ಬಳಕೆದಾರರು' })}</span>
                     <span className="text-3xl font-black">{adminStats.totalUsers}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-bold opacity-80">Active Students</span>
+                    <span className="text-sm font-bold opacity-80">{t({ en: 'Active Students', kn: 'ಸಕ್ರಿಯ ವಿದ್ಯಾರ್ಥಿಗಳು' })}</span>
                     <span className="text-3xl font-black">{adminStats.completions}</span>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <h4 className="font-black uppercase tracking-[0.2em] text-xs opacity-70 mb-6">Your Proficiency</h4>
+                <h4 className="font-black uppercase tracking-[0.2em] text-xs opacity-70 mb-6">{t({ en: 'Your Proficiency', kn: 'ನಿಮ್ಮ ಪ್ರಾವೀಣ್ಯತೆ' })}</h4>
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Current Level</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60">{t({ en: 'Current Level', kn: 'ಪ್ರಸ್ತುತ ಹಂತ' })}</p>
                       <h5 className="text-3xl font-black uppercase">{progress?.current_level || 'BASIC'}</h5>
                     </div>
                     <span className="text-4xl">🚀</span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                      <span>Lessons Done</span>
+                      <span>{t({ en: 'Lessons Done', kn: 'ಮುಗಿಸಿದ ಪಾಠಗಳು' })}</span>
                       <span>{progress?.completed_lessons?.length || 0}</span>
                     </div>
                     <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -253,8 +255,8 @@ const SettingsPage: React.FC = () => {
             <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-8">
               <span className="text-4xl bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">✏️</span>
               <div>
-                <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">Edit Profile</h3>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Keep your details updated</p>
+                <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Edit Profile', kn: 'ಪ್ರೊಫೈಲ್ ತಿದ್ದಿ' })}</h3>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Keep your details updated', kn: 'ಮಾಹಿತಿಯನ್ನು ನವೀಕರಿಸಿ' })}</p>
               </div>
             </div>
 
@@ -281,7 +283,7 @@ const SettingsPage: React.FC = () => {
               <span className="text-3xl">⚠️</span>
               <div>
                 <h3 className="text-xl font-black text-red-700 dark:text-red-400 uppercase tracking-tight">{t({ en: 'Danger Zone', kn: 'ಅಪಾಯಕಾರಿ ವಲಯ' })}</h3>
-                <p className="text-xs font-bold text-red-500/60 uppercase tracking-widest">Account Management</p>
+                <p className="text-xs font-bold text-red-500/60 uppercase tracking-widest">{t({ en: 'Account Management', kn: 'ಖಾತೆ ನಿರ್ವಹಣೆ' })}</p>
               </div>
             </div>
             <p className="text-sm text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../components/LanguageContext';
 import { getAiInstructions, updateAiInstructions } from '../services/aiInstructionsService';
 import { useAppStore } from '../store/useAppStore';
 
@@ -74,6 +75,7 @@ Your ultimate goal is to make English learning accessible, enjoyable, and effect
 };
 
 const AiInstructions: React.FC = () => {
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const { session } = useAppStore();
     const [data, setData] = useState<typeof DEFAULT_INSTRUCTIONS>(DEFAULT_INSTRUCTIONS);
@@ -140,10 +142,10 @@ const AiInstructions: React.FC = () => {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-3xl md:text-5xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tighter mb-2">
-                            AI Context & Instructions
+                            {t({ en: 'AI Context & Instructions', kn: 'AI ಕಾಂಟೆಕ್ಸ್ಟ್ ಮತ್ತು ಸೂಚನೆಗಳು' })}
                         </h1>
                         <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
-                            Core directives for AI Agents, Content Creation & Platform Development
+                            {t({ en: 'Core directives for AI Agents, Content Creation & Platform Development', kn: 'AI ಏಜೆಂಟ್‌ಗಳು, ವಿಷಯ ರಚನೆ ಮತ್ತು ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅಭಿವೃದ್ಧಿಗಾಗಿ ಪ್ರಮುಖ ನಿರ್ದೇಶನಗಳು' })}
                         </p>
                     </div>
                     <div className="flex gap-4">
@@ -151,13 +153,13 @@ const AiInstructions: React.FC = () => {
                             onClick={() => navigate('/admin')}
                             className="px-6 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-2 border-slate-100 dark:border-slate-700 rounded-xl font-black text-xs uppercase tracking-widest shadow-sm hover:bg-slate-50 transition-all"
                         >
-                            Back to Admin
+                            {t({ en: 'Back to Admin', kn: 'ಅಡ್ಮಿನ್ ಹಿಂದಕ್ಕೆ' })}
                         </button>
                         <button
                             onClick={() => fetchData()}
                             className="px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-black text-xs uppercase tracking-widest shadow-sm hover:bg-blue-100 transition-all"
                         >
-                            Refresh
+                            {t({ en: 'Refresh', kn: 'ರಿಫ್ರೆಶ್' })}
                         </button>
                     </div>
                 </div>
@@ -167,17 +169,19 @@ const AiInstructions: React.FC = () => {
                     <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none text-6xl">⚙️</div>
                     <div className="flex justify-between items-center mb-8 border-b-2 border-slate-50 dark:border-slate-700 pb-4">
                         <h2 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tighter">
-                            Active AI Engine Configuration
+                            {t({ en: 'Active AI Engine Configuration', kn: 'ಸಕ್ರಿಯ AI ಇಂಜಿನ್ ಕಾನ್ಫಿಗರೇಶನ್' })}
                         </h2>
                         {editingSection !== 'aiConfig' ? (
                             <button onClick={() => startEdit('aiConfig', data.aiConfig)} className="bg-blue-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-blue-700 transition-all">
-                                Change Settings
+                                {t({ en: 'Change Settings', kn: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಬದಲಾಯಿಸಿ' })}
                             </button>
                         ) : (
                             <div className="flex gap-2">
-                                <button onClick={() => setEditingSection(null)} className="px-4 py-2 bg-slate-200 rounded-xl text-[10px] font-black uppercase text-slate-600">Cancel</button>
+                                <button onClick={() => setEditingSection(null)} className="px-4 py-2 bg-slate-200 rounded-xl text-[10px] font-black uppercase text-slate-600">
+                                    {t({ en: 'Cancel', kn: 'ರದ್ದುಮಾಡಿ' })}
+                                </button>
                                 <button onClick={() => handleSave('aiConfig')} disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded-xl text-[10px] font-black uppercase shadow-lg disabled:opacity-50">
-                                    {saving ? 'Updating...' : 'Save Changes'}
+                                    {saving ? t({ en: 'Updating...', kn: 'ಅಪ್‌ಡೇಟ್ ಆಗುತ್ತಿದೆ...' }) : t({ en: 'Save Changes', kn: 'ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ' })}
                                 </button>
                             </div>
                         )}
@@ -226,15 +230,15 @@ const AiInstructions: React.FC = () => {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Active Logic</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">{t({ en: 'Active Logic', kn: 'ಸಕ್ರಿಯ ತರ್ಕ' })}</span>
                                 <span className="text-sm font-black text-blue-900 dark:text-blue-100">{data.aiConfig?.model || 'Gemini 3 Flash Preview'}</span>
                             </div>
                             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Correction Strictness</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">{t({ en: 'Correction Strictness', kn: 'ತಿದ್ದುಪಡಿ ಕಟ್ಟುನಿಟ್ಟು' })}</span>
                                 <span className="text-sm font-black text-blue-900 dark:text-blue-100 uppercase">{data.aiConfig?.strictness || 'High'}</span>
                             </div>
                             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Fluency Voice</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">{t({ en: 'Fluency Voice', kn: 'ಸರಾಗತೆ ಧ್ವನಿ' })}</span>
                                 <span className="text-sm font-black text-blue-900 dark:text-blue-100">{data.aiConfig?.voice || 'Aoede'}</span>
                             </div>
                         </div>
@@ -250,7 +254,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-t-8 border-amber-400 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                                    1. Theme & Identity
+                                    1. {t({ en: 'Theme & Identity', kn: 'ಥೀಮ್ ಮತ್ತು ಗುರುತು' })}
                                 </h2>
                                 {editingSection !== 'theme' && (
                                     <button onClick={() => startEdit('theme', { tagline: data.tagline, mission: data.mission })} className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-lg">Edit</button>
@@ -300,7 +304,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-t-8 border-blue-500 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                                    2. Core Philosophy
+                                    2. {t({ en: 'Core Philosophy', kn: 'ಮೂಲ ತತ್ವಜ್ಞಾನ' })}
                                 </h2>
                                 {editingSection !== 'philosophy' && (
                                     <button onClick={() => startEdit('philosophy', data.philosophy)} className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">Edit</button>
@@ -342,7 +346,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-2 border-slate-100 dark:border-slate-700 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
-                                    3. Tiered Path
+                                    3. {t({ en: 'Tiered Path', kn: 'ಶ್ರೇಣೀಕೃತ ಮಾರ್ಗ' })}
                                 </h2>
                                 {editingSection !== 'path' && (
                                     <button onClick={() => startEdit('path', data.path)} className="text-xs font-bold bg-slate-200 text-slate-700 px-3 py-1 rounded-lg">Edit</button>
@@ -385,7 +389,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-t-8 border-purple-500 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">
-                                    4. AI Chat/Voice Rules
+                                    4. {t({ en: 'AI Chat/Voice Rules', kn: 'AI ಚಾಟ್/ಧ್ವನಿ ನಿಯಮಗಳು' })}
                                 </h2>
                                 {editingSection !== 'aiRules' && (
                                     <button onClick={() => startEdit('aiRules', { aiChat: data.aiChat, aiVoice: data.aiVoice })} className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-lg">Edit</button>
@@ -432,7 +436,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-t-8 border-green-500 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-green-600 dark:text-green-400 uppercase tracking-widest">
-                                    5. Course Scenarios
+                                    5. {t({ en: 'Course Scenarios', kn: 'ಕೋರ್ಸ್ ಸನ್ನಿವೇಶಗಳು' })}
                                 </h2>
                                 {editingSection !== 'scenarios' && (
                                     <button onClick={() => startEdit('scenarios', data.scenarios)} className="text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-lg">Edit</button>
@@ -462,7 +466,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-t-8 border-rose-500 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">
-                                    6. Dev / UX Directives
+                                    6. {t({ en: 'Dev / UX Directives', kn: 'ಡೆವ್ / UX ನಿರ್ದೇಶನಗಳು' })}
                                 </h2>
                                 {editingSection !== 'uiUx' && (
                                     <button onClick={() => startEdit('uiUx', data.uiUx)} className="text-xs font-bold bg-rose-100 text-rose-700 px-3 py-1 rounded-lg">Edit</button>
@@ -501,7 +505,7 @@ const AiInstructions: React.FC = () => {
                         <section className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-xl border-t-8 border-cyan-500 relative">
                             <div className="flex justify-between items-center mb-6 border-b-2 border-slate-100 dark:border-slate-700 pb-2">
                                 <h2 className="text-xl font-black text-cyan-600 dark:text-cyan-400 uppercase tracking-widest">
-                                    7. Global Constraints
+                                    7. {t({ en: 'Global Constraints', kn: 'ಜಾಗತಿಕ ನಿರ್ಬಂಧಗಳು' })}
                                 </h2>
                                 {editingSection !== 'globalDirectives' && (
                                     <button onClick={() => startEdit('globalDirectives', data.globalDirectives)} className="text-xs font-bold bg-cyan-100 text-cyan-700 px-3 py-1 rounded-lg">Edit</button>

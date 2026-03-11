@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLanguage } from '../components/LanguageContext';
 import {
     Phone,
     MessageSquare,
@@ -79,6 +80,7 @@ const fetchAPIStats = async (): Promise<APIStats> => {
 };
 
 const APIAnalytics: React.FC = () => {
+    const { t } = useLanguage();
     const [stats, setStats] = useState<APIStats | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -136,26 +138,26 @@ const APIAnalytics: React.FC = () => {
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-500/20">
                             <ShieldAlert className="h-6 w-6 text-white" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-white">API Core</span>
+                        <span className="text-xl font-bold tracking-tight text-white">{t({ en: 'API Core', kn: 'API ಕೋರ್' })}</span>
                     </div>
 
                     <nav className="flex-1 space-y-2 px-4">
                         <button className="flex w-full items-center space-x-3 rounded-2xl bg-blue-500/10 px-4 py-4 text-blue-400">
                             <LayoutDashboard className="h-5 w-5" />
-                            <span className="font-semibold">Dashboard</span>
+                            <span className="font-semibold">{t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })}</span>
                         </button>
                         <button className="flex w-full items-center space-x-3 rounded-2xl px-4 py-4 text-slate-400 hover:bg-slate-800 hover:text-white transition-all">
                             <Settings className="h-5 w-5" />
-                            <span className="font-semibold">Settings</span>
+                            <span className="font-semibold">{t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })}</span>
                         </button>
                     </nav>
 
                     <div className="p-4">
                         <div className="rounded-2xl bg-slate-800/50 p-6 border border-slate-700/50">
-                            <p className="text-sm font-medium text-slate-400">System Status</p>
+                            <p className="text-sm font-medium text-slate-400">{t({ en: 'System Status', kn: 'ಸಿಸ್ಟಮ್ ಸ್ಥಿತಿ' })}</p>
                             <div className="mt-4 flex items-center space-x-2 text-emerald-400">
                                 <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                                <span className="text-xs font-bold uppercase tracking-wider">All Systems Operational</span>
+                                <span className="text-xs font-bold uppercase tracking-wider">{t({ en: 'All Systems Operational', kn: 'ಎಲ್ಲಾ ವ್ಯವಸ್ಥೆಗಳು ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿವೆ' })}</span>
                             </div>
                         </div>
                     </div>
@@ -172,12 +174,12 @@ const APIAnalytics: React.FC = () => {
                         >
                             <Menu className="h-6 w-6" />
                         </button>
-                        <h1 className="text-2xl font-bold text-white">Usage Analytics</h1>
+                        <h1 className="text-2xl font-bold text-white">{t({ en: 'Usage Analytics', kn: 'ಬಳಕೆ ವಿಶ್ಲೇಷಣೆ' })}</h1>
                     </div>
 
                     <div className="flex items-center space-x-6 text-sm">
                         <div className="hidden flex-col items-end sm:flex">
-                            <span className="text-xs text-slate-500 font-medium tracking-wide uppercase">Last Sync</span>
+                            <span className="text-xs text-slate-500 font-medium tracking-wide uppercase">{t({ en: 'Last Sync', kn: 'ಕೊನೆಯ ಸಿಂಕ್' })}</span>
                             <span className="font-semibold text-slate-300">{lastUpdated.toLocaleTimeString()}</span>
                         </div>
                         <button
@@ -185,7 +187,7 @@ const APIAnalytics: React.FC = () => {
                             className="flex items-center space-x-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-95 transition-all"
                         >
                             <RefreshCw className="h-4 w-4" />
-                            <span>Rotate Key</span>
+                            <span>{t({ en: 'Rotate Key', kn: 'ಕೀ ಬದಲಿಸಿ' })}</span>
                         </button>
                     </div>
                 </header>
@@ -200,10 +202,10 @@ const APIAnalytics: React.FC = () => {
                             </div>
 
                             <div className="relative z-10">
-                                <h2 className="text-lg font-semibold text-slate-400">Total Account Usage</h2>
+                                <h2 className="text-lg font-semibold text-slate-400">{t({ en: 'Total Account Usage', kn: 'ಒಟ್ಟು ಖಾತೆ ಬಳಕೆ' })}</h2>
                                 <div className="mt-4 flex items-baseline space-x-3">
                                     <span className="text-5xl font-black text-white">{totalUsage.toLocaleString()}</span>
-                                    <span className="text-xl font-medium text-slate-500">/ {stats.total_limit.toLocaleString()} units</span>
+                                    <span className="text-xl font-medium text-slate-500">/ {stats.total_limit.toLocaleString()} {t({ en: 'units', kn: 'ಯುನಿಟ್' })}</span>
                                 </div>
 
                                 <div className="mt-8">
@@ -212,7 +214,7 @@ const APIAnalytics: React.FC = () => {
 
                                 <div className="mt-6 flex items-center space-x-3 text-sm text-slate-400">
                                     <div className={`h-2 w-12 rounded-full ${usagePercent > 90 ? 'bg-rose-500' : 'bg-blue-500'} bg-opacity-20`} />
-                                    <p>You have used <span className="font-bold text-white">{usagePercent.toFixed(1)}%</span> of your monthly credits.</p>
+                                    <p>{t({ en: 'You have used', kn: 'ನೀವು ಬಳಸಿದ್ದೀರಿ' })} <span className="font-bold text-white">{usagePercent.toFixed(1)}%</span> {t({ en: 'of your monthly credits.', kn: 'ನಿಮ್ಮ ಮಾಸಿಕ ಕ್ರೆಡಿಟ್‌ಗಳಲ್ಲಿ.' })}</p>
                                 </div>
                             </div>
                         </div>
@@ -227,18 +229,21 @@ const APIAnalytics: React.FC = () => {
                                     </div>
                                     <div>
                                         <p className={`text-2xl font-bold ${isExpired ? 'text-rose-500' : 'text-white'}`}>
-                                            {isExpired ? 'Expired' : stats.expiry_date}
+                                            {isExpired ? t({ en: 'Expired', kn: 'ಅವಧಿ ಮೀರಿದೆ' }) : stats.expiry_date}
                                         </p>
-                                        <p className="text-sm text-slate-500">{getTimeRemaining()}</p>
+                                        <p className="text-sm text-slate-500">{t({ 
+                                            en: stats.expiry_date === 'Expires today' ? 'Expires today' : `${getTimeRemaining()} days remaining`, 
+                                            kn: stats.expiry_date === 'Expires today' ? 'ಇಂದು ಕಾಲಮಿತಿ ಮುಗಿಯುತ್ತದೆ' : `${getTimeRemaining()} ದಿನಗಳು ಬಾಕಿ ಇವೆ` 
+                                        })}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="mt-8 space-y-4">
                                 <div className="flex items-center justify-between rounded-xl bg-slate-800/50 p-4">
-                                    <span className="text-sm text-slate-400 font-medium">Auto-Renew</span>
+                                    <span className="text-sm text-slate-400 font-medium">{t({ en: 'Auto-Renew', kn: 'ಸ್ವಯಂ ನವೀಕರಣ' })}</span>
                                     <span className={`rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider ${stats.is_auto_renew ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
-                                        {stats.is_auto_renew ? 'Enabled' : 'Disabled'}
+                                        {stats.is_auto_renew ? t({ en: 'Enabled', kn: 'ಸಕ್ರಿಯ' }) : t({ en: 'Disabled', kn: 'ನಿಷ್ಕ್ರಿಯ' })}
                                     </span>
                                 </div>
                             </div>
@@ -248,17 +253,17 @@ const APIAnalytics: React.FC = () => {
                     {/* Secondary Grid: Detailed API Usage */}
                     <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
                         <UsageCard
-                            title="Voice API Usage"
-                            value={`${(stats.voice_usage / 60).toFixed(1)} min`}
-                            subValue={`${stats.voice_usage.toLocaleString()} seconds total`}
+                            title={t({ en: 'Voice API Usage', kn: 'ಧ್ವನಿ API ಬಳಕೆ' })}
+                            value={`${(stats.voice_usage / 60).toFixed(1)} ${t({ en: 'min', kn: 'ನಿಮಿಷ' })}`}
+                            subValue={`${stats.voice_usage.toLocaleString()} ${t({ en: 'seconds total', kn: 'ಒಟ್ಟು ಸೆಕೆಂಡುಗಳು' })}`}
                             icon={Phone}
                             color="bg-indigo-500"
                             trend={{ value: 12, isUp: true }}
                         />
                         <UsageCard
-                            title="Chat API Usage"
+                            title={t({ en: 'Chat API Usage', kn: 'ಚಾಟ್ API ಬಳಕೆ' })}
                             value={stats.chat_usage.toLocaleString()}
-                            subValue="Total tokens consumed"
+                            subValue={t({ en: 'Total tokens consumed', kn: 'ಒಟ್ಟು ಟೋಕನ್‌ಗಳ ಬಳಕೆ' })}
                             icon={MessageSquare}
                             color="bg-blue-500"
                             trend={{ value: 5, isUp: false }}
@@ -279,13 +284,13 @@ const APIAnalytics: React.FC = () => {
                             </div>
                             <div className="flex space-x-4">
                                 <button className="rounded-xl border border-slate-700 px-6 py-3 font-semibold text-slate-300 hover:bg-slate-800 transition-colors">
-                                    Copy Key
+                                    {t({ en: 'Copy Key', kn: 'ಕೀ ನಕಲಿಸಿ' })}
                                 </button>
                                 <button
                                     onClick={() => setIsModalOpen(true)}
                                     className="rounded-xl bg-slate-800 px-6 py-3 font-semibold text-white hover:bg-slate-700 transition-colors"
                                 >
-                                    Regenerate
+                                    {t({ en: 'Regenerate', kn: 'ಮತ್ತೆ ರಚಿಸಿ' })}
                                 </button>
                             </div>
                         </div>

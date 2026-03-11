@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
-import { registerUser, loginUser, getUserSession } from '../services/authService';
+import { getUserSession, loginUser, registerUser, sendPasswordResetOTP, verifyOTPAndResetPassword } from '../services/authService';
 import Logo from '../components/Logo';
 import { UserRole } from '../types';
 import { useAppStore } from '../store/useAppStore';
@@ -46,10 +46,12 @@ interface InputFieldProps {
   prefix?: string;
   suffix?: React.ReactNode;
   error?: string;
+  maxLength?: number;
+  inputMode?: 'text' | 'numeric' | 'tel' | 'email' | 'url' | 'search' | 'decimal' | 'none';
 }
 
 const InputField: React.FC<InputFieldProps> = ({
-  label, type, value, onChange, placeholder, autoComplete, required, prefix, suffix, error
+  label, type, value, onChange, placeholder, autoComplete, required, prefix, suffix, error, maxLength, inputMode
 }) => (
   <div className="space-y-1.5">
     <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
@@ -71,6 +73,8 @@ const InputField: React.FC<InputFieldProps> = ({
         autoComplete={autoComplete}
         placeholder={placeholder}
         value={value}
+        maxLength={maxLength}
+        inputMode={inputMode}
         onChange={e => onChange(e.target.value)}
         className="flex-1 px-4 py-4 bg-transparent outline-none text-sm font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 min-w-0"
       />
@@ -98,6 +102,10 @@ const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showAdminField, setShowAdminField] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  
+  const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -131,12 +139,16 @@ const RegisterPage: React.FC = () => {
   const validate = (): boolean => {
     const errors: Record<string, string> = {};
     if (!formData.phone || formData.phone.length < 10)
-      errors.phone = 'Enter a valid 10-digit phone number';
-    if (!formData.password || formData.password.length < 6)
-      errors.password = 'Password must be at least 6 characters';
-    if (!isLoginMode) {
-      if (!formData.fullName.trim()) errors.fullName = 'Full name is required';
-      if (!formData.place.trim()) errors.place = 'Village/City is required';
+      errors.phone = t({ en: 'Enter a valid 10-digit phone number', kn: 'ಹತ್ತು ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ' });
+    
+    if (!(isForgotPasswordMode && !otpSent)) {
+      if (!formData.password || formData.password.length < 6)
+        errors.password = t({ en: 'Password must be at least 6 characters', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರ ಇರಬೇಕು' });
+    }
+ 
+    if (!isLoginMode && !isForgotPasswordMode) {
+      if (!formData.fullName.trim()) errors.fullName = t({ en: 'Full name is required', kn: 'ಪೂರ್ಣ ಹೆಸರು ಅಗತ್ಯವಿದೆ' });
+      if (!formData.place.trim()) errors.place = t({ en: 'Village/City is required', kn: 'ಊರು/ನಗರ ಅಗತ್ಯವಿದೆ' });
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -150,19 +162,45 @@ const RegisterPage: React.FC = () => {
     setGlobalError('');
 
     let result;
-    if (isLoginMode) {
+    if (isForgotPasswordMode) {
+      if (!otpSent) {
+        if (!formData.phone || formData.phone.length < 10) {
+          setFieldErrors({ phone: t({ en: 'Enter a valid 10-digit phone number', kn: 'ಹತ್ತು ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ' }) });
+          setLoading(false);
+          return;
+        }
+        result = await sendPasswordResetOTP(formData.phone);
+        if (result.success) {
+          setOtpSent(true);
+          setLoading(false);
+          return; // Stop execution here, wait for OTP
+        }
+      } else {
+        if (!otpCode || otpCode.length < 6) {
+          setFieldErrors({ otpCode: t({ en: 'Enter the 6-digit OTP', kn: '6 ಅಂಕಿಯ OTP ನಮೂದಿಸಿ' }) });
+          setLoading(false);
+          return;
+        }
+        if (!formData.password || formData.password.length < 6) {
+          setFieldErrors({ password: t({ en: 'Password must be at least 6 characters', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರ ಇರಬೇಕು' }) });
+          setLoading(false);
+          return;
+        }
+        result = await verifyOTPAndResetPassword(formData.phone, otpCode, formData.password);
+      }
+    } else if (isLoginMode) {
       result = await loginUser({ phone: formData.phone, password: formData.password });
     } else {
       result = await registerUser({ ...formData, phone: formData.phone });
     }
 
-    if (result.success) {
+    if (result && result.success) {
       setSuccess(true);
       // Force store to fetch the logged in user's progress and modules.
       // App.tsx will detect the session change and navigate accordingly.
       await useAppStore.getState().initialize(true);
-    } else {
-      setGlobalError(result.error || 'Something went wrong. Please try again.');
+    } else if (result) {
+      setGlobalError(result.error || t({ en: 'Something went wrong. Please try again.', kn: 'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.' }));
     }
     setLoading(false);
   };
@@ -173,6 +211,9 @@ const RegisterPage: React.FC = () => {
     setFieldErrors({});
     setShowPassword(false);
     setShowAdminField(false);
+    setIsForgotPasswordMode(false);
+    setOtpSent(false);
+    setOtpCode('');
   };
 
   const pwStrength = getPasswordStrength(formData.password);
@@ -217,7 +258,7 @@ const RegisterPage: React.FC = () => {
 
         {/* Bottom tagline */}
         <p className="relative z-10 text-[11px] font-bold text-blue-300/60 dark:text-slate-600 uppercase tracking-widest">
-          ಕನ್ನಡಿಗರಿಗಾಗಿ ಇಂಗ್ಲಿಷ್
+          {t({ en: 'English for Kannadigas', kn: 'ಕನ್ನಡಿಗರಿಗಾಗಿ ಇಂಗ್ಲಿಷ್' })}
         </p>
       </div>
 
@@ -235,39 +276,45 @@ const RegisterPage: React.FC = () => {
         <div className="w-full max-w-sm">
 
           {/* ── Tab Switcher ── */}
-          <div className="relative flex bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 mb-8">
-            <div
-              className={`absolute top-1 bottom-1 w-1/2 bg-white dark:bg-slate-700 rounded-xl shadow-sm transition-transform duration-300 ease-out ${isLoginMode ? 'translate-x-0' : 'translate-x-full'}`}
-            />
-            {[
-              { label: t({ en: 'Sign In', kn: 'ಲಾಗಿನ್' }), login: true },
-              { label: t({ en: 'Register', kn: 'ನೋಂದಣಿ' }), login: false },
-            ].map(tab => (
-              <button
-                key={String(tab.login)}
-                type="button"
-                onClick={() => switchMode(tab.login)}
-                className={`relative z-10 flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-colors duration-200 ${isLoginMode === tab.login
-                  ? 'text-blue-900 dark:text-white'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {!isForgotPasswordMode && (
+            <div className="relative flex bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 mb-8">
+              <div
+                className={`absolute top-1 bottom-1 w-1/2 bg-white dark:bg-slate-700 rounded-xl shadow-sm transition-transform duration-300 ease-out ${isLoginMode ? 'translate-x-0' : 'translate-x-full'}`}
+              />
+              {[
+                { label: t({ en: 'Sign In', kn: 'ಲಾಗಿನ್' }), login: true },
+                { label: t({ en: 'Register', kn: 'ನೋಂದಣಿ' }), login: false },
+              ].map(tab => (
+                <button
+                  key={String(tab.login)}
+                  type="button"
+                  onClick={() => switchMode(tab.login)}
+                  className={`relative z-10 flex-1 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-colors duration-200 ${isLoginMode === tab.login
+                    ? 'text-blue-900 dark:text-white'
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400'
+                    }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* ── Heading ── */}
           <div className="mb-7">
             <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {isLoginMode
-                ? t({ en: 'Welcome back 👋', kn: 'ಮರಳಿ ಸ್ವಾಗತ 👋' })
-                : t({ en: 'Create your account ✨', kn: 'ಖಾತೆ ತೆರೆಯಿರಿ ✨' })}
+              {isForgotPasswordMode 
+                ? t({ en: 'Reset Password 🔒', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ 🔒' })
+                : isLoginMode
+                  ? t({ en: 'Welcome back 👋', kn: 'ಮರಳಿ ಸ್ವಾಗತ 👋' })
+                  : t({ en: 'Create your account ✨', kn: 'ಖಾತೆ ತೆರೆಯಿರಿ ✨' })}
             </h2>
             <p className="mt-1 text-sm text-slate-400 dark:text-slate-500 font-medium">
-              {isLoginMode
-                ? t({ en: 'Sign in to continue your learning journey.', kn: 'ನಿಮ್ಮ ಕಲಿಕೆ ಮುಂದುವರಿಸಿ.' })
-                : t({ en: 'Join thousands of Kannada learners today.', kn: 'ಸಾವಿರಾರು ಕನ್ನಡಿಗರೊಂದಿಗೆ ಸೇರಿ.' })}
+              {isForgotPasswordMode
+                ? (otpSent ? t({ en: 'Enter the 6-digit OTP sent to your phone.', kn: 'ನಿಮ್ಮ ಫೋನ್‌ಗೆ ಬಂದ OTP ನಮೂದಿಸಿ.' }) : t({ en: 'We will send a code to your phone.', kn: 'ನಿಮ್ಮ ಫೋನ್‌ಗೆ OTP ಕಳುಹಿಸುತ್ತೇವೆ.' }))
+                : isLoginMode
+                  ? t({ en: 'Sign in to continue your learning journey.', kn: 'ನಿಮ್ಮ ಕಲಿಕೆ ಮುಂದುವರಿಸಿ.' })
+                  : t({ en: 'Join thousands of Kannada learners today.', kn: 'ಸಾವಿರಾರು ಕನ್ನಡಿಗರೊಂದಿಗೆ ಸೇರಿ.' })}
             </p>
           </div>
 
@@ -292,7 +339,7 @@ const RegisterPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
             {/* Full Name — register only */}
-            {!isLoginMode && (
+            {!isLoginMode && !isForgotPasswordMode && (
               <div className="animate-in fade-in duration-300">
                 <InputField
                   label={t({ en: 'Full Name', kn: 'ಪೂರ್ಣ ಹೆಸರು' })}
@@ -308,61 +355,110 @@ const RegisterPage: React.FC = () => {
             )}
 
             {/* Phone */}
-            <InputField
-              label={t({ en: 'Phone Number', kn: 'ಫೋನ್ ಸಂಖ್ಯೆ' })}
-              type="tel"
-              autoComplete="tel"
-              placeholder="98765 43210"
-              value={formData.phone}
-              onChange={handlePhoneChange}
-              error={fieldErrors.phone}
-              required
-            />
+            {(!isForgotPasswordMode || !otpSent) && (
+              <InputField
+                label={t({ en: 'Phone Number', kn: 'ಫೋನ್ ಸಂಖ್ಯೆ' })}
+                type="tel"
+                autoComplete="tel"
+                placeholder="98765 43210"
+                value={formData.phone}
+                onChange={handlePhoneChange}
+                error={fieldErrors.phone}
+                maxLength={10}
+                inputMode="numeric"
+                required
+              />
+            )}
+
+            {/* OTP Code Input */}
+            {isForgotPasswordMode && otpSent && (
+              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                <InputField
+                  label={t({ en: '6-Digit OTP', kn: '6-ಅಂಕಿಯ OTP' })}
+                  type="text"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  value={otpCode}
+                  onChange={v => {
+                    const digits = v.replace(/\D/g, '').slice(0, 6);
+                    setOtpCode(digits);
+                    if (fieldErrors.otpCode) setFieldErrors(prev => ({ ...prev, otpCode: '' }));
+                    setGlobalError('');
+                  }}
+                  error={fieldErrors.otpCode}
+                  maxLength={6}
+                  inputMode="numeric"
+                  required
+                />
+              </div>
+            )}
 
             {/* Password */}
-            <div className="space-y-2">
-              <InputField
-                label={t({ en: 'Password', kn: 'ಪಾಸ್‌ವರ್ಡ್' })}
-                type={showPassword ? 'text' : 'password'}
-                autoComplete={isLoginMode ? 'current-password' : 'new-password'}
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={v => setField('password', v)}
-                error={fieldErrors.password}
-                required
-                suffix={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(p => !p)}
-                    className="text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-1"
-                    tabIndex={-1}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    <EyeIcon open={showPassword} />
-                  </button>
-                }
-              />
+            {(!isForgotPasswordMode || otpSent) && (
+              <div className="space-y-2 animate-in fade-in duration-300">
+                <InputField
+                  label={isForgotPasswordMode ? t({ en: 'New Password', kn: 'ಹೊಸ ಪಾಸ್‌ವರ್ಡ್' }) : t({ en: 'Password', kn: 'ಪಾಸ್‌ವರ್ಡ್' })}
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete={isLoginMode && !isForgotPasswordMode ? 'current-password' : 'new-password'}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={v => setField('password', v)}
+                  error={fieldErrors.password}
+                  required
+                  suffix={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(p => !p)}
+                      className="text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-1"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      <EyeIcon open={showPassword} />
+                    </button>
+                  }
+                />
 
-              {/* Password strength — register only */}
-              {!isLoginMode && formData.password && (
-                <div className="px-1 animate-in fade-in duration-200">
-                  <div className="flex gap-1 mb-1">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div
-                        key={i}
-                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= pwStrength.score ? pwStrength.color : 'bg-slate-200 dark:bg-slate-700'}`}
-                      />
-                    ))}
+                {/* Forgot Password Link Button in Login Mode */}
+                {isLoginMode && !isForgotPasswordMode && (
+                  <div className="flex justify-end">
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setIsForgotPasswordMode(true);
+                        setGlobalError('');
+                        setFieldErrors({});
+                      }}
+                      className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 transition-colors"
+                    >
+                      {t({ en: 'Forgot Password?', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ?' })}
+                    </button>
                   </div>
-                  <p className={`text-[10px] font-black uppercase tracking-widest ${pwStrength.score <= 1 ? 'text-red-500' : pwStrength.score <= 3 ? 'text-amber-500' : 'text-emerald-500'}`}>
-                    {pwStrength.label}
-                  </p>
-                </div>
-              )}
-            </div>
+                )}
+
+                {/* Password strength — register & reset password */}
+                {(!isLoginMode || isForgotPasswordMode) && formData.password && (
+                  <div className="px-1 animate-in fade-in duration-200">
+                    <div className="flex gap-1 mb-1">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div
+                          key={i}
+                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= pwStrength.score ? pwStrength.color : 'bg-slate-200 dark:bg-slate-700'}`}
+                        />
+                      ))}
+                    </div>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${pwStrength.score <= 1 ? 'text-red-500' : pwStrength.score <= 3 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                      {t({ 
+                        en: pwStrength.label, 
+                        kn: pwStrength.label === 'Weak' ? 'ದುರ್ಬಲ' : pwStrength.label === 'Fair' ? 'ಪರವಾಗಿಲ್ಲ' : 'ಬಲವಾಗಿದೆ' 
+                      })}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Village/City — register only */}
-            {!isLoginMode && (
+            {!isLoginMode && !isForgotPasswordMode && (
               <div className="animate-in fade-in duration-300">
                 <InputField
                   label={t({ en: 'Village / City', kn: 'ನಿಮ್ಮ ಊರು' })}
@@ -378,7 +474,7 @@ const RegisterPage: React.FC = () => {
             )}
 
             {/* Admin code — register only */}
-            {!isLoginMode && (
+            {!isLoginMode && !isForgotPasswordMode && (
               <div className="animate-in fade-in duration-300">
                 <button
                   type="button"
@@ -393,7 +489,7 @@ const RegisterPage: React.FC = () => {
                     <input
                       type="text"
                       autoComplete="off"
-                      placeholder="Enter secret code"
+                      placeholder={t({ en: 'Enter secret code', kn: 'ರಹಸ್ಯ ಕೋಡ್ ನಮೂದಿಸಿ' })}
                       value={formData.adminCode}
                       onChange={e => setField('adminCode', e.target.value)}
                       className="w-full px-4 py-3 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-200 dark:border-amber-900/30 rounded-2xl focus:border-amber-400 outline-none transition-all font-mono text-xs text-amber-900 dark:text-amber-300 uppercase tracking-widest"
@@ -427,10 +523,12 @@ const RegisterPage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  {isLoginMode
-                    ? t({ en: 'Sign In', kn: 'ಸೈನ್ ಇನ್' })
-                    : t({ en: 'Create Account', kn: 'ಖಾತೆ ತೆರೆಯಿರಿ' })}
-                  <span>{isLoginMode ? '→' : '✨'}</span>
+                  {isForgotPasswordMode
+                    ? (otpSent ? t({ en: 'Verify & Reset', kn: 'ಪರಿಶೀಲಿಸಿ' }) : t({ en: 'Send OTP', kn: 'OTP ಕಳುಹಿಸಿ' }))
+                    : isLoginMode
+                      ? t({ en: 'Sign In', kn: 'ಸೈನ್ ಇನ್' })
+                      : t({ en: 'Create Account', kn: 'ಖಾತೆ ತೆರೆಯಿರಿ' })}
+                  <span>{isLoginMode && !isForgotPasswordMode ? '→' : '✨'}</span>
                 </>
               )}
             </button>
@@ -438,18 +536,22 @@ const RegisterPage: React.FC = () => {
 
           {/* ── Switch Mode Link ── */}
           <p className="mt-6 text-center text-xs text-slate-400 dark:text-slate-600 font-semibold">
-            {isLoginMode
-              ? t({ en: "Don't have an account?", kn: 'ಖಾತೆ ಇಲ್ಲವೇ?' })
-              : t({ en: 'Already have an account?', kn: 'ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?' })}
+            {isForgotPasswordMode 
+              ? t({ en: "Remembered your password?", kn: 'ಪಾಸ್‌ವರ್ಡ್ ನೆನಪಿದೆಯೇ?' })
+              : isLoginMode
+                ? t({ en: "Don't have an account?", kn: 'ಖಾತೆ ಇಲ್ಲವೇ?' })
+                : t({ en: 'Already have an account?', kn: 'ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?' })}
             {' '}
             <button
               type="button"
-              onClick={() => switchMode(!isLoginMode)}
+              onClick={() => isForgotPasswordMode ? switchMode(true) : switchMode(!isLoginMode)}
               className="font-black text-blue-600 dark:text-blue-400 hover:underline transition-colors"
             >
-              {isLoginMode
-                ? t({ en: 'Register now', kn: 'ಈಗಲೇ ನೋಂದಾಯಿಸಿ' })
-                : t({ en: 'Sign in', kn: 'ಲಾಗಿನ್ ಆಗಿ' })}
+              {isForgotPasswordMode 
+                ? t({ en: 'Sign in instead', kn: 'ಲಾಗಿನ್ ಆಗಿ' })
+                : isLoginMode
+                  ? t({ en: 'Register now', kn: 'ಈಗಲೇ ನೋಂದಾಯಿಸಿ' })
+                  : t({ en: 'Sign in', kn: 'ಲಾಗಿನ್ ಆಗಿ' })}
             </button>
           </p>
 

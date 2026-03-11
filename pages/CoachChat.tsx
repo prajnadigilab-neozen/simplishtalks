@@ -282,18 +282,18 @@ const CoachChat: React.FC = () => {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5 group-hover:-translate-x-1 transition-transform">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
-              <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Dashboard</span>
+              <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })}</span>
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-black text-blue-900 dark:text-slate-100 text-sm uppercase tracking-widest">Simplish Coach</h2>
+                <h2 className="font-black text-blue-900 dark:text-slate-100 text-sm uppercase tracking-widest">{t({ en: 'Simplish Coach', kn: 'ಸಿಂಪ್ಲಿಷ್ ಕೋಚ್' })}</h2>
                 <div className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-800">
                   <span className="text-[10px] font-black text-blue-700 dark:text-blue-400 tabular-nums">
                     {totalChatMessages}/{CHAT_QUOTA}
                   </span>
                 </div>
               </div>
-              <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter">Bilingual Training</p>
+              <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter">{t({ en: 'Bilingual Training', kn: 'ದ್ವಿಭಾಷಾ ತರಬೇತಿ' })}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -336,7 +336,7 @@ const CoachChat: React.FC = () => {
           {historyLoading && (
             <div className="flex flex-col items-center py-10 opacity-40">
               <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Loading History...</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{t({ en: 'Loading History...', kn: 'ಇತಿಹಾಸ ಲೋಡ್ ಆಗುತ್ತಿದೆ...' })}</span>
             </div>
           )}
 
@@ -402,14 +402,14 @@ const CoachChat: React.FC = () => {
                     )}
                     {m.correction && (
                       <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-2xl border border-amber-100/50 dark:border-amber-900/50">
-                        <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-tighter">Correction</p>
+                        <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-tighter">{t({ en: 'Correction', kn: 'ತಿದ್ದುಪಡಿ' })}</p>
                         <p className="text-sm text-amber-900 dark:text-amber-200 italic">{m.correction}</p>
                       </div>
                     )}
                     {m.pronunciationTip && (
                       <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-2xl border border-green-100/50 dark:border-green-900/50 flex justify-between items-start gap-2">
                         <div className="flex-1">
-                          <p className="text-xs font-bold text-green-700 dark:text-green-400 mb-1 uppercase tracking-tighter">Pronunciation Tip 🎙️</p>
+                          <p className="text-xs font-bold text-green-700 dark:text-green-400 mb-1 uppercase tracking-tighter">{t({ en: 'Pronunciation Tip 🎙️', kn: 'ಉಚ್ಚಾರಣಾ ಸಲಹೆ 🎙️' })}</p>
                           <p className="text-sm text-green-900 dark:text-green-200">{m.pronunciationTip}</p>
                         </div>
                         <button

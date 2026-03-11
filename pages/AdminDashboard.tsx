@@ -207,6 +207,8 @@ const AdminDashboard: React.FC = () => {
       "Active Users",
       "Talks Sold",
       "Snehi Sold",
+      "Voice Usage (secs)",
+      "Chat Usage (msgs)",
       ...(isSuperAdmin ? ["Revenue (INR)"] : []),
       "Deleted Users"
     ];
@@ -221,6 +223,8 @@ const AdminDashboard: React.FC = () => {
         `"${r.active_count || 0}"`,
         `"${r.talks_sold || 0}"`,
         `"${r.snehi_sold || 0}"`,
+        `"${r.total_voice_seconds || 0}"`,
+        `"${r.total_messages || 0}"`,
         ...(isSuperAdmin ? [`"${r.daily_revenue || 0}"`] : []),
         `"${r.deleted_count || 0}"`
       ];
@@ -276,7 +280,7 @@ const AdminDashboard: React.FC = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div>
-          <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">Admin Dashboard</h2>
+          <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">{t({ en: 'Admin Dashboard', kn: 'ಅಡ್ಮಿನ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })}</h2>
           {currentUser && (
             <p className="text-[10px] text-slate-400 font-mono mt-2">
               ID: {currentUser.id} <br />
@@ -290,32 +294,32 @@ const AdminDashboard: React.FC = () => {
             onClick={() => navigate('/admin/course')}
             className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-blue-700 transition-all flex items-center gap-2"
           >
-            <span>📚</span> Course Content
+            <span>📚</span> {t({ en: 'Course Content', kn: 'ಕೋರ್ಸ್ ವಿಷಯ' })}
           </button>
           {currentUser?.role === UserRole.SUPER_ADMIN && (
             <button
               onClick={() => navigate('/admin/ai-instructions')}
               className="px-6 py-2.5 bg-purple-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-purple-700 transition-all flex items-center gap-2"
             >
-              <span>🤖</span> AI Instructions
+              <span>🤖</span> {t({ en: 'AI Instructions', kn: 'AI ಸೂಚನೆಗಳು' })}
             </button>
           )}
         </div>
 
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl shadow-inner overflow-x-auto no-scrollbar">
           {currentUser?.role === UserRole.SUPER_ADMIN && (
-            <button key="users" onClick={() => setActiveTab('users')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Users</button>
+            <button key="users" onClick={() => setActiveTab('users')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'users' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Users', kn: 'ಬಳಕೆದಾರರು' })}</button>
           )}
-          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>General Stats</button>
-          <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Reports</button>
-
+          <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'General Stats', kn: 'ಅಂಕಿಅಂಶಗಳು' })}</button>
+          <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Reports', kn: 'ವರದಿಗಳು' })}</button>
+ 
           {currentUser?.role === UserRole.SUPER_ADMIN && (
             <>
-              <button key="mods" onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Moderators</button>
+              <button key="mods" onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Moderators', kn: 'ಮಾಡರೇಟರ್‌ಗಳು' })}</button>
             </>
           )}
-
-          {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>Audit</button>}
+ 
+          {selectedAuditUser && <button key="audit" onClick={() => setActiveTab('audit')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'audit' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Audit', kn: 'ತಪಾಸಣೆ' })}</button>}
         </div>
       </div>
 
@@ -324,11 +328,11 @@ const AdminDashboard: React.FC = () => {
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-900">
               <tr>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">User</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Role</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Voice Usage</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Chat Usage</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'User', kn: 'ಬಳಕೆದಾರರು' })}</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Role', kn: 'ಪಾತ್ರ' })}</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
+                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Actions', kn: 'ಕ್ರಮಗಳು' })}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -338,6 +342,17 @@ const AdminDashboard: React.FC = () => {
                     <div className="flex flex-col">
                       <span className="font-black text-slate-800 dark:text-slate-100">{user.full_name}</span>
                       <span className="text-[10px] text-slate-400">{user.phone}</span>
+                      {user.created_at && (
+                        <span className="text-[8px] text-slate-400 uppercase mt-1">
+                          Reg: {new Date(user.created_at).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="p-6">
@@ -357,11 +372,11 @@ const AdminDashboard: React.FC = () => {
                       const isOver = seconds >= 180;
                       return (
                         <div className="flex flex-col">
-                          <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-blue-600'}`}>
+                           <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-blue-600'}`}>
                             🎙️ {mins}:{secs.toString().padStart(2, '0')} / 3:00
                           </span>
                           <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
-                            Live Talk Time
+                            {t({ en: 'Live Talk Time', kn: 'ಲೈವ್ ಟಾಕ್ ಸಮಯ' })}
                           </span>
                         </div>
                       );
@@ -414,8 +429,8 @@ const AdminDashboard: React.FC = () => {
       {activeTab === 'mods' && (
         <div className="space-y-8 animate-in fade-in">
           <div className="flex justify-between items-center">
-            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">Moderator List</h3>
-            <p className="text-[10px] font-black text-slate-400 uppercase">Curators of SIMPLISH - Talks</p>
+            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">{t({ en: 'Moderator List', kn: 'ಮಾಡರೇಟರ್ ಪಟ್ಟಿ' })}</h3>
+            <p className="text-[10px] font-black text-slate-400 uppercase">{t({ en: 'Curators of SIMPLISH - Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಸಂಯೋಜಕರು' })}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {users.filter(u => u.role === UserRole.MODERATOR).map(mod => (
@@ -450,9 +465,9 @@ const AdminDashboard: React.FC = () => {
       {activeTab === 'stats' && (
         <div className="space-y-8 animate-in fade-in">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">Platform Analytics</h3>
+            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">{t({ en: 'Platform Analytics', kn: 'ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ವಿಶ್ಲೇಷಣೆ' })}</h3>
             <button onClick={fetchData} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">
-              Refresh Data
+              {t({ en: 'Refresh Data', kn: 'ಡೇಟಾ ನವೀಕರಿಸಿ' })}
             </button>
           </div>
 
@@ -464,11 +479,11 @@ const AdminDashboard: React.FC = () => {
                   <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-2xl flex items-center justify-center text-2xl">
                     💰
                   </div>
-                  <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg uppercase tracking-wider">Revenue</span>
+                  <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg uppercase tracking-wider">{t({ en: 'Revenue', kn: 'ಆದಾಯ' })}</span>
                 </div>
                 <div>
                   <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">₹{globalStats.totalRevenue.toLocaleString()}</h4>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Account Recieved</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Total Account Received', kn: 'ಒಟ್ಟು ಸ್ವೀಕರಿಸಿದ ಮೊತ್ತ' })}</p>
                 </div>
               </div>
             )}
@@ -482,7 +497,7 @@ const AdminDashboard: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.totalUsers}</h4>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Registered</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Total Registered', kn: 'ಒಟ್ಟು ನೋಂದಾಯಿತರು' })}</p>
               </div>
             </div>
 
@@ -495,7 +510,7 @@ const AdminDashboard: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.activeLearners}</h4>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Active Learners</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Active Learners', kn: 'ಸಕ್ರಿಯ ವಿದ್ಯಾರ್ಥಿಗಳು' })}</p>
               </div>
             </div>
 
@@ -508,7 +523,7 @@ const AdminDashboard: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.totalModules}</h4>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Course Modules</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Course Modules', kn: 'ಕೋರ್ಸ್ ಮಾಡ್ಯೂಲ್‌ಗಳು' })}</p>
               </div>
             </div>
 
@@ -521,7 +536,39 @@ const AdminDashboard: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.totalLessons}</h4>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Lessons</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Total Lessons', kn: 'ಒಟ್ಟು ಪಾಠಗಳು' })}</p>
+              </div>
+            </div>
+            
+            {/* New KPI Card: Voice & Chat Usage */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1">
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 text-pink-600 rounded-2xl flex items-center justify-center text-2xl">
+                  📊
+                </div>
+                <span className="text-[10px] font-black text-pink-600 bg-pink-50 px-2 py-1 rounded-lg uppercase tracking-wider">AI API</span>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 px-3 py-2 rounded-xl">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">🎙️ {t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</span>
+                  <span className="text-sm font-black text-slate-800 dark:text-slate-200">
+                    {(() => {
+                      const totalSecs = usageData.reduce((acc, curr) => acc + (curr.voice_seconds_total || 0), 0);
+                      return `${Math.floor(totalSecs / 60)}m ${totalSecs % 60}s`;
+                    })()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 px-3 py-2 rounded-xl">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">💬 {t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm font-black text-slate-800 dark:text-slate-200">
+                      {usageData.reduce((acc, curr) => acc + (curr.chat_messages_total || 0), 0)} {t({ en: 'msgs', kn: 'ಸಂದೇಶಗಳು' })}
+                    </span>
+                    <span className="text-[8px] text-slate-400">
+                      {usageData.reduce((acc, curr) => acc + (curr.chat_tokens_total || 0), 0).toLocaleString()} {t({ en: 'tokens', kn: 'ಟೋಕನ್ಗಳು' })}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -763,8 +810,8 @@ const AdminDashboard: React.FC = () => {
         <div className="space-y-6 animate-in fade-in">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
             <div>
-              <h3 className="text-2xl font-black text-orange-900 dark:text-orange-300">Platform Reports</h3>
-              <p className="text-sm text-slate-500">Daily performance metrics and user activity trends.</p>
+              <h3 className="text-2xl font-black text-orange-900 dark:text-orange-300">{t({ en: 'Platform Reports', kn: 'ವೇದಿಕೆ ವರದಿಗಳು' })}</h3>
+              <p className="text-sm text-slate-500">{t({ en: 'Daily performance metrics and user activity trends.', kn: 'ದೈನಂದಿನ ಕಾರ್ಯಕ್ಷಮತೆ ಮತ್ತು ಬಳಕೆದಾರರ ಚಟುವಟಿಕೆಗಳು.' })}</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center">
@@ -802,7 +849,7 @@ const AdminDashboard: React.FC = () => {
                 onClick={handleDownloadCSV}
                 className="px-4 py-3 bg-orange-100 hover:bg-orange-200 text-orange-700 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 dark:text-orange-400 rounded-xl text-xs font-black uppercase transition-colors flex items-center gap-2 border border-orange-200 dark:border-orange-800 shadow-sm"
               >
-                <span>📥</span> Download CSV
+                <span>📥</span> {t({ en: 'Download CSV', kn: 'CSV ಡೌನ್‌ಲೋಡ್' })}
               </button>
             </div>
           </div>
@@ -811,21 +858,23 @@ const AdminDashboard: React.FC = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50 dark:bg-slate-800/50">
                 <tr>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Date</th>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Reg. Users</th>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Active</th>
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Talks/Snehi</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Date', kn: 'ದಿನಾಂಕ' })}</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Reg. Users', kn: 'ನೋಂದಾಯಿತರು' })}</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Active', kn: 'ಸಕ್ರಿಯ' })}</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Talks/Snehi', kn: 'ಟಾಕ್ಸ್/ಸ್ನೇಹಿ' })}</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
                   {currentUser?.role === UserRole.SUPER_ADMIN && (
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Revenue</th>
+                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Revenue', kn: 'ಆದಾಯ' })}</th>
                   )}
-                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Deleted</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Deleted', kn: 'ಅಳಿಸಲಾಗಿದೆ' })}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredReports.length === 0 ? (
                   <tr>
                     <td colSpan={currentUser?.role === UserRole.SUPER_ADMIN ? 6 : 5} className="p-8 text-center text-slate-400 font-bold">
-                      No reports found for the selected date range.
+                      {t({ en: 'No reports found for the selected date range.', kn: 'ಆಯ್ದ ಅವಧಿಯಲ್ಲಿ ಯಾವುದೇ ವರದಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ.' })}
                     </td>
                   </tr>
                 ) : (
@@ -842,6 +891,12 @@ const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="p-6 text-slate-600 font-black">
                         <span className="text-blue-500">T: {report.talks_sold}</span> / <span className="text-indigo-500">S: {report.snehi_sold}</span>
+                      </td>
+                      <td className="p-6 text-slate-600 font-bold">
+                        {report.total_voice_seconds ? `${Math.floor(report.total_voice_seconds / 60)}m ${report.total_voice_seconds % 60}s` : '0m 0s'}
+                      </td>
+                      <td className="p-6 text-slate-600 font-bold">
+                        {report.total_messages ? `${report.total_messages} msgs` : '0 msgs'}
                       </td>
                       {currentUser?.role === UserRole.SUPER_ADMIN && (
                         <td className="p-6 text-green-600 font-bold">

@@ -57,9 +57,11 @@ export const useAppStore = create<AppState>((set, get) => ({
         console.log("🚀 Starting App Initialization...");
 
         try {
-            // STEP 1: Get auth session. The Navigator Lock is disabled in supabase.ts, 
-            // so this is now fast and reliable with no deadlock risk.
-            const { data: { session: rawSession } } = await supabase.auth.getSession();
+            // STEP 1: Get auth session. Wrapped in try-catch to silently handle
+            // the 'Invalid Refresh Token' error for unauthenticated guest users,
+            // which would otherwise pollute the browser console.
+            const { data: { session: rawSession } } = await supabase.auth.getSession()
+                .catch(() => ({ data: { session: null }, error: null }));
             const userId = rawSession?.user?.id;
             console.log("✅ Auth check complete. User:", userId || 'Guest');
 

@@ -68,14 +68,14 @@ const AdminTelemetry: React.FC = () => {
         <div className="p-4 md:p-8 bg-slate-50 dark:bg-slate-950 min-h-screen">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-black text-blue-900 dark:text-white uppercase tracking-tighter">Infrastructure Health</h1>
-                    <p className="text-slate-500 font-bold uppercase text-xs tracking-widest mt-1">Network Telemetry & TTI Monitoring</p>
+                    <h1 className="text-3xl font-black text-blue-900 dark:text-white uppercase tracking-tighter">{t({ en: 'Infrastructure Health', kn: 'ಮೂಲಸೌಕರ್ಯದ ಸ್ಥಿತಿ' })}</h1>
+                    <p className="text-slate-500 font-bold uppercase text-xs tracking-widest mt-1">{t({ en: 'Network Telemetry & TTI Monitoring', kn: 'ನೆಟ್‌ವರ್ಕ್ ಟೆಲಿಮೆಟ್ರಿ ಮತ್ತು TTI ಮಾನಿಟರಿಂಗ್' })}</p>
                 </div>
                 <button
                     onClick={() => navigate('/admin')}
                     className="px-6 py-2 bg-white dark:bg-slate-900 text-blue-900 dark:text-white rounded-xl border-2 border-slate-100 dark:border-slate-800 font-black uppercase text-xs tracking-widest transition-all hover:bg-slate-50"
                 >
-                    Back
+                    {t({ en: 'Back', kn: 'ಹಿಂದಕ್ಕೆ' })}
                 </button>
             </div>
 
@@ -87,7 +87,7 @@ const AdminTelemetry: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* TTI by Region */}
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
-                        <h2 className="text-xl font-black text-blue-900 dark:text-white mb-6 uppercase tracking-tighter">TTI by Region (ms)</h2>
+                        <h2 className="text-xl font-black text-blue-900 dark:text-white mb-6 uppercase tracking-tighter">{t({ en: 'TTI by Region (ms)', kn: 'ಪ್ರದೇಶದ ಪ್ರಕಾರ TTI (ms)' })}</h2>
                         <div className="space-y-4">
                             {Object.entries(statsByRegion).map(([region, stats]) => {
                                 const avgTti = stats.count > 0 ? Math.round(stats.ttiSum / stats.count) : 0;
@@ -112,7 +112,7 @@ const AdminTelemetry: React.FC = () => {
 
                     {/* Connection Quality */}
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
-                        <h2 className="text-xl font-black text-blue-900 dark:text-white mb-6 uppercase tracking-tighter">ECT Distribution</h2>
+                        <h2 className="text-xl font-black text-blue-900 dark:text-white mb-6 uppercase tracking-tighter">{t({ en: 'ECT Distribution', kn: 'ECT ವಿತರಣೆ' })}</h2>
                         <div className="flex h-40 gap-4 items-end">
                             {Object.entries(ectDist).map(([type, count]) => {
                                 const height = data.length > 0 ? (count / data.length) * 100 : 0;
@@ -132,15 +132,15 @@ const AdminTelemetry: React.FC = () => {
 
                     {/* Drop Rates */}
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 lg:col-span-2">
-                        <h2 className="text-xl font-black text-blue-900 dark:text-white mb-6 uppercase tracking-tighter">Connection Stability</h2>
+                        <h2 className="text-xl font-black text-blue-900 dark:text-white mb-6 uppercase tracking-tighter">{t({ en: 'Connection Stability', kn: 'ಸಂಪರ್ಕ ಸ್ಥಿರತೆ' })}</h2>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="border-b border-slate-100 dark:border-slate-800">
-                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">Region</th>
-                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">Samples</th>
-                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">Drops detected</th>
-                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">Reliability</th>
+                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">{t({ en: 'Region', kn: 'ಪ್ರದೇಶ' })}</th>
+                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">{t({ en: 'Samples', kn: 'ನಮೂನೆಗಳು' })}</th>
+                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">{t({ en: 'Drops detected', kn: 'ಸಂಪರ್ಕ ಕಡಿತ' })}</th>
+                                        <th className="pb-4 text-xs font-black uppercase text-slate-400">{t({ en: 'Reliability', kn: 'ವಿಶ್ವಾಸಾರ್ಹತೆ' })}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50 dark:divide-slate-800">

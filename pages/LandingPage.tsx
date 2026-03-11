@@ -59,17 +59,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
             className="w-full bg-orange-500 text-white px-8 py-5 rounded-2xl font-black text-xl hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-orange-500/20 border-b-4 border-orange-700 flex items-center justify-center gap-2 group"
           >
             {isLoggedIn
-              ? (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR ? 'Admin Panel' : 'Continue Learning')
-              : t({ en: 'Open The Door (Free)', kn: 'ಬಾಗಿಲು ತೆರೆಯಿರಿ (ಉಚಿತ)' })}
+              ? (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR 
+                  ? t({ en: 'Admin Panel', kn: 'ಅಡ್ಮಿನ್ ಫಲಕ' }) 
+                  : t({ en: 'Continue Learning', kn: 'ಕಲಿಕೆ ಮುಂದುವರಿಸಿ' }))
+              : t({ en: 'Open The Door', kn: 'ಬಾಗಿಲು ತೆರೆಯಿರಿ' })}
             <span className="text-2xl group-hover:translate-x-1 transition-transform">➔</span>
           </button>
         </div>
-        <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
-          <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-          {isLoggedIn
-            ? t({ en: 'Dashboard Enabled', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಸಕ್ರಿಯವಾಗಿದೆ' })
-            : t({ en: 'No credit card required', kn: 'ಕ್ರೆಡಿಟ್ ಕಾರ್ಡ್ ಅಗತ್ಯವಿಲ್ಲ' })}
-        </div>
+        {isLoggedIn && (
+          <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
+            <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+            {t({ en: 'Dashboard Enabled', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಸಕ್ರಿಯವಾಗಿದೆ' })}
+          </div>
+        )}
       </section>
 
       {/* 2. Core Philosophy */}
@@ -181,7 +183,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
             onClick={handleCTA}
             className="bg-amber-400 text-blue-950 px-10 py-5 rounded-2xl font-black text-2xl hover:bg-amber-300 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-amber-400/20 border-b-4 border-amber-600 flex items-center gap-3"
           >
-            {isLoggedIn ? (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR ? 'Admin Panel' : 'Continue Learning') : t({ en: 'Start Your Free Journey', kn: 'ನಿಮ್ಮ ಉಚಿತ ಪ್ರಯಾಣವನ್ನು ಪ್ರಾರಂಭಿಸಿ' })}
+            {isLoggedIn 
+              ? (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR 
+                  ? t({ en: 'Admin Panel', kn: 'ಅಡ್ಮಿನ್ ಫಲಕ' }) 
+                  : t({ en: 'Continue Learning', kn: 'ಕಲಿಕೆ ಮುಂದುವರಿಸಿ' })) 
+              : t({ en: 'Start Your Journey', kn: 'ನಿಮ್ಮ ಪ್ರಯಾಣವನ್ನು ಪ್ರಾರಂಭಿಸಿ' })}
             <span>🚀</span>
           </button>
         </div>
@@ -193,13 +199,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
           <div className="flex flex-col items-center md:items-start gap-2">
             <Logo textOnly className="text-2xl font-black invert opacity-50" />
             <div className="text-slate-500 font-bold text-sm">
-              © 2026 Simplish - Talks • Karnataka
+              © 2026 Simplish - Talks • {t({ en: 'Karnataka', kn: 'ಕರ್ನಾಟಕ' })}
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-6">
-            <FooterLink href="#">Privacy Policy</FooterLink>
-            <FooterLink href="#">Terms of Service</FooterLink>
-            <FooterLink href="#">Contact</FooterLink>
+            <FooterLink href="#">{t({ en: 'Privacy Policy', kn: 'ಗೌಪ್ಯತಾ ನೀತಿ' })}</FooterLink>
+            <FooterLink href="#">{t({ en: 'Terms of Service', kn: 'ಸೇವಾ ನಿಯಮಗಳು' })}</FooterLink>
+            <FooterLink href="#">{t({ en: 'Contact', kn: 'ಸಂಪರ್ಕಿಸಿ' })}</FooterLink>
           </div>
         </div>
       </footer>
@@ -226,10 +232,10 @@ const FeatureCard: React.FC<{ icon: string, title: string, desc: string }> = ({ 
 );
 
 const JourneyStep: React.FC<{ num: string, title: string, desc: string }> = ({ num, title, desc }) => (
-  <div className="relative p-6 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-100 dark:border-slate-800">
-    <div className="text-6xl font-black text-slate-200 dark:text-slate-800 mb-4">{num}</div>
+  <div className="relative p-6 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all hover:shadow-md">
+    <div className="text-6xl font-black text-slate-300 dark:text-slate-700 mb-4 select-none" aria-hidden="true">{num}</div>
     <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 relative z-10">{title}</h4>
-    <p className="text-sm text-slate-600 dark:text-slate-400 relative z-10">{desc}</p>
+    <p className="text-sm text-slate-600 dark:text-slate-400 relative z-10 leading-relaxed">{desc}</p>
   </div>
 );
 

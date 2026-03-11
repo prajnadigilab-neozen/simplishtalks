@@ -304,14 +304,16 @@ const LessonEditor: React.FC = () => {
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
-                    <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">{lessonId ? 'Edit Lesson' : 'Add Lesson'}</h2>
-                    <p className="text-[10px] text-slate-400 font-mono mt-2 tracking-widest uppercase">Lesson Configuration ✨</p>
+                    <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">
+                        {lessonId ? t({ en: 'Edit Lesson', kn: 'ಪಾಠ ಸಂಪಾದಿಸಿ' }) : t({ en: 'Add Lesson', kn: 'ಪಾಠ ಸೇರಿಸಿ' })}
+                    </h2>
+                    <p className="text-[10px] text-slate-400 font-mono mt-2 tracking-widest uppercase">{t({ en: 'Lesson Configuration ✨', kn: 'ಪಾಠದ ಸಂರಚನೆ ✨' })}</p>
                 </div>
                 <button
                     onClick={() => navigate('/admin/course')}
                     className="px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all dark:text-slate-300"
                 >
-                    Back to Curriculum
+                    {t({ en: 'Back to Curriculum', kn: 'ಪಠ್ಯಕ್ರಮಕ್ಕೆ ಹಿಂದಕ್ಕೆ' })}
                 </button>
             </div>
 
@@ -322,12 +324,12 @@ const LessonEditor: React.FC = () => {
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
                         <div>
                             <h5 className="font-black text-lg text-indigo-900 dark:text-indigo-400 flex items-center gap-2">
-                                <span>✨</span> AI Instructions & Auto-Fill
+                                <span>✨</span> {t({ en: 'AI Instructions & Auto-Fill', kn: 'AI ಸೂಚನೆಗಳು ಮತ್ತು ಆಟೋ-ಫಿಲ್' })}
                             </h5>
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Generate lesson content instantly using Gemini 2.0</p>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">{t({ en: 'Generate lesson content instantly using Gemini 2.0', kn: 'ಜೆಮಿನಿ 2.0 ಬಳಸಿ ಪಾಠದ ವಿಷಯವನ್ನು ತಕ್ಷಣವೇ ರಚಿಸಿ' })}</p>
                         </div>
                         <label className="cursor-pointer bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:shadow-xl transition-all active:scale-95">
-                            Upload JSON File
+                            {t({ en: 'Upload JSON File', kn: 'JSON ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ' })}
                             <input type="file" accept=".json" className="hidden" onChange={handleJsonUpload} />
                         </label>
                     </div>
@@ -479,7 +481,7 @@ const LessonEditor: React.FC = () => {
                                 onClick={() => navigate('/admin/course')}
                                 className="flex-1 py-4 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white rounded-2xl font-black uppercase text-xs tracking-widest transition-all hover:bg-slate-200"
                             >
-                                Cancel
+                                {t({ en: 'Cancel', kn: 'ರದ್ದುಗೊಳಿಸಿ' })}
                             </button>
                             <button
                                 type="submit"
