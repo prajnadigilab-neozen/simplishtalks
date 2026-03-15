@@ -1,7 +1,7 @@
 
 /** V 1.0 */
 import { create } from 'zustand';
-import { CourseLevel, UserProgress, Module, UserRole, LevelStatus, PackageType } from '../types';
+import { CourseLevel, UserProgress, Module, UserRole, LevelStatus, PackageType, SnehiScenario } from '../types';
 import { getUserSession } from '../services/authService';
 import { fetchAllModules } from '../services/courseService';
 import { supabase } from '../lib/supabase';
@@ -17,6 +17,8 @@ interface AppState {
     initialized: boolean;
     dataSaverMode: boolean;
     evaluationHistory: any[];
+    scenarios: SnehiScenario[];
+    currentScenarioId: string | null;
 
     // Actions
     initialize: (forceRefresh?: boolean) => Promise<void>;
@@ -28,6 +30,10 @@ interface AppState {
     refreshModules: () => Promise<void>;
     setDataSaverMode: (enabled: boolean) => void;
     syncUsage: (type: 'voice' | 'chat', amount: number) => void;
+    updateSNEHIPreferences: (updates: { prefersTranslation?: boolean, prefersPronunciation?: boolean }) => Promise<void>;
+    fetchScenarios: () => Promise<void>;
+    setCurrentScenario: (id: string | null) => void;
+    markScenarioComplete: (scenarioId: string) => Promise<void>;
     refreshSession: () => Promise<void>;
 }
 
@@ -38,6 +44,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     evaluationHistory: [],
     loading: true,
     initialized: false,
+    scenarios: [],
+    currentScenarioId: null,
     dataSaverMode: (() => {
         const enabled = localStorage.getItem('dataSaverMode') === 'true';
         if (enabled) document.documentElement.classList.add('data-saver-active');
@@ -97,24 +105,26 @@ export const useAppStore = create<AppState>((set, get) => ({
                 id: rawSession.user.id,
                 name: rawSession.user.user_metadata?.full_name || 'User',
                 role: rawSession.user.user_metadata?.role || UserRole.STUDENT,
-                packageType: rawSession.user.user_metadata?.package_type || 'NONE',
-                packageStatus: rawSession.user.user_metadata?.package_status || 'INACTIVE',
+                packageType: rawSession.user.user_metadata?.package_type,
+                packageStatus: rawSession.user.user_metadata?.package_status,
                 isLoggedIn: true,
                 isRestricted: false,
             } : null);
 
-            // CRITICAL: Merge speculatively to preserve package info if the fetch was partial 
-            // or if we are in the middle of a post-payment re-refetch.
+            // CRITICAL: Merge speculatively to preserve package info if currentSession already has it but fetched one says NONE (stale Auth metadata)
             const session = fetchedSession ? {
                 ...currentSession,
                 ...fetchedSession,
-                // Hard-preserve package if currentSession already has it but fetched one says NONE (stale Auth metadata)
-                packageType: (fetchedSession.packageType !== 'NONE') ? fetchedSession.packageType : (currentSession?.packageType || 'NONE'),
-                packageStatus: (fetchedSession.packageStatus !== 'INACTIVE') ? fetchedSession.packageStatus : (currentSession?.packageStatus || 'INACTIVE'),
+                // Only use 'NONE' as value if it's explicitly set or we've confirmed the profile has NO package
+                packageType: fetchedSession.packageType || currentSession?.packageType,
+                packageStatus: fetchedSession.packageStatus || currentSession?.packageStatus,
             } : null;
 
             set({ session, modules: modules || [], initialized: true });
             console.log("✅ Core state set. Session:", !!session, "Modules:", modules?.length);
+
+            // Fetch SNEHI scenarios
+            await get().fetchScenarios();
 
             if (userId) {
                 get().fetchEvaluationHistory();
@@ -133,6 +143,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                         completedLessons,
                         role: session?.role || UserRole.STUDENT,
                         isPlacementDone: data.is_placement_done,
+                        completedScenarios: data.completed_scenarios || [],
                     }
                 });
 
@@ -159,15 +170,14 @@ export const useAppStore = create<AppState>((set, get) => ({
                     await supabase.auth.signOut();
                     set({ session: null, progress: null });
                 } else {
-                    console.warn("Progress fetch returned no data:", errMsg);
-                    // FAIL-SAFE: If user exists but progress doesn't, initialize default progress 
-                    // to prevent blank page/deadlock.
+                    console.warn("Progress fetch returned no data");
                     set({
                         progress: {
                             currentLevel: CourseLevel.BASIC,
                             completedLessons: [],
                             role: session?.role || UserRole.STUDENT,
                             isPlacementDone: false,
+                            completedScenarios: [],
                         }
                     });
                 }
@@ -179,6 +189,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                         completedLessons: [],
                         role: session?.role || UserRole.STUDENT,
                         isPlacementDone: false,
+                        completedScenarios: [],
                     }
                 });
             }
@@ -194,6 +205,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                         completedLessons: [],
                         role: get().session?.role || UserRole.STUDENT,
                         isPlacementDone: false,
+                        completedScenarios: [],
                     }
                 });
             }
@@ -309,7 +321,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setPlacementResult: async (result) => {
-        const { session } = get();
+        const { session, progress } = get();
         if (!session?.id || session.isRestricted) return;
 
         const { suggestedLevel, score, reasoning, reasoningKn } = result;
@@ -320,7 +332,8 @@ export const useAppStore = create<AppState>((set, get) => ({
                 currentLevel: suggestedLevel,
                 completedLessons: [],
                 isPlacementDone: true,
-                role: session.role
+                role: session.role,
+                completedScenarios: progress?.completedScenarios || [],
             }
         });
 
@@ -410,6 +423,73 @@ export const useAppStore = create<AppState>((set, get) => ({
                     packageStatus: (profile.packageStatus !== 'INACTIVE') ? profile.packageStatus : (currentSession?.packageStatus || 'INACTIVE'),
                 }
             });
+        }
+    },
+    updateSNEHIPreferences: async (updates) => {
+        const { session } = get();
+        if (!session?.id) return;
+
+        const updatedSession = { ...session, ...updates };
+        set({ session: updatedSession });
+
+        try {
+            await supabase.from('profiles').update({
+                prefers_translation: updates.prefersTranslation ?? session.prefersTranslation,
+                prefers_pronunciation: updates.prefersPronunciation ?? session.prefersPronunciation
+            }).eq('id', session.id);
+        } catch (e) {
+            console.error("Failed to update SNEHI preferences:", e);
+        }
+    },
+    fetchScenarios: async () => {
+        try {
+            let local = await db.snehi_scenarios.orderBy('order_index').toArray();
+            if (local.length === 0 && navigator.onLine) {
+                const { data, error } = await supabase.from('snehi_scenarios').select('*').order('order_index');
+                if (!error && data) {
+                    const mapped = data.map(s => ({
+                        id: s.id,
+                        title: s.title,
+                        category: s.category,
+                        level: s.level,
+                        systemInstruction: s.system_instruction,
+                        initialMessage: s.initial_message,
+                        order_index: s.order_index
+                    }));
+                    await db.snehi_scenarios.bulkPut(mapped);
+                    local = mapped;
+                }
+            }
+            set({ scenarios: local });
+        } catch (e) {
+            console.error("Fetch Scenarios Error:", e);
+        }
+    },
+    setCurrentScenario: (id) => set({ currentScenarioId: id }),
+    markScenarioComplete: async (scenarioId) => {
+        const { session, progress } = get();
+        if (!session?.id || !progress) return;
+
+        const newCompleted = progress.completedScenarios.includes(scenarioId)
+            ? progress.completedScenarios
+            : [...progress.completedScenarios, scenarioId];
+
+        set({ progress: { ...progress, completedScenarios: newCompleted } });
+
+        try {
+            const payload = {
+                user_id: session.id,
+                completed_lessons: progress.completedLessons,
+                completed_scenarios: newCompleted,
+                current_level: progress.currentLevel,
+                is_placement_done: progress.isPlacementDone || false,
+                updated_at: new Date().toISOString()
+            };
+            await db.user_progress.put(payload);
+            // We should also update profiles in Supabase directly for scenarios to ensure it's saved
+            await supabase.from('profiles').update({ completed_scenarios: newCompleted }).eq('id', session.id);
+        } catch (e) {
+            console.error("Error marking scenario complete", e);
         }
     },
 }));

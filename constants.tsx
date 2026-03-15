@@ -34,6 +34,10 @@ export const TRANSLATIONS: TranslationStrings = {
   practice: { en: 'Interact', kn: 'ಸಂವಾದ' },
   scenarioTitle: { en: 'Scenario Roleplay', kn: 'ಸನ್ನಿವೇಶದ ಪಾತ್ರಾಭಿನಯ' },
   scenarioDesc: { en: "Use what you learned to complete the conversation objective. It's safe to make mistakes here!", kn: "ಸಂಭಾಷಣೆಯ ಉದ್ದೇಶವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ನೀವು ಕಲಿತದ್ದನ್ನು ಬಳಸಿ. ಇಲ್ಲಿ ತಪ್ಪುನ ಮಾಡಲು ಭಯಪಡಬೇಡಿ!" },
+  curriculum: { en: 'Curriculum', kn: 'ಪಠ್ಯಕ್ರಮ' },
+  revise: { en: 'Revise', kn: 'ಮತ್ತೆ ಓದಿ' },
+  translation: { en: 'Translation', kn: 'ಅನುವಾದ (Translation)' },
+  pronunciation: { en: 'Pronunciation', kn: 'ಉಚ್ಚಾರಣೆ (Pronunciation)' },
 };
 
 // Placeholder removed — real content is loaded from Supabase.

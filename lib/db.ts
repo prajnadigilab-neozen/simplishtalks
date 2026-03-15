@@ -21,6 +21,7 @@ export class SimplishDB extends Dexie {
     modules!: Table<any, string>;
     lessons!: Table<any, string>;
     user_progress!: Table<LocalUserProgress, string>;
+    snehi_scenarios!: Table<any, string>;
     sync_queue!: Table<SyncQueueItem, number>;
 
     constructor() {
@@ -29,6 +30,7 @@ export class SimplishDB extends Dexie {
             modules: 'id, level, order_index',
             lessons: 'id, module_id, order_index',
             user_progress: 'user_id',
+            snehi_scenarios: 'id, level, order_index',
             sync_queue: '++id, action, created_at'
         });
     }

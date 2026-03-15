@@ -345,15 +345,31 @@ export async function getUserSession(providedSession?: any) {
     const profileQuery = Promise.resolve(
       supabase
         .from('profiles')
-        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, system_prompt_focus, package_type, package_status, package_start_date, package_end_date, agent_credits, streak_count, last_streak_date, total_messages_sent, total_talk_time')
+        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, voice_gender, system_prompt_focus, package_type, package_status, package_start_date, package_end_date, agent_credits, streak_count, last_streak_date, total_messages_sent, total_talk_time, prefers_translation, prefers_pronunciation')
         .eq('id', session.user.id)
         .maybeSingle()
     );
 
-    const { data: profile, error } = await withTimeout(profileQuery, 5000).catch(e => {
+    let { data: profile, error } = await withTimeout(profileQuery, 5000).catch(e => {
       console.warn('Profile fetch timed out or failed:', e.message);
       return { data: null, error: e };
     });
+
+    // 400 Error Recovery: If the full query failed, try a minimal "safe" query
+    if (error && (error as any).status === 400) {
+      console.warn("⚠️ Full profile fetch failed (400). Retrying with minimal safe columns...");
+      const safeQuery = supabase
+        .from('profiles')
+        .select('full_name, place, role, is_restricted, avatar_url')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      
+      const { data: safeData, error: safeError } = await safeQuery;
+      if (!safeError && safeData) {
+         profile = safeData;
+         error = null;
+      }
+    }
 
     if (!error && profile) {
       cachedProfile = {
@@ -366,17 +382,19 @@ export async function getUserSession(providedSession?: any) {
         avatar_url: profile.avatar_url,
         preferredModel: profile.preferred_model || 'gemini-3-flash-preview',
         voiceProfile: profile.voice_profile || 'Aoede',
+        voiceGender: profile.voice_gender || 'WOMAN',
         systemPromptFocus: profile.system_prompt_focus || '',
         packageType: (profile.package_type === 'SANGAATHI' ? 'SNEHI' : (profile.package_type || 'NONE')),
         packageStatus: profile.package_status || 'INACTIVE',
         packageStartDate: profile.package_start_date || null,
         packageEndDate: profile.package_end_date || null,
-        voiceGender: profile.voice_gender || 'WOMAN',
         agentCredits: profile.agent_credits || 0,
         streakCount: profile.streak_count || 0,
         lastStreakDate: profile.last_streak_date || null,
         totalMessagesSent: profile.total_messages_sent || 0,
         totalTalkTime: profile.total_talk_time || 0,
+        prefersTranslation: profile.prefers_translation ?? true,
+        prefersPronunciation: profile.prefers_pronunciation ?? true,
         isLoggedIn: true
       };
     } else {
@@ -406,8 +424,8 @@ export async function getUserSession(providedSession?: any) {
         preferredModel: 'gemini-3-flash-preview',
         voiceProfile: 'Aoede',
         systemPromptFocus: '',
-        packageType: 'NONE',
-        packageStatus: 'INACTIVE',
+        packageType: session.user.user_metadata?.package_type,
+        packageStatus: session.user.user_metadata?.package_status,
         packageStartDate: null,
         packageEndDate: null,
         agentCredits: 0,

@@ -8,7 +8,7 @@ import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
 
 const Dashboard: React.FC = () => {
-  const { session, modules, progress, evaluationHistory, loading, initialized } = useAppStore();
+  const { session, modules, scenarios, progress, evaluationHistory, loading, initialized } = useAppStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [voiceHistory, setVoiceHistory] = useState<any[]>([]);
@@ -97,7 +97,7 @@ const Dashboard: React.FC = () => {
       { label: t({ en: 'Progress', kn: 'ಪ್ರಗತಿ' }), value: `${progressPercentage}%`, icon: '📈', color: 'text-green-500' },
     ] : [
       { label: t({ en: 'Active Streak', kn: 'ಸಕ್ರಿಯ ಸರಣಿ' }), value: `${session?.streakCount || 0}`, icon: '🔥', color: 'text-orange-500' },
-      { label: t({ en: 'Talk Time', kn: 'ಮಾತನಾಡುವ ಸಮಯ' }), value: `${Math.floor((session?.totalTalkTime || 0) / 60)}${t({ en: 'm', kn: 'ನಿ' })}`, icon: '🎙️', color: 'text-purple-500' },
+      { label: t({ en: 'Scenarios', kn: 'ಸನ್ನಿವೇಶಗಳು' }), value: `${progress?.completedScenarios.length || 0}/${scenarios.length}`, icon: '🎯', color: 'text-purple-500' },
       { label: t({ en: 'Credits Left', kn: 'ಬಾಕಿ ಕ್ರೆಡಿಟ್ಸ್' }), value: `${session?.agentCredits || 0}`, icon: '🪙', color: 'text-amber-500' },
     ];
 
@@ -116,11 +116,13 @@ const Dashboard: React.FC = () => {
     );
   };
 
-  const totalLessons = modules.reduce((acc, mod) => acc + mod.lessons.length, 0);
-  const completedLessons = modules.reduce((acc, mod) =>
-    acc + mod.lessons.filter(l => l.isCompleted).length, 0
-  );
+  const totalLessons = modules.reduce((acc, mod) => acc + (mod.lessons?.length || 0), 0);
+  const completedLessons = progress?.completedLessons.length || 0;
   const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+  const totalScenarios = scenarios.length;
+  const completedScenarios = progress?.completedScenarios.length || 0;
+  const snehiProgressPercentage = totalScenarios > 0 ? Math.round((completedScenarios / totalScenarios) * 100) : 0;
 
   const getSmartRedirectPath = () => {
     if (session?.packageType === PackageType.SNEHI) return '/talk';
@@ -157,7 +159,7 @@ const Dashboard: React.FC = () => {
 
   // 1. Don't redirect while still loading session data
   useEffect(() => {
-    if (initialized && !loading && (!session?.packageType || session.packageType === PackageType.NONE)) {
+    if (initialized && !loading && session?.packageType === PackageType.NONE) {
       navigate('/packages', { replace: true });
     }
   }, [session?.packageType, loading, initialized, navigate]);
@@ -257,7 +259,7 @@ const Dashboard: React.FC = () => {
                   }}
                   className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95"
                 >
-                  {completedLessons === 0 ? t({ en: 'Go to Talks', kn: 'ಪಾಠಗಳಿಗೆ ಹೋಗಿ' }) : t({ en: 'Continue Talks', kn: 'ಕಲಿಕೆ ಮುಂದುವರಿಸಿ' })}
+                  {completedLessons === 0 ? t({ en: 'Go to SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್‌ಗೆ ಹೋಗಿ' }) : t({ en: 'Continue SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಮುಂದುವರಿಸಿ' })}
                 </button>
               )}
             </PackageCardCompact>
@@ -336,19 +338,32 @@ const Dashboard: React.FC = () => {
             {isTalksActive ? (
               <>
                 <div className="text-4xl font-black mb-2">{progressPercentage}%</div>
+                <div className="text-[10px] font-bold opacity-80 mb-4">{t({ en: 'LESSONS COMPLETED', kn: 'ಪಾಠಗಳು ಪೂರ್ಣಗೊಂಡಿವೆ' })}</div>
                 <div className={`h-1.5 ${!isTalksActive ? 'bg-orange-800' : 'bg-blue-800'} rounded-full overflow-hidden`}>
                   <div className="h-full bg-white" style={{ width: `${progressPercentage}%` }}></div>
                 </div>
               </>
             ) : (
               <>
-                <div className="text-4xl font-black mb-2 flex items-center gap-3">
-                  🎙️
+                <div className="text-4xl font-black mb-2">{snehiProgressPercentage}%</div>
+                <div className="text-[10px] font-bold opacity-80 mb-4">{t({ en: 'SCENARIOS COMPLETED', kn: 'ಸನ್ನಿವೇಶಗಳು ಪೂರ್ಣಗೊಂಡಿವೆ' })}</div>
+                <div className="h-1.5 bg-orange-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-white" style={{ width: `${snehiProgressPercentage}%` }}></div>
                 </div>
-                <p className="text-sm font-bold text-orange-100">{t({ en: 'Ready to start speaking?', kn: 'ಮಾತನಾಡಲು ಸಿದ್ಧರಿದ್ದೀರಾ?' })}</p>
               </>
             )}
           </div>
+          {isBoth && (
+             <div className="mt-6 pt-6 border-t border-white/20">
+                <div className="flex justify-between items-center mb-2">
+                   <span className="text-[10px] font-black uppercase opacity-70">{isTalksActive ? 'SNEHI Progress' : 'Talks Progress'}</span>
+                   <span className="text-xs font-black">{isTalksActive ? snehiProgressPercentage : progressPercentage}%</span>
+                </div>
+                <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+                   <div className="h-full bg-white" style={{ width: `${isTalksActive ? snehiProgressPercentage : progressPercentage}%` }}></div>
+                </div>
+             </div>
+          )}
         </div>
       </div>
 

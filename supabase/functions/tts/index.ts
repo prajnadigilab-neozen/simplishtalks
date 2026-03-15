@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const { text, voice = 'Kore', lowBitrate = false } = await req.json();
+        const { text, voice = 'Snehi', lowBitrate = false } = await req.json();
 
         if (!text) {
             return new Response(JSON.stringify({ audio: null }), {

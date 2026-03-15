@@ -4,42 +4,45 @@ import {
     Phone,
     MessageSquare,
     ShieldAlert,
-    Calendar,
     RefreshCw,
     LayoutDashboard,
     Settings,
-    ChevronRight,
     Menu,
-    X
+    Zap,
+    Timer
 } from 'lucide-react';
 import UsageCard from '../components/UsageCard';
 import ProgressBar from '../components/ProgressBar';
 import TrendChart from '../components/TrendChart';
 import RegenerationModal from '../components/RegenerationModal';
-import { APIStats, normalizeUsage, getProgressColor } from '../utils/apiStatsUtils';
+import { APIStats, normalizeUsage, getProgressColor, calculateSpend } from '../utils/apiStatsUtils';
+import { getUsageStatus } from '../utils/QuotaMiddleware';
 import { supabase } from '../lib/supabase';
 
-const fetchAPIStats = async (): Promise<APIStats> => {
+const fetchAPIStats = async (filters: { model: string; days: number }): Promise<APIStats & { total_spend: number }> => {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData?.session?.user?.id;
 
-    // 1. Fetch historical usage for the last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - filters.days);
 
-    const { data: usageData, error } = await supabase
+    let query = supabase
         .from('api_usage')
         .select('*')
-        .gte('created_at', sevenDaysAgo.toISOString())
+        .gte('created_at', startDate.toISOString())
         .order('created_at', { ascending: true });
+
+    if (filters.model !== 'all') {
+        query = query.ilike('model_name', `%${filters.model}%`);
+    }
+
+    const { data: usageData, error } = await query;
 
     if (error) console.error("Error fetching usage data:", error);
 
-    // 2. Aggregate trend data by day
     const trendMap: Record<string, { voice: number; chat: number }> = {};
 
-    // Initialize last 7 days with 0
-    for (let i = 6; i >= 0; i--) {
+    for (let i = filters.days - 1; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split('T')[0];
@@ -48,6 +51,7 @@ const fetchAPIStats = async (): Promise<APIStats> => {
 
     let totalVoiceSeconds = 0;
     let totalChatTokens = 0;
+    let totalSpend = 0;
 
     usageData?.forEach(row => {
         const dateStr = new Date(row.created_at).toISOString().split('T')[0];
@@ -60,6 +64,7 @@ const fetchAPIStats = async (): Promise<APIStats> => {
                 totalVoiceSeconds += row.total_units || 0;
             }
         }
+        totalSpend += calculateSpend(row.model_name || 'default', row.input_units || 0, row.output_units || 0);
     });
 
     const trend_data = Object.entries(trendMap).map(([date, vals]) => ({
@@ -71,7 +76,8 @@ const fetchAPIStats = async (): Promise<APIStats> => {
     return {
         voice_usage: totalVoiceSeconds,
         chat_usage: totalChatTokens,
-        total_limit: 1000000, // This could be fetched from a 'subscriptions' table in the future
+        total_spend: totalSpend,
+        total_limit: 1000000,
         expiry_date: "2026-04-06",
         is_auto_renew: true,
         api_key: "sk_live_••••" + (userId ? userId.substring(0, 8) : "demo"),
@@ -81,22 +87,26 @@ const fetchAPIStats = async (): Promise<APIStats> => {
 
 const APIAnalytics: React.FC = () => {
     const { t } = useLanguage();
-    const [stats, setStats] = useState<APIStats | null>(null);
+    const [stats, setStats] = useState<APIStats & { total_spend: number } | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+    const [selectedModel, setSelectedModel] = useState<string>('all');
+    const [days, setDays] = useState<number>(7);
 
     const fetchData = useCallback(async () => {
-        const data = await fetchAPIStats();
+        const data = await fetchAPIStats({ model: selectedModel, days });
         setStats(data);
         setLastUpdated(new Date());
-    }, []);
+    }, [selectedModel, days]);
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 5000);
+        const interval = setInterval(fetchData, 10000); // 10s is plenty for analytics
         return () => clearInterval(interval);
     }, [fetchData]);
+
+    const quotaStatus = getUsageStatus(selectedModel === 'all' ? 'gemini-flash-latest' : selectedModel);
 
     if (!stats) return (
         <div className="flex h-screen items-center justify-center bg-slate-950">
@@ -105,15 +115,6 @@ const APIAnalytics: React.FC = () => {
     );
 
     const totalUsage = normalizeUsage(stats.voice_usage, stats.chat_usage);
-    const usagePercent = (totalUsage / stats.total_limit) * 100;
-    const isExpired = new Date(stats.expiry_date) < new Date();
-
-    const getTimeRemaining = () => {
-        const total = Date.parse(stats.expiry_date) - Date.now();
-        const days = Math.floor(total / (1000 * 60 * 60 * 24));
-        return days > 0 ? `${days} days remaining` : "Expires today";
-    };
-
     const handleRegenerate = (type: 'temporal' | 'manual') => {
         console.log(`Key regenerated: ${type}`);
         setIsModalOpen(false);
@@ -166,86 +167,141 @@ const APIAnalytics: React.FC = () => {
 
             {/* Main Content */}
             <main className="flex-1 overflow-auto bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
-                <header className="flex items-center justify-between border-b border-slate-800/50 bg-slate-950/50 px-8 py-6 backdrop-blur-md sticky top-0 z-30">
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => setIsSidebarOpen(true)}
-                            className="rounded-xl bg-slate-900 p-2 text-slate-400 lg:hidden"
-                        >
-                            <Menu className="h-6 w-6" />
-                        </button>
-                        <h1 className="text-2xl font-bold text-white">{t({ en: 'Usage Analytics', kn: 'ಬಳಕೆ ವಿಶ್ಲೇಷಣೆ' })}</h1>
+                <header className="flex flex-col border-b border-slate-800/50 bg-slate-950/50 px-8 py-4 backdrop-blur-md sticky top-0 z-30 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <button
+                                onClick={() => setIsSidebarOpen(true)}
+                                className="rounded-xl bg-slate-900 p-2 text-slate-400 lg:hidden"
+                            >
+                                <Menu className="h-6 w-6" />
+                            </button>
+                            <h1 className="text-2xl font-bold text-white">{t({ en: 'Usage Analytics', kn: 'ಬಳಕೆ ವಿಶ್ಲೇಷಣೆ' })}</h1>
+                        </div>
+
+                        <div className="flex items-center space-x-6 text-sm">
+                            <div className="hidden flex-col items-end sm:flex">
+                                <span className="text-xs text-slate-500 font-medium tracking-wide uppercase">{t({ en: 'Last Sync', kn: 'ಕೊನೆಯ ಸಿಂಕ್' })}</span>
+                                <span className="font-semibold text-slate-300">{lastUpdated.toLocaleTimeString()}</span>
+                            </div>
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="flex items-center space-x-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-95 transition-all"
+                            >
+                                <RefreshCw className="h-4 w-4" />
+                                <span>{t({ en: 'Rotate Key', kn: 'ಕೀ ಬದಲಿಸಿ' })}</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex items-center space-x-6 text-sm">
-                        <div className="hidden flex-col items-end sm:flex">
-                            <span className="text-xs text-slate-500 font-medium tracking-wide uppercase">{t({ en: 'Last Sync', kn: 'ಕೊನೆಯ ಸಿಂಕ್' })}</span>
-                            <span className="font-semibold text-slate-300">{lastUpdated.toLocaleTimeString()}</span>
+                    {/* Filters Row */}
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex items-center bg-slate-900 rounded-xl p-1 border border-slate-800">
+                            {[7, 30, 90].map(d => (
+                                <button
+                                    key={d}
+                                    onClick={() => setDays(d)}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${days === d ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                                >
+                                    {d}D
+                                </button>
+                            ))}
                         </div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="flex items-center space-x-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 active:scale-95 transition-all"
+
+                        <select
+                            value={selectedModel}
+                            onChange={(e) => setSelectedModel(e.target.value)}
+                            className="bg-slate-900 text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 transition-colors"
                         >
-                            <RefreshCw className="h-4 w-4" />
-                            <span>{t({ en: 'Rotate Key', kn: 'ಕೀ ಬದಲಿಸಿ' })}</span>
-                        </button>
+                            <option value="all">ALL MODELS</option>
+                            <option value="gemini-flash-latest">GEMINI FLASH LATEST</option>
+                            <option value="gemini-3-flash-preview">GEMINI 3.0 FLASH PREVIEW</option>
+                            <option value="gemini-1.5-flash">GEMINI 1.5 FLASH</option>
+                            <option value="gemini-1.5-pro">GEMINI 1.5 PRO</option>
+                            <option value="gemini-2.0-flash-exp">GEMINI 2.0 FLASH</option>
+                        </select>
                     </div>
                 </header>
 
                 <div className="p-8">
                     {/* Top Grid: Hero Stats */}
                     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                        {/* Main Limit Card */}
+                        {/* Main Spend Card */}
                         <div className="col-span-1 rounded-3xl bg-slate-900 p-8 shadow-2xl border border-slate-800 lg:col-span-2 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-8">
-                                <ShieldAlert className={`h-12 w-12 opacity-10 group-hover:opacity-20 transition-opacity ${usagePercent > 90 ? 'text-rose-500' : 'text-blue-500'}`} />
+                                <Zap className="h-12 w-12 opacity-10 group-hover:opacity-20 transition-opacity text-blue-500" />
                             </div>
 
                             <div className="relative z-10">
-                                <h2 className="text-lg font-semibold text-slate-400">{t({ en: 'Total Account Usage', kn: 'ಒಟ್ಟು ಖಾತೆ ಬಳಕೆ' })}</h2>
+                                <h2 className="text-lg font-semibold text-slate-400">{t({ en: 'Estimated API Spend', kn: 'ಅಂದಾಜು API ವೆಚ್ಚ' })}</h2>
                                 <div className="mt-4 flex items-baseline space-x-3">
-                                    <span className="text-5xl font-black text-white">{totalUsage.toLocaleString()}</span>
-                                    <span className="text-xl font-medium text-slate-500">/ {stats.total_limit.toLocaleString()} {t({ en: 'units', kn: 'ಯುನಿಟ್' })}</span>
+                                    <span className="text-5xl font-black text-white">${stats.total_spend.toFixed(2)}</span>
+                                    <span className="text-xl font-medium text-slate-500">USD</span>
                                 </div>
 
-                                <div className="mt-8">
-                                    <ProgressBar current={totalUsage} total={stats.total_limit} label="Consumption Progress" />
+                                <div className="mt-8 flex gap-8">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t({ en: 'Monthly Credit', kn: 'ಮಾಸಿಕ ಕ್ರೆಡಿಟ್' })}</p>
+                                        <p className="text-lg font-bold text-white">$10.00</p>
+                                    </div>
+                                    <div className="space-y-1 text-center">
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t({ en: 'Remaining', kn: 'ಬಾಕಿ' })}</p>
+                                        <p className="text-lg font-bold text-emerald-400">${Math.max(0, 10 - stats.total_spend).toFixed(2)}</p>
+                                    </div>
+                                    <div className="space-y-1 text-right">
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t({ en: 'Consumption', kn: 'ಬಳಕೆ' })}</p>
+                                        <p className="text-lg font-bold text-blue-400">{((stats.total_spend / 10) * 100).toFixed(1)}%</p>
+                                    </div>
                                 </div>
-
-                                <div className="mt-6 flex items-center space-x-3 text-sm text-slate-400">
-                                    <div className={`h-2 w-12 rounded-full ${usagePercent > 90 ? 'bg-rose-500' : 'bg-blue-500'} bg-opacity-20`} />
-                                    <p>{t({ en: 'You have used', kn: 'ನೀವು ಬಳಸಿದ್ದೀರಿ' })} <span className="font-bold text-white">{usagePercent.toFixed(1)}%</span> {t({ en: 'of your monthly credits.', kn: 'ನಿಮ್ಮ ಮಾಸಿಕ ಕ್ರೆಡಿಟ್‌ಗಳಲ್ಲಿ.' })}</p>
+                                <div className="mt-4 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full bg-blue-500 transition-all duration-1000" 
+                                        style={{ width: `${Math.min(100, (stats.total_spend / 10) * 100)}%` }}
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Expiry Card */}
+                        {/* Rate Limit Info Card */}
                         <div className="rounded-3xl bg-slate-900 p-8 shadow-2xl border border-slate-800 flex flex-col justify-between">
                             <div>
-                                <h2 className="text-lg font-semibold text-slate-400">Plan Expiry</h2>
-                                <div className="mt-6 flex items-center space-x-4">
-                                    <div className="rounded-2xl bg-amber-500/10 p-4">
-                                        <Calendar className="h-8 w-8 text-amber-500" />
+                                <h2 className="text-lg font-semibold text-slate-400">Live Rate Limits</h2>
+                                <div className="mt-6 space-y-6">
+                                    <div>
+                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                                            <span>Tokens / Min</span>
+                                            <span className="text-white">{quotaStatus.tpm.toLocaleString()} / {quotaStatus.tpmLimit.toLocaleString()}</span>
+                                        </div>
+                                        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                            <div 
+                                                className={`h-full transition-all duration-500 ${quotaStatus.tpm / quotaStatus.tpmLimit > 0.8 ? 'bg-amber-500' : 'bg-purple-500'}`}
+                                                style={{ width: `${(quotaStatus.tpm / quotaStatus.tpmLimit) * 100}%` }}
+                                            />
+                                        </div>
                                     </div>
                                     <div>
-                                        <p className={`text-2xl font-bold ${isExpired ? 'text-rose-500' : 'text-white'}`}>
-                                            {isExpired ? t({ en: 'Expired', kn: 'ಅವಧಿ ಮೀರಿದೆ' }) : stats.expiry_date}
-                                        </p>
-                                        <p className="text-sm text-slate-500">{t({ 
-                                            en: stats.expiry_date === 'Expires today' ? 'Expires today' : `${getTimeRemaining()} days remaining`, 
-                                            kn: stats.expiry_date === 'Expires today' ? 'ಇಂದು ಕಾಲಮಿತಿ ಮುಗಿಯುತ್ತದೆ' : `${getTimeRemaining()} ದಿನಗಳು ಬಾಕಿ ಇವೆ` 
-                                        })}</p>
+                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                                            <span>Requests / Min</span>
+                                            <span className="text-white">{quotaStatus.rpm} / {quotaStatus.rpmLimit}</span>
+                                        </div>
+                                        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                            <div 
+                                                className={`h-full transition-all duration-500 ${quotaStatus.rpm / quotaStatus.rpmLimit > 0.8 ? 'bg-amber-500' : 'bg-amber-400'}`}
+                                                style={{ width: `${(quotaStatus.rpm / quotaStatus.rpmLimit) * 100}%` }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-8 space-y-4">
-                                <div className="flex items-center justify-between rounded-xl bg-slate-800/50 p-4">
-                                    <span className="text-sm text-slate-400 font-medium">{t({ en: 'Auto-Renew', kn: 'ಸ್ವಯಂ ನವೀಕರಣ' })}</span>
-                                    <span className={`rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider ${stats.is_auto_renew ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
-                                        {stats.is_auto_renew ? t({ en: 'Enabled', kn: 'ಸಕ್ರಿಯ' }) : t({ en: 'Disabled', kn: 'ನಿಷ್ಕ್ರಿಯ' })}
-                                    </span>
+                            <div className="mt-8 flex items-center justify-between rounded-xl bg-blue-500/10 p-4 border border-blue-500/20">
+                                <div className="flex items-center text-blue-400">
+                                    <Timer className="h-4 w-4 mr-2" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Next Reset</span>
                                 </div>
+                                <span className="text-xs font-bold text-white tabular-nums">
+                                    {new Date(quotaStatus.resetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
                             </div>
                         </div>
                     </div>

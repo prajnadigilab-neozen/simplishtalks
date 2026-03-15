@@ -26,6 +26,7 @@ const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
 const PackageSelection = React.lazy(() => import('./pages/PackageSelection'));
 const APIAnalytics = React.lazy(() => import('./pages/APIAnalytics'));
 const QuotaDashboard = React.lazy(() => import('./pages/QuotaDashboard'));
+const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
 
 import { telemetry } from './services/telemetryService';
 
@@ -80,6 +81,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
               ) : (
                 <>
                   <NavButton to="/dashboard" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/dashboard'} light={isLanding} />
+                  <NavButton to="/curriculum" label={t({ en: 'Curriculum', kn: 'ಪಠ್ಯಕ್ರಮ' })} active={location.pathname === '/curriculum'} light={isLanding} />
                   <NavButton to="/packages" label={t({ en: 'Product', kn: 'ಉತ್ಪನ್ನ' })} active={location.pathname === '/packages'} light={isLanding} />
                 </>
               )}
@@ -229,7 +231,7 @@ const AppContent: React.FC = () => {
             place: user.user_metadata?.place || currentSession?.place || '',
             // CRITICAL: Preserve the actual packageType fetched from the database
             // INSTEAD of overwriting it to 'NONE', which kicks users out of the Dashboard
-            packageType: currentSession?.packageType || 'NONE',
+            packageType: currentSession?.packageType,
             isLoggedIn: true,
             isRestricted: currentSession?.isRestricted || false,
           });
@@ -325,6 +327,7 @@ const AppContent: React.FC = () => {
                     progress.isPlacementDone ? <ErrorBoundary><Dashboard /></ErrorBoundary> :
                       <Navigate to="/placement" />
               } />
+              <Route path="/curriculum" element={session ? <ErrorBoundary><CurriculumPage /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/lesson/:id" element={session ? <ErrorBoundary><LessonView /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/coachchat" element={session ? <ErrorBoundary><CoachChat /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
@@ -357,6 +360,7 @@ const AppContent: React.FC = () => {
           ) : (
             <>
               <MobileNavItem icon="📚" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} to="/dashboard" />
+              <MobileNavItem icon="📖" label={t({ en: 'Curriculum', kn: 'ಪಠ್ಯಕ್ರಮ' })} to="/curriculum" />
               {(session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH) && (
                 <MobileNavItem icon="💬" label={t({ en: 'Chat', kn: 'ಚಾಟ್' })} to="/coachchat" />
               )}

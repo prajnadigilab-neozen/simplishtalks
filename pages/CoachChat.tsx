@@ -12,7 +12,7 @@ import { supabase } from '../lib/supabase';
 const CoachChat: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session, dataSaverMode, syncUsage } = useAppStore();
+  const { session, dataSaverMode, syncUsage, updateSNEHIPreferences } = useAppStore();
   const userId = session?.id ?? null;
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [input, setInput] = useState('');
@@ -94,7 +94,12 @@ const CoachChat: React.FC = () => {
     try {
       // 1. Invoke function
       const { data, error } = await supabase.functions.invoke('coach-chat', {
-        body: { message: input, history: historyForAI },
+        body: { 
+          message: input, 
+          history: historyForAI,
+          prefersTranslation: session?.prefersTranslation ?? true,
+          prefersPronunciation: session?.prefersPronunciation ?? true
+        },
       });
 
       if (error) throw error;
@@ -296,7 +301,51 @@ const CoachChat: React.FC = () => {
               <p className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter">{t({ en: 'Bilingual Training', kn: 'ದ್ವಿಭಾಷಾ ತರಬೇತಿ' })}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            {/* Translation Toggle */}
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
+              <button
+                onClick={() => updateSNEHIPreferences({ prefersTranslation: true })}
+                className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${session?.prefersTranslation ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+              >
+                {t({ en: 'ON', kn: 'ಆನ್' })}
+              </button>
+              <button
+                onClick={() => updateSNEHIPreferences({ prefersTranslation: false })}
+                className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${!session?.prefersTranslation ? 'bg-slate-300 dark:bg-slate-600 text-slate-700 dark:text-slate-100' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+              >
+                {t({ en: 'OFF', kn: 'ಆಫ್' })}
+              </button>
+              <div className="ml-2 pr-2 border-l border-slate-200 dark:border-slate-700 pl-2 flex items-center gap-1.5 self-stretch">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3.5 h-3.5 ${session?.prefersTranslation ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                </svg>
+                <span className={`text-[8px] font-black uppercase tracking-tighter hidden xl:inline ${session?.prefersTranslation ? 'text-blue-700 dark:text-blue-300' : 'text-slate-500'}`}>{t({ en: 'Translation', kn: 'ಅನುವಾದ' })}</span>
+              </div>
+            </div>
+
+            {/* Pronunciation Toggle */}
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
+              <button
+                onClick={() => updateSNEHIPreferences({ prefersPronunciation: true })}
+                className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${session?.prefersPronunciation ? 'bg-green-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+              >
+                {t({ en: 'ON', kn: 'ಆನ್' })}
+              </button>
+              <button
+                onClick={() => updateSNEHIPreferences({ prefersPronunciation: false })}
+                className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${!session?.prefersPronunciation ? 'bg-slate-300 dark:bg-slate-600 text-slate-700 dark:text-slate-100' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+              >
+                {t({ en: 'OFF', kn: 'ಆಫ್' })}
+              </button>
+              <div className="ml-2 pr-2 border-l border-slate-200 dark:border-slate-700 pl-2 flex items-center gap-1.5 self-stretch">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`w-3.5 h-3.5 ${session?.prefersPronunciation ? 'text-green-600 dark:text-green-400' : 'text-slate-400'}`}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3Z" />
+                </svg>
+                <span className={`text-[8px] font-black uppercase tracking-tighter hidden xl:inline ${session?.prefersPronunciation ? 'text-green-700 dark:text-green-300' : 'text-slate-500'}`}>{t({ en: 'Pronunciation', kn: 'ಉಚ್ಚಾರಣೆ' })}</span>
+              </div>
+            </div>
+
             <button
               onClick={handleDownloadHistory}
               className="p-2 text-slate-300 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-full transition-all"

@@ -6,8 +6,11 @@ import BillingWallet from '../components/BillingWallet';
 import { getUsageStatus } from '../utils/QuotaMiddleware';
 
 const MODELS = [
-    { id: 'gemini-3-flash-preview', label: 'FLASH (3.0 Preview)' },
     { id: 'gemini-flash-latest', label: 'FLASH LATEST' },
+    { id: 'gemini-3-flash-preview', label: 'FLASH (3.0 Preview)' },
+    { id: 'gemini-1.5-flash', label: 'FLASH 1.5' },
+    { id: 'gemini-1.5-pro', label: 'PRO 1.5' },
+    { id: 'gemini-2.0-flash-exp', label: 'FLASH 2.0 (EXP)' },
 ];
 
 const QuotaDashboard: React.FC = () => {

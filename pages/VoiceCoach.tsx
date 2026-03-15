@@ -25,7 +25,7 @@ const Spin = ({ c = 'border-white' }: { c?: string }) => <div className={`w-5 h-
 const VoiceCoach: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { session, dataSaverMode, syncUsage } = useAppStore();
+  const { session, scenarios, currentScenarioId, dataSaverMode, syncUsage, updateSNEHIPreferences, markScenarioComplete } = useAppStore();
   const userId = session?.id ?? null;
 
   const [messages, setMessages] = useState<CoachMessage[]>([]);
@@ -76,7 +76,17 @@ const VoiceCoach: React.FC = () => {
     }
     if (!userId) return;
     if (uTxt) { const m: CoachMessage = { role: 'user', text: uTxt, timestamp: Date.now() }; const id = await saveChatMessage(userId, m, undefined, 'voice'); if (id) m.dbId = id; setMessages(p => [...p, m]); }
-    if (cTxt) { const m: CoachMessage = { role: 'coach', text: cTxt, correction: fb.correction, kannadaGuide: fb.kannadaGuide, pronunciationTip: fb.pronunciationTip, timestamp: Date.now() }; const id = await saveChatMessage(userId, m, undefined, 'voice'); if (id) m.dbId = id; setMessages(p => [...p, m]); }
+    if (cTxt) { 
+      const m: CoachMessage = { role: 'coach', text: cTxt, correction: fb.correction, kannadaGuide: fb.kannadaGuide, pronunciationTip: fb.pronunciationTip, timestamp: Date.now() }; 
+      const id = await saveChatMessage(userId, m, undefined, 'voice'); 
+      if (id) m.dbId = id; 
+      setMessages(p => [...p, m]); 
+
+      // If in a scenario, mark it complete after a few turns
+      if (currentScenarioId && messages.length >= 6) {
+        markScenarioComplete(currentScenarioId);
+      }
+    }
   }, [userId]);
 
   const onInterrupted = useCallback(() => {
@@ -187,9 +197,24 @@ const VoiceCoach: React.FC = () => {
     }
 
     const ctx = messages.slice(-5).map(m => `${m.role === 'user' ? 'Student' : 'Coach'}: ${m.text}`).join('\n');
-    const finalInst = `${inst}
-IMPORTANT TRANSCRIPTION RULE: When you transcribe or summarize the student's speech, you MUST transcribe Kannada words exclusively in the Kannada script. NEVER use Devanagari (Hindi) or Bengali scripts in your transcriptions or output. Always produce authentic Kannada script for Kannada words.
-${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
+    
+    // Scenario Override
+    const activeScenario = scenarios.find(s => s.id === currentScenarioId);
+    if (activeScenario) {
+      inst = activeScenario.systemInstruction;
+    }
+
+    let finalInst = `${inst}
+IMPORTANT TRANSCRIPTION RULE: When you transcribe or summarize the student's speech, you MUST transcribe Kannada words exclusively in the Kannada script. NEVER use Devanagari (Hindi) or Bengali scripts in your transcriptions or output. Always produce authentic Kannada script for Kannada words.`;
+
+    if (session?.prefersTranslation === false) {
+      finalInst += "\nSTRICT RULE: The user has DISABLED translations. Do NOT provide Kannada translations or guides. Communicate exclusively in English.";
+    }
+    if (session?.prefersPronunciation === false) {
+      finalInst += "\nSTRICT RULE: The user has DISABLED pronunciation tips. Do NOT provide pronunciation feedback or tips.";
+    }
+
+    finalInst += `${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
     
     await gemini.connect(finalInst, session?.voiceGender === 'MAN' ? 'Puck' : 'Aoede');
     await audio.startMic(pcm => {
@@ -197,6 +222,16 @@ ${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
       resetIdleTimerRef.current();
     });
     resetIdleTimerRef.current();
+
+    // If starting a fresh scenario session, send the initial message
+    if (activeScenario && messages.length === 0) {
+      setTimeout(() => {
+        const m: CoachMessage = { role: 'coach', text: activeScenario.initialMessage, timestamp: Date.now() };
+        setMessages([m]);
+        saveChatMessage(userId!, m, undefined, 'voice');
+        // We could also trigger TTS here if wanted
+      }, 1000);
+    }
   };
 
   const setGender = async (g: 'MAN' | 'WOMAN') => { if (!userId) return; useAppStore.setState({ session: { ...session, voiceGender: g } }); await supabase.from('profiles').update({ voice_gender: g }).eq('id', userId); };
@@ -229,7 +264,7 @@ ${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
      │  ┌────────┐  │   Coach bubble (left-aligned, wide)           │
      │  │ AVATAR │  │                     User bubble (right)       │
      │  └────────┘  │   Coach bubble                                │
-     │ Speak w/Kore │                     User bubble               │
+     │ Speak w/Snehi │                     User bubble               │
      │  desc text   │   Coach bubble with corrections               │
      │ [START LEARN] │                                              │
      │ 57 MIN AVAIL │  ← only this right panel scrolls (scrollbar) │
@@ -251,10 +286,14 @@ ${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
 
           {/* Center: title + status + credits */}
           <div className="flex items-center gap-3">
-            <span className="text-xs font-black uppercase tracking-[0.25em]">Live Talk</span>
-            <div className="flex items-center gap-1.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${stColor}`} />
-              <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{stText}</span>
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-black uppercase tracking-[0.25em]">
+                {scenarios.find(s => s.id === currentScenarioId)?.title.en || 'Live Talk'}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${stColor}`} />
+                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{stText}</span>
+              </div>
             </div>
             {session?.agentCredits !== undefined && (
               <span className="text-[9px] font-black text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-md">
@@ -269,6 +308,43 @@ ${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
               <button disabled={live} onClick={() => setGender('MAN')} className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${man ? 'bg-blue-600 text-white shadow' : 'text-white/40 hover:text-white/70'}`}>Man</button>
               <button disabled={live} onClick={() => setGender('WOMAN')} className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${!man ? 'bg-orange-500 text-white shadow' : 'text-white/40 hover:text-white/70'}`}>Woman</button>
             </div>
+
+            {/* Translation Segmented Toggle */}
+            <div className={`flex bg-white/10 rounded-lg p-0.5 border border-white/10 transition-all ${live ? 'opacity-30 pointer-events-none' : ''}`}>
+              <button
+                disabled={live}
+                onClick={() => updateSNEHIPreferences({ prefersTranslation: true })}
+                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${session?.prefersTranslation ? 'bg-indigo-600 text-white shadow' : 'text-white/40 hover:text-white/70'}`}
+              >
+                TR
+              </button>
+              <button
+                disabled={live}
+                onClick={() => updateSNEHIPreferences({ prefersTranslation: false })}
+                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${!session?.prefersTranslation ? 'bg-white/20 text-white/90 shadow' : 'text-white/40 hover:text-white/70'}`}
+              >
+                OFF
+              </button>
+            </div>
+
+            {/* Pronunciation Segmented Toggle */}
+            <div className={`flex bg-white/10 rounded-lg p-0.5 border border-white/10 transition-all ${live ? 'opacity-30 pointer-events-none' : ''}`}>
+              <button
+                disabled={live}
+                onClick={() => updateSNEHIPreferences({ prefersPronunciation: true })}
+                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${session?.prefersPronunciation ? 'bg-emerald-600 text-white shadow' : 'text-white/40 hover:text-white/70'}`}
+              >
+                PR
+              </button>
+              <button
+                disabled={live}
+                onClick={() => updateSNEHIPreferences({ prefersPronunciation: false })}
+                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${!session?.prefersPronunciation ? 'bg-white/20 text-white/90 shadow' : 'text-white/40 hover:text-white/70'}`}
+              >
+                OFF
+              </button>
+            </div>
+
             <button onClick={download} title="Download" className="p-1 text-white/40 hover:text-white/70 transition-colors hidden sm:block"><IcoDown /></button>
             <button onClick={() => { if (clearConfirm) { setMessages([]); setClearConfirm(false); } else setClearConfirm(true); }} title="Clear" className={`p-1 transition-colors ${clearConfirm ? 'text-red-400 animate-pulse' : 'text-white/40 hover:text-white/70'}`}><IcoBin /></button>
           </div>
@@ -311,12 +387,12 @@ ${ctx ? `\n\nContext of last 5 messages:\n${ctx}` : ''}`;
             </div>
 
             <div className="hidden md:flex flex-col items-center text-center gap-1">
-              <h2 className="text-base font-black text-white">{t({ en: 'Speak with Kore', kn: 'ಕೋರ್ ಜೊತೆ ಮಾತನಾಡಿ' })}</h2>
+              <h2 className="text-base font-black text-white">{t({ en: 'Speak with Snehi', kn: 'ಸ್ನೇಹಿಯೊಂದಿಗೆ ಮಾತನಾಡಿ' })}</h2>
               <p className="text-[10px] text-white/50 leading-relaxed px-2">{t({ en: 'Practice naturally and improve your fluency instantly.', kn: 'ನೈಸರ್ಗಿಕವಾಗಿ ಅಭ್ಯಾಸ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ನಿರರ್ಗಳತೆಯನ್ನು ತಕ್ಷಣವೇ ಸುಧಾರಿಸಿ.' })}</p>
             </div>
 
             <div className="flex-1 md:hidden">
-              <p className="text-xs font-black text-white">{t({ en: 'Speak with Kore', kn: 'ಕೋರ್ ಜೊತೆ ಮಾತನಾಡಿ' })}</p>
+              <p className="text-xs font-black text-white">{t({ en: 'Speak with Snehi', kn: 'ಸ್ನೇಹಿಯೊಂದಿಗೆ ಮಾತನಾಡಿ' })}</p>
               <p className="text-[9px] text-white/40 uppercase tracking-widest">{stText}</p>
             </div>
 

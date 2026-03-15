@@ -58,6 +58,16 @@ export interface Lesson {
   order_index: number;
 }
 
+export interface SnehiScenario {
+  id: string;
+  title: Record<Language, string>;
+  category: Record<Language, string>;
+  level: CourseLevel;
+  systemInstruction: string;
+  initialMessage: string;
+  order_index: number;
+}
+
 export interface Module {
   id?: string;
   level: CourseLevel;
@@ -84,6 +94,9 @@ export interface UserProgress {
   totalMessagesSent?: number;
   totalTalkTime?: number;
   voiceGender?: 'MAN' | 'WOMAN';
+  prefersTranslation?: boolean;
+  prefersPronunciation?: boolean;
+  completedScenarios: string[];
 }
 
 export interface TranslationStrings {

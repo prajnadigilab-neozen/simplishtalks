@@ -2,6 +2,13 @@
 
 All notable features implemented and issues fixed for **SIMPLISH Talks** will be documented in this file. 
 
+## [2026-03-11]
+
+### General Updates 🔄
+- V 7.4 For UAT
+- V 7.3 For UAT
+
+
 ## [2026-03-09]
 
 ### General Updates 🔄

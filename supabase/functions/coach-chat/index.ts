@@ -76,13 +76,22 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const { message, history } = await req.json();
+        const { message, history, prefersTranslation, prefersPronunciation } = await req.json();
+        
+        let systemInstruction = COACH_SYSTEM_INSTRUCTION;
+        if (prefersTranslation === false) {
+            systemInstruction += "\nSTRICT RULE: The user has DISABLED translations. Do NOT provide 'kannadaGuide'. Communicate exclusively in English.";
+        }
+        if (prefersPronunciation === false) {
+            systemInstruction += "\nSTRICT RULE: The user has DISABLED pronunciation tips. Do NOT provide 'pronunciationTip'.";
+        }
+
         const contents = [
             ...(history || []),
             { role: 'user', parts: [{ text: message }] },
         ];
 
-        const stream = streamGemini(PRIMARY_MODEL, contents, COACH_SYSTEM_INSTRUCTION);
+        const stream = streamGemini(PRIMARY_MODEL, contents, systemInstruction);
 
         const { readable, writable } = new TransformStream();
         const writer = writable.getWriter();

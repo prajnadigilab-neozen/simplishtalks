@@ -167,7 +167,7 @@ const ttsQueue = new TTSQueue();
 /**
  * Text-to-Speech via Supabase Edge Function.
  */
-export async function textToSpeech(text: string, voice: string = 'Kore', lowBitrate: boolean = false, retryCount = 0): Promise<string | null> {
+export async function textToSpeech(text: string, voice: string = 'Snehi', lowBitrate: boolean = false, retryCount = 0): Promise<string | null> {
   // 1. Check Cache first
   const cached = AudioStore.get(text);
   if (cached) return cached;
