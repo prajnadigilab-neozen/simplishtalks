@@ -2,7 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
-import { chatWithCoach, saveChatMessage, getChatHistory, clearUserChatHistory, deleteChatMessage, getUserUsage, updateUserUsage, syncUsageToProfiles } from '../services/coachService';
+import { chatWithCoach, saveChatMessage, getChatHistory, clearUserChatHistory, deleteChatMessage, getUserUsage } from '../services/coachService';
+import { telemetry } from '../services/telemetryService';
 import { textToSpeech, getTTSQuotaStatus } from '../services/geminiService';
 import { playPCM, AudioStore } from '../utils/audioUtils';
 import { CoachMessage } from '../types';
@@ -77,8 +78,7 @@ const CoachChat: React.FC = () => {
     setMessages(prev => prev.map(m => m.timestamp === userMsg.timestamp ? { ...m, dbId: dbId || undefined } : m));
 
     // Update usage and sync UI
-    updateUserUsage(userId, 0, 0, 1);
-    syncUsageToProfiles(userId, 0, 1); // Mirror to profiles for Dashboard display
+    telemetry.logUsage({ api_type: 'chat', total_units: 1 });
     syncUsage('chat', 1);
 
     // Compression and Fast-Track handled in coachService
@@ -173,7 +173,6 @@ const CoachChat: React.FC = () => {
     }
 
     isSendingRef.current = false;
-    await updateUserUsage(userId, 0, 0, 1);
     setTotalChatMessages(prev => prev + 1);
   };
 

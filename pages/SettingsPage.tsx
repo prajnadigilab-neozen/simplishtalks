@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { useTheme } from '../components/ThemeContext';
 import { getUserSession, updateProfile, getAllUsers, deleteUser, deleteOwnAccount } from '../services/authService';
-import { UserRole } from '../types';
+import { UserRole, PackageType } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAppStore } from '../store/useAppStore';
 import { getSystemConfig } from '../services/systemConfigService';
@@ -320,47 +320,49 @@ const SettingsPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Voice Time Top-up Section */}
-          <div className="mt-12 bg-blue-50 dark:bg-blue-900/10 p-10 md:p-14 rounded-[4rem] border-2 border-blue-100 dark:border-blue-900/30">
-            <div className="flex items-center gap-4 mb-8">
-              <span className="text-4xl bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">🎙️</span>
-              <div>
-                <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Voice Time Top-up', kn: 'ಧ್ವನಿ ಸಮಯ ಟಾಪ್-ಅಪ್' })}</h3>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Add custom voice practice minutes', kn: 'ಹೆಚ್ಚುವರಿ ಧ್ವನಿ ಅಭ್ಯಾಸದ ನಿಮಿಷಗಳನ್ನು ಸೇರಿಸಿ' })}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-              <div className="space-y-4">
-                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Enter Amount (₹)', kn: 'ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ (₹)' })}</label>
-                <div className="relative">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-black text-slate-400">₹</span>
-                    <input 
-                      type="number" 
-                      value={topUpAmount || ''} 
-                      onChange={e => setTopUpAmount(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-full p-6 pl-12 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-black text-2xl text-slate-800 dark:text-slate-100 shadow-sm" 
-                      placeholder="0"
-                    />
+          {/* Voice Time Top-up Section - Restricted to SNEHI/BOTH */}
+          {(user?.package_type === PackageType.SNEHI || user?.package_type === PackageType.BOTH) && (
+            <div className="mt-12 bg-blue-50 dark:bg-blue-900/10 p-10 md:p-14 rounded-[4rem] border-2 border-blue-100 dark:border-blue-900/30">
+              <div className="flex items-center gap-4 mb-8">
+                <span className="text-4xl bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">🎙️</span>
+                <div>
+                  <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Voice Time Top-up', kn: 'ಧ್ವನಿ ಸಮಯ ಟಾಪ್-ಅಪ್' })}</h3>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Add custom voice practice minutes', kn: 'ಹೆಚ್ಚುವರಿ ಧ್ವನಿ ಅಭ್ಯಾಸದ ನಿಮಿಷಗಳನ್ನು ಸೇರಿಸಿ' })}</p>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 flex flex-col justify-center">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t({ en: 'Estimated Time', kn: 'ಅಂದಾಜು ಸಮಯ' })}</p>
-                 <p className="text-3xl font-black text-blue-600 dark:text-blue-400">
-                   {Math.floor(topUpAmount / costPerMinute)} <span className="text-sm uppercase tracking-tighter opacity-60">Min</span>
-                 </p>
-                 <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">@ ₹{costPerMinute}/minute</p>
-              </div>
-            </div>
 
-            <button 
-                onClick={handleTopUp}
-                disabled={isTopUpProcessing || topUpAmount <= 0}
-                className="w-full mt-8 bg-blue-600 text-white py-6 rounded-[2rem] font-black text-xl uppercase tracking-widest shadow-xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
-            >
-              {isTopUpProcessing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '💳'} {t({ en: 'Buy Minutes Now', kn: 'ನಿಮಿಷಗಳನ್ನು ಈಗಲೇ ಖರೀದಿಸಿ' })}
-            </button>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+                <div className="space-y-4">
+                  <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Enter Amount (₹)', kn: 'ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ (₹)' })}</label>
+                  <div className="relative">
+                      <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-black text-slate-400">₹</span>
+                      <input 
+                        type="number" 
+                        value={topUpAmount || ''} 
+                        onChange={e => setTopUpAmount(Math.max(0, parseInt(e.target.value) || 0))}
+                        className="w-full p-6 pl-12 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-black text-2xl text-slate-800 dark:text-slate-100 shadow-sm" 
+                        placeholder="0"
+                      />
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 flex flex-col justify-center">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t({ en: 'Estimated Time', kn: 'ಅಂದಾಜು ಸಮಯ' })}</p>
+                   <p className="text-3xl font-black text-blue-600 dark:text-blue-400">
+                     {Math.floor(topUpAmount / costPerMinute)} <span className="text-sm uppercase tracking-tighter opacity-60">Min</span>
+                   </p>
+                   <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">@ ₹{costPerMinute}/minute</p>
+                </div>
+              </div>
+
+              <button 
+                  onClick={handleTopUp}
+                  disabled={isTopUpProcessing || topUpAmount <= 0}
+                  className="w-full mt-8 bg-blue-600 text-white py-6 rounded-[2rem] font-black text-xl uppercase tracking-widest shadow-xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+              >
+                {isTopUpProcessing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '💳'} {t({ en: 'Buy Minutes Now', kn: 'ನಿಮಿಷಗಳನ್ನು ಈಗಲೇ ಖರೀದಿಸಿ' })}
+              </button>
+            </div>
+          )}
 
           <div className="mt-12 p-10 bg-red-50 dark:bg-red-900/10 rounded-[4rem] border-2 border-red-100 dark:border-red-900/30">
             <div className="flex items-center gap-4 mb-6">

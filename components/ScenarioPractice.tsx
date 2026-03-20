@@ -129,15 +129,35 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
   };
 
   const handleSpeak = async (text: string, id: string) => {
-    if (playingId || fetchingId || getTTSQuotaStatus()) return;
+    if (getTTSQuotaStatus()) {
+      alert(t({ 
+        en: "AI Voice quota exhausted. Please wait 5 minutes or top up your credits.", 
+        kn: "AI ಧ್ವನಿ ಮಿತಿ ಮುಗಿದಿದೆ. ದಯವಿಟ್ಟು 5 ನಿಮಿಷ ಕಾಯಿರಿ ಅಥವಾ ಹೆಚ್ಚಿನ ಕ್ರೆಡಿಟ್‌ಗಳನ್ನು ಪಡೆದುಕೊಳ್ಳಿ." 
+      }));
+      return;
+    }
+    if (playingId || fetchingId) return;
+
+    console.log("ScenarioPractice: Starting speak for:", id);
     setFetchingId(id);
     try {
       const audio = await textToSpeech(text);
       setFetchingId(null);
+      
+      if (!audio) {
+        console.warn("ScenarioPractice: No audio returned from textToSpeech");
+        alert(t({
+          en: "AI was unable to generate voice for this message. Please try again or check your connection.",
+          kn: "ಈ ಸಂದೇಶಕ್ಕೆ ಧ್ವನಿಯನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ನಿಮ್ಮ ಅಂತರ್ಜಾಲ ಸಂಪರ್ಕವನ್ನು ಪರೀಕ್ಷಿಸಿ."
+        }));
+        return;
+      }
+
       setPlayingId(id);
-      if (audio) await playPCM(audio, text);
+      await playPCM(audio, text);
+      console.log("ScenarioPractice: Playback complete for:", id);
     } catch (e) {
-      console.error(e);
+      console.error("ScenarioPractice: Audio error:", e);
       setFetchingId(null);
     } finally {
       setPlayingId(null);

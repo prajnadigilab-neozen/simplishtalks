@@ -19,7 +19,8 @@ export function encodeBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-export async function decodeAudioData(
+/** Decode raw 16-bit PCM data (used by Gemini Live) */
+export async function decodeRawPCM(
   data: Uint8Array,
   ctx: AudioContext,
   sampleRate: number = 24000,
@@ -59,8 +60,16 @@ export const AudioStore = {
     // Trigger background decoding so it's ready for instant play
     const ctx = getAudioCtx();
     const data = decodeBase64(base64);
-    decodeAudioData(data, ctx).then(buffer => {
+    // Standard TTS returns encoded files (MP3/WAV/etc)
+    // CRITICAL: slice(0) to create a copy, as decodeAudioData detaches the buffer on failure/success
+    const bufferToDecode = data.buffer.slice(0) as ArrayBuffer;
+    ctx.decodeAudioData(bufferToDecode).then(buffer => {
       globalBufferCache.set(text, buffer);
+    }).catch(() => {
+      // Fallback to PCM if decoding failed
+      decodeRawPCM(data, ctx).then(buffer => {
+        globalBufferCache.set(text, buffer);
+      });
     });
   },
   get: (text: string) => globalAudioCache.get(text),
@@ -79,10 +88,23 @@ export async function playPCM(base64Audio: string, textKey?: string) {
 
   // If we have a cached buffer for this text, use it immediately
   if (textKey && globalBufferCache.has(textKey)) {
+    console.log("AudioUtils: Using cached audio buffer for key:", textKey);
     audioBuffer = globalBufferCache.get(textKey)!;
   } else {
     const audioData = decodeBase64(base64Audio);
-    audioBuffer = await decodeAudioData(audioData, ctx, 24000, 1);
+    try {
+      // Try native decoding first (for MP3/WAV from TTS)
+      console.log("AudioUtils: Attempting native decode...");
+      // CRITICAL: slice(0) to create a copy, as decodeAudioData detaches the buffer
+      const bufferToDecode = audioData.buffer.slice(0) as ArrayBuffer;
+      audioBuffer = await ctx.decodeAudioData(bufferToDecode);
+      console.log("AudioUtils: Native decode success. Duration:", audioBuffer.duration);
+    } catch (e) {
+      // Fallback to raw PCM (for Gemini Live)
+      console.log("AudioUtils: Native decode failed, falling back to PCM. Error:", e);
+      audioBuffer = await decodeRawPCM(audioData, ctx, 24000, 1);
+      console.log("AudioUtils: PCM decode success. Duration:", audioBuffer.duration);
+    }
     if (textKey) globalBufferCache.set(textKey, audioBuffer);
   }
 

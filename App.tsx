@@ -27,6 +27,7 @@ const PackageSelection = React.lazy(() => import('./pages/PackageSelection'));
 const APIAnalytics = React.lazy(() => import('./pages/APIAnalytics'));
 const QuotaDashboard = React.lazy(() => import('./pages/QuotaDashboard'));
 const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
+const TopupPage = React.lazy(() => import('./pages/TopupPage'));
 
 import { telemetry } from './services/telemetryService';
 
@@ -34,6 +35,7 @@ import Logo from './components/Logo';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useAppStore } from './store/useAppStore';
 import { initSyncAndListen } from './services/syncService';
+import NotificationToast from './components/NotificationToast';
 
 interface NavigationProps {
   onSignOut: () => void;
@@ -64,7 +66,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
       </div>
 
       <div className="flex items-center gap-1.5 md:gap-4">
-        <nav className="hidden lg:flex items-center gap-6 mr-4">
+        <nav className="hidden md:flex items-center gap-6 mr-4">
           <NavButton to="/" label={t({ en: 'Home', kn: 'ಮುಖಪುಟ' })} active={location.pathname === '/'} light={isLanding} />
           {isLoggedIn && !session.isRestricted && (
             <>
@@ -297,6 +299,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 flex flex-col max-w-[1280px] mx-auto border-x border-gray-100 dark:border-slate-800 shadow-sm transition-all duration-300 overflow-x-hidden">
       <Navigation onSignOut={handleSignOut} session={session} />
+      <NotificationToast />
 
       <main className={`flex-1 overflow-y-auto ${session && !session.isRestricted ? 'pb-24 md:pb-0' : ''}`}>
         {session?.isRestricted ? (
@@ -320,6 +323,7 @@ const AppContent: React.FC = () => {
               <Route path="/settings" element={session ? <ErrorBoundary><SettingsPage /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/payment" element={session ? <ErrorBoundary><PaymentPage /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/packages" element={session ? <ErrorBoundary><PackageSelection /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/topup" element={session ? <ErrorBoundary><TopupPage /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/placement" element={session ? <ErrorBoundary><PlacementTest /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/dashboard" element={
                 !session ? <Navigate to="/login" /> :

@@ -122,6 +122,9 @@ class TelemetryService {
                 user_id: user?.id || null,
                 ...usage
             });
+            // NOTE: user_usage and profiles are kept in sync by the DB trigger
+            // on api_usage (see 20260316_auto_sync_user_usage.sql).
+            // Do NOT add increments here to avoid double-counting.
         } catch (err) {
             console.error('Failed to log API usage:', err);
         }

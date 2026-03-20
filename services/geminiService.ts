@@ -88,6 +88,7 @@ async function invokeFunction(name: string, body: any): Promise<any> {
 
       const data = await response.json();
       if (!response.ok) {
+        console.error(`invokeFunction error: [${name}] status=${response.status}`, data);
         // Check for 404/503 (often Gemini availability issues)
         if (response.status === 404 || response.status === 503 || response.status === 504) {
           throw new Error(data.error || data.message || `AI Service Temporary Error (${response.status})`);
@@ -167,7 +168,7 @@ const ttsQueue = new TTSQueue();
 /**
  * Text-to-Speech via Supabase Edge Function.
  */
-export async function textToSpeech(text: string, voice: string = 'Snehi', lowBitrate: boolean = false, retryCount = 0): Promise<string | null> {
+export async function textToSpeech(text: string, voice: string = 'Aoede', lowBitrate: boolean = false, retryCount = 0): Promise<string | null> {
   // 1. Check Cache first
   const cached = AudioStore.get(text);
   if (cached) return cached;
@@ -189,6 +190,7 @@ export async function textToSpeech(text: string, voice: string = 'Snehi', lowBit
       if (result.isQuota) throw { status: 'RESOURCE_EXHAUSTED', message: '429' };
 
       if (result.audio) {
+        console.log("geminiService: Received audio from TTS. Length:", result.audio.length);
         AudioStore.set(text, result.audio);
 
         // Log real usage if metadata exists
@@ -307,10 +309,10 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
 
     const result = await invokeFunction('evaluate', { type: 'speech', audioBase64, targetText });
 
-    // Log real usage
+    // Log real usage as chat to avoid conflating tokens with voice seconds
     if (result.usage) {
       telemetry.logUsage({
-        api_type: 'voice', // multimodal voice input
+        api_type: 'chat', 
         model_name: result.model || 'gemini-speech',
         input_units: result.usage.promptTokenCount,
         output_units: result.usage.candidatesTokenCount,
@@ -386,5 +388,34 @@ export async function generateLessonWithAI(promptText: string) {
     }
 
     throw error;
+  }
+}
+
+/**
+ * Evaluate Snehi Practice Session via Supabase Edge Function to generate a Scorecard.
+ */
+export async function evaluateSnehiScorecard(transcript: string) {
+  try {
+    // Quota Guardrail for chat evaluation
+    const guard = await quotaGuard('gemini-3-flash-preview', transcript, 'chat');
+    if (!guard.isAllowed) throw new Error(guard.message);
+    if (guard.mockData) return guard.mockData.data;
+
+    const result = await invokeFunction('evaluate', { type: 'snehi_scorecard', transcript });
+
+    if (result.usage) {
+      telemetry.logUsage({
+        api_type: 'chat',
+        model_name: result.model || 'gemini-scorecard',
+        input_units: result.usage.promptTokenCount,
+        output_units: result.usage.candidatesTokenCount,
+        total_units: result.usage.totalTokenCount
+      });
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Snehi Scorecard Evaluation Error:", error);
+    return null; // Silent failure here, handled safely by frontend UI
   }
 }

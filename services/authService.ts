@@ -289,7 +289,7 @@ export async function getAllUsers(): Promise<any[]> {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, phone, place, role, created_at, avatar_url, is_restricted, package_type, package_status')
+      .select('id, full_name, phone, place, role, created_at, avatar_url, is_restricted, package_type, package_status, topup_amount')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -310,9 +310,35 @@ export async function getAllUsers(): Promise<any[]> {
   }
 }
 
-export async function getUserSession(providedSession?: any) {
+export async function getArchivedUsers(): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from('deleted_users_archive')
+      .select('id, full_name, phone, original_created_at, deleted_at, package_type')
+      .order('deleted_at', { ascending: false });
+
+    if (error) {
+      console.error("🔍 Supabase getArchivedUsers ERROR:", error);
+      throw error;
+    }
+
+    return (data || []).map(u => ({
+      ...u,
+      created_at: u.original_created_at,
+      status: 'DELETED',
+      role: UserRole.STUDENT, // Archived users are always treated as students
+      package_status: 'DELETED',
+      package_type: u.package_type === 'SANGAATHI' || u.package_type === 'SNEHI' ? 'SNEHI' : u.package_type
+    }));
+  } catch (e: any) {
+    console.error("getArchivedUsers error:", e);
+    return [];
+  }
+}
+
+export async function getUserSession(providedSession?: any, forceRefresh?: boolean) {
   const now = Date.now();
-  if (cachedProfile && (now - lastCacheTime < CACHE_TTL)) return cachedProfile;
+  if (!forceRefresh && cachedProfile && (now - lastCacheTime < CACHE_TTL)) return cachedProfile;
 
   try {
     let session = providedSession;
@@ -345,7 +371,7 @@ export async function getUserSession(providedSession?: any) {
     const profileQuery = Promise.resolve(
       supabase
         .from('profiles')
-        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, voice_gender, system_prompt_focus, package_type, package_status, package_start_date, package_end_date, agent_credits, streak_count, last_streak_date, total_messages_sent, total_talk_time, prefers_translation, prefers_pronunciation')
+        .select('full_name, place, role, is_restricted, avatar_url, preferred_model, voice_profile, voice_gender, system_prompt_focus, package_type, package_status, package_start_date, package_end_date, agent_credits, streak_count, last_streak_date, total_messages_sent, total_talk_time, prefers_translation, prefers_pronunciation, topup_amount')
         .eq('id', session.user.id)
         .maybeSingle()
     );
@@ -395,6 +421,7 @@ export async function getUserSession(providedSession?: any) {
         totalTalkTime: profile.total_talk_time || 0,
         prefersTranslation: profile.prefers_translation ?? true,
         prefersPronunciation: profile.prefers_pronunciation ?? true,
+        topupAmount: profile.topup_amount || 0,
         isLoggedIn: true
       };
     } else {

@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
-import { getAllUsers, toggleUserRestriction, deleteUser, mapRole } from '../services/authService';
-import { getAdminAuditLogs, getAllUserUsage, getUserUsageLogs, getPlatformReports } from '../services/coachService';
+import { getAllUsers, toggleUserRestriction, deleteUser, mapRole, getArchivedUsers } from '../services/authService';
+import { getAdminAuditLogs, getAllUserUsage, getUserUsageLogs, getPlatformReports, getUserUsageByRange } from '../services/coachService';
 import { getGlobalStats } from '../services/courseService';
 import { UserRole, PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
@@ -31,8 +31,12 @@ const AdminDashboard: React.FC = () => {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [usageData, setUsageData] = useState<any[]>([]);
   const [reportsData, setReportsData] = useState<any[]>([]);
-  const [reportsStartDate, setReportsStartDate] = useState<string>('');
-  const [reportsEndDate, setReportsEndDate] = useState<string>('');
+  const [filteredUsageData, setFilteredUsageData] = useState<any[]>([]);
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [filterRole, setFilterRole] = useState<string>('ALL');
+  const [filterPackage, setFilterPackage] = useState<string>('ALL');
+  const [filterStatus, setFilterStatus] = useState<string>('ACTIVE');
 
   const [selectedAuditUser, setSelectedAuditUser] = useState<string | null>(null);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -48,7 +52,8 @@ const AdminDashboard: React.FC = () => {
     totalLessons: 0,
     totalRevenue: 0,
     talksCount: 0,
-    snehiCount: 0
+    snehiCount: 0,
+    topupRevenue: 0
   });
 
 
@@ -65,8 +70,16 @@ const AdminDashboard: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const userData = await getAllUsers();
-      setUsers(userData);
+      const profiles = await getAllUsers();
+      const archived = await getArchivedUsers();
+      
+      const allUsers = [...profiles, ...archived].sort((a, b) => {
+        // Use archived_at if available (for deleted users), otherwise created_at
+        const dateA = new Date(a.archived_at || a.created_at).getTime();
+        const dateB = new Date(b.archived_at || b.created_at).getTime();
+        return dateB - dateA;
+      });
+      setUsers(allUsers);
 
       const config = await getSystemConfig();
       setSystemConfig(config);
@@ -84,12 +97,12 @@ const AdminDashboard: React.FC = () => {
 
       const stats = await getGlobalStats();
 
-      // Calculate Revenue and Package Counts from users list
+      // Calculate Revenue and Package Counts from all users list (including deleted for historical tallying)
       let totalRevenue = 0;
       let talksCount = 0;
       let snehiCount = 0;
 
-      userData.forEach(u => {
+      allUsers.forEach(u => {
         if (u.package_type === PackageType.TALKS) {
           totalRevenue += 299;
           talksCount++;
@@ -101,13 +114,17 @@ const AdminDashboard: React.FC = () => {
           talksCount++;
           snehiCount++;
         }
+        totalRevenue += (u.topup_amount || 0);
       });
+
+      const topupRevenue = allUsers.reduce((sum, u) => sum + (u.topup_amount || 0), 0);
 
       setGlobalStats({
         ...stats,
         totalRevenue,
         talksCount,
-        snehiCount
+        snehiCount,
+        topupRevenue
       });
 
       const usage = await getAllUserUsage();
@@ -115,6 +132,15 @@ const AdminDashboard: React.FC = () => {
 
       const reports = await getPlatformReports();
       setReportsData(reports);
+
+      // Reset filtered usage on initial load
+      setFilteredUsageData([]);
+      
+      // If dates are already set (on manual refresh), fetch range data
+      if (startDate || endDate) {
+        const rangeUsage = await getUserUsageByRange(startDate, endDate);
+        setFilteredUsageData(rangeUsage);
+      }
     } catch (err: any) {
       setError(err.message || "Could not connect to the database.");
     } finally {
@@ -190,28 +216,54 @@ const AdminDashboard: React.FC = () => {
     setProcessingId(null);
   };
 
-  // --- Reports Filtering and Download ---
-  const filteredReports = reportsData.filter(report => {
-    if (!reportsStartDate && !reportsEndDate) return true;
+  // --- Reports & Users Filtering and Download ---
+  const filterByDate = (dateStr: string) => {
+    if (!startDate && !endDate) return true;
+    if (!dateStr) return false;
+    
+    // Extract YYYY-MM-DD to match SQL DATE() behavior and avoid timezone shifting
+    const isoDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
 
-    // Create Date objects. Report dates are typically 'YYYY-MM-DD' or full ISO strings
-    const rDate = new Date(report.report_date);
-    rDate.setHours(0, 0, 0, 0);
-
-    if (reportsStartDate) {
-      const sDate = new Date(reportsStartDate);
-      sDate.setHours(0, 0, 0, 0);
-      if (rDate < sDate) return false;
-    }
-
-    if (reportsEndDate) {
-      const eDate = new Date(reportsEndDate);
-      eDate.setHours(0, 0, 0, 0);
-      if (rDate > eDate) return false;
-    }
+    if (startDate && isoDate < startDate) return false;
+    if (endDate && isoDate > endDate) return false;
 
     return true;
+  };
+
+  const filteredReports = reportsData.filter(r => filterByDate(r.report_date));
+  
+  // Update filteredUsers to include users who registered in the range OR had usage in the range
+  // AND intersect with Role, Package, and Status filters
+  const filteredUsers = users.filter(u => {
+    // 1. Date Filter (Range vs Registration)
+    const isRegisteredInRange = filterByDate(u.created_at);
+    const hasUsageInRange = filteredUsageData.some(usage => usage.user_id === u.id);
+    const dateMatch = (!startDate && !endDate) || isRegisteredInRange || hasUsageInRange;
+    
+    // 2. Role Filter
+    const roleMatch = filterRole === 'ALL' || u.role === filterRole;
+    
+    // 3. Package Filter
+    const packageMatch = filterPackage === 'ALL' || u.package_type === filterPackage;
+    
+    // 4. Status Filter
+    const statusMatch = filterStatus === 'ALL' || 
+                        (filterStatus === 'ACTIVE' && u.status !== 'DELETED') ||
+                        (filterStatus === 'DELETED' && u.status === 'DELETED');
+
+    return dateMatch && roleMatch && packageMatch && statusMatch;
   });
+
+  const handleClearFilters = () => {
+    setStartDate('');
+    setEndDate('');
+    setFilterRole('ALL');
+    setFilterPackage('ALL');
+    setFilterStatus('ALL');
+    setFilteredUsageData([]);
+    // Reload regular data
+    fetchData();
+  };
 
   const handleDownloadCSV = () => {
     if (filteredReports.length === 0) {
@@ -252,12 +304,45 @@ const AdminDashboard: React.FC = () => {
       csvContent += row.join(",") + "\n";
     });
 
-    // Download file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", url);
+    link.setAttribute("href", encodeURI(csvContent));
     link.setAttribute("download", `platform_reports_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadUsersCSV = () => {
+    if (filteredUsers.length === 0) {
+      showNotification("No users found to download.", "info");
+      return;
+    }
+
+    const isFiltering = startDate || endDate;
+    const usageSource = isFiltering ? filteredUsageData : usageData;
+
+    const headers = ['Full Name', 'Phone', 'Place', 'Role', 'Package', 'Status', 'Join Date', 'Voice (Min)', 'Chat (Msg)', 'Topup (₹)'];
+    const rows = filteredUsers.map(u => {
+      const usage = filteredUsageData.find(d => d.user_id === u.id);
+      return [
+        u.full_name,
+        u.phone,
+        u.place || '',
+        u.role,
+        u.package_type || 'NONE',
+        u.package_status || (u.deleted_at ? 'DELETED' : 'ACTIVE'),
+        new Date(u.created_at).toLocaleDateString(),
+        Math.floor((usage?.voice_seconds_total || 0) / 60), // Convert seconds to minutes
+        usage?.chat_messages_total || 0,
+        u.topup_amount || 0
+      ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(',');
+    });
+
+    let csvContent = "data:text/csv;charset=utf-8," + headers.map(h => `"${h}"`).join(",") + "\n" + rows.join("\n");
+
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeURI(csvContent));
+    link.setAttribute("download", `user_management_export_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -304,7 +389,6 @@ const AdminDashboard: React.FC = () => {
           <h2 className="text-4xl font-black text-blue-900 dark:text-slate-100 tracking-tighter uppercase">{t({ en: 'Admin Dashboard', kn: 'ಅಡ್ಮಿನ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })}</h2>
           {currentUser && (
             <p className="text-[10px] text-slate-400 font-mono mt-2">
-              ID: {currentUser.id} <br />
               Role: <span className={currentUser.role === UserRole.SUPER_ADMIN ? 'text-green-600 font-bold' : 'text-red-500 font-bold'}>{currentUser.role || 'NONE'}</span>
             </p>
           )}
@@ -348,129 +432,373 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {activeTab === 'users' && (
-        <div className="bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 overflow-hidden shadow-xl">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50 dark:bg-slate-900">
-              <tr>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'User', kn: 'ಬಳಕೆದಾರರು' })}</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Role', kn: 'ಪಾತ್ರ' })}</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Package', kn: 'ಪ್ಯಾಕೇಜ್' })}</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
-                <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Actions', kn: 'ಕ್ರಮಗಳು' })}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-              {users.map((user, idx) => (
-                <tr key={user.id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-900">
-                  <td className="p-6">
-                    <div className="flex flex-col">
-                      <span className="font-black text-slate-800 dark:text-slate-100">{user.full_name}</span>
-                      <span className="text-[10px] text-slate-400">{user.phone}</span>
-                      {user.created_at && (
-                        <span className="text-[8px] text-slate-400 uppercase mt-1">
-                          Reg: {new Date(user.created_at).toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-6">
-                    <span className={`text-[10px] font-black px-2 py-1 rounded-full ${user.role === UserRole.SUPER_ADMIN ? 'bg-green-100 text-green-700' :
-                      user.role === UserRole.MODERATOR ? 'bg-blue-100 text-blue-700' :
-                        'bg-slate-100 text-slate-600'
-                      }`}>
-                      {user.role || 'STUDENT'}
-                    </span>
-                  </td>
-                  <td className="p-6">
-                    <div className="flex flex-col">
-                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full w-fit ${
-                        user.package_type === PackageType.BOTH ? 'bg-purple-100 text-purple-700' :
-                        user.package_type === PackageType.SNEHI ? 'bg-indigo-100 text-indigo-700' :
-                        user.package_type === PackageType.TALKS ? 'bg-blue-100 text-blue-700' :
-                        'bg-slate-100 text-slate-500'
-                      }`}>
-                        {user.package_type || 'NONE'}
-                      </span>
-                      <span className={`text-[8px] font-bold uppercase mt-1 ${
-                        user.package_status === 'ACTIVE' ? 'text-green-600' : 
-                        user.package_status === 'EXPIRED' ? 'text-red-500' : 
-                        'text-slate-400'
-                      }`}>
-                        ● {user.package_status || 'INACTIVE'}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-6">
-                    {(() => {
-                      const usage = usageData.find(u => u.user_id === user.id);
-                      const seconds = usage?.voice_seconds_total || 0;
-                      const mins = Math.floor(seconds / 60);
-                      const secs = seconds % 60;
-                      
-                      const freeLimitMins = Math.ceil((systemConfig?.universal_free_seconds || 180) / 60);
-                      const agentCredits = user.package_type === PackageType.SNEHI ? (user.agent_credits || 0) : 0;
-                      const maxTotalMins = freeLimitMins + agentCredits;
-                      
-                      const isOver = mins >= maxTotalMins;
-                      
-                      return (
-                        <div className="flex flex-col">
-                           <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-blue-600'}`}>
-                            🎙️ {mins}:{secs.toString().padStart(2, '0')} / {maxTotalMins}:00
-                          </span>
-                          <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
-                            {t({ en: 'Live Talk Time', kn: 'ಲೈವ್ ಟಾಕ್ ಸಮಯ' })}
-                          </span>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Section Header & Main Actions */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-2">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none uppercase">
+                  {t({ en: 'User Management', kn: 'ಬಳಕೆದಾರ ನಿರ್ವಹಣೆ' })}
+                </h3>
+              </div>
+              <p className="text-sm text-slate-500 font-medium max-w-md">
+                {t({ en: 'Monitor user activity, manage roles, and review AI usage metrics across the platform.', kn: 'ಬಳಕೆದಾರರ ಚಟುವಟಿಕೆಯನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ ಮತ್ತು ಪಾತ್ರಗಳನ್ನು ನಿರ್ವಹಿಸಿ.' })}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 w-full lg:w-auto">
+              <button
+                onClick={fetchData}
+                className="flex-1 lg:flex-none px-6 py-3.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-blue-200 dark:shadow-none hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 group"
+              >
+                <span className="group-hover:rotate-180 transition-transform duration-500">🔄</span> 
+                {t({ en: 'Refresh', kn: 'ನವೀಕರಿಸಿ' })}
+              </button>
+              <button
+                onClick={handleDownloadUsersCSV}
+                className="flex-1 lg:flex-none px-6 py-3.5 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border-2 border-slate-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-900 hover:bg-blue-50/50 dark:hover:bg-blue-900/20"
+              >
+                <span>📥</span> {t({ en: 'Export CSV', kn: 'ಎಕ್ಸ್‌ಪೋರ್ಟ್' })}
+              </button>
+            </div>
+          </div>
+
+          {/* Premium Filter Control Card */}
+          <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Date Range Picker */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Activity Period</label>
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm focus-within:border-blue-500 transition-colors">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none w-full"
+                  />
+                  <span className="text-slate-300">→</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-200 outline-none w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Role Selection */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Account Role</label>
+                <div className="relative group">
+                  <select
+                    value={filterRole}
+                    onChange={(e) => setFilterRole(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 p-3.5 pl-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-xs font-bold text-slate-700 dark:text-slate-200 appearance-none outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                  >
+                    <option value="ALL">All Roles</option>
+                    <option value={UserRole.STUDENT}>Students Only</option>
+                    <option value={UserRole.MODERATOR}>Moderators</option>
+                    <option value={UserRole.SUPER_ADMIN}>Super Admins</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+                </div>
+              </div>
+
+              {/* Package Selection */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Service Tier</label>
+                <div className="relative group">
+                  <select
+                    value={filterPackage}
+                    onChange={(e) => setFilterPackage(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 p-3.5 pl-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-xs font-bold text-slate-700 dark:text-slate-200 appearance-none outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                  >
+                    <option value="ALL">All Packages</option>
+                    <option value={PackageType.TALKS}>Simplish Talks</option>
+                    <option value={PackageType.SNEHI}>Simplish Snehi</option>
+                    <option value={PackageType.BOTH}>Premium (Both)</option>
+                    <option value="NONE">No Package</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+                </div>
+              </div>
+
+              {/* Status & Clear */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Lifecycle Status</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1 group">
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-800 p-3.5 pl-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-xs font-bold text-slate-700 dark:text-slate-200 appearance-none outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                    >
+                      <option value="ALL">Any Status</option>
+                      <option value="ACTIVE">Active Users</option>
+                      <option value="DELETED">Archived (Deleted)</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+                  </div>
+                  
+                  {(startDate || endDate || filterRole !== 'ALL' || filterPackage !== 'ALL' || filterStatus !== 'ALL') && (
+                    <button
+                      onClick={handleClearFilters}
+                      className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors border border-red-100 dark:border-red-900/30 shadow-sm"
+                      title="Reset All Filters"
+                    >
+                      <span className="text-lg">✕</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-slate-50/50 dark:bg-slate-800/50">
+                  <tr>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">{t({ en: 'User Profile', kn: 'ಬಳಕೆದಾರರು' })}</th>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">{t({ en: 'Role', kn: 'ಪಾತ್ರ' })}</th>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">{t({ en: 'Tier & Status', kn: 'ಪ್ಯಾಕೇಜ್' })}</th>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">{t({ en: 'Voice Minutes', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">{t({ en: 'Chat Messages', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800 text-right">{t({ en: 'Topup', kn: 'ಟಾಪ್‌ಅಪ್' })}</th>
+                    <th className="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800 text-right">{t({ en: 'Manage', kn: 'ಕ್ರಮಗಳು' })}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                  {filteredUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-20 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <span className="text-4xl">🔍</span>
+                          <h4 className="text-lg font-black text-slate-300 uppercase tracking-widest">{t({ en: 'No results found', kn: 'ಯಾವುದೇ ಫಲಿತಾಂಶಗಳಿಲ್ಲ' })}</h4>
+                          <p className="text-xs text-slate-400">{t({ en: 'Try adjusting your filters or date range.', kn: 'ದಯವಿಟ್ಟು ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಬದಲಾಯಿಸಿ.' })}</p>
                         </div>
-                      );
-                    })()}
-                  </td>
-                  <td className="p-6">
-                    {(() => {
-                      const usage = usageData.find(u => u.user_id === user.id);
-                      const msgs = usage?.chat_messages_total || 0;
-                      const tokens = usage?.chat_tokens_total || 0;
-                      const isOver = msgs >= 50;
-                      return (
-                        <div className="flex flex-col">
-                          <span className={`text-[10px] font-black ${isOver ? 'text-red-500' : 'text-purple-600'}`}>
-                            💬 {msgs} / 50 msgs
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredUsers.map((user, idx) => (
+                      <tr key={user.id || idx} className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group">
+                        <td className="p-6">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-white font-black shadow-lg shadow-blue-200 dark:shadow-none shrink-0">
+                              {(user.full_name || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <span className="font-black text-slate-900 dark:text-slate-100 tracking-tight text-sm">
+                                  {user.full_name || (user.status === 'DELETED' ? 'Archived User' : 'Anonymous Member')}
+                                </span>
+                                {users.filter(u => u.phone === user.phone).length > 1 && (
+                                  <span className="text-[8px] bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded-md font-black uppercase tracking-wider">
+                                    Re-Reg
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-xs text-slate-400 font-mono">
+                                {user.phone || 'Private Number'}
+                              </span>
+                              <span className="text-[9px] text-slate-300 font-bold uppercase mt-1 tracking-wider">
+                                Joined {user.created_at ? new Date(user.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown'}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-6">
+                          <span className={`text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest ${
+                            user.role === UserRole.SUPER_ADMIN ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' :
+                            user.role === UserRole.MODERATOR ? 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
+                            'bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                          }`}>
+                            {user.role || 'STUDENT'}
                           </span>
-                          <span className="text-[8px] text-slate-400 uppercase tracking-tighter">
-                            {tokens.toLocaleString()} tokens
-                          </span>
-                        </div>
-                      );
-                    })()}
-                  </td>
-                  <td className="p-6 flex gap-2">
-                    <button onClick={() => handleAudit(user.id)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100" title="Review Chat Audit">👁️ Chat</button>
-                    <button onClick={() => handleUsageLogs(user.id)} className="p-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100" title="View Usage History">📊 Usage</button>
-                    <button onClick={() => handleRestrict(user.id, user.is_restricted)} className="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100">{user.is_restricted ? '🔓' : '🚫'}</button>
-                    {currentUser?.role === UserRole.SUPER_ADMIN && (
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleUpdateRole(user.id, e.target.value as UserRole)}
-                        className="text-[10px] font-black border-2 border-slate-100 rounded-lg px-2 bg-white"
-                      >
-                        <option value={UserRole.STUDENT}>STUDENT</option>
-                        <option value={UserRole.MODERATOR}>MODERATOR</option>
-                        <option value={UserRole.SUPER_ADMIN}>SUPER ADMIN</option>
-                      </select>
-                    )}
-                    <button onClick={() => handleDelete(user.id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">🗑️</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="p-6">
+                          <div className="flex flex-col gap-1.5">
+                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg w-fit transition-colors ${
+                              user.package_type === PackageType.BOTH ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 dark:from-purple-900/50 dark:to-pink-900/50 dark:text-purple-300' :
+                              user.package_type === PackageType.SNEHI ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                              user.package_type === PackageType.TALKS ? 'bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300' :
+                              'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                            }`}>
+                              {user.package_type || 'FREE TRIAL'}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                user.status === 'DELETED' ? 'bg-red-500' :
+                                user.package_status === 'ACTIVE' ? 'bg-green-500' : 
+                                'bg-slate-300'
+                              }`}></span>
+                              <span className={`text-[9px] font-black uppercase tracking-widest ${
+                                user.status === 'DELETED' ? 'text-red-500' :
+                                user.package_status === 'ACTIVE' ? 'text-green-600' : 
+                                'text-slate-400'
+                              }`}>
+                                {user.status === 'DELETED' ? 'ARCHIVED' : (user.package_status || 'IDLE')}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-6">
+                          {(() => {
+                            const isFiltering = startDate || endDate;
+                            const source = isFiltering ? filteredUsageData : usageData;
+                            const usage = source.find(u => u.user_id === user.id);
+                            const seconds = usage?.voice_seconds_total || 0;
+                            const mins = Math.floor(seconds / 60);
+                            const secs = seconds % 60;
+                            
+                            // Universal Base (10m) + Package Credit (250m for SNEHI/BOTH) + All Topup Credits
+                            const universalMins = 10;
+                            const isSnehiOrBoth = user.package_type === PackageType.SNEHI || user.package_type === PackageType.BOTH;
+                            const packageCredits = isSnehiOrBoth ? 250 : 0;
+                            const agentCredits = user.agent_credits || 0;
+                            
+                            const maxTotalMins = universalMins + packageCredits + agentCredits;
+
+                            const percent = Math.min(100, (mins / (maxTotalMins || 1)) * 100);
+                            const isOver = mins >= maxTotalMins;
+                            
+                            return (
+                              <div className="flex flex-col gap-2 min-w-[120px]">
+                                <div className="flex justify-between items-end">
+                                  <span className={`text-xs font-black ${isOver ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>
+                                    {mins}:{secs.toString().padStart(2, '0')}
+                                  </span>
+                                  {!isFiltering && user.role === UserRole.STUDENT && <span className="text-[8px] font-bold text-slate-400">OF {maxTotalMins}m</span>}
+                                </div>
+                                {user.role === UserRole.STUDENT ? (
+                                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-inner">
+                                    <div 
+                                      className={`h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-blue-500'}`}
+                                      style={{ width: `${percent}%` }}
+                                    ></div>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1.5 mt-1">
+                                    <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded-md">∞ Staff</span>
+                                  </div>
+                                )}
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                  {isFiltering ? 'Selected Range' : 'Total Airtime'}
+                                </span>
+                              </div>
+                            );
+                          })()}
+                        </td>
+                        <td className="p-6">
+                          {(() => {
+                            const isFiltering = startDate || endDate;
+                            const source = isFiltering ? filteredUsageData : usageData;
+                            const usage = source.find(u => u.user_id === user.id);
+                            const msgs = usage?.chat_messages_total || 0;
+                            const tokens = usage?.chat_tokens_total || 0;
+                            
+                            const percent = Math.min(100, (msgs / 50) * 100);
+                            const isOver = msgs >= 50;
+                            return (
+                              <div className="flex flex-col gap-2 min-w-[120px]">
+                                <div className="flex justify-between items-end">
+                                  <span className={`text-xs font-black ${isOver ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>
+                                    {msgs} <span className="text-[9px]">msgs</span>
+                                  </span>
+                                  {!isFiltering && <span className="text-[8px] font-bold text-slate-400">OF 50</span>}
+                                </div>
+                                <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-inner">
+                                  <div 
+                                    className={`h-full rounded-full transition-all duration-1000 ${isOver ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-purple-500'}`}
+                                    style={{ width: `${percent}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                  {tokens.toLocaleString()} Tokens
+                                </span>
+                              </div>
+                            );
+                          })()}
+                        </td>
+                        <td className="p-6 text-right">
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">₹{user.topup_amount || 0}</span>
+                        </td>
+                        <td className="p-6">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {/* Detailed Info Actions */}
+                            <button 
+                                onClick={() => handleAudit(user.id)} 
+                                className="w-9 h-9 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                title="Review Chat Audit"
+                            >
+                                💬
+                            </button>
+                            <button 
+                                onClick={() => handleUsageLogs(user.id)} 
+                                className="w-9 h-9 flex items-center justify-center bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white transition-all shadow-sm"
+                                title="View Usage History"
+                            >
+                                📊
+                            </button>
+
+                            {user.status !== 'DELETED' && (
+                              <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-slate-100 dark:border-slate-800">
+                                {/* Restriction Toggle */}
+                                <button 
+                                    onClick={() => handleRestrict(user.id, user.is_restricted)} 
+                                    className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shadow-sm ${
+                                        user.is_restricted 
+                                        ? 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' 
+                                        : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white'
+                                    }`}
+                                    title={user.is_restricted ? 'Unrestrict User' : 'Restrict User'}
+                                >
+                                    {user.is_restricted ? '🔓' : '🚫'}
+                                </button>
+
+                                {/* Quick Role Adjust (Super Admin Only) */}
+                                {currentUser?.role === UserRole.SUPER_ADMIN && (
+                                  <div className="relative group/role">
+                                    <button className="w-9 h-9 flex items-center justify-center bg-slate-50 text-slate-600 rounded-xl hover:bg-slate-200 transition-all shadow-sm">
+                                        👤
+                                    </button>
+                                    <div className="absolute right-0 bottom-full mb-2 hidden group-hover/role:block bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl p-2 shadow-2xl z-50 min-w-[140px] animate-in fade-in zoom-in-95">
+                                        <div className="text-[9px] font-black text-slate-400 uppercase p-2 border-b border-slate-50 mb-1">Set Account Role</div>
+                                        {[UserRole.STUDENT, UserRole.MODERATOR, UserRole.SUPER_ADMIN].map(role => (
+                                            <button
+                                                key={role}
+                                                onClick={() => handleUpdateRole(user.id, role)}
+                                                className={`w-full text-left px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-colors ${
+                                                    user.role === role ? 'bg-blue-50 text-blue-600' : 'hover:bg-slate-50 text-slate-500'
+                                                }`}
+                                            >
+                                                {role}
+                                            </button>
+                                        ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Delete User */}
+                                <button 
+                                    onClick={() => handleDelete(user.id)} 
+                                    className="w-9 h-9 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                    title="Archive User"
+                                >
+                                    🗑️
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
@@ -625,7 +953,7 @@ const AdminDashboard: React.FC = () => {
 
           <div className="mt-8 bg-blue-50 dark:bg-slate-800/50 rounded-[2rem] p-8 border border-blue-100 dark:border-slate-700">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-3xl shadow-lg">
                 🎯
               </div>
               <div>
@@ -832,20 +1160,21 @@ const AdminDashboard: React.FC = () => {
                         {new Date(log.created_at).toLocaleString()}
                       </td>
                       <td className="p-6">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${log.event_type === 'voice'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                          (log.event_type || '').toLowerCase().includes('voice')
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                            : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                           }`}>
-                          {log.event_type}
+                          {(log.event_type || 'N/A').replace('_', ' ')}
                         </span>
                       </td>
                       <td className="p-6 font-bold text-slate-700 dark:text-slate-300">
-                        {log.event_type === 'voice'
-                          ? `${Math.floor(log.amount / 60)}m ${log.amount % 60}s`
-                          : `${log.amount} messages`}
+                        {(log.event_type || '').toLowerCase().includes('voice')
+                          ? `${Math.floor((log.amount || 0) / 60)}m ${(log.amount || 0) % 60}s`
+                          : `${log.amount || 0} messages`}
                       </td>
                       <td className="p-6 text-slate-400 text-xs text-right whitespace-nowrap">
-                        {log.tokens?.toLocaleString()} tokens
+                        {log.tokens ? `${log.tokens.toLocaleString()} tokens` : '---'}
                       </td>
                     </tr>
                   ))}
@@ -870,8 +1199,8 @@ const AdminDashboard: React.FC = () => {
                   <label className="text-[8px] font-black uppercase text-slate-400 px-1">Start Date</label>
                   <input
                     type="date"
-                    value={reportsStartDate}
-                    onChange={(e) => setReportsStartDate(e.target.value)}
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
                     className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
                   />
                 </div>
@@ -880,14 +1209,14 @@ const AdminDashboard: React.FC = () => {
                   <label className="text-[8px] font-black uppercase text-slate-400 px-1">End Date</label>
                   <input
                     type="date"
-                    value={reportsEndDate}
-                    onChange={(e) => setReportsEndDate(e.target.value)}
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
                     className="bg-transparent text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
                   />
                 </div>
-                {(reportsStartDate || reportsEndDate) && (
+                {(startDate || endDate) && (
                   <button
-                    onClick={() => { setReportsStartDate(''); setReportsEndDate(''); }}
+                    onClick={() => { setStartDate(''); setEndDate(''); }}
                     className="ml-2 w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 flex items-center justify-center text-xs text-slate-500"
                     title="Clear Filters"
                   >
@@ -895,6 +1224,12 @@ const AdminDashboard: React.FC = () => {
                   </button>
                 )}
               </div>
+              <button
+                onClick={fetchData}
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:bg-blue-700 transition-all flex items-center gap-2 border-b-4 border-blue-800 active:border-b-0 active:translate-y-1"
+              >
+                <span>🔍</span> {t({ en: 'View', kn: 'ನೋಡಿ' })}
+              </button>
               <button
                 onClick={handleDownloadCSV}
                 className="px-4 py-3 bg-orange-100 hover:bg-orange-200 text-orange-700 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 dark:text-orange-400 rounded-xl text-xs font-black uppercase transition-colors flex items-center gap-2 border border-orange-200 dark:border-orange-800 shadow-sm"
@@ -915,7 +1250,10 @@ const AdminDashboard: React.FC = () => {
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
                   {currentUser?.role === UserRole.SUPER_ADMIN && (
-                    <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Revenue', kn: 'ಆದಾಯ' })}</th>
+                    <>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Top-up Rev', kn: 'ಟಾಪ್-ಅಪ್ ಆದಾಯ' })}</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Total Revenue', kn: 'ಒಟ್ಟು ಆದಾಯ' })}</th>
+                    </>
                   )}
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Deleted', kn: 'ಅಳಿಸಲಾಗಿದೆ' })}</th>
                 </tr>
@@ -923,7 +1261,7 @@ const AdminDashboard: React.FC = () => {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredReports.length === 0 ? (
                   <tr>
-                    <td colSpan={currentUser?.role === UserRole.SUPER_ADMIN ? 6 : 5} className="p-8 text-center text-slate-400 font-bold">
+                    <td colSpan={currentUser?.role === UserRole.SUPER_ADMIN ? 8 : 7} className="p-8 text-center text-slate-400 font-bold">
                       {t({ en: 'No reports found for the selected date range.', kn: 'ಆಯ್ದ ಅವಧಿಯಲ್ಲಿ ಯಾವುದೇ ವರದಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ.' })}
                     </td>
                   </tr>
@@ -949,9 +1287,14 @@ const AdminDashboard: React.FC = () => {
                         {report.total_messages ? `${report.total_messages} msgs` : '0 msgs'}
                       </td>
                       {currentUser?.role === UserRole.SUPER_ADMIN && (
-                        <td className="p-6 text-green-600 font-bold">
-                          ₹{report.daily_revenue?.toLocaleString()}
-                        </td>
+                        <>
+                          <td className="p-6 text-amber-600 font-bold">
+                            ₹{report.topup_revenue?.toLocaleString()}
+                          </td>
+                          <td className="p-6 text-green-600 font-black">
+                            ₹{report.daily_revenue?.toLocaleString()}
+                          </td>
+                        </>
                       )}
                       <td className="p-6 text-red-500 font-bold">
                         {report.deleted_count > 0 ? `-${report.deleted_count}` : '0'}

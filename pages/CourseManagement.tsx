@@ -24,6 +24,8 @@ const CourseManagement: React.FC = () => {
     const [editingScenario, setEditingScenario] = useState<any | null>(null);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [filterLevel, setFilterLevel] = useState<string>('ALL');
+    const [filterCategory, setFilterCategory] = useState<string>('ALL');
 
     const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
         const id = Math.random().toString(36).substr(2, 9);
@@ -237,12 +239,32 @@ const CourseManagement: React.FC = () => {
                     <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">
                         {activeTab === 'talks' ? t({ en: 'Curriculum Editor', kn: 'ಪಠ್ಯಕ್ರಮ ಸಂಪಾದಕ' }) : t({ en: 'SNEHI Scenarios', kn: 'ಸ್ನೇಹಿ ಸನ್ನಿವೇಶಗಳು' })}
                     </h3>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-4 items-center">
                         {activeTab === 'snehi' && (
-                            <label className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-2 rounded-xl text-xs font-black uppercase shadow-sm hover:bg-slate-200 cursor-pointer flex items-center transition-all">
-                                📁 {t({ en: 'Upload JSON', kn: 'JSON ಅಪ್‌ಲೋಡ್' })}
-                                <input type="file" accept=".json" className="hidden" onChange={handleFileUpload} />
-                            </label>
+                            <>
+                                <select 
+                                    value={filterLevel}
+                                    onChange={(e) => setFilterLevel(e.target.value)}
+                                    className="px-4 py-2 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-500"
+                                >
+                                    <option value="ALL">All Levels</option>
+                                    {Object.values(CourseLevel).map(l => <option key={l} value={l}>{l}</option>)}
+                                </select>
+                                <select 
+                                    value={filterCategory}
+                                    onChange={(e) => setFilterCategory(e.target.value)}
+                                    className="px-4 py-2 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-500"
+                                >
+                                    <option value="ALL">All Categories</option>
+                                    {Array.from(new Set(scenarios.map(s => s.category.en))).map(c => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
+                                <label className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-sm hover:bg-slate-200 cursor-pointer flex items-center transition-all">
+                                    📁 {t({ en: 'Upload JSON', kn: 'JSON ಅಪ್‌ಲೋಡ್' })}
+                                    <input type="file" accept=".json" className="hidden" onChange={handleFileUpload} />
+                                </label>
+                            </>
                         )}
                         <button
                             onClick={() => activeTab === 'talks' 
@@ -256,7 +278,7 @@ const CourseManagement: React.FC = () => {
                                     order_index: scenarios.length 
                                 })
                             }
-                            className="bg-blue-800 text-white px-6 py-2 rounded-xl text-xs font-black uppercase shadow-lg hover:scale-105 transition-transform"
+                            className="bg-blue-800 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg hover:scale-105 transition-transform"
                         >
                             {activeTab === 'talks' ? t({ en: '+ Add Module', kn: '+ ಮಾಡ್ಯೂಲ್ ಸೇರಿಸಿ' }) : t({ en: '+ Add Scenario', kn: '+ ಸನ್ನಿವೇಶ ಸೇರಿಸಿ' })}
                         </button>
@@ -321,8 +343,10 @@ const CourseManagement: React.FC = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {scenarios.map((s, idx) => (
-                            <div key={s.id || idx} className="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 p-6 flex justify-between items-start shadow-sm hover:shadow-md transition-shadow">
+                        {scenarios
+                          .filter(s => (filterLevel === 'ALL' || s.level === filterLevel) && (filterCategory === 'ALL' || s.category.en === filterCategory))
+                          .map((s, idx) => (
+                            <div key={s.id || idx} className="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 p-6 flex justify-between items-start shadow-sm hover:shadow-md transition-shadow animate-in zoom-in duration-300">
                                 <div>
                                     <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">{s.level}</span>
                                     <h4 className="font-black text-lg text-slate-800 dark:text-white mt-2">{s.title.en}</h4>

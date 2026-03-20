@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
 // Use the TTS-specific preview model found in the list
-const MODEL = 'gemini-3-flash-preview';
+const MODEL = 'gemini-1.5-flash-8b';
 
 async function generateTTS(text: string, voice: string, lowBitrate: boolean) {
     const url = `https://generativelanguage.googleapis.com/v1beta/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
@@ -46,7 +46,8 @@ async function generateTTS(text: string, voice: string, lowBitrate: boolean) {
     const usage = data.usageMetadata;
 
     if (!audio) {
-        console.warn('Gemini returned OK but no audio data in response. Response:', JSON.stringify(data, null, 2));
+        console.warn('Gemini returned OK but no audio data. Text:', text.substring(0, 50));
+        console.warn('Full Response:', JSON.stringify(data, null, 2));
     }
     return { audio, usage };
 }
@@ -57,8 +58,12 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const { text, voice = 'Snehi', lowBitrate = false } = await req.json();
+        let { text, voice = 'Aoede', lowBitrate = false } = await req.json();
 
+        // Map application voice names to valid Gemini prebuilt voices
+        if (voice === 'Snehi' || voice === 'WOMAN') voice = 'Aoede';
+        if (voice === 'MAN') voice = 'Puck';
+        
         if (!text) {
             return new Response(JSON.stringify({ audio: null }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },

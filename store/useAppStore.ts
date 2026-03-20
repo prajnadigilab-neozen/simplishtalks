@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { LEVEL_ORDER } from '../constants';
 import { db } from '../lib/db';
 import { syncUp } from '../services/syncService';
+import { evaluateSnehiScorecard } from '../services/geminiService';
 
 interface AppState {
     session: any | null;
@@ -19,6 +20,8 @@ interface AppState {
     evaluationHistory: any[];
     scenarios: SnehiScenario[];
     currentScenarioId: string | null;
+    scenarioSaves: any[];
+    clearChatRequested: boolean;
 
     // Actions
     initialize: (forceRefresh?: boolean) => Promise<void>;
@@ -35,6 +38,9 @@ interface AppState {
     setCurrentScenario: (id: string | null) => void;
     markScenarioComplete: (scenarioId: string) => Promise<void>;
     refreshSession: () => Promise<void>;
+    fetchScenarioSaves: () => Promise<void>;
+    saveScenarioPractice: (scenarioId: string, chatHistory: any[], audioBlob?: Blob, duration?: number) => Promise<void>;
+    setClearChatRequested: (requested: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -46,6 +52,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     initialized: false,
     scenarios: [],
     currentScenarioId: null,
+    scenarioSaves: [],
+    clearChatRequested: false,
     dataSaverMode: (() => {
         const enabled = localStorage.getItem('dataSaverMode') === 'true';
         if (enabled) document.documentElement.classList.add('data-saver-active');
@@ -412,7 +420,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     refreshSession: async () => {
-        const profile = await getUserSession();
+        const profile = await getUserSession(undefined, true);
         if (profile) {
             const currentSession = get().session;
             set({
@@ -443,8 +451,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
     fetchScenarios: async () => {
         try {
-            let local = await db.snehi_scenarios.orderBy('order_index').toArray();
-            if (local.length === 0 && navigator.onLine) {
+            // First, try fetching from Supabase to get the freshest data
+            if (navigator.onLine) {
                 const { data, error } = await supabase.from('snehi_scenarios').select('*').order('order_index');
                 if (!error && data) {
                     const mapped = data.map(s => ({
@@ -456,10 +464,18 @@ export const useAppStore = create<AppState>((set, get) => ({
                         initialMessage: s.initial_message,
                         order_index: s.order_index
                     }));
+                    
+                    // Update local DB cache
+                    await db.snehi_scenarios.clear();
                     await db.snehi_scenarios.bulkPut(mapped);
-                    local = mapped;
+                    set({ scenarios: mapped });
+                    console.log("✅ Scenarios synced from Supabase");
+                    return;
                 }
             }
+
+            // Fallback to local DB if offline or if fetch failed
+            const local = await db.snehi_scenarios.orderBy('order_index').toArray();
             set({ scenarios: local });
         } catch (e) {
             console.error("Fetch Scenarios Error:", e);
@@ -470,9 +486,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         const { session, progress } = get();
         if (!session?.id || !progress) return;
 
-        const newCompleted = progress.completedScenarios.includes(scenarioId)
-            ? progress.completedScenarios
-            : [...progress.completedScenarios, scenarioId];
+        if (progress.completedScenarios.includes(scenarioId)) return;
+        const newCompleted = [...progress.completedScenarios, scenarioId];
 
         set({ progress: { ...progress, completedScenarios: newCompleted } });
 
@@ -492,4 +507,100 @@ export const useAppStore = create<AppState>((set, get) => ({
             console.error("Error marking scenario complete", e);
         }
     },
+    fetchScenarioSaves: async () => {
+        const { session } = get();
+        if (!session?.id) return;
+        try {
+            const { data, error } = await supabase
+                .from('scenario_saves')
+                .select('*')
+                .eq('user_id', session.id)
+                .order('created_at', { ascending: false });
+            if (!error && data) {
+                set({ scenarioSaves: data });
+            }
+        } catch (e) {
+            console.error("Fetch Scenario Saves Error:", e);
+        }
+    },
+    saveScenarioPractice: async (scenarioId, chatHistory, audioBlob, duration = 0) => {
+        const { session } = get();
+        if (!session?.id) return;
+        
+        try {
+            let audioUrl = null;
+            if (audioBlob) {
+                try {
+                    const fileName = `${session.id}/${scenarioId}_${Date.now()}.webm`;
+                    const { data, error: uploadError } = await supabase.storage
+                        .from('scenario-audio')
+                        .upload(fileName, audioBlob);
+                    
+                    if (!uploadError) {
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('scenario-audio')
+                            .getPublicUrl(fileName);
+                        audioUrl = publicUrl;
+                    } else {
+                        alert(`DEBUG - Upload Error: ${JSON.stringify(uploadError)}`);
+                        console.warn("Audio upload failed:", uploadError);
+                    }
+                } catch (audioErr) {
+                    alert(`DEBUG - Audio save exception: ${audioErr}`);
+                    console.error("Audio save error (continuing with chat only):", audioErr);
+                }
+            } else {
+                alert("DEBUG - audioBlob is null or undefined! The recorder did not output a file.");
+            }
+
+            // --- Generate AI Scorecard ---
+            let scorecard = null;
+            try {
+                // Format chat history for the AI
+                const transcript = chatHistory.map(m => {
+                    let msg = `${m.role.toUpperCase()}: ${m.text}`;
+                    if (m.correction) msg += `\n[Correction given: ${m.correction}]`;
+                    if (m.pronunciationTip) msg += `\n[Pronunciation Tip: ${m.pronunciationTip}]`;
+                    return msg;
+                }).join('\n\n');
+
+                scorecard = await evaluateSnehiScorecard(transcript);
+            } catch (evalErr) {
+                console.error("Scorecard evaluation failed:", evalErr);
+            }
+
+            const safeInt = (val: any) => {
+                if (val == null) return null;
+                const parsed = Math.round(Number(val));
+                return isNaN(parsed) ? null : parsed;
+            };
+
+            const { error: insertError } = await supabase
+                .from('scenario_saves')
+                .insert([{
+                    user_id: session.id,
+                    scenario_id: scenarioId,
+                    chat_history: chatHistory,
+                    audio_url: audioUrl,
+                    duration_seconds: duration,
+                    p_score: safeInt(scorecard?.p_score),
+                    f_score: safeInt(scorecard?.f_score),
+                    c_score: safeInt(scorecard?.c_score),
+                    a_score: safeInt(scorecard?.a_score),
+                    evaluation_feedback: scorecard?.evaluation_feedback || null
+                }]);
+
+            if (insertError) {
+                alert(`DEBUG - Insert Error: ${insertError.message}\nCode: ${insertError.code}\nDetails: ${insertError.details}`);
+                throw insertError;
+            }
+
+            // Refresh saves
+            await get().fetchScenarioSaves();
+        } catch (e) {
+            console.error("Save Scenario Practice Error:", e);
+            throw e;
+        }
+    },
+    setClearChatRequested: (requested) => set({ clearChatRequested: requested }),
 }));

@@ -2,6 +2,12 @@
 
 All notable features implemented and issues fixed for **SIMPLISH Talks** will be documented in this file. 
 
+## [2026-03-15]
+
+### General Updates 🔄
+- V 7.5 Voice Scenarios added
+
+
 ## [2026-03-11]
 
 ### General Updates 🔄

@@ -63,6 +63,17 @@ export interface UseGeminiLiveReturn {
     clearError: () => void;
 }
 
+// ── Suppress specific SDK console noise ─────────────────────────
+// The Gemini SDK internally calls console.error("WebSocket is already in
+// CLOSING or CLOSED state") from its send() path. This is NOT a thrown
+// exception so try/catch cannot intercept it. We install a one-time,
+// permanent filter that simply drops that specific message.
+const _origConsoleError = console.error;
+console.error = (...args: any[]) => {
+    if (typeof args[0] === 'string' && (args[0].includes('CLOSING') || args[0].includes('CLOSED'))) return;
+    _origConsoleError.apply(console, args);
+};
+
 // ─── Hook ───────────────────────────────────────────────────────
 export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveReturn {
     const [isConnected, setIsConnected] = useState(false);
@@ -171,7 +182,7 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                     },
 
                     onerror: (e: any) => {
-                        console.error('Live Error:', e);
+                        console.warn('Live Error:', e);
                         if (activeIdRef.current !== connectionId) return;
 
                         const msg = e?.message?.includes('Requested entity was not found')
@@ -215,6 +226,8 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
     }, [callbacks]);
 
     const cleanupInternal = useCallback(() => {
+        canSendRef.current = false; // Immediately stop PCM sends
+
         // Log duration before clearing
         if (sessionStartTimeRef.current) {
             const durationSeconds = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);

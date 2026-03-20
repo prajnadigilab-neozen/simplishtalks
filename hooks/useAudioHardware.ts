@@ -1,6 +1,6 @@
 
 import { useRef, useState, useCallback } from 'react';
-import { decodeBase64, decodeAudioData } from '../utils/audioUtils';
+import { decodeBase64, decodeRawPCM as decodeAudioData } from '../utils/audioUtils';
 
 // ─── Types ──────────────────────────────────────────────────────
 export interface UseAudioHardwareReturn {
@@ -10,11 +10,16 @@ export interface UseAudioHardwareReturn {
     stopAllAudio: () => void;
     analyserNode: AnalyserNode | null;
     isAiTalking: boolean;
+    recordingUrl: string | null;
+    lastRecordingBlob: Blob | null;
+    getLatestBlob: () => Blob | null;
 }
 
 // ─── Hook ───────────────────────────────────────────────────────
 export function useAudioHardware(): UseAudioHardwareReturn {
     const [isAiTalking, setIsAiTalking] = useState(false);
+    const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
+    const [lastRecordingBlob, setLastRecordingBlob] = useState<Blob | null>(null);
 
     // Singleton AudioContexts — created once, resumed/suspended as needed
     const ctxInRef = useRef<AudioContext | null>(null);
@@ -27,6 +32,11 @@ export function useAudioHardware(): UseAudioHardwareReturn {
     const nextStartTimeRef = useRef(0);
     const workletLoadedRef = useRef(false);
     const isAiTalkingRef = useRef(false); // Used to gate mic during AI speech
+    
+    const destNodeRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const recordedChunksRef = useRef<Blob[]>([]);
+    const latestBlobRef = useRef<Blob | null>(null);
 
     // ── Get or create singleton AudioContexts ──
     const getCtxIn = useCallback(() => {
@@ -70,10 +80,43 @@ export function useAudioHardware(): UseAudioHardwareReturn {
         const workletNode = new AudioWorkletNode(ctx, 'voice-coach-processor');
         workletNodeRef.current = workletNode;
 
+        // ** Setup Recording Destination **
+        if (!destNodeRef.current) {
+            destNodeRef.current = outCtx.createMediaStreamDestination();
+        }
+        
+        // Reset recording state
+        recordedChunksRef.current = [];
+        if (recordingUrl) {
+            URL.revokeObjectURL(recordingUrl);
+            setRecordingUrl(null);
+        }
+
+        // Start MediaRecorder
+        try {
+            const mr = new MediaRecorder(destNodeRef.current.stream);
+            mr.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+            };
+            mr.onstop = () => {
+                const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+                latestBlobRef.current = blob;
+                setLastRecordingBlob(blob);
+                setRecordingUrl(URL.createObjectURL(blob));
+            };
+            mr.start(1000); // chunk every second
+            mediaRecorderRef.current = mr;
+        } catch (err) {
+            console.error("Failed to start MediaRecorder:", err);
+        }
+
+        // Connect mic directly to destination for recording (mixed with AI)
+        // Note: outCtx is used for both AI playback and mixed recording
+        const outSource = outCtx.createMediaStreamSource(stream);
+        outSource.connect(destNodeRef.current);
+
         workletNode.port.onmessage = (event) => {
             if (event.data.type === 'pcm') {
-                // ⚡ CRITICAL: Do NOT send mic audio while AI is talking.
-                // This prevents the AI from hearing its own voice and looping.
                 if (!isAiTalkingRef.current) {
                     onPcmData(new Uint8Array(event.data.data));
                 }
@@ -103,6 +146,12 @@ export function useAudioHardware(): UseAudioHardwareReturn {
             streamRef.current = null;
         }
 
+        // Stop MediaRecorder
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            try { mediaRecorderRef.current.stop(); } catch (e) { /* noop */ }
+            mediaRecorderRef.current = null;
+        }
+
         // Suspend (don't close) input context for reuse
         if (ctxInRef.current && ctxInRef.current.state === 'running') {
             ctxInRef.current.suspend().catch(() => { });
@@ -129,7 +178,12 @@ export function useAudioHardware(): UseAudioHardwareReturn {
 
         const source = outCtx.createBufferSource();
         source.buffer = audioBuffer;
+        
+        // Connect to speaker AND recording destination
         source.connect(analyserRef.current);
+        if (destNodeRef.current) {
+            source.connect(destNodeRef.current);
+        }
 
         source.onended = () => {
             sourcesRef.current.delete(source);
@@ -162,5 +216,8 @@ export function useAudioHardware(): UseAudioHardwareReturn {
         stopAllAudio,
         analyserNode: analyserRef.current,
         isAiTalking,
+        recordingUrl,
+        lastRecordingBlob,
+        getLatestBlob: () => latestBlobRef.current
     };
 }

@@ -327,6 +327,20 @@ export async function getAllUserUsage(): Promise<any[]> {
   }
 }
 
+export async function getUserUsageByRange(startDate?: string, endDate?: string): Promise<any[]> {
+  try {
+    const { data, error } = await supabase.rpc('get_user_usage_by_range', {
+      p_start_date: startDate || null,
+      p_end_date: endDate || null
+    });
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.error("Failed to fetch user usage by range:", err);
+    return [];
+  }
+}
+
 export async function getUserUsageLogs(userId: string): Promise<any[]> {
   try {
     const { data, error } = await supabase

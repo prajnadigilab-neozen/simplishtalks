@@ -97,6 +97,7 @@ export interface UserProgress {
   prefersTranslation?: boolean;
   prefersPronunciation?: boolean;
   completedScenarios: string[];
+  topupAmount?: number;
 }
 
 export interface TranslationStrings {
@@ -114,4 +115,19 @@ export interface CoachMessage {
   audioUrl?: string; // Link to recorded audio
   audioEn?: string; // Pre-fetched audio for main reply
   audioTip?: string; // Pre-fetched audio for pronunciation tip
+}
+
+export interface ScenarioSave {
+  id: string;
+  user_id: string;
+  scenario_id: string;
+  chat_history: CoachMessage[];
+  audio_url?: string;
+  duration_seconds: number;
+  created_at: string;
+  p_score?: number | null;
+  f_score?: number | null;
+  c_score?: number | null;
+  a_score?: number | null;
+  evaluation_feedback?: string | null;
 }

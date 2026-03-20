@@ -215,6 +215,60 @@ async function handleGenerateLesson(body: any) {
     }
 }
 
+// ── Snehi Scorecard Evaluation ───────────────────────────────────────────────
+
+async function handleSnehiScorecard(body: any) {
+    const { transcript } = body;
+
+    const prompt = `
+    You are an AI English Coach for a conversational practice app.
+    Review the following chat transcript between the USER and the AI ("Snehi").
+    The AI may have provided corrections or pronunciation tips during the chat.
+    
+    TRANSCRIPT:
+    ${transcript}
+    
+    TASKS:
+    Evaluate the USER's performance on a scale of 1 to 10 for each of the following four pillars:
+    1. p_score (Pronunciation): Focus on clarity and any target sounds corrected.
+    2. f_score (Flow & Reduction): Focus on rhythm, natural flow, and use of connected speech.
+    3. c_score (Confidence): Focus on responsiveness and lack of filler words (um, uh).
+    4. a_score (Accuracy): Focus on grammatical correctness and vocabulary.
+    
+    Provide a short encouraging generic feedback message (max 2 sentences) summarizing their performance and offering a quick tip.
+
+    Return JSON format.
+    `;
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                p_score: { type: 'NUMBER' },
+                f_score: { type: 'NUMBER' },
+                c_score: { type: 'NUMBER' },
+                a_score: { type: 'NUMBER' },
+                evaluation_feedback: { type: 'STRING' },
+            },
+            required: ['p_score', 'f_score', 'c_score', 'a_score', 'evaluation_feedback'],
+        },
+    };
+
+    const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, contents, config);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, contents, config);
+        }
+        throw err;
+    }
+}
+
 // ── Router ───────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
@@ -237,6 +291,8 @@ Deno.serve(async (req) => {
             result = await handleSpeech(body);
         } else if (type === 'generate_lesson') {
             result = await handleGenerateLesson(body);
+        } else if (type === 'snehi_scorecard') {
+            result = await handleSnehiScorecard(body);
         } else {
             return new Response(JSON.stringify({ error: `Unknown evaluation type: ${type}` }), {
                 status: 400,
