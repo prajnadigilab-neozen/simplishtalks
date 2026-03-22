@@ -22,15 +22,17 @@ export class SimplishDB extends Dexie {
     lessons!: Table<any, string>;
     user_progress!: Table<LocalUserProgress, string>;
     snehi_scenarios!: Table<any, string>;
+    user_custom_scenarios!: Table<any, string>;
     sync_queue!: Table<SyncQueueItem, number>;
 
     constructor() {
         super('SimplishTalksDB');
-        this.version(1).stores({
+        this.version(2).stores({
             modules: 'id, level, order_index',
             lessons: 'id, module_id, order_index',
             user_progress: 'user_id',
             snehi_scenarios: 'id, level, order_index',
+            user_custom_scenarios: 'id, user_id, level',
             sync_queue: '++id, action, created_at'
         });
     }

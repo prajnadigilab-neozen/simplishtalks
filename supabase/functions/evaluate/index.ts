@@ -269,6 +269,59 @@ async function handleSnehiScorecard(body: any) {
     }
 }
 
+// ── Custom Scenario Generation ───────────────────────────────────────────────
+
+async function handleGenerateCustomScenario(body: any) {
+    const { category, promptText } = body;
+
+    const prompt = `
+    You are an AI English Coach for a conversational practice app.
+    Generate a JSON object for a custom roleplay scenario based on the following context and category.
+    The category is: "${category}".
+    User's instructions/idea (might be in Kannada or English): "${promptText}"
+    
+    TASKS:
+    1. Create a clear 'title' object with 'en' and 'kn' (Kannada) translations.
+    2. Write a comprehensive 'systemInstruction'. It must tell the AI how to act, what the user's goal is, and strictly remind the AI to be helpful, concise, and provide bilingual translations if needed. DO NOT use markdown in systemInstruction, keep it plain text.
+    3. Provide an 'initialMessage' (the first thing the AI will say to start the conversation, to get the user speaking).
+
+    Output must be valid JSON matching the schema.
+    `;
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                title: {
+                    type: 'OBJECT',
+                    properties: {
+                        en: { type: 'STRING' },
+                        kn: { type: 'STRING' }
+                    },
+                    required: ['en', 'kn']
+                },
+                systemInstruction: { type: 'STRING' },
+                initialMessage: { type: 'STRING' }
+            },
+            required: ['title', 'systemInstruction', 'initialMessage']
+        }
+    };
+
+    const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, contents, config);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, contents, config);
+        }
+        throw err;
+    }
+}
+
 // ── Router ───────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
@@ -293,6 +346,8 @@ Deno.serve(async (req) => {
             result = await handleGenerateLesson(body);
         } else if (type === 'snehi_scorecard') {
             result = await handleSnehiScorecard(body);
+        } else if (type === 'generate_custom_scenario') {
+            result = await handleGenerateCustomScenario(body);
         } else {
             return new Response(JSON.stringify({ error: `Unknown evaluation type: ${type}` }), {
                 status: 400,

@@ -419,3 +419,45 @@ export async function evaluateSnehiScorecard(transcript: string) {
     return null; // Silent failure here, handled safely by frontend UI
   }
 }
+
+/**
+ * Generate Custom Scenario via Supabase Edge Function.
+ */
+export async function generateCustomScenario(category: string, promptText: string) {
+  // Quota Guardrail
+  const guard = await quotaGuard('gemini-1.5-flash', promptText, 'chat');
+  if (!guard.isAllowed) throw new Error(guard.message);
+  if (guard.mockData) return guard.mockData.data;
+
+  try {
+    const result = await invokeFunction('evaluate', { type: 'generate_custom_scenario', category, promptText });
+
+    if (result && result.usage) {
+      telemetry.logUsage({
+        api_type: 'chat',
+        model_name: result.model || 'gemini-custom-scenario',
+        input_units: result.usage.promptTokenCount,
+        output_units: result.usage.candidatesTokenCount,
+        total_units: result.usage.totalTokenCount
+      });
+    }
+
+    const scenarioData = result.data;
+    if (!scenarioData || !scenarioData.title || !scenarioData.systemInstruction || !scenarioData.initialMessage) {
+      throw new Error('AI returned incomplete scenario data. Please try again.');
+    }
+    return scenarioData;
+  } catch (error: any) {
+    console.error("Custom Scenario Generation Error:", error);
+    const msg = (error.message || "").toLowerCase();
+
+    if (msg.includes('429') || msg.includes('quota')) {
+      throw new Error('⏳ API quota exhausted. Please wait a few minutes.');
+    }
+    if (msg.includes('401') || msg.includes('jwt')) {
+      throw new Error('🔑 Authentication error. Please try logging out and back in.');
+    }
+
+    throw error;
+  }
+}

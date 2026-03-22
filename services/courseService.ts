@@ -269,28 +269,57 @@ export async function fetchUserRecordings(userId: string, lessonId: string) {
 /**
  * Fetches global aggregation stats for the Admin Dashboard.
  */
-export async function getGlobalStats(): Promise<{ totalUsers: number, activeLearners: number, totalModules: number, totalLessons: number }> {
+export async function getGlobalStats(): Promise<{ totalUsers: number, activeLearners: number, totalModules: number, totalLessons: number, customScenariosCount: number }> {
   try {
     const [
       { count: usersCount },
       { count: activeCount },
       { count: modulesCount },
-      { count: lessonsCount }
+      { count: lessonsCount },
+      { count: customScenariosCount }
     ] = await Promise.all([
       supabase.from('profiles').select('*', { count: 'exact', head: true }),
       supabase.from('user_progress').select('*', { count: 'exact', head: true }).not('current_level', 'is', null),
       supabase.from('modules').select('*', { count: 'exact', head: true }),
-      supabase.from('lessons').select('*', { count: 'exact', head: true })
+      supabase.from('lessons').select('*', { count: 'exact', head: true }),
+      supabase.from('user_custom_scenarios').select('*', { count: 'exact', head: true })
     ]);
 
     return {
       totalUsers: usersCount || 0,
       activeLearners: activeCount || 0,
       totalModules: modulesCount || 0,
-      totalLessons: lessonsCount || 0
+      totalLessons: lessonsCount || 0,
+      customScenariosCount: customScenariosCount || 0
     };
   } catch (error) {
     console.error("Global stats error:", error);
-    return { totalUsers: 0, activeLearners: 0, totalModules: 0, totalLessons: 0 };
+    return { totalUsers: 0, activeLearners: 0, totalModules: 0, totalLessons: 0, customScenariosCount: 0 };
+  }
+}
+
+/**
+ * Fetches all custom scenarios created by users for the Admin Dashboard.
+ */
+export async function getAllCustomScenarios(): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_custom_scenarios')
+      .select(`
+        *,
+        profiles (full_name, phone)
+      `)
+      .order('created_at', { ascending: false });
+      
+    if (error) throw error;
+    
+    // Map profiles object to creator for the dashboard UI
+    return (data || []).map((s: any) => ({
+      ...s,
+      creator: s.profiles
+    }));
+  } catch (error) {
+    console.error("Fetch custom scenarios error:", error);
+    return [];
   }
 }

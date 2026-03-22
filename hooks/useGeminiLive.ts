@@ -24,16 +24,17 @@ const forceKannadaScript = (text: string): string => {
     }).join('');
 };
 
-// ─── Tool Declaration ───────────────────────────────────────────
 const provideFeedbackTool: FunctionDeclaration = {
     name: 'provide_feedback',
     parameters: {
         type: Type.OBJECT,
-        description: 'Provide linguistic feedback to the student including corrections and pronunciation tips.',
+        description: 'MANDATORY TOOL: You must call this tool on EVERY turn to ensure the application receives the english translation (user_english_transcript) of what the user said, even if their speech was already in perfect English. Also provide linguistic feedback.',
         properties: {
             correction: { type: Type.STRING, description: 'The corrected English sentence if the user made a mistake.' },
             kannada_guide: { type: Type.STRING, description: 'A brief explanation in Kannada.' },
-            pronunciation_tip: { type: Type.STRING, description: 'A phonetic tip for words the user struggled with.' }
+            pronunciation_tip: { type: Type.STRING, description: 'A phonetic tip for words the user struggled with.' },
+            user_english_transcript: { type: Type.STRING, description: 'The accurate English translation or transcription of what the user just said.' },
+            user_kannada_transcript: { type: Type.STRING, description: 'The Kannada translation of what the user just said.' }
         }
     }
 };
@@ -43,6 +44,8 @@ export interface FeedbackData {
     correction?: string;
     kannadaGuide?: string;
     pronunciationTip?: string;
+    userEnglishTranscript?: string;
+    userKannadaTranscript?: string;
 }
 
 export interface UseGeminiLiveCallbacks {
@@ -137,6 +140,8 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                                         correction: args.correction,
                                         kannadaGuide: args.kannada_guide,
                                         pronunciationTip: args.pronunciation_tip,
+                                        userEnglishTranscript: args.user_english_transcript,
+                                        userKannadaTranscript: args.user_kannada_transcript
                                     };
                                     sessionPromise.then(s => s.sendToolResponse({
                                         functionResponses: { id: fc.id, name: fc.name, response: { status: 'logged' } },

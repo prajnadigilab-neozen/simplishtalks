@@ -34,13 +34,14 @@ interface AppState {
     setDataSaverMode: (enabled: boolean) => void;
     syncUsage: (type: 'voice' | 'chat', amount: number) => void;
     updateSNEHIPreferences: (updates: { prefersTranslation?: boolean, prefersPronunciation?: boolean }) => Promise<void>;
-    fetchScenarios: () => Promise<void>;
+    fetchScenarios: (userId?: string) => Promise<void>;
     setCurrentScenario: (id: string | null) => void;
     markScenarioComplete: (scenarioId: string) => Promise<void>;
     refreshSession: () => Promise<void>;
     fetchScenarioSaves: () => Promise<void>;
     saveScenarioPractice: (scenarioId: string, chatHistory: any[], audioBlob?: Blob, duration?: number) => Promise<void>;
     setClearChatRequested: (requested: boolean) => void;
+    addCustomScenario: (scenario: SnehiScenario) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -131,8 +132,8 @@ export const useAppStore = create<AppState>((set, get) => ({
             set({ session, modules: modules || [], initialized: true });
             console.log("✅ Core state set. Session:", !!session, "Modules:", modules?.length);
 
-            // Fetch SNEHI scenarios
-            await get().fetchScenarios();
+            // Fetch SNEHI scenarios — pass userId directly to avoid race with set()
+            await get().fetchScenarios(userId || undefined);
 
             if (userId) {
                 get().fetchEvaluationHistory();
@@ -449,13 +450,16 @@ export const useAppStore = create<AppState>((set, get) => ({
             console.error("Failed to update SNEHI preferences:", e);
         }
     },
-    fetchScenarios: async () => {
+    fetchScenarios: async (passedUserId?: string) => {
+        // Use passed userId to avoid race with store session state
+        const userId = passedUserId ?? get().session?.id;
         try {
+            let baseScenarios: SnehiScenario[] = [];
             // First, try fetching from Supabase to get the freshest data
             if (navigator.onLine) {
                 const { data, error } = await supabase.from('snehi_scenarios').select('*').order('order_index');
                 if (!error && data) {
-                    const mapped = data.map(s => ({
+                    baseScenarios = data.map(s => ({
                         id: s.id,
                         title: s.title,
                         category: s.category,
@@ -467,16 +471,61 @@ export const useAppStore = create<AppState>((set, get) => ({
                     
                     // Update local DB cache
                     await db.snehi_scenarios.clear();
-                    await db.snehi_scenarios.bulkPut(mapped);
-                    set({ scenarios: mapped });
-                    console.log("✅ Scenarios synced from Supabase");
-                    return;
+                    await db.snehi_scenarios.bulkPut(baseScenarios);
+                    console.log("✅ Standard scenarios synced from Supabase");
                 }
             }
 
-            // Fallback to local DB if offline or if fetch failed
-            const local = await db.snehi_scenarios.orderBy('order_index').toArray();
-            set({ scenarios: local });
+            if (baseScenarios.length === 0) {
+                // Fallback to local DB if offline or if fetch failed
+                baseScenarios = await db.snehi_scenarios.orderBy('order_index').toArray();
+            }
+            
+            // ALWAYS MERGE CUSTOM SCENARIOS FROM LOCAL DB
+            const customLocal = await db.user_custom_scenarios.toArray();
+            let allScenarios = [...baseScenarios];
+            
+            // FETCH CUSTOM SCENARIOS FROM SUPABASE IF ONLINE AND USER IS LOGGED IN
+            if (navigator.onLine && userId) {
+               const { data: remoteCustom, error: remoteError } = await supabase
+                  .from('user_custom_scenarios')
+                  .select('*')
+                  .eq('user_id', userId);
+               
+               if (!remoteError && remoteCustom) {
+                  const mappedRemote = remoteCustom.map(s => ({
+                     id: s.id,
+                     title: s.title,
+                     category: s.category,
+                     level: s.level,
+                     systemInstruction: s.system_instruction,
+                     initialMessage: s.initial_message,
+                     order_index: 999
+                  }));
+                  
+                  // Sync to local DB
+                  await db.user_custom_scenarios.bulkPut(mappedRemote);
+                  
+                  // Merge with deduping
+                  mappedRemote.forEach(rs => {
+                     if (!allScenarios.find(s => s.id === rs.id)) {
+                        allScenarios.push(rs);
+                     }
+                  });
+                  console.log(`✅ Fetched ${mappedRemote.length} custom scenarios from Supabase for user`, userId);
+               } else if (remoteError) {
+                  console.warn('Failed to fetch custom scenarios from Supabase:', remoteError.message);
+               }
+            }
+
+            // Also merge from local Dexie (for offline-created ones not yet synced)
+            customLocal.forEach(cs => {
+               if (!allScenarios.find(s => s.id === cs.id)) {
+                  allScenarios.push(cs);
+               }
+            });
+
+            set({ scenarios: allScenarios });
         } catch (e) {
             console.error("Fetch Scenarios Error:", e);
         }
@@ -603,4 +652,32 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
     },
     setClearChatRequested: (requested) => set({ clearChatRequested: requested }),
+    addCustomScenario: async (scenario) => {
+        set((state) => ({ scenarios: [...state.scenarios, scenario] }));
+        const userId = get().session?.id;
+        try {
+            // 1. Save to local DB (Dexie)
+            await db.user_custom_scenarios.put({
+                ...scenario,
+                user_id: userId || 'guest'
+            });
+
+            // 2. Sync to Supabase if logged in
+            if (userId && userId !== 'guest') {
+                const { error } = await supabase.from('user_custom_scenarios').insert({
+                    id: scenario.id,
+                    user_id: userId,
+                    title: scenario.title,
+                    category: scenario.category,
+                    level: scenario.level,
+                    system_instruction: scenario.systemInstruction,
+                    initial_message: scenario.initialMessage
+                });
+                if (error) console.error("Supabase sync error for custom scenario:", error);
+                else console.log("✅ Custom scenario synced to Supabase");
+            }
+        } catch (e) {
+            console.error("Failed to persist custom scenario:", e);
+        }
+    },
 }));

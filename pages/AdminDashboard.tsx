@@ -25,7 +25,7 @@ const AdminDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config' | 'custom_scenarios'>('users');
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
   const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -42,6 +42,7 @@ const AdminDashboard: React.FC = () => {
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [selectedUsageUser, setSelectedUsageUser] = useState<string | null>(null);
   const [usageLogs, setUsageLogs] = useState<any[]>([]);
+  const [customScenarios, setCustomScenarios] = useState<any[]>([]);
 
   // Platform Stats State
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -53,7 +54,8 @@ const AdminDashboard: React.FC = () => {
     totalRevenue: 0,
     talksCount: 0,
     snehiCount: 0,
-    topupRevenue: 0
+    topupRevenue: 0,
+    customScenariosCount: 0
   });
 
 
@@ -132,6 +134,9 @@ const AdminDashboard: React.FC = () => {
 
       const reports = await getPlatformReports();
       setReportsData(reports);
+      
+      const scenarios = await import('../services/courseService').then(m => m.getAllCustomScenarios());
+      setCustomScenarios(scenarios);
 
       // Reset filtered usage on initial load
       setFilteredUsageData([]);
@@ -282,6 +287,7 @@ const AdminDashboard: React.FC = () => {
       "Snehi Sold",
       "Voice Usage (secs)",
       "Chat Usage (msgs)",
+      "Custom Scenarios",
       ...(isSuperAdmin ? ["Revenue (INR)"] : []),
       "Deleted Users"
     ];
@@ -298,6 +304,7 @@ const AdminDashboard: React.FC = () => {
         `"${r.snehi_sold || 0}"`,
         `"${r.total_voice_seconds || 0}"`,
         `"${r.total_messages || 0}"`,
+        `"${r.custom_scenarios_created || 0}"`,
         ...(isSuperAdmin ? [`"${r.daily_revenue || 0}"`] : []),
         `"${r.deleted_count || 0}"`
       ];
@@ -422,6 +429,7 @@ const AdminDashboard: React.FC = () => {
             {currentUser?.role === UserRole.SUPER_ADMIN && (
               <>
                 <button key="mods" onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'mods' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Moderators', kn: 'ಮಾಡರೇಟರ್‌ಗಳು' })}</button>
+                <button key="custom_scenarios" onClick={() => setActiveTab('custom_scenarios')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'custom_scenarios' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Custom Scenarios', kn: 'ಕಸ್ಟಮ್ ಸನ್ನಿವೇಶಗಳು' })}</button>
                 <button key="config" onClick={() => setActiveTab('config')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'config' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Global Settings', kn: 'ಜಾಗತಿಕ ಸೆಟ್ಟಿಂಗ್‌ಗಳು' })}</button>
               </>
             )}
@@ -917,6 +925,19 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Total Lessons', kn: 'ಒಟ್ಟು ಪಾಠಗಳು' })}</p>
               </div>
             </div>
+
+            {/* Stat Card 5 (Custom Scenarios) */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">
+                  🎙️
+                </div>
+              </div>
+              <div>
+                <h4 className="text-4xl font-black text-slate-800 dark:text-slate-100 mb-1">{globalStats.customScenariosCount}</h4>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Custom Scenarios', kn: 'ಕಸ್ಟಮ್ ಸನ್ನಿವೇಶಗಳು' })}</p>
+              </div>
+            </div>
             
             {/* New KPI Card: Voice & Chat Usage */}
             <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between col-span-1 md:col-span-2 lg:col-span-1">
@@ -1249,6 +1270,7 @@ const AdminDashboard: React.FC = () => {
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Talks/Snehi', kn: 'ಟಾಕ್ಸ್/ಸ್ನೇಹಿ' })}</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Voice Usage', kn: 'ಧ್ವನಿ ಬಳಕೆ' })}</th>
                   <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Chat Usage', kn: 'ಚಾಟ್ ಬಳಕೆ' })}</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Custom Scenarios', kn: 'ಕಸ್ಟಮ್ ಸನ್ನಿವೇಶ' })}</th>
                   {currentUser?.role === UserRole.SUPER_ADMIN && (
                     <>
                       <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">{t({ en: 'Top-up Rev', kn: 'ಟಾಪ್-ಅಪ್ ಆದಾಯ' })}</th>
@@ -1285,6 +1307,9 @@ const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="p-6 text-slate-600 font-bold">
                         {report.total_messages ? `${report.total_messages} msgs` : '0 msgs'}
+                      </td>
+                      <td className="p-6 text-indigo-600 font-black">
+                        {report.custom_scenarios_created || 0}
                       </td>
                       {currentUser?.role === UserRole.SUPER_ADMIN && (
                         <>
@@ -1394,6 +1419,82 @@ const AdminDashboard: React.FC = () => {
                   = {systemConfig ? Math.floor(systemConfig.price_snehi / systemConfig.cost_per_minute) : 0} Minutes
                 </div>
              </div>
+          </div>
+        </div>
+      )}
+      {activeTab === 'custom_scenarios' && (
+        <div className="space-y-6 animate-in fade-in">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">
+                {t({ en: 'User Custom Scenarios', kn: 'ಬಳಕೆದಾರ ಕಸ್ಟಮ್ ಸನ್ನಿವೇಶಗಳು' })}
+              </h3>
+              <p className="text-sm text-slate-500 font-medium">
+                {t({ en: 'Review voice scenarios created by SNEHI users.', kn: 'ಬಳಕೆದಾರರು ರಚಿಸಿದ ಕಸ್ಟಮ್ ಸನ್ನಿವೇಶಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.' })}
+              </p>
+            </div>
+            <span className="px-4 py-2 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-xl text-xs font-black uppercase">
+              Total: {customScenarios.length}
+            </span>
+          </div>
+
+          <div className="overflow-hidden bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 shadow-xl">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 dark:bg-slate-800/50">
+                <tr>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Date</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Creator</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Title</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Prompt Length</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {customScenarios.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-400 font-bold">
+                      No custom scenarios found.
+                    </td>
+                  </tr>
+                ) : (
+                  customScenarios.map((scenario) => (
+                    <tr key={scenario.id} className="hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors">
+                      <td className="p-6 whitespace-nowrap text-xs font-medium text-slate-500">
+                        {new Date(scenario.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="p-6">
+                        <div className="flex flex-col">
+                          <span className="font-black text-slate-800 dark:text-slate-200">
+                            {scenario.creator?.full_name || 'Anonymous User'}
+                          </span>
+                          <span className="text-[9px] font-mono text-slate-400">
+                            {scenario.creator?.phone || 'No phone'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-6">
+                        <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                          {scenario.category?.en || 'CUSTOM'}
+                        </span>
+                      </td>
+                      <td className="p-6">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                          {scenario.title?.en}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {scenario.title?.kn}
+                        </p>
+                      </td>
+                      <td className="p-6 text-right">
+                        <span className="text-xs font-bold text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full">
+                          {scenario.user_prompt?.length || 0} chars
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

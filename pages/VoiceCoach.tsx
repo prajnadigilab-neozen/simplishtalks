@@ -85,7 +85,21 @@ const VoiceCoach: React.FC = () => {
       responseTimeoutRef.current = null;
     }
     if (!userId) return;
-    if (uTxt) { const m: CoachMessage = { role: 'user', text: uTxt, timestamp: Date.now() }; const id = await saveChatMessage(userId, m, undefined, 'voice'); if (id) m.dbId = id; setMessages(p => [...p, m]); }
+    
+    // Use the AI's English translation of the user's speech if provided, otherwise the raw transcription.
+    const finalUTxt = fb.userEnglishTranscript || uTxt;
+    if (finalUTxt) { 
+      const m: CoachMessage = { 
+        role: 'user', 
+        text: finalUTxt, 
+        kannadaGuide: fb.userKannadaTranscript, 
+        timestamp: Date.now() 
+      }; 
+      const id = await saveChatMessage(userId, m, undefined, 'voice'); 
+      if (id) m.dbId = id; 
+      setMessages(p => [...p, m]); 
+    }
+    
     if (cTxt) { 
       const m: CoachMessage = { role: 'coach', text: cTxt, correction: fb.correction, kannadaGuide: fb.kannadaGuide, pronunciationTip: fb.pronunciationTip, timestamp: Date.now() }; 
       const id = await saveChatMessage(userId, m, undefined, 'voice'); 
@@ -230,8 +244,8 @@ const VoiceCoach: React.FC = () => {
     if (!inst) inst = 'Persona: "Namma Simplish Meshtru", patient bilingual tutor.';
     const activeScenario = scenarios.find(s => s.id === currentScenarioId);
     if (activeScenario) inst = activeScenario.systemInstruction;
-    let finalInst = `${inst}\nSTRICT RULES: Transcribe Kannada in Kannada script ONLY. Be brief. Responses must be under 30 words.`;
-    if (session?.prefersTranslation === false) finalInst += "\nDISABLE TRANSLATIONS.";
+    let finalInst = `${inst}\nSTRICT RULES: You MUST ALWAYS call the provide_feedback tool on EVERY single turn. You MUST provide the 'user_english_transcript' (what the user said, translated to English) parameter in the tool call every time. Be brief. Responses must be under 30 words.`;
+    if (session?.prefersTranslation === false) finalInst += "\nDISABLE KANNADA TRANSLATIONS.";
     if (session?.prefersPronunciation === false) finalInst += "\nDISABLE PRONUNCIATION TIPS.";
     const ctx = messages.slice(-3).map(m => `${m.role === 'user' ? 'S' : 'C'}: ${m.text}`).join('\n');
     finalInst += `\n\nCtx:\n${ctx}`;
@@ -402,17 +416,27 @@ const VoiceCoach: React.FC = () => {
 
           <section className="flex-1 flex flex-col min-h-0 overflow-hidden relative bg-[#050b24]/40">
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 md:px-10 pt-10 pb-32 space-y-8 scroll-smooth" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(59, 130, 246, 0.2) transparent' }}>
+              {sessionError.type !== 'NONE' && (
+                <div className="animate-in fade-in slide-in-from-top-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-start gap-3 text-red-400 mb-6">
+                  <span className="text-sm">⚠️</span>
+                  <p className="text-xs font-medium leading-relaxed">{sessionError.msg}</p>
+                </div>
+              )}
               {messages.map((m, idx) => (
                 <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4`}>
                   <div className={`flex flex-col gap-2 ${m.role === 'user' ? 'items-end max-w-[85%]' : 'items-start max-w-[92%]'}`}>
                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">{m.role === 'user' ? 'You' : 'Snehi'} • {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     <div className={`px-5 py-4 rounded-[1.5rem] border transition-all ${m.role === 'user' ? "bg-indigo-600 border-indigo-500/40 text-white rounded-tr-none" : "bg-white/5 border-white/5 text-white/90 rounded-tl-none"}`}>
                       <p className="text-[14px] leading-relaxed font-medium whitespace-pre-wrap">{m.text}</p>
-                      {m.role === 'coach' && (m.correction || m.kannadaGuide || m.pronunciationTip) && (
-                        <div className="mt-5 space-y-4 border-t border-white/5 pt-4">
+                      {(m.correction || m.kannadaGuide || m.pronunciationTip) && (
+                        <div className={`mt-5 space-y-4 border-t pt-4 ${m.role === 'user' ? 'border-indigo-400/30' : 'border-white/5'}`}>
                           {m.correction && <p className="text-[11px] font-bold text-amber-400">✨ {m.correction}</p>}
-                          {m.kannadaGuide && <p className="text-[10px] text-white/60 bg-indigo-950/30 p-3 rounded-xl">{m.kannadaGuide}</p>}
-                          {m.pronunciationTip && (
+                          {m.kannadaGuide && session?.prefersTranslation !== false && (
+                            <p className={`text-[10px] p-3 rounded-xl ${m.role === 'user' ? 'bg-indigo-700/50 text-indigo-100' : 'text-white/60 bg-indigo-950/30'}`}>
+                              {m.kannadaGuide}
+                            </p>
+                          )}
+                          {m.pronunciationTip && m.role === 'coach' && (
                             <div className="flex items-center justify-between gap-4 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
                               <p className="text-[10px] text-emerald-200 italic">“{m.pronunciationTip}”</p>
                               <button onClick={() => speakTip(m.pronunciationTip!, `v-${idx}`)} className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20">{fetchingTipId === `v-${idx}` ? <Spin c="border-emerald-400" /> : <IcoVol />}</button>

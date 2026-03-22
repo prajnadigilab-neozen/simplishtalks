@@ -32,7 +32,8 @@ export enum CourseLevel {
   BASIC = 'BASIC',
   INTERMEDIATE = 'INTERMEDIATE',
   ADVANCED = 'ADVANCED',
-  EXPERT = 'EXPERT'
+  EXPERT = 'EXPERT',
+  CUSTOM = 'CUSTOM'
 }
 
 export interface Lesson {
