@@ -51,6 +51,7 @@ const VoiceCoach: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveView, setShowSaveView] = useState(false);
   const [isAiThinking, setIsAiThinking] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
   const isScenarioMarkedRef = useRef(false);
   const scenarioIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -227,41 +228,55 @@ const VoiceCoach: React.FC = () => {
   }, [messages, pendingUserText, pendingCoachText, isAiThinking]);
 
   const handleStart = async () => {
-    setSessionError({ type: 'NONE', msg: '' });
-    const usedSeconds = session?.totalTalkTime || 0;
-    const universalSeconds = 600;
-    const isSnehiOrBoth = session.packageType === PackageType.SNEHI || session.packageType === PackageType.BOTH;
-    const packageSeconds = isSnehiOrBoth ? (250 * 60) : 0;
-    const agentCredits = session.agentCredits || 0;
-    const totalLimitSeconds = universalSeconds + packageSeconds + (agentCredits * 60);
-    if (Math.ceil((totalLimitSeconds - usedSeconds) / 60) <= 0) {
-      alert(t({ en: 'Voice practice time exhausted.', kn: 'ಧ್ವನಿ ಅಭ್ಯಾಸದ ಸಮಯ ಮುಗಿದಿದೆ.' }));
-      return;
-    }
-    startRef.current = Date.now();
-    const rawInst = await getAiInstructions();
-    let inst = rawInst ? (JSON.parse(rawInst).instructions || rawInst) : "";
-    if (!inst) inst = 'Persona: "Namma Simplish Meshtru", patient bilingual tutor.';
-    const activeScenario = scenarios.find(s => s.id === currentScenarioId);
-    if (activeScenario) inst = activeScenario.systemInstruction;
-    let finalInst = `${inst}\nSTRICT RULES: You MUST ALWAYS call the provide_feedback tool on EVERY single turn. You MUST provide the 'user_english_transcript' (what the user said, translated to English) parameter in the tool call every time. Be brief. Responses must be under 30 words.`;
-    if (session?.prefersTranslation === false) finalInst += "\nDISABLE KANNADA TRANSLATIONS.";
-    if (session?.prefersPronunciation === false) finalInst += "\nDISABLE PRONUNCIATION TIPS.";
-    const ctx = messages.slice(-3).map(m => `${m.role === 'user' ? 'S' : 'C'}: ${m.text}`).join('\n');
-    finalInst += `\n\nCtx:\n${ctx}`;
-    isSessionActiveRef.current = true;
-    await gemini.connect(finalInst, session?.voiceGender === 'MAN' ? 'Puck' : 'Aoede');
-    await audio.startMic(pcm => {
-      if (!isSessionActiveRef.current) return; // PCM gate: drop data if session is ending
-      gemini.sendPcmData(pcm);
+    try {
+      setIsInitializing(true);
+      setSessionError({ type: 'NONE', msg: '' });
+      const usedSeconds = session?.totalTalkTime || 0;
+      const universalSeconds = 600;
+      const isSnehiOrBoth = session.packageType === PackageType.SNEHI || session.packageType === PackageType.BOTH;
+      const packageSeconds = isSnehiOrBoth ? (250 * 60) : 0;
+      const agentCredits = session.agentCredits || 0;
+      const totalLimitSeconds = universalSeconds + packageSeconds + (agentCredits * 60);
+      if (Math.ceil((totalLimitSeconds - usedSeconds) / 60) <= 0) {
+        alert(t({ en: 'Voice practice time exhausted.', kn: 'ಧ್ವನಿ ಅಭ್ಯಾಸದ ಸಮಯ ಮುಗಿದಿದೆ.' }));
+        return;
+      }
+      startRef.current = Date.now();
+      const rawInst = await getAiInstructions();
+      let inst = rawInst ? (JSON.parse(rawInst).instructions || rawInst) : "";
+      if (!inst) inst = 'Persona: "Namma Simplish Meshtru", patient bilingual tutor.';
+      const activeScenario = scenarios.find(s => s.id === currentScenarioId);
+      if (activeScenario) inst = activeScenario.systemInstruction;
+      let finalInst = `${inst}\nSTRICT RULES: You MUST ALWAYS call the provide_feedback tool on EVERY single turn. You MUST provide the 'user_english_transcript' (what the user said, translated to English) parameter in the tool call every time. Be brief. Responses must be under 30 words.`;
+      if (session?.prefersTranslation === false) finalInst += "\nDISABLE KANNADA TRANSLATIONS.";
+      if (session?.prefersPronunciation === false) finalInst += "\nDISABLE PRONUNCIATION TIPS.";
+      const ctx = messages.slice(-3).map(m => `${m.role === 'user' ? 'S' : 'C'}: ${m.text}`).join('\n');
+      finalInst += `\n\nCtx:\n${ctx}`;
+      isSessionActiveRef.current = true;
+      await gemini.connect(finalInst, session?.voiceGender === 'MAN' ? 'Puck' : 'Aoede');
+      await audio.startMic(pcm => {
+        if (!isSessionActiveRef.current) return; // PCM gate: drop data if session is ending
+        gemini.sendPcmData(pcm);
+        resetIdleTimerRef.current();
+      });
       resetIdleTimerRef.current();
-    });
-    resetIdleTimerRef.current();
-    if (activeScenario && messages.length === 0) {
-      setTimeout(() => {
-        const m: CoachMessage = { role: 'coach', text: activeScenario.initialMessage, timestamp: Date.now() };
-        setMessages([m]); saveChatMessage(userId!, m, undefined, 'voice');
-      }, 1000);
+      if (activeScenario && messages.length === 0) {
+        setTimeout(() => {
+          const m: CoachMessage = { role: 'coach', text: activeScenario.initialMessage, timestamp: Date.now() };
+          setMessages([m]); saveChatMessage(userId!, m, undefined, 'voice');
+        }, 1000);
+      }
+    } catch (err: any) {
+      console.error("Failed to start voice session:", err);
+      setSessionError({ 
+        type: 'TECHNICAL', 
+        msg: t({ 
+          en: 'Microphone access required. Please allow microphone access in your browser settings.', 
+          kn: 'ಮೈಕ್ರೊಫೋನ್ ಪ್ರವೇಶವನ್ನು ಅನುಮತಿಸಿ. ದಯವಿಟ್ಟು ಬ್ರೌಸರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.' 
+        }) 
+      });
+    } finally {
+      setIsInitializing(false);
     }
   };
 
@@ -353,7 +368,10 @@ const VoiceCoach: React.FC = () => {
               <div className="relative group shrink-0">
                 {audio.isAiTalking && <div className={`absolute inset-[-8px] rounded-full border-2 animate-[ping_2s_infinite] opacity-20 ${man ? 'border-blue-400' : 'border-orange-400'}`} />}
                 <div className={`overflow-hidden rounded-[2.5rem] w-16 h-16 md:w-32 md:h-32 lg:w-44 lg:h-44 border-4 transition-all duration-700 ${audio.isAiTalking ? 'border-white/50 scale-105 shadow-blue-500/20' : (isAiThinking || gemini.isConnecting) ? 'border-amber-400/50 scale-95 shadow-amber-500/20' : 'border-white/10'}`}>
-                  <img src={man ? '/male_coach.png' : '/female_coach.png'} alt="Coach" className={`w-full h-full object-cover transition-all duration-700 ${(audio.isAiTalking || isAiThinking) ? 'grayscale-0' : 'grayscale-[0.3]'}`} />
+                  <picture>
+                    <source srcSet={man ? '/male_coach.avif' : '/female_coach.avif'} type="image/avif" />
+                    <img src={man ? '/male_coach.png' : '/female_coach.png'} alt="Coach" className={`w-full h-full object-cover transition-all duration-700 ${(audio.isAiTalking || isAiThinking) ? 'grayscale-0' : 'grayscale-[0.3]'}`} />
+                  </picture>
                   {(isAiThinking || gemini.isConnecting) && (
                     <div className="absolute inset-0 bg-amber-500/20 flex items-center justify-center">
                       <div className="flex gap-1.5">
@@ -397,11 +415,13 @@ const VoiceCoach: React.FC = () => {
 
             <div className="w-full">
               {!live ? (
-                <button onClick={handleStart} className="w-full relative group overflow-hidden p-[2px] rounded-2xl transition-all active:scale-95 shadow-xl shadow-orange-900/20">
+                <button onClick={handleStart} disabled={isInitializing} className={`w-full relative group overflow-hidden p-[2px] rounded-2xl transition-all active:scale-95 shadow-xl shadow-orange-900/20 ${isInitializing ? 'opacity-70 cursor-not-allowed' : ''}`}>
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-600 via-amber-400 to-orange-600 animate-[shimmer_2s_linear_infinite]" />
                   <div className="relative bg-[#0a1440] group-hover:bg-[#0c1a4d] transition-colors rounded-[14px] py-3.5 px-4 flex items-center justify-center gap-3">
-                    <span className="text-sm">🎙️</span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Start Practice</span>
+                    {isInitializing ? <Spin /> : <span className="text-sm">🎙️</span>}
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                      {isInitializing ? (t({ en: 'Initializing...', kn: 'ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ...' })) : (t({ en: 'Start Practice', kn: 'ಅಭ್ಯಾಸ ಪ್ರಾರಂಭಿಸಿ' }))}
+                    </span>
                   </div>
                 </button>
               ) : (

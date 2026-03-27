@@ -30,6 +30,7 @@ const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
 const TopupPage = React.lazy(() => import('./pages/TopupPage'));
 
 import { telemetry } from './services/telemetryService';
+import NotFoundPage from './pages/NotFoundPage';
 
 import Logo from './components/Logo';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -342,7 +343,7 @@ const AppContent: React.FC = () => {
               <Route path="/admin/ai-instructions" element={session?.role === UserRole.SUPER_ADMIN || session?.role === UserRole.MODERATOR ? <ErrorBoundary><AiInstructions /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/analytics" element={session?.role === UserRole.SUPER_ADMIN ? <ErrorBoundary><APIAnalytics /></ErrorBoundary> : <Navigate to="/dashboard" />} />
               <Route path="/quota" element={session?.role === UserRole.SUPER_ADMIN ? <ErrorBoundary><QuotaDashboard /></ErrorBoundary> : <Navigate to="/dashboard" />} />
-              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
         )}

@@ -1,0 +1,46 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e7] [cursor=pointer]:
+      - generic [ref=e8]: SIMPLISH
+      - generic [ref=e9]: Talks
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - button "🌙" [ref=e12] [cursor=pointer]
+        - button "En" [ref=e13] [cursor=pointer]
+      - button "ಲಾಗಿನ್" [ref=e16] [cursor=pointer]
+  - main [ref=e17]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - img "SIMPLISH Symbol" [ref=e22]
+        - heading "SIMPLISH Talks" [level=1] [ref=e23]:
+          - text: SIMPLISH
+          - generic [ref=e24]: Talks
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - button "ಲಾಗಿನ್" [ref=e28] [cursor=pointer]
+          - button "ನೋಂದಣಿ" [ref=e29] [cursor=pointer]
+        - generic [ref=e30]:
+          - heading "ಮರಳಿ ಸ್ವಾಗತ 👋" [level=2] [ref=e31]
+          - paragraph [ref=e32]: ನಿಮ್ಮ ಕಲಿಕೆ ಮುಂದುವರಿಸಿ.
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]: ಫೋನ್ ಸಂಖ್ಯೆ
+            - textbox "98765 43210" [ref=e37]
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - generic [ref=e40]: ಪಾಸ್‌ವರ್ಡ್
+              - generic [ref=e41]:
+                - textbox "••••••••" [ref=e42]
+                - button "Show password" [ref=e44] [cursor=pointer]:
+                  - img [ref=e45]
+            - button "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ?" [ref=e48] [cursor=pointer]
+          - button "ಸೈನ್ ಇನ್ →" [ref=e49] [cursor=pointer]:
+            - text: ಸೈನ್ ಇನ್
+            - generic [ref=e50]: →
+        - paragraph [ref=e51]:
+          - text: ಖಾತೆ ಇಲ್ಲವೇ?
+          - button "ಈಗಲೇ ನೋಂದಾಯಿಸಿ" [ref=e52] [cursor=pointer]
+```

@@ -1,6 +1,6 @@
-
 import { UserRole } from '../types';
 import { supabase } from '../lib/supabase';
+import DOMPurify from 'dompurify';
 
 export interface RegisterData {
   fullName: string;
@@ -47,13 +47,18 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
   try {
     const role = data.adminCode === ADMIN_SECRET ? UserRole.SUPER_ADMIN : UserRole.STUDENT;
 
+    // SECURITY (REMEDIATION): Sanitize inputs against XSS payloads before DB insertion.
+    // Preserves legitimate bilingual/Kannada text while stripping `<script>` tags.
+    const cleanFullName = DOMPurify.sanitize(data.fullName);
+    const cleanPlace = DOMPurify.sanitize(data.place);
+
     const { data: authData, error: authError } = await supabase.auth.signUp({
       phone: data.phone,
       password: data.password,
       options: {
         data: {
-          full_name: data.fullName,
-          place: data.place,
+          full_name: cleanFullName,
+          place: cleanPlace,
           role: role
         }
       }
@@ -75,16 +80,16 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
         // Ensure profile exists for the gracefully logged-in user
         if (signinData.user) {
           const { error: profileError } = await supabase.from('profiles').update({
-            full_name: data.fullName,
-            place: data.place
+            full_name: cleanFullName,
+            place: cleanPlace
           }).eq('id', signinData.user.id);
 
           if (profileError && !profileError.message.includes('row-level')) {
             await supabase.from('profiles').insert([{
               id: signinData.user.id,
-              full_name: data.fullName,
+              full_name: cleanFullName,
               phone: data.phone,
-              place: data.place,
+              place: cleanPlace,
               role: role
             }]);
             await supabase.from('user_progress').upsert([{ user_id: signinData.user.id }], { onConflict: 'user_id' });
@@ -103,9 +108,9 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
       const { data: updatedRows, error: profileError } = await supabase
         .from('profiles')
         .update({
-          full_name: data.fullName,
+          full_name: cleanFullName,
           phone: data.phone,
-          place: data.place,
+          place: cleanPlace,
           role: role
         })
         .eq('id', authData.user.id)
@@ -117,9 +122,9 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
         // Try insert if update failed to affect any rows (meaning row doesn't exist)
         const { error: insertError } = await supabase.from('profiles').insert([{
           id: authData.user.id,
-          full_name: data.fullName,
+          full_name: cleanFullName,
           phone: data.phone,
-          place: data.place,
+          place: cleanPlace,
           role: role
         }]);
         if (insertError && !insertError.message.includes('row-level')) {
@@ -146,16 +151,28 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
 
 export async function updateProfile(id: string, updates: any): Promise<{ success: boolean; error?: string }> {
   try {
+    // SECURITY (REMEDIATION): Sanitize string inputs against XSS
+    const sanitizedUpdates = { ...updates };
+    if (typeof sanitizedUpdates.full_name === 'string') {
+        sanitizedUpdates.full_name = DOMPurify.sanitize(sanitizedUpdates.full_name);
+    }
+    if (typeof sanitizedUpdates.place === 'string') {
+        sanitizedUpdates.place = DOMPurify.sanitize(sanitizedUpdates.place);
+    }
+    if (typeof sanitizedUpdates.bio === 'string') {
+        sanitizedUpdates.bio = DOMPurify.sanitize(sanitizedUpdates.bio);
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .upsert({ id, ...updates })
+      .upsert({ id, ...sanitizedUpdates })
       .eq('id', id);
 
     if (error) {
       const columnMatch = error.message.match(/column "(.+)" does not exist/);
       if (columnMatch) {
         const missingColumn = columnMatch[1];
-        const { [missingColumn]: _, ...safeUpdates } = updates;
+        const { [missingColumn]: _, ...safeUpdates } = sanitizedUpdates;
         const { error: retryError } = await supabase.from('profiles').upsert({ id, ...safeUpdates }).eq('id', id);
         if (retryError) throw retryError;
         return { success: true, error: `Updated, but ${missingColumn} is not supported by DB.` };

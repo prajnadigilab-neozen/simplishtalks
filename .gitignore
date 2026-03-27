@@ -25,3 +25,8 @@ dist-ssr
 
 # Development Notes (Not committed)
 dev_tracker.md
+
+# Playwright E2E test artifacts
+e2e/.env.test
+e2e/test-results/
+playwright-report/
