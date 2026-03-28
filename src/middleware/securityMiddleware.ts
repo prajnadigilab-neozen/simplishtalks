@@ -1,11 +1,22 @@
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+// Deep Object Sanitizer for Edge execution
+function sanitizeObject(obj: any): any {     
+    if (typeof obj === 'string') {
+        // Lightweight regex-based HTML tag stripper (suitable for Edge runtimes)
+        return obj.replace(/<[^>]*>?/gm, '');
+    }
+    if (Array.isArray(obj)) {
+        return obj.map(sanitizeObject);
+    }
+    if (typeof obj === 'object' && obj !== null) {
+        return Object.keys(obj).reduce((acc, key) => {
+            acc[key] = sanitizeObject(obj[key]);
+            return acc;
+        }, {} as Record<string, any>);
+    }
+    return obj;
+}
 
-// In a Node environment, DOMPurify needs a window object to function correctly
-const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
-
-export async function securityMiddleware(req: Request): Promise<Response | null> {
+export async function securityMiddleware(req: Request): Promise<Response | Request | null> {
     // 1. Authorization Check (Lesson Leech Test & Valid Session Test)
     const url = new URL(req.url);
     if (url.pathname.includes('/lesson/') || url.pathname.includes('/profile')) {
@@ -25,24 +36,24 @@ export async function securityMiddleware(req: Request): Promise<Response | null>
             const clonedReq = req.clone();
             const body = await clonedReq.json();
             
-            // Sanitize string values in the body
-            const sanitizedBody = { ...body };
-            for (const key in sanitizedBody) {
-                if (typeof sanitizedBody[key] === 'string') {
-                    // Use DOMPurify to strip malicious tags while preserving Kannada
-                    sanitizedBody[key] = purify.sanitize(sanitizedBody[key]);
-                }
-            }
+            // Deep Sanitize all values in the body
+            const sanitizedBody = sanitizeObject(body);
 
-            // Return a modified request or pass the sanitized body downstream
-            // For this mock middleware validation, we will attach the sanitized body to a custom header or simply return null to indicate 'passed'
-            (req as any).sanitizedBody = sanitizedBody;
-
+            // Reconstruct the request to pass the sanitized body downstream
+            const newBodyStream = JSON.stringify(sanitizedBody);
+            
+            // Return a reconstructed Request overriding the dirty payload
+            return new Request(req.url, {
+                method: req.method,
+                headers: req.headers,
+                body: newBodyStream
+            });
         } catch (e) {
             // If it's not JSON, skip parsing or handle accordingly
+            console.error("Failed to parse or sanitize request body", e);
         }
     }
 
-    // Return null indicates the middleware passed and the request can proceed
+    // Return null indicates the middleware passed and the request can proceed unmodified
     return null;
 }

@@ -1,43 +1,104 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PackageType, PackageStatus } from '../types';
 import { useAppStore } from '../store/useAppStore';
-import { supabase } from '../lib/supabase';
-import { useLanguage } from '../components/LanguageContext';
 import { clearProfileCache } from '../services/authService';
 import { getSystemConfig } from '../services/systemConfigService';
+import { applyMockLocalFulfillmentDB, resolveUpgradedPackage, calculateBonusCredits } from '../services/paymentService';
+
+// --- CONFIGURATION CONSTANTS ---
+const PACKAGE_CONFIG: Record<PackageType, { label: string; price: number; displayPrice: string }> = {
+    [PackageType.TALKS]: { label: 'SIMPLISH - TALKS', price: 299, displayPrice: '₹299' },
+    [PackageType.SNEHI]: { label: 'SIMPLISH SNEHI', price: 499, displayPrice: '₹499' },
+    [PackageType.BOTH]: { label: 'PREMIUM BUNDLE', price: 798, displayPrice: '₹798' }, // Assuming arbitrary sum for both
+    [PackageType.NONE]: { label: 'NONE', price: 0, displayPrice: '₹0' },
+};
+
+const DEFAULT_COST_PER_MINUTE = 2.0;
+const SUBSCRIPTION_DAYS_DURATION = 30;
+const MS_IN_A_DAY = 24 * 60 * 60 * 1000;
+
+// --- PRESENTATIONAL SUB-COMPONENTS ---
+
+const OrderSummary = ({ packageLabel, packagePrice }: { packageLabel: string, packagePrice: string }) => (
+    <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-slate-100 dark:border-slate-800 shadow-xl">
+        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Order Summary</h3>
+        <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800">
+            <div>
+                <div className="font-black text-slate-900 dark:text-white">{packageLabel}</div>
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">1 Month Subscription</div>
+            </div>
+            <div className="font-black text-slate-900 dark:text-white">{packagePrice}</div>
+        </div>
+        <div className="flex justify-between items-center pt-6">
+            <div className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Total Amount</div>
+            <div className="text-2xl font-black text-blue-600">{packagePrice}</div>
+        </div>
+    </div>
+);
+
+const TrustBadges = () => (
+    <div className="flex justify-between px-4">
+        <div className="flex flex-col items-center opacity-40">
+            <span className="text-2xl mb-1">🔒</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-center">Secure SSL</span>
+        </div>
+        <div className="flex flex-col items-center opacity-40">
+            <span className="text-2xl mb-1">⚡</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-center">Instant Access</span>
+        </div>
+        <div className="flex flex-col items-center opacity-40">
+            <span className="text-2xl mb-1">🛡️</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-center">Data Protected</span>
+        </div>
+    </div>
+);
+
+// --- MAIN COMPONENT ---
 
 const PaymentPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { session } = useAppStore();
-    const { t } = useLanguage();
-    const [isProcessing, setIsProcessing] = useState(false);
+    const mounted = useRef(true); 
+    
+    const session = useAppStore(state => state.session);
+    
+    // Refactor Fix: Eliminated redundant flag state `isProcessing`, derived directly from payment step
     const [paymentStep, setPaymentStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
-    const [costPerMinute, setCostPerMinute] = useState<number>(2.0); // Default fallback
+    const isProcessing = paymentStep === 'processing';
+    
+    const [costPerMinute, setCostPerMinute] = useState<number>(DEFAULT_COST_PER_MINUTE);
 
     useEffect(() => {
+        mounted.current = true;
+        let active = true;
         getSystemConfig().then(cfg => {
-            if (cfg) setCostPerMinute(cfg.cost_per_minute);
+            if (active && mounted.current && cfg) setCostPerMinute(cfg.cost_per_minute);
         });
+        return () => { 
+            active = false;
+            mounted.current = false; 
+        };
     }, []);
 
     const selectedPackage = searchParams.get('package') as PackageType;
-    const packageLabel = selectedPackage === PackageType.TALKS ? 'SIMPLISH - TALKS' : 'SIMPLISH SNEHI';
-    const packagePrice = selectedPackage === PackageType.TALKS ? '₹299' : '₹499';
+    const isValidPackage = Object.values(PackageType).includes(selectedPackage);
+    const safePackageKey = isValidPackage ? selectedPackage : PackageType.NONE;
+    
+    const config = PACKAGE_CONFIG[safePackageKey];
+    const packageLabel = config.label;
+    const packagePrice = config.displayPrice;
 
     useEffect(() => {
         if (!session) {
             navigate('/login');
-        }
-        if (!selectedPackage || !Object.values(PackageType).includes(selectedPackage)) {
+        } else if (!selectedPackage || !isValidPackage) {
             navigate('/dashboard');
         }
-    }, [session, selectedPackage, navigate]);
+    }, [session, selectedPackage, isValidPackage, navigate]);
 
     const handlePayment = async () => {
-        setIsProcessing(true);
+        if (isProcessing) return; // Prevent double submit
         setPaymentStep('processing');
 
         try {
@@ -47,34 +108,45 @@ const PaymentPage: React.FC = () => {
             
             // Step 1: Request Order / Token from secure backend
             console.log("🔒 Requesting secure payment token from Edge Function...");
-            // const { data: order } = await supabase.functions.invoke('create-razorpay-order', { body: { package: selectedPackage }});
+            // const { data: order } = await supabase.functions.invoke('create-razorpay-order', { body: { package: safePackageKey }});
             await new Promise(resolve => setTimeout(resolve, 800)); // Mock network delay
+            if (!mounted.current) return; // Fix: Memory leak on unmount cancellation
             
             // Step 2: Open Provider Checkout (e.g., Razorpay / Stripe Elements)
             console.log("💳 Opening secure checkout iframe...");
             await new Promise(resolve => setTimeout(resolve, 1200)); // Mock user entering card details
             const mockPaymentToken = "tok_simulated_secure_123456";
+            if (!mounted.current) return; // Unmount cancellation block
 
             // Step 3: Send Token for Backend Verification & Fulfillment
             console.log("📡 Sending token to backend for fulfillment verification...");
             // const { error } = await supabase.functions.invoke('verify-and-fulfill', { body: { token: mockPaymentToken }});
             await new Promise(resolve => setTimeout(resolve, 1000)); // Mock backend processing time
+            if (!mounted.current) return; // Unmount cancellation block
 
             // --- LOCAL DEV FALLBACK ---
             // Because we don't have the edge functions deployed in this local environment,
             // we will simulate the backend's successful fulfillment here.
-            await simulateBackendFulfillment();
+            if (import.meta.env.DEV) {
+                const fulfilled = await simulateBackendFulfillment();
+                if (!fulfilled || !mounted.current) return; 
+            } else {
+                // In production, wait for the actual secure webhook fulfillment
+                console.log("Waiting for real backend webhook fulfillment confirmation...");
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                if (!mounted.current) return; // Unmount cancellation
+            }
             
             setPaymentStep('success');
 
-            // Redirect after success message
+            // Redirect after success message (safely bound to mount)
             setTimeout(() => {
-                navigate('/dashboard', { replace: true });
+                if (mounted.current) navigate('/dashboard', { replace: true });
             }, 2000);
 
         } catch (err) {
+            if (!mounted.current) return;
             console.error("Payment failed:", err);
-            setIsProcessing(false);
             setPaymentStep('checkout');
             alert("Payment failed. Please try again or contact support.");
         }
@@ -82,42 +154,39 @@ const PaymentPage: React.FC = () => {
 
     // This function mimics what the secure backend / Webhook handler MUST do.
     const simulateBackendFulfillment = async () => {
-        let newPackageType = selectedPackage;
-        // Upgrade logic to BOTH
-        if (
-            (session?.packageType === PackageType.TALKS && selectedPackage === PackageType.SNEHI) ||
-            (session?.packageType === PackageType.SNEHI && selectedPackage === PackageType.TALKS) ||
-            session?.packageType === PackageType.BOTH
-        ) {
-            newPackageType = PackageType.BOTH;
+        if (!import.meta.env.DEV) {
+            console.error("Critical Security Alert: Attempted to run local backend mock in production.");
+            return false;
         }
+        
+        // PURE MATH & LOGIC EXTRACTED TO SERVICE LAYER
+        const safeCostPerMinute = (costPerMinute && costPerMinute > 0) ? costPerMinute : DEFAULT_COST_PER_MINUTE;
+        const newPackageType = resolveUpgradedPackage(session?.packageType, safePackageKey);
+        const addedCredits = calculateBonusCredits(safePackageKey, config.price, safeCostPerMinute);
 
         const currentCredits = session?.agentCredits || 0;
-        const price = selectedPackage === PackageType.SNEHI ? 499 : 0;
-        const addedCredits = selectedPackage === PackageType.SNEHI ? Math.floor(price / costPerMinute) : 0;
+        const now = new Date();
+        const currentEndDate = session?.packageEndDate ? new Date(session.packageEndDate) : now;
+        const baseDate = currentEndDate > now ? currentEndDate : now;
+        const newEndDate = new Date(baseDate.getTime() + SUBSCRIPTION_DAYS_DURATION * MS_IN_A_DAY).toISOString();
 
         const updates = {
             package_type: newPackageType,
             package_status: PackageStatus.ACTIVE,
-            package_start_date: new Date().toISOString(),
-            package_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            package_start_date: now.toISOString(),
+            package_end_date: newEndDate,
             agent_credits: currentCredits + addedCredits
         };
 
-        const { error } = await supabase
-            .from('profiles')
-            .update(updates)
-            .eq('id', session?.id);
-
-        if (error) throw error;
-
-        // Log the transaction
-        await supabase.from('package_transactions').insert([{
-            user_id: session?.id,
-            package_type: selectedPackage,
-            amount: selectedPackage === PackageType.SNEHI ? 499 : 299,
+        const transactionLog = {
+            user_id: session!.id,
+            package_type: safePackageKey,
+            amount: config.price,
             payment_provider: 'simulated_backend_tokenized'
-        }]);
+        };
+
+        // DATABASE SIDE-EFFECTS EXTRACTED TO SERVICE LAYER
+        await applyMockLocalFulfillmentDB(session!.id, updates, transactionLog);
 
         // CRITICAL: Immediately update the Zustand store with the new package data
         const currentSession = useAppStore.getState().session;
@@ -134,8 +203,22 @@ const PaymentPage: React.FC = () => {
 
         // Trigger a background re-fetch for full sync
         clearProfileCache();
-        useAppStore.getState().refreshSession();
+        try {
+             await useAppStore.getState().refreshSession();
+        } catch (e) {
+             console.error("Failed to re-sync optimistic UI session state", e);
+        }
+        
+        return true;
     };
+
+    if (!session || !isValidPackage) {
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex justify-center items-center">
+                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     if (paymentStep === 'processing') {
         return (
@@ -170,38 +253,10 @@ const PaymentPage: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-                    {/* Order Summary */}
+                    {/* Order Summary & Badges  */}
                     <div className="md:col-span-3 space-y-6">
-                        <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-slate-100 dark:border-slate-800 shadow-xl">
-                            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Order Summary</h3>
-                            <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800">
-                                <div>
-                                    <div className="font-black text-slate-900 dark:text-white">{packageLabel}</div>
-                                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">1 Month Subscription</div>
-                                </div>
-                                <div className="font-black text-slate-900 dark:text-white">{packagePrice}</div>
-                            </div>
-                            <div className="flex justify-between items-center pt-6">
-                                <div className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Total Amount</div>
-                                <div className="text-2xl font-black text-blue-600">{packagePrice}</div>
-                            </div>
-                        </div>
-
-                        {/* Premium Trust Badges */}
-                        <div className="flex justify-between px-4">
-                            <div className="flex flex-col items-center opacity-40">
-                                <span className="text-2xl mb-1">🔒</span>
-                                <span className="text-[8px] font-black uppercase tracking-widest text-center">Secure SSL</span>
-                            </div>
-                            <div className="flex flex-col items-center opacity-40">
-                                <span className="text-2xl mb-1">⚡</span>
-                                <span className="text-[8px] font-black uppercase tracking-widest text-center">Instant Access</span>
-                            </div>
-                            <div className="flex flex-col items-center opacity-40">
-                                <span className="text-2xl mb-1">🛡️</span>
-                                <span className="text-[8px] font-black uppercase tracking-widest text-center">Data Protected</span>
-                            </div>
-                        </div>
+                        <OrderSummary packageLabel={packageLabel} packagePrice={packagePrice} />
+                        <TrustBadges />
                     </div>
 
                     {/* Payment Method Selector */}

@@ -1,7 +1,7 @@
 import { securityMiddleware } from '../src/middleware/securityMiddleware';
 
 async function runSecurityTests() {
-    console.log("🛡️ Starting Security Middleware Validation...\\n");
+    console.log("🛡️ Starting Security Middleware Validation...\n");
 
     // ==========================================
     // Test 1: The XSS Bypass Attempt
@@ -9,7 +9,10 @@ async function runSecurityTests() {
     console.log("--- Test 1: The XSS Bypass Attempt ---");
     const maliciousPayload = {
         name: "ರಮೇಶ್ <img src=x onerror=alert(1)>",
-        bio: "Test User"
+        bio: "Test User",
+        nested: {
+            data: "Bad <script>alert(1)</script> data"
+        }
     };
 
     // Need to mock a POST request with the malicious body
@@ -23,21 +26,29 @@ async function runSecurityTests() {
     });
 
     try {
-        await securityMiddleware(req1);
-        const sanitizedBody = (req1 as any).sanitizedBody;
-        console.log("Original Input:", maliciousPayload.name);
-        console.log("Sanitized Output:", sanitizedBody?.name);
-        
-        if (sanitizedBody?.name === "ರಮೇಶ್ <img src=\"x\">" || sanitizedBody?.name === "ರಮೇಶ್ ") {
-             console.log("✅ Passed: XSS tags neutralized, Kannada preserved.");
+        const resultReq = await securityMiddleware(req1);
+        let sanitizedBody: any = null;
+
+        if (resultReq instanceof Request) {
+            sanitizedBody = await resultReq.json();
+            console.log("Original Input Name:", maliciousPayload.name);
+            console.log("Sanitized Output Name:", sanitizedBody?.name);
+            console.log("Original Nested Data:", maliciousPayload.nested.data);
+            console.log("Sanitized Nested Data:", sanitizedBody?.nested?.data);
+
+            if (sanitizedBody?.name === "ರಮೇಶ್ " && sanitizedBody?.nested?.data === "Bad alert(1) data") {
+                 console.log("✅ Passed: XSS tags neutralized, deep nested objects sanitized, Kannada preserved.");
+            } else {
+                 console.log("❌ Failed: Suboptimal sanitization.", sanitizedBody);
+            }
         } else {
-             console.log("❌ Failed: Suboptimal sanitization.");
+             console.log("❌ Failed: Middleware did not return a new Request object.");
         }
     } catch (e: any) {
         console.log("❌ Failed with exception:", e.message);
     }
 
-    console.log("\\n");
+    console.log("\n");
 
     // ==========================================
     // Test 2: The "Lesson Leech" Test
@@ -49,7 +60,7 @@ async function runSecurityTests() {
     });
 
     const res2 = await securityMiddleware(req2);
-    if (res2 && res2.status === 401) {
+    if (res2 instanceof Response && res2.status === 401) {
         const errorBody = await res2.json();
         console.log(`Status: ${res2.status} Unauthorized`);
         console.log(`Message: ${errorBody.error}`);
@@ -59,10 +70,10 @@ async function runSecurityTests() {
             console.log("❌ Failed: Incorrect error message.");
         }
     } else {
-        console.log("❌ Failed: Request was not blocked. Status:", res2 ? res2.status : 'Passed through');
+        console.log("❌ Failed: Request was not blocked. Status:", res2 instanceof Response ? res2.status : 'Passed through');
     }
 
-    console.log("\\n");
+    console.log("\n");
 
     // ==========================================
     // Test 3: The Valid Session Test
@@ -80,7 +91,7 @@ async function runSecurityTests() {
         console.log("Status: Passed (200 OK equivalent)");
         console.log("✅ Passed: Legitimate session allowed through seamlessly.");
     } else {
-        console.log("❌ Failed: Valid session was incorrectly blocked with status:", res3.status);
+        console.log("❌ Failed: Valid session was incorrectly manipulated.");
     }
 }
 
