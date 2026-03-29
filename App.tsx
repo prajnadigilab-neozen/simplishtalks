@@ -27,6 +27,7 @@ const PackageSelection = React.lazy(() => import('./pages/PackageSelection'));
 const APIAnalytics = React.lazy(() => import('./pages/APIAnalytics'));
 const QuotaDashboard = React.lazy(() => import('./pages/QuotaDashboard'));
 const CurriculumPage = React.lazy(() => import('./pages/CurriculumPage'));
+const VisualDiscoveryPage = React.lazy(() => import('./pages/VisualDiscoveryPage'));
 const TopupPage = React.lazy(() => import('./pages/TopupPage'));
 
 import { telemetry } from './services/telemetryService';
@@ -85,6 +86,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
                 <>
                   <NavButton to="/dashboard" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/dashboard'} light={isLanding} />
                   <NavButton to="/curriculum" label={t({ en: 'Curriculum', kn: 'ಪಠ್ಯಕ್ರಮ' })} active={location.pathname === '/curriculum'} light={isLanding} />
+                  <NavButton to="/discover" label={t({ en: 'Discover', kn: 'ಅನ್ವೇಷಿಸಿ' })} active={location.pathname === '/discover'} light={isLanding} />
                   <NavButton to="/packages" label={t({ en: 'Product', kn: 'ಉತ್ಪನ್ನ' })} active={location.pathname === '/packages'} light={isLanding} />
                 </>
               )}
@@ -333,6 +335,7 @@ const AppContent: React.FC = () => {
                       <Navigate to="/placement" />
               } />
               <Route path="/curriculum" element={session ? <ErrorBoundary><CurriculumPage /></ErrorBoundary> : <Navigate to="/login" />} />
+              <Route path="/discover" element={session ? <ErrorBoundary><VisualDiscoveryPage session={session} /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/lesson/:id" element={session ? <ErrorBoundary><LessonView /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/coachchat" element={session ? <ErrorBoundary><CoachChat /></ErrorBoundary> : <Navigate to="/login" />} />
               <Route path="/talk" element={session ? <ErrorBoundary><VoiceCoach /></ErrorBoundary> : <Navigate to="/login" />} />
@@ -366,6 +369,7 @@ const AppContent: React.FC = () => {
             <>
               <MobileNavItem icon="📚" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} to="/dashboard" />
               <MobileNavItem icon="📖" label={t({ en: 'Curriculum', kn: 'ಪಠ್ಯಕ್ರಮ' })} to="/curriculum" />
+              <MobileNavItem icon="🖼️" label={t({ en: 'Discover', kn: 'ಅನ್ವೇಷಿಸಿ' })} to="/discover" />
               {(session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH) && (
                 <MobileNavItem icon="💬" label={t({ en: 'Chat', kn: 'ಚಾಟ್' })} to="/coachchat" />
               )}

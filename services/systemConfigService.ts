@@ -6,6 +6,7 @@ export interface SystemConfig {
     cost_per_minute: number;
     price_talks: number;
     price_snehi: number;
+    visual_categories: string[];
     updated_at: string;
     updated_by: string | null;
 }

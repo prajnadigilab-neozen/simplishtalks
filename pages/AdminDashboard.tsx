@@ -9,6 +9,7 @@ import { UserRole, PackageType } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { clearAllRecordings } from '../utils/recordingStore';
 import { getSystemConfig, updateSystemConfig, SystemConfig } from '../services/systemConfigService';
+import { VisualContentAdmin } from '../components/VisualContentAdmin';
 
 interface Notification {
   id: string;
@@ -425,6 +426,7 @@ const AdminDashboard: React.FC = () => {
             )}
             <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'General Stats', kn: 'ಅಂಕಿಅಂಶಗಳು' })}</button>
             <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Reports', kn: 'ವರದಿಗಳು' })}</button>
+            <button key="content" onClick={() => setActiveTab('content')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'content' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Visual Content', kn: 'ದೃಶ್ಯ ವಿಷಯ' })}</button>
  
             {currentUser?.role === UserRole.SUPER_ADMIN && (
               <>
@@ -1498,6 +1500,12 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       )}
+      {activeTab === 'content' && (currentUser?.role === UserRole.SUPER_ADMIN || currentUser?.role === UserRole.MODERATOR) && (
+        <div className="space-y-6 animate-in fade-in">
+          <VisualContentAdmin />
+        </div>
+      )}
+
       {/* Audit views remain similar... */}
     </div>
   );

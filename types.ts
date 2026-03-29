@@ -132,3 +132,21 @@ export interface ScenarioSave {
   a_score?: number | null;
   evaluation_feedback?: string | null;
 }
+
+export type VisualContentCategory = string;
+
+export type VisualAccessLevel = 'free' | 'premium';
+
+export interface VisualContent {
+  id: string;
+  image_url: string;
+  caption: string | null;
+  category: VisualContentCategory;
+  access_level: VisualAccessLevel;
+  metadata: {
+    expected_answer?: string;
+    image_description?: string;
+    difficulty?: string;
+  };
+  created_at: string;
+}

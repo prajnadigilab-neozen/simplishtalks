@@ -377,107 +377,124 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Content Tabs (Curriculum vs History) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        {/* Curriculum Preview */}
-        {displayTalks && (
-          <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-all ${isNone ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">{t({ en: 'Curriculum Preview', kn: 'ಪಠ್ಯಕ್ರಮದ ಅವಲೋಕನ' })}</h3>
-              <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{progress?.currentLevel || 'BASIC'} {t({ en: 'Level', kn: 'ಹಂತ' })}</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+        {/* SIMPLISH Talks Curriculum Preview */}
+        <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-all relative group ${!isTalksActive ? 'opacity-50 grayscale blur-[0.5px]' : ''}`}>
+          {!isTalksActive && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/20 dark:bg-slate-900/20 backdrop-blur-[1px] rounded-[2rem]">
+              <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center text-xl border border-slate-100 dark:border-slate-700">🔒</div>
             </div>
-
-            <div className="space-y-3">
-              {(modules.find(m => m.level === (progress?.currentLevel || CourseLevel.BASIC))?.lessons?.slice(0, 5) || []).map((l, i) => {
-                const isCompleted = progress?.completedLessons.includes(l.id);
-                return (
-                  <div key={l.id} className={`flex items-center gap-4 p-4 rounded-2xl border ${isCompleted ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black ${isCompleted ? 'bg-green-100 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                      {isCompleted ? '✓' : i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <div className={`text-xs font-black ${isCompleted ? 'text-slate-400' : 'text-slate-900 dark:text-white'}`}>{l.title.en}</div>
-                      <div className="text-[10px] font-bold text-slate-400">{l.title.kn}</div>
-                    </div>
-                    {!isCompleted && i === 0 && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded-lg text-[8px] font-black uppercase">{t({ en: 'Next', kn: 'ಮುಂದಿನದು' })}</span>
-                    )}
-                  </div>
-                );
-              })}
-              {progressPercentage < 100 && (
-                <button
-                  onClick={() => navigate(getSmartRedirectPath())}
-                  className="w-full py-3 mt-4 text-[10px] font-black text-blue-500 uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
-                >
-                  {t({ en: 'Keep Practicing To Unlock More →', kn: 'ಹೆಚ್ಚು ಅನ್ಲಾಕ್ ಮಾಡಲು ಅಭ್ಯಾಸ ಮುಂದುವರಿಸಿ →' })}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* AI Evaluation & Retake */}
-        <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col transition-all ${isNone ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+          )}
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-black text-slate-900 dark:text-white">{t({ en: 'AI Evaluation Score 📈', kn: 'AI ಮೌಲ್ಯಮಾಪನ ಅಂಕಗಳು 📈' })}</h3>
-            <button
-              onClick={() => navigate('/placement')}
-              className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-            >
-              <span>{t({ en: 'Retake Test', kn: 'ಮತ್ತೆ ಪರೀಕ್ಷೆ ನೀಡಿ' })}</span>
-              <span className="text-xs">🔄</span>
-            </button>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white">{t({ en: 'Study Lessons', kn: 'ಪಾಠಗಳು' })}</h3>
+            <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{progress?.currentLevel || 'BASIC'}</span>
           </div>
 
-          <div className="flex-1 space-y-4">
+          <div className="space-y-3">
+            {(modules.find(m => m.level === (progress?.currentLevel || CourseLevel.BASIC))?.lessons?.slice(0, 5) || []).map((l, i) => {
+              const isCompleted = progress?.completedLessons.includes(l.id);
+              return (
+                <div key={l.id} className={`flex items-center gap-4 p-4 rounded-2xl border ${isCompleted ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black ${isCompleted ? 'bg-green-100 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                    {isCompleted ? '✓' : i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className={`text-[11px] font-black ${isCompleted ? 'text-slate-400' : 'text-slate-900 dark:text-white'}`}>{l.title.en}</div>
+                    <div className="text-[10px] font-bold text-slate-400">{l.title.kn}</div>
+                  </div>
+                </div>
+              );
+            })}
+            {isTalksActive && progressPercentage < 100 && (
+              <button
+                onClick={() => navigate(getSmartRedirectPath())}
+                className="w-full py-3 mt-4 text-[10px] font-black text-blue-500 uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
+              >
+                {t({ en: 'Continue Reading →', kn: 'ಓದುತ್ತಾ ಇರಿ →' })}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* SNEHI Practice Preview (New) */}
+        <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-all relative group ${!isSnehiActive ? 'opacity-50 grayscale blur-[0.5px]' : ''}`}>
+          {!isSnehiActive && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/20 dark:bg-slate-900/20 backdrop-blur-[1px] rounded-[2rem]">
+              <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center text-xl border border-slate-100 dark:border-slate-700">🔒</div>
+            </div>
+          )}
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white">{t({ en: 'Voice Practice', kn: 'ಧ್ವನಿ ಅಭ್ಯಾಸ' })}</h3>
+            <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">{t({ en: 'SNEHI', kn: 'ಸ್ನೇಹಿ' })}</span>
+          </div>
+
+          <div className="space-y-3">
+            {(scenarios.slice(0, 5)).map((s, i) => {
+              const isCompleted = progress?.completedScenarios.includes(s.id);
+              return (
+                <div key={s.id} className={`flex items-center gap-4 p-4 rounded-2xl border ${isCompleted ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}>
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black ${isCompleted ? 'bg-green-100 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                    {isCompleted ? '✓' : i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className={`text-[11px] font-black ${isCompleted ? 'text-slate-400' : 'text-slate-900 dark:text-white'}`}>{s.title.en}</div>
+                    <div className="text-[10px] font-bold text-slate-400">{s.category.en}</div>
+                  </div>
+                </div>
+              );
+            })}
+            {isSnehiActive && (
+              <button
+                onClick={() => navigate('/talk')}
+                className="w-full py-3 mt-4 text-[10px] font-black text-orange-500 uppercase tracking-widest hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-xl transition-all"
+              >
+                {t({ en: 'Start Practicing →', kn: 'ಅಭ್ಯಾಸ ಪ್ರಾರಂಭಿಸಿ →' })}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* AI Evaluation & Retake (Shrunk) */}
+        <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col transition-all relative ${isNone ? 'opacity-50 grayscale blur-[0.5px]' : ''}`}>
+          {isNone && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/20 dark:bg-slate-900/20 backdrop-blur-[1px] rounded-[2rem]">
+              <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center text-xl border border-slate-100 dark:border-slate-700">🔒</div>
+            </div>
+          )}
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">{t({ en: 'AI Scorecard', kn: 'AI ಸ್ಕೋರ್‌ಕಾರ್ಡ್' })}</h3>
+            <button onClick={() => navigate('/placement')} className="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all">🔄</button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
             {evaluationHistory.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center py-10 opacity-40">
-                <span className="text-4xl mb-4">🧠</span>
-                <p className="text-[10px] font-black uppercase tracking-widest text-center">
-                  {t({ 
-                    en: 'No evaluation data yet. Take the test to see your level!', 
-                    kn: 'ಇನ್ನೂ ಯಾವುದೇ ಮೌಲ್ಯಮಾಪನ ಡೇಟಾ ಇಲ್ಲ. ನಿಮ್ಮ ಹಂತವನ್ನು ತಿಳಿಯಲು ಪರೀಕ್ಷೆ ತೆಗೆದುಕೊಳ್ಳಿ!' 
-                  })}
-                </p>
+              <div className="h-full flex flex-col items-center justify-center py-10 opacity-40">
+                <span className="text-3xl mb-4">📈</span>
+                <p className="text-[9px] font-black uppercase tracking-widest text-center">{t({ en: 'Waiting for Test...', kn: 'ಪರೀಕ್ಷೆಗಾಗಿ ಕಾಯುತ್ತಿದೆ...' })}</p>
               </div>
             ) : (
-              <div className="space-y-6">
-                {/* Latest Score Card */}
+              <div className="space-y-4">
+                {/* Compact Latest Score Card */}
                 {evaluationHistory[0] && (
-                  <div className="p-5 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl text-white shadow-lg relative overflow-hidden group">
-                    <div className="absolute -right-4 -bottom-4 text-6xl opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">🎯</div>
-                    <div className="relative z-10">
-                      <div className="text-[9px] font-black uppercase tracking-widest opacity-80 mb-2">{t({ en: 'Current Proficiency Level', kn: 'ಪ್ರಸ್ತುತ ಪ್ರಾವೀಣ್ಯತೆಯ ಹಂತ' })}</div>
-                      <div className="flex items-end gap-3 mb-2">
-                        <span className="text-3xl font-black">{evaluationHistory[0].score}/100</span>
-                        <span className="text-[10px] font-black bg-white/20 px-3 py-1 rounded-full mb-1 uppercase tracking-widest">
-                          {evaluationHistory[0].level}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-blue-100 font-medium leading-relaxed italic line-clamp-2">
-                        "{evaluationHistory[0].reasoning}"
-                      </p>
+                  <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl text-white shadow-md">
+                    <div className="flex justify-between items-start mb-2">
+                       <span className="text-[10px] font-black uppercase opacity-80">{evaluationHistory[0].level}</span>
+                       <span className="text-lg font-black">{evaluationHistory[0].score}%</span>
                     </div>
+                    <p className="text-[9px] text-blue-100 font-medium italic line-clamp-2 leading-relaxed opacity-90">"{evaluationHistory[0].reasoning}"</p>
                   </div>
                 )}
 
-                {/* Last 5 History List */}
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t({ en: 'Performance History', kn: 'ಪ್ರದರ್ಶನದ ಇತಿಹಾಸ' })}</h4>
-                  {evaluationHistory.map((ev: any) => (
-                    <div key={ev.id} className="flex items-center gap-4 p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-900/50 transition-colors">
-                      <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-700 flex flex-col items-center justify-center shadow-sm">
-                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 leading-none">{ev.score}</span>
-                        <div className="w-6 h-[1px] bg-slate-100 dark:bg-slate-600 my-0.5"></div>
-                        <span className="text-[8px] font-bold text-slate-400 uppercase leading-none">{t({ en: 'Pts', kn: 'ಅಂಕಗಳು' })}</span>
+                {/* Compact History Items */}
+                <div className="space-y-2">
+                  <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t({ en: 'Last Attempts', kn: 'ಹಿಂದಿನ ಪ್ರಯತ್ನಗಳು' })}</h4>
+                  {evaluationHistory.slice(1, 4).map((ev: any) => (
+                    <div key={ev.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-3">
+                         <div className="text-[10px] font-black text-blue-600">{ev.score}%</div>
+                         <div className="text-[9px] font-bold text-slate-500 uppercase">{ev.level}</div>
                       </div>
-                      <div className="flex-1">
-                        <div className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tight">{ev.level}</div>
-                        <div className="text-[9px] font-bold text-slate-400">
-                          {new Date(ev.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </div>
-                      </div>
-                      <div className="text-[10px] font-black text-slate-300">#{ev.id.slice(0, 4)}</div>
+                      <div className="text-[8px] font-bold text-slate-400">{new Date(ev.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
                     </div>
                   ))}
                 </div>
