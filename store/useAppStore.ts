@@ -520,8 +520,11 @@ export const useAppStore = create<AppState>((set, get) => ({
 
             // Also merge from local Dexie (for offline-created ones not yet synced)
             customLocal.forEach(cs => {
-               if (!allScenarios.find(s => s.id === cs.id)) {
-                  allScenarios.push(cs);
+               // Ensure we only merge custom scenarios for the current user
+               if (cs.user_id === userId || (!userId && cs.user_id === 'guest')) {
+                   if (!allScenarios.find(s => s.id === cs.id)) {
+                      allScenarios.push(cs);
+                   }
                }
             });
 

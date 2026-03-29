@@ -31,20 +31,17 @@ export const applyMockLocalFulfillmentDB = async (
         payment_provider: string;
     }
 ) => {
-    // 1. Update Profile Layer
-    const { error: profileError } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', userId);
+    const { error: rpcError } = await supabase.rpc('dev_mock_payment_fulfillment', {
+        p_user_id: userId,
+        p_package_type: updates.package_type,
+        p_package_status: updates.package_status,
+        p_package_start_date: updates.package_start_date,
+        p_package_end_date: updates.package_end_date,
+        p_agent_credits: updates.agent_credits,
+        p_amount: transactionLog.amount
+    });
 
-    if (profileError) throw profileError;
-
-    // 2. Insert Transaction Log Layer
-    const { error: transactionError } = await supabase
-        .from('package_transactions')
-        .insert([transactionLog]);
-        
-    if (transactionError) throw transactionError;
+    if (rpcError) throw rpcError;
 };
 
 /**

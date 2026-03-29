@@ -157,12 +157,7 @@ const Dashboard: React.FC = () => {
     navigate(`/payment?package=${selectedPackage}`);
   };
 
-  // 1. Don't redirect while still loading session data
-  useEffect(() => {
-    if (initialized && !loading && session?.packageType === PackageType.NONE) {
-      navigate('/packages', { replace: true });
-    }
-  }, [session?.packageType, loading, initialized, navigate]);
+  // 1. (Removed automatic redirect for PackageType.NONE to allow greyed-out viewing)
 
 
   // Show nothing while loading or if no package
@@ -174,13 +169,17 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (!session?.packageType || session.packageType === PackageType.NONE) {
-    return null;
-  }
 
-  const isTalksActive = session.packageType === PackageType.TALKS || session.packageType === PackageType.BOTH;
-  const isSnehiActive = session.packageType === PackageType.SNEHI || session.packageType === PackageType.BOTH;
-  const isBoth = session.packageType === PackageType.BOTH;
+
+  const isTalksActive = session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH;
+  const isSnehiActive = session?.packageType === PackageType.SNEHI || session?.packageType === PackageType.BOTH;
+  const isBoth = session?.packageType === PackageType.BOTH;
+  const isNone = !session?.packageType || session?.packageType === PackageType.NONE;
+  
+  // For display purposes, we act as if BOTH are available so the layout renders everything,
+  // but we apply CSS locks based on isNone.
+  const displayTalks = isTalksActive || isNone;
+  const displayBoth = isBoth || isNone;
 
   // 2. Active Dashboard (Unified)
   return (
@@ -225,27 +224,36 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="mb-10 text-center md:text-left relative">
-        <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-6">
-          {session.packageType === PackageType.TALKS 
-            ? t({ en: 'Your Learning Dashboard', kn: 'ನಿಮ್ಮ ಕಲಿಕೆಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' }) 
-            : (isBoth ? t({ en: 'Your Supercharged Hub', kn: 'ನಿಮ್ಮ ಸೂಪರ್ ಹಬ್' }) : t({ en: 'Your Voice Practice Hub', kn: 'ನಿಮ್ಮ ಧ್ವನಿ ಅಭ್ಯಾಸ ಕೇಂದ್ರ' }))} {isTalksActive ? '📚' : '🎙️'}
-        </h1>
+        <div className="mb-10 text-center md:text-left relative">
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-6">
+            {isNone ? t({ en: 'Preview Your Dashboard', kn: 'ನಿಮ್ಮ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಪೂರ್ವವೀಕ್ಷಣೆ' }) : 
+             session?.packageType === PackageType.TALKS 
+              ? t({ en: 'Your Learning Dashboard', kn: 'ನಿಮ್ಮ ಕಲಿಕೆಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' }) 
+              : (isBoth ? t({ en: 'Your Supercharged Hub', kn: 'ನಿಮ್ಮ ಸೂಪರ್ ಹಬ್' }) : t({ en: 'Your Voice Practice Hub', kn: 'ನಿಮ್ಮ ಧ್ವನಿ ಅಭ್ಯಾಸ ಕೇಂದ್ರ' }))} {displayTalks ? '📚' : '🎙️'}
+          </h1>
 
-        {!isBoth && (
-          <div className="absolute top-0 right-0 hidden md:block">
-            <button onClick={() => navigate('/packages')} className="px-4 py-2 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-200 transition-all shadow-sm">
-              {t({ en: 'Upgrade Path ✨', kn: 'ಹೊಸ ಫೀಚರ್ ಪಡೆಯಿರಿ ✨' })}
-            </button>
-          </div>
-        )}
+          {isNone && (
+            <div className="absolute top-0 right-0">
+              <button onClick={() => navigate('/packages')} className="px-6 py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg animate-pulse">
+                {t({ en: 'Unlock All Features ✨', kn: 'ಎಲ್ಲಾ ವೈಶಿಷ್ಟ್ಯಗಳನ್ನು ಅನ್ಲಾಕ್ ಮಾಡಿ ✨' })}
+              </button>
+            </div>
+          )}
+          {(!displayBoth && !isNone) && (
+            <div className="absolute top-0 right-0 hidden md:block">
+              <button onClick={() => navigate('/packages')} className="px-4 py-2 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-200 transition-all shadow-sm">
+                {t({ en: 'Upgrade Path ✨', kn: 'ಹೊಸ ಫೀಚರ್ ಪಡೆಯಿರಿ ✨' })}
+              </button>
+            </div>
+          )}
 
         {/* Package Selection Area (Showing Both, Greyed out Inactive) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 overflow-hidden">
           <div className={`transition-all duration-500 ${!isTalksActive ? 'opacity-40 grayscale pointer-events-none scale-[0.98]' : 'scale-100'}`}>
-            <PackageCardCompact type={PackageType.TALKS} isActive={isTalksActive}>
-              {isTalksActive && (
+            <PackageCardCompact type={PackageType.TALKS} isActive={isTalksActive || isNone}>
+              {(isTalksActive || isNone) && (
                 <button
+                  disabled={isNone}
                   onClick={() => {
                     const path = getSmartRedirectPath();
                     if (path === '/dashboard') {
@@ -257,7 +265,7 @@ const Dashboard: React.FC = () => {
                       navigate(path);
                     }
                   }}
-                  className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                  className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95 disabled:bg-slate-400"
                 >
                   {completedLessons === 0 ? t({ en: 'Go to SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್‌ಗೆ ಹೋಗಿ' }) : t({ en: 'Continue SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಮುಂದುವರಿಸಿ' })}
                 </button>
@@ -265,11 +273,12 @@ const Dashboard: React.FC = () => {
             </PackageCardCompact>
           </div>
           <div className={`transition-all duration-500 ${!isSnehiActive ? 'opacity-40 grayscale pointer-events-none scale-[0.98]' : 'scale-100'}`}>
-            <PackageCardCompact type={PackageType.SNEHI} isActive={isSnehiActive}>
-              {isSnehiActive && (
+            <PackageCardCompact type={PackageType.SNEHI} isActive={isSnehiActive || isNone}>
+              {(isSnehiActive || isNone) && (
                 <button
+                  disabled={isNone}
                   onClick={() => navigate('/talk')}
-                  className="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg active:scale-95"
+                  className="w-full py-3 bg-orange-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg active:scale-95 disabled:bg-slate-400"
                 >
                   {t({ en: 'Go to SNEHI', kn: 'ಸ್ನೇಹಿಗೆ ಹೋಗಿ' })}
                 </button>
@@ -299,7 +308,7 @@ const Dashboard: React.FC = () => {
             <div>
               <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-1">{t({ en: 'Active Subscription', kn: 'ಸಕ್ರಿಯ ಸದಸ್ಯತ್ವ' })}</h3>
               <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-4">
-                {isBoth ? t({ en: 'SIMPLISH - TALKS & Simplish SNEHI', kn: 'ಸಿಂಪ್ಲಿಷ್ - ಟಾಕ್ಸ್ ಮತ್ತು ಸ್ನೇಹಿ' }) : (isTalksActive ? t({ en: 'SIMPLISH - TALKS', kn: 'ಸಿಂಪ್ಲಿಷ್ - ಟಾಕ್ಸ್' }) : t({ en: 'Simplish SNEHI', kn: 'ಸಿಂಪ್ಲಿಷ್ ಸ್ನೇಹಿ' }))}
+                {isNone ? t({ en: 'No Active Packages', kn: 'ಸಕ್ರಿಯ ಪ್ಯಾಕೇಜ್ ಇಲ್ಲ' }) : (isBoth ? t({ en: 'SIMPLISH - TALKS & Simplish SNEHI', kn: 'ಸಿಂಪ್ಲಿಷ್ - ಟಾಕ್ಸ್ ಮತ್ತು ಸ್ನೇಹಿ' }) : (isTalksActive ? t({ en: 'SIMPLISH - TALKS', kn: 'ಸಿಂಪ್ಲಿಷ್ - ಟಾಕ್ಸ್' }) : t({ en: 'Simplish SNEHI', kn: 'ಸಿಂಪ್ಲಿಷ್ ಸ್ನೇಹಿ' })))}
               </h2>
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
@@ -370,8 +379,8 @@ const Dashboard: React.FC = () => {
       {/* Content Tabs (Curriculum vs History) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         {/* Curriculum Preview */}
-        {isTalksActive && (
-          <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+        {displayTalks && (
+          <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm transition-all ${isNone ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-black text-slate-900 dark:text-white">{t({ en: 'Curriculum Preview', kn: 'ಪಠ್ಯಕ್ರಮದ ಅವಲೋಕನ' })}</h3>
               <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{progress?.currentLevel || 'BASIC'} {t({ en: 'Level', kn: 'ಹಂತ' })}</span>
@@ -408,7 +417,7 @@ const Dashboard: React.FC = () => {
         )}
 
         {/* AI Evaluation & Retake */}
-        <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col">
+        <div className={`bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col transition-all ${isNone ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-black text-slate-900 dark:text-white">{t({ en: 'AI Evaluation Score 📈', kn: 'AI ಮೌಲ್ಯಮಾಪನ ಅಂಕಗಳು 📈' })}</h3>
             <button

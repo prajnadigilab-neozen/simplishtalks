@@ -1,5 +1,5 @@
 /** V 1.0 */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { useAppStore } from '../store/useAppStore';
@@ -9,15 +9,21 @@ import { useNotificationStore } from '../store/useNotificationStore';
 import { CreateCustomScenarioModal } from '../components/CreateCustomScenarioModal';
 
 const CurriculumPage: React.FC = () => {
-  const { session, modules, scenarios, scenarioSaves, progress, loading, setCurrentScenario, fetchScenarioSaves, setClearChatRequested } = useAppStore();
+  const { session, modules, scenarios, scenarioSaves, progress, loading, initialized, setCurrentScenario, fetchScenarioSaves, setClearChatRequested } = useAppStore();
   const { showSuccess, showError } = useNotificationStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchScenarioSaves();
   }, []);
+
+  useEffect(() => {
+    if (initialized && !loading && session?.packageType === PackageType.NONE) {
+      navigate('/packages', { replace: true });
+    }
+  }, [session?.packageType, loading, initialized, navigate]);
 
   const isTalksActive = session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH || session?.role !== UserRole.STUDENT;
   const isSnehiActive = session?.packageType === PackageType.SNEHI || session?.packageType === PackageType.BOTH || session?.role !== UserRole.STUDENT;
@@ -35,6 +41,10 @@ const CurriculumPage: React.FC = () => {
         <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  if (!session?.packageType || session.packageType === PackageType.NONE) {
+    return null;
   }
 
   // Filter modules/scenarios
