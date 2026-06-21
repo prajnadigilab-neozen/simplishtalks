@@ -8,6 +8,9 @@ import { Language, CoachMessage } from '../types';
 import { getChatHistory, saveChatMessage, clearUserChatHistory } from '../services/coachService';
 import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
+import { estimateTokens } from '../services/apiGuardrail';
+import { quotaGuard } from '../utils/QuotaMiddleware';
+import { telemetry } from '../services/telemetryService';
 
 interface ScenarioPracticeProps {
   scenario: {
@@ -63,6 +66,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
     if (isSendingRef.current || !input.trim() || isTyping || !userId) return;
     isSendingRef.current = true;
 
+    const currentInput = input;
     const userMsg: CoachMessage = { role: 'user', text: input, timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
@@ -70,12 +74,30 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
 
     saveChatMessage(userId, userMsg, lessonId);
 
-    // Update usage and sync UI
-    const { updateUserUsage } = await import('../services/coachService');
-    updateUserUsage(userId, 0, 0, 1);
+    // Update local state usage metrics
     syncUsage('chat', 1);
 
     try {
+      // Check API Guardrail
+      const guard = await quotaGuard('gemini-3-flash-preview', currentInput, 'chat');
+      if (!guard.isAllowed) {
+        throw new Error(guard.message);
+      }
+      if (guard.mockData) {
+        const mockResponse = guard.mockData.data;
+        const coachMsg: CoachMessage = {
+          role: 'coach',
+          text: mockResponse.content,
+          kannadaGuide: mockResponse.kannada_guide,
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, coachMsg]);
+        saveChatMessage(userId, coachMsg, lessonId);
+        setIsTyping(false);
+        isSendingRef.current = false;
+        return;
+      }
+
       const historyForAI = messages.map(m => ({
         role: m.role === 'user' ? 'user' as const : 'model' as const,
         parts: [{ text: m.text }]
@@ -83,7 +105,7 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
 
       const { data, error } = await supabase.functions.invoke('scenario-chat', {
         body: {
-          message: input,
+          message: currentInput,
           history: historyForAI,
           systemInstruction: scenario.systemInstruction,
         },
@@ -114,6 +136,19 @@ const ScenarioPractice: React.FC<ScenarioPracticeProps> = ({ scenario }) => {
 
       setMessages(prev => [...prev, coachMsg]);
       saveChatMessage(userId, coachMsg, lessonId);
+
+      // Log prompt + response tokens under SNEHI package
+      const promptTokens = estimateTokens(currentInput) + 150;
+      const responseTokens = estimateTokens(JSON.stringify(result));
+      const totalTokens = promptTokens + responseTokens;
+      telemetry.logUsage({
+        api_type: 'chat',
+        model_name: 'gemini-3-flash-preview',
+        input_units: promptTokens,
+        output_units: responseTokens,
+        total_units: totalTokens,
+        package_type: 'SNEHI'
+      });
     } catch (error: any) {
       console.error("Scenario AI Error:", error);
       const errorMsg: CoachMessage = {

@@ -1,0 +1,1010 @@
+[
+  {
+    "id": "49bb8042-983c-425a-ac23-3652678da399",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Self-Introduction",
+      "kn": "ನನ್ನ ಪರಿಚಯ"
+    },
+    "notes": {
+      "en": "To introduce oneself confidently using simple 'I am' structures.",
+      "kn": "To introduce oneself confidently using simple 'I am' structures."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602530194_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Arjun: Hello! I am Arjun. What is your name? | ನಮಸ್ಕಾರ! ನಾನು ಅರ್ಜುನ್. ನಿಮ್ಮ ಹೆಸರೇನು?\nRavi: Hi! My name is Ravi. | ಹಾಯ್! ನನ್ನ ಹೆಸರು ರವಿ.\nArjun: Nice to meet you, Ravi. Where are you from? | ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿದ್ದಕ್ಕೆ ಸಂತೋಷ, ರವಿ. ನೀವು ಎಲ್ಲಿಯವರು?\nRavi: I am from Mandya. I am a student. | ನಾನು ಮಂಡ್ಯದವನು. ನಾನು ಒಬ್ಬ ವಿದ್ಯಾರ್ಥಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ನಾನು ವಿದ್ಯಾರ್ಥಿ' (Naanu Vidyarthi). In English, we must add 'am' and 'a'. So it becomes 'I AM A student'. Without 'AM', the sentence feels incomplete to an English speaker.\n\n📚 KEY PHRASES:\n- I am...: Used to describe yourself (name, job, or state).\n  Example: \"I am a teacher.\"\n- My name is...: A clear, polite way to share your identity.\n  Example: \"My name is Shanti.\"\n- I am from...: Used to tell someone your hometown or village.\n  Example: \"I am from Belagavi.\"\n\n🗣️ PRONUNCIATION:\n- Student (ಸ್ಟೂಡೆಂಟ್): Start with a soft 'Sss' sound, not 'Ee-stoo-dent'.\n- Name (ನೇಮ್): Ends with a closed mouth 'M' sound, like the end of 'Amma'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello! **My** name is [User Name]. I **am** from [User Place]. I am a **student** / I **work** in [User Work]. It is **nice** to meet you.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Introduce yourself to the AI Coach 'Kaveri' and tell her your name, location, and what you do.",
+        "kn": "Introduce yourself to the AI Coach 'Kaveri' and tell her your name, location, and what you do."
+      },
+      "objectiveStr": "Introduce yourself to the AI Coach 'Kaveri' and tell her your name, location, and what you do.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Introduce yourself to the AI Coach 'Kaveri' and tell her your name, location, and what you do.\n\nAnticipated Mistakes:\n- Myself [Name] -> It’s better to say 'I am [Name]' or 'My name is [Name]'. 'Myself' is technically incorrect in this context.\n- I from Karnataka -> Don't forget the bridge! Say: 'I AM from Karnataka'.\n- I name is... -> Use 'My' for possession. Say: 'MY name is...'\n\nPronunciation Focus: Nice (Think of the Kannada word 'ನೈಸ್'. Make sure the 'S' sound at the end is sharp like a whistle.)"
+    },
+    "order_index": 0,
+    "created_at": "2026-03-09T09:09:32.773501+00:00",
+    "text_url": null
+  },
+  {
+    "id": "69713478-448d-41da-bda1-156d5a1b616c",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "The Marketplace: Buying Vegetables & Groceries",
+      "kn": "ಮಾರುಕಟ್ಟೆ: ತರಕಾರಿ ಮತ್ತು ದಿನಸಿ ಖರೀದಿ"
+    },
+    "notes": {
+      "en": "Survival English: Asking for prices and quantities using simple, direct sentences.",
+      "kn": "Survival English: Asking for prices and quantities using simple, direct sentences."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602552407_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Radha: Hello! How much is one kg of onions? | ನಮಸ್ಕಾರ! ಒಂದು ಕೆಜಿ ಈರುಳ್ಳಿಗೆ ಎಷ್ಟು ಬೆಲೆ?\nVendor: It is forty rupees, Madam. | ಇದು ನಲವತ್ತು ರೂಪಾಯಿ, ಮೇಡಂ.\nRadha: Okay. Give me two kg of onions and one kg of potatoes. | ಸರಿ. ನನಗೆ ಎರಡು ಕೆಜಿ ಈರುಳ್ಳಿ ಮತ್ತು ಒಂದು ಕೆಜಿ ಆಲೂಗಡ್ಡೆ ಕೊಡಿ.\nVendor: Anything else? | ಇನ್ನೇನಾದರೂ ಬೇಕೆ?\nRadha: No, thank you. What is the total? | ಇಲ್ಲ, ಧನ್ಯವಾದಗಳು. ಒಟ್ಟು ಎಷ್ಟು?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಎಷ್ಟು?' (Eshtu?). In English, when asking for a price, we say 'How much'. If you are talking about one item, use 'is' (How much IS this?). If you are talking about many items, use 'are' (How much ARE these?).\n\n📚 KEY PHRASES:\n- How much is...?: Used to ask the price of something.\n  Example: \"How much is this pen?\"\n- Give me...: A direct but polite way to ask for an item.\n  Example: \"Give me one liter of milk.\"\n- What is the total?: Used to ask for the final bill amount.\n  Example: \"What is the total for these bags?\"\n\n🗣️ PRONUNCIATION:\n- Forty (ಫೋರ್ಟಿ): Focus on the 'F' sound—keep it soft like blowing air, not a hard 'P' sound.\n- Potato (ಪೊಟೇಟೋ): Say 'Po-Tay-Toe'. Don't rush the middle 'Tay' sound.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello! **How much** is this? Give me **two** kg of [Vegetable Name]. **What** is the total **price**? Thank you!",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You are at a grocery store. Ask the AI Shopkeeper for the price of milk and bread, and then tell the shopkeeper to 'Give me' those items.",
+        "kn": "You are at a grocery store. Ask the AI Shopkeeper for the price of milk and bread, and then tell the shopkeeper to 'Give me' those items."
+      },
+      "objectiveStr": "You are at a grocery store. Ask the AI Shopkeeper for the price of milk and bread, and then tell the shopkeeper to 'Give me' those items.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are at a grocery store. Ask the AI Shopkeeper for the price of milk and bread, and then tell the shopkeeper to 'Give me' those items.\n\nAnticipated Mistakes:\n- Price eshtu? -> Try saying 'How much is it?' or 'What is the price?'. Mixing Kannada is okay for now, but let's try the full English sentence!\n- Give two kg. -> Good! But remember the person—say 'Give ME two kg'.\n- How much one kg? -> Almost perfect! Just add 'is'—say 'How much IS one kg?'\n\nPronunciation Focus: Total (Say 'Total' like the Kannada 'ಟೋಟಲ್'. Make sure the 'L' at the end is clear by touching your tongue to the roof of your mouth.)"
+    },
+    "order_index": 1,
+    "created_at": "2026-03-09T09:09:32.920354+00:00",
+    "text_url": null
+  },
+  {
+    "id": "07f341a3-c736-4c37-a9ca-246b7e7d1d9d",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Asking for Help: Finding Places",
+      "kn": "ಸಹಾಯ ಕೇಳುವುದು: ಸ್ಥಳಗಳನ್ನು ಹುಡುಕುವುದು"
+    },
+    "notes": {
+      "en": "Survival English: Learning to ask for directions to essential locations like bus stands and hospitals.",
+      "kn": "Survival English: Learning to ask for directions to essential locations like bus stands and hospitals."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602609772_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Manjunath: Excuse me, I need help. Where is the hospital? | ಕ್ಷಮಿಸಿ, ನನಗೆ ಸಹಾಯ ಬೇಕು. ಆಸ್ಪತ್ರೆ ಎಲ್ಲಿದೆ?\nStranger: The hospital is straight and then take a left. | ಆಸ್ಪತ್ರೆ ನೇರವಾಗಿದೆ ಮತ್ತು ನಂತರ ಎಡಕ್ಕೆ ತಿರುಗಿ.\nManjunath: Is it near the bus stand? | ಅದು ಬಸ್ ನಿಲ್ದಾಣದ ಹತ್ತಿರವಿದೆಯೇ?\nStranger: Yes, it is very near. | ಹೌದು, ಅದು ತುಂಬಾ ಹತ್ತಿರದಲ್ಲಿದೆ.\nManjunath: Thank you so much! | ತುಂಬಾ ಧನ್ಯವಾದಗಳು!",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we put the place first: 'ಆಸ್ಪತ್ರೆ (Hospital) ಎಲ್ಲಿದೆ (Where is)?'. In English, we flip it: 'Where is the hospital?'. Always start with 'Where is' when looking for a door to your destination!\n\n📚 KEY PHRASES:\n- Excuse me...: The most polite way to get someone's attention before asking a question.\n  Example: \"Excuse me, what is the time?\"\n- Where is...?: Used to ask the location of a place.\n  Example: \"Where is the bus stand?\"\n- I am looking for...: Used when you are searching for a specific address or building.\n  Example: \"I am looking for the Railway Station.\"\n\n🗣️ PRONUNCIATION:\n- Hospital (ಹಾಸ್ಪಿಟಲ್): Keep the 'H' sound clear. Do not say 'Aas-pi-tal'. It should be 'Hoss-pi-tal'.\n- Straight (ಸ್ಟ್ರೈಟ್): One smooth sound. Think of the Kannada word 'ಸ್ರೈಟ್'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Excuse me**, I am **looking for** the bus stand. **Where** is it? Is it **straight**? Thank you for your **help**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You are lost in a city. Ask the AI Agent for directions to the 'City Bank' and ask if it is 'near' or 'far'.",
+        "kn": "You are lost in a city. Ask the AI Agent for directions to the 'City Bank' and ask if it is 'near' or 'far'."
+      },
+      "objectiveStr": "You are lost in a city. Ask the AI Agent for directions to the 'City Bank' and ask if it is 'near' or 'far'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are lost in a city. Ask the AI Agent for directions to the 'City Bank' and ask if it is 'near' or 'far'.\n\nAnticipated Mistakes:\n- Bus stand where? -> You've got the words right! Now put them in order: 'WHERE IS the bus stand?'\n- I want help. -> That's okay, but 'I NEED help' or 'Could you help me?' sounds more natural when asking strangers.\n- Where hospital? -> Don't forget the tiny bridge! Say: 'Where IS THE hospital?'\n\nPronunciation Focus: Excuse (Think of the Kannada 'ಎಕ್ಸ್'. Say 'Ex-kyooz'. Make sure you don't skip the 'K' sound!)"
+    },
+    "order_index": 2,
+    "created_at": "2026-03-27T09:10:14.705106+00:00",
+    "text_url": null
+  },
+  {
+    "id": "57af267a-1458-4ba5-8c77-135bc1c4f8e4",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Time & Date: Appointments & Schedules",
+      "kn": "ಸಮಯ ಮತ್ತು ದಿನಾಂಕ: ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಮತ್ತು ವೇಳಾಪಟ್ಟಿ"
+    },
+    "notes": {
+      "en": "Survival English: Asking about bus timings, setting meeting times, and understanding days of the week.",
+      "kn": "Survival English: Asking about bus timings, setting meeting times, and understanding days of the week."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602652878_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Kumar: Excuse me, when is the next bus to Mysuru? | ಕ್ಷಮಿಸಿ, ಮೈಸೂರಿಗೆ ಮುಂದಿನ ಬಸ್ ಯಾವಾಗ?\nCounter Staff: The next bus is at ten-thirty AM. | ಮುಂದಿನ ಬಸ್ ಬೆಳಿಗ್ಗೆ ಹತ್ತು-ವರೆಗೆ ಇದೆ.\nKumar: What time will it reach Mysuru? | ಅದು ಎಷ್ಟು ಗಂಟೆಗೆ ಮೈಸೂರು ತಲುಪುತ್ತದೆ?\nCounter Staff: It will reach at one PM. | ಅದು ಮಧ್ಯಾಹ್ನ ಒಂದು ಗಂಟೆಗೆ ತಲುಪುತ್ತದೆ.\nKumar: Is there a bus on Sunday also? | ಭಾನುವಾರವೂ ಬಸ್ ಇದೆಯೇ?\nCounter Staff: Yes, buses are available every day. | ಹೌದು, ಬಸ್‌ಗಳು ಪ್ರತಿದಿನ ಲಭ್ಯವಿವೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಯಾವಾಗ' (Yavaga) for 'When'. In English, we often use 'When is...' for days/dates and 'What time...' for clock time. Remember: Use 'at' before the time (at 10 o'clock) just like you use 'ಗೆ' in Kannada (ಹತ್ತಕ್ಕೆ).\n\n📚 KEY PHRASES:\n- When is...?: Used to ask about the time of an event.\n  Example: \"When is the meeting?\"\n- What time...?: Used to ask for a specific clock time.\n  Example: \"What time is it now?\"\n- At [Time] AM/PM: Used to specify morning (AM) or afternoon/night (PM).\n  Example: \"I will come at 5 PM.\"\n\n🗣️ PRONUNCIATION:\n- Schedule (ಶೆಡ್ಯೂಲ್): Focus on the 'She' sound. Say 'She-dyool'.\n- Wednesday (ವೆನ್ಸ್‌ಡೇ): The 'd' in the middle is silent! Don't say 'Wed-nes-day'. Say 'Wenz-day'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**When** is the next bus? It is at **nine** AM. **What** time is the **appointment**? See you on **Monday**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Call a clinic to make an appointment. Ask the AI Receptionist 'When is the doctor available?' and confirm a time for 'tomorrow'.",
+        "kn": "Call a clinic to make an appointment. Ask the AI Receptionist 'When is the doctor available?' and confirm a time for 'tomorrow'."
+      },
+      "objectiveStr": "Call a clinic to make an appointment. Ask the AI Receptionist 'When is the doctor available?' and confirm a time for 'tomorrow'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Call a clinic to make an appointment. Ask the AI Receptionist 'When is the doctor available?' and confirm a time for 'tomorrow'.\n\nAnticipated Mistakes:\n- Bus yavaga? -> Try saying 'When is the bus?'. Use the word 'When' for 'ಯಾವಾಗ'.\n- Ten o'clock morning. -> You can just say 'Ten AM'. It is shorter and more common!\n- Next bus ten-thirty. -> Add the bridge: 'The next bus IS AT ten-thirty'.\n\nPronunciation Focus: Thursday (Think of the Kannada 'ಥ'. Say 'Thurz-day'. Make sure to buzz the 'z' sound in the middle.)"
+    },
+    "order_index": 3,
+    "created_at": "2026-03-27T09:11:08.404936+00:00",
+    "text_url": null
+  },
+  {
+    "id": "dd380eda-c8f7-4068-83a8-7b41f80eb6db",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "At the Bank: Forms & Cash",
+      "kn": "ಬ್ಯಾಂಕ್‌ನಲ್ಲಿ: ಫಾರ್ಮ್‌ಗಳು ಮತ್ತು ನಗದು ಚಲಾವಣೆ"
+    },
+    "notes": {
+      "en": "Survival English: Understanding bank terminology and asking for help with deposits, withdrawals, and form filling.",
+      "kn": "Survival English: Understanding bank terminology and asking for help with deposits, withdrawals, and form filling."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602681976_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Latha: Excuse me, I want to deposit cash. Which form should I fill? | ಕ್ಷಮಿಸಿ, ನಾನು ಹಣ ಜಮೆ ಮಾಡಬೇಕು. ಯಾವ ಫಾರ್ಮ್ ಭರ್ತಿ ಮಾಡಬೇಕು?\nStaff: Please use this pay-in slip. You need to write your account number here. | ದಯವಿಟ್ಟು ಈ ಪೇ-ಇನ್ ಸ್ಲಿಪ್ ಬಳಸಿ. ನಿಮ್ಮ ಖಾತೆ ಸಂಖ್ಯೆಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಬೇಕು.\nLatha: Can you help me? Where should I sign? | ನನಗೆ ಸಹಾಯ ಮಾಡುವಿರಾ? ನಾನು ಎಲ್ಲಿ ಸಹಿ ಮಾಡಬೇಕು?\nStaff: Sign at the bottom, right here. | ಕೆಳಭಾಗದಲ್ಲಿ, ಇಲ್ಲೇ ಸಹಿ ಮಾಡಿ.\nLatha: Thank you. Where is the cash counter? | ಧನ್ಯವಾದಗಳು. ನಗದು ಕೌಂಟರ್ ಎಲ್ಲಿದೆ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಸಹಿ' (Sahi). In English, we say 'Sign' (ಕ್ರಿಯೆ/Action) or 'Signature' (ನಾಮಪದ/Noun). Also, notice that instead of saying 'Money put', we use the professional word 'Deposit'. It makes you sound more confident!\n\n📚 KEY PHRASES:\n- Deposit cash: To put money into your bank account.\n  Example: \"I want to deposit five thousand rupees.\"\n- Withdraw money: To take money out of your bank account.\n  Example: \"Where can I withdraw money?\"\n- Account Number: The unique number for your bank account.\n  Example: \"Please write your account number clearly.\"\n\n🗣️ PRONUNCIATION:\n- Deposit (ಡಿಪಾಸಿಟ್): Say 'De-pos-it'. Don't say 'Day-po-sit'.\n- Cashier (ಕ್ಯಾಶಿಯರ್): The 'Sh' is soft like 'ಶ'. Say 'Cash-eer'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I want to **deposit** cash. Where is the **slip**? Please help me fill my **account number**. Where do I **sign**?",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Interact with the AI Bank Clerk. Tell them you want to 'withdraw ten thousand rupees' and ask for the 'withdrawal form'.",
+        "kn": "Interact with the AI Bank Clerk. Tell them you want to 'withdraw ten thousand rupees' and ask for the 'withdrawal form'."
+      },
+      "objectiveStr": "Interact with the AI Bank Clerk. Tell them you want to 'withdraw ten thousand rupees' and ask for the 'withdrawal form'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Interact with the AI Bank Clerk. Tell them you want to 'withdraw ten thousand rupees' and ask for the 'withdrawal form'.\n\nAnticipated Mistakes:\n- Money jame. -> Use the bank word! Say: 'I want to DEPOSIT money'.\n- Where sign put? -> Simply say: 'Where should I sign?' or 'Where do I sign?'\n- This my account number. -> Add the 'bridge': 'This IS my account number'.\n\nPronunciation Focus: Withdraw (Think of the Kannada 'ವಿತ್'. Say 'With-draw'. Make sure the 'th' is soft like 'ಥ'.)"
+    },
+    "order_index": 4,
+    "created_at": "2026-03-27T09:11:32.023344+00:00",
+    "text_url": null
+  },
+  {
+    "id": "563432b4-5fcd-408c-a086-0005be12fe7f",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Emergency: Seeking Help & Reporting Loss",
+      "kn": "ತುರ್ತು ಸಂದರ್ಭ: ವೈದ್ಯಕೀಯ ಸಹಾಯ ಮತ್ತು ವಸ್ತು ಕಳೆದುಹೋಗಿರುವ ಬಗ್ಗೆ ವರದಿ ಮಾಡುವುದು"
+    },
+    "notes": {
+      "en": "Survival English: Using urgent, short sentences to get medical help or report a missing item (like a bag or phone).",
+      "kn": "Survival English: Using urgent, short sentences to get medical help or report a missing item (like a bag or phone)."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602706992_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Suresh: Help! I am not feeling well. I need a doctor. | ಸಹಾಯ ಮಾಡಿ! ನನಗೆ ಆರಾಮವಿಲ್ಲ. ನನಗೆ ವೈದ್ಯರ ಅಗತ್ಯವಿದೆ.\nBystander: Sit down. I will call an ambulance. | ಕುಳಿತುಕೊಳ್ಳಿ. ನಾನು ಆಂಬ್ಯುಲೆನ್ಸ್ ಕರೆಯುತ್ತೇನೆ.\nDeepa: Excuse me, I lost my bag. It is a black bag. | ಕ್ಷಮಿಸಿ, ನನ್ನ ಬ್ಯಾಗ್ ಕಳೆದುಹೋಗಿದೆ. ಅದು ಕಪ್ಪು ಬಣ್ಣದ ಬ್ಯಾಗ್.\nGuard: Don't worry. Where did you leave it? | ಚಿಂತಿಸಬೇಡಿ. ನೀವು ಅದನ್ನು ಎಲ್ಲಿ ಬಿಟ್ಟಿದ್ದೀರಿ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ನನಗೆ ಆರಾಮವಿಲ್ಲ' (Nanage aaraamavilla). In English, we say 'I am NOT feeling well.' In an emergency, don't worry about long sentences. Just say the main words: 'NEED DOCTOR' or 'LOST BAG'—people will understand you!\n\n📚 KEY PHRASES:\n- I need help!: The most important phrase to use in any emergency.\n  Example: \"I need help! Call the police.\"\n- I lost my...: Used when you cannot find an item.\n  Example: \"I lost my phone.\"\n- Call a doctor.: Direct request for medical assistance.\n  Example: \"Please call a doctor quickly.\"\n\n🗣️ PRONUNCIATION:\n- Emergency (ಎಮರ್ಜೆನ್ಸಿ): Start with 'E' like in 'Egg'. Say 'E-mer-jen-see'.\n- Police (ಪೊಲೀಸ್): Keep the 'O' sound short. Say 'Pu-leece', not 'Po-layss'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Help** me! I am **not** feeling well. **Call** a doctor. I **lost** my black **bag**. Please **help** me find it.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You are at a bus stand and you realize your mobile phone is missing. Tell the AI Security Guard 'I lost my phone' and describe it (e.g., 'It is a blue phone').",
+        "kn": "You are at a bus stand and you realize your mobile phone is missing. Tell the AI Security Guard 'I lost my phone' and describe it (e.g., 'It is a blue phone')."
+      },
+      "objectiveStr": "You are at a bus stand and you realize your mobile phone is missing. Tell the AI Security Guard 'I lost my phone' and describe it (e.g., 'It is a blue phone').",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are at a bus stand and you realize your mobile phone is missing. Tell the AI Security Guard 'I lost my phone' and describe it (e.g., 'It is a blue phone').\n\nAnticipated Mistakes:\n- My phone lost. -> Almost! Say: 'I LOST my phone' or 'My phone IS lost'.\n- Body paining. -> To get help faster, say: 'I am in pain' or 'I need a doctor'.\n- Help call police. -> Good! Just add a small word: 'Help! CALL THE police'.\n\nPronunciation Focus: Ambulance (Think of the Kannada 'ಆಂ'. Say 'Am-byu-lans'. Don't forget the 'S' sound at the end!)"
+    },
+    "order_index": 5,
+    "created_at": "2026-03-27T09:11:52.818448+00:00",
+    "text_url": null
+  },
+  {
+    "id": "adb711a8-938a-48d9-89a5-c455e4471e56",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Food & Drink: Ordering at a Hotel",
+      "kn": "ಹೋಟೆಲ್‌ನಲ್ಲಿ ಊಟ ಮತ್ತು ತಿಂಡಿ ಆರ್ಡರ್ ಮಾಡುವುದು"
+    },
+    "notes": {
+      "en": "Survival English: Ordering food/beverages, specifying preferences (like less sugar), and asking for the bill.",
+      "kn": "Survival English: Ordering food/beverages, specifying preferences (like less sugar), and asking for the bill."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602726856_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Waiter: Good morning! What do you want, sir? | ಶುಭೋದಯ! ತಮಗೆ ಏನು ಬೇಕು, ಸರ್?\nShivanna: Give me one Masala Dosa and one Coffee. | ನನಗೆ ಒಂದು ಮಸಾಲ ದೋಸೆ ಮತ್ತು ಒಂದು ಕಾಫಿ ಕೊಡಿ.\nShivanna: In coffee, put less sugar please. | ಕಾಫಿಯಲ್ಲಿ ಸಕ್ಕರೆ ಕಡಿಮೆ ಇರಲಿ.\nWaiter: Sure. Anything else? | ಖಂಡಿತ. ಇನ್ನೇನಾದರೂ ಬೇಕೆ?\nShivanna: No. Give me the bill. | ಇಲ್ಲ. ಬಿಲ್ ಕೊಡಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಸಕ್ಕರೆ ಕಡಿಮೆ ಇರಲಿ' (Sakkare kadime irali). In English, you don't need a long sentence. Just say 'Less sugar'. Also, notice we use 'Give me'—it is direct and common in local hotels, though adding 'please' at the end makes it much more polite!\n\n📚 KEY PHRASES:\n- I want...: A simple way to express what you wish to eat.\n  Example: \"I want an idli.\"\n- Less sugar / No sugar: Important for specifying how you like your drink.\n  Example: \"One tea, no sugar please.\"\n- The bill, please.: The standard way to ask for the check at the end.\n  Example: \"Excuse me, the bill please.\"\n\n🗣️ PRONUNCIATION:\n- Coffee (ಕಾಫಿ): Touch your top teeth to your bottom lip for the 'F' sound. It is not 'Koppee'.\n- Sugar (ಶುಗರ್): Use the soft 'Sh' sound like in 'ಶುಂಠಿ' (Shunthi). Say 'Shu-gar'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I **want** one tea. Please **put** less sugar. **Give** me one **plate** of meals. How **much** is the **bill**?",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You are at a hotel. Order a 'Tea' and 'Vada' from the AI Waiter. Tell the waiter 'No sugar' for the tea and ask for the 'Bill' at the end.",
+        "kn": "You are at a hotel. Order a 'Tea' and 'Vada' from the AI Waiter. Tell the waiter 'No sugar' for the tea and ask for the 'Bill' at the end."
+      },
+      "objectiveStr": "You are at a hotel. Order a 'Tea' and 'Vada' from the AI Waiter. Tell the waiter 'No sugar' for the tea and ask for the 'Bill' at the end.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are at a hotel. Order a 'Tea' and 'Vada' from the AI Waiter. Tell the waiter 'No sugar' for the tea and ask for the 'Bill' at the end.\n\nAnticipated Mistakes:\n- Tea sugar beda. -> Try saying 'No sugar' or 'Without sugar'. It sounds much better in English!\n- One coffee kodi. -> You're close! Say 'GIVE ME one coffee' or 'I WANT one coffee'.\n- Bill eshtu? -> Use the English phrase: 'How much is the bill?' or simply 'The bill, please'.\n\nPronunciation Focus: Water (Think of the Kannada 'ವಾ'. Say 'Waa-ter'. Don't make the 'T' too hard.)"
+    },
+    "order_index": 6,
+    "created_at": "2026-03-27T09:12:15.491421+00:00",
+    "text_url": null
+  },
+  {
+    "id": "dafe5df5-f8c7-4a9d-9b1d-31a06242d913",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Socializing: Meeting Family & Weddings",
+      "kn": "ಸಾಮಾಜಿಕ ಒಡನಾಟ: ಸ್ನೇಹಿತರ ಕುಟುಂಬವನ್ನು ಭೇಟಿ ಮಾಡುವುದು ಅಥವಾ ಮದುವೆಗೆ ಹೋಗುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Moving from single phrases to full sentences while expressing emotions and social etiquette.",
+      "kn": "Social Interaction: Moving from single phrases to full sentences while expressing emotions and social etiquette."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695810176_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Naveen: Dad, this is my friend Vikas. We work together. | ಅಪ್ಪ, ಇವನು ನನ್ನ ಗೆಳೆಯ ವಿಕಾಸ್. ನಾವು ಜೊತೆಯಾಗಿ ಕೆಲಸ ಮಾಡುತ್ತೇವೆ.\nVikas: Namaste Uncle. Congratulations! The wedding decorations are very beautiful. | ನಮಸ್ತೆ ಅಂಕಲ್. ಅಭಿನಂದನೆಗಳು! ಮದುವೆಯ ಅಲಂಕಾರಗಳು ತುಂಬಾ ಸುಂದರವಾಗಿವೆ.\nDad: Thank you, Vikas. I am happy you came. Did you have lunch? | ಧನ್ಯವಾದಗಳು ವಿಕಾಸ್. ನೀವು ಬಂದಿದ್ದು ನನಗೆ ಸಂತೋಷವಾಯಿತು. ಊಟ ಮಾಡಿದಿರಾ?\nVikas: Not yet, Uncle. I will go now. The food smells delicious! | ಇನ್ನೂ ಇಲ್ಲ ಅಂಕಲ್. ಈಗ ಹೋಗುತ್ತೇನೆ. ಅಡುಗೆಯ ವಾಸನೆ ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ!",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often say 'ಊಟ ಆಯ್ತಾ?' (Oota aayta?). In English, instead of just 'Lunch over?', use the full sentence: 'Did you HAVE lunch?'. Also, when admiring something, use 'very' to show intensity, like 'Very beautiful' instead of just 'Beautiful'.\n\n📚 KEY PHRASES:\n- This is my friend...: Used to introduce someone to another person.\n  Example: \"This is my friend, Suma.\"\n- Congratulations!: Used to praise someone for a happy event like a wedding or success.\n  Example: \"Congratulations on your new job!\"\n- Did you have...?: A polite way to ask if someone has finished an action like lunch or tea.\n  Example: \"Did you have coffee?\"\n\n🗣️ PRONUNCIATION:\n- Congratulations (ಕಂಗ್ರಾಚುಲೇಷನ್ಸ್): Break it down: Con-grat-u-lay-shuns. The 't' in 'grat' sounds like a soft 'ಚ' (cha).\n- Delicious (ಡೆಲಿಷಿಯಸ್): Say 'De-li-shus'. The 'ci' sounds like 'ಶ' (sha).\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello Uncle! **Congratulations** to the whole family. The **decorations** are very **beautiful**. I am **happy** to be here. The **food** looks **delicious**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You are at a wedding. The AI (Friend's Mother) approaches you. Introduce yourself, congratulate her on the wedding, and compliment the food.",
+        "kn": "You are at a wedding. The AI (Friend's Mother) approaches you. Introduce yourself, congratulate her on the wedding, and compliment the food."
+      },
+      "objectiveStr": "You are at a wedding. The AI (Friend's Mother) approaches you. Introduce yourself, congratulate her on the wedding, and compliment the food.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are at a wedding. The AI (Friend's Mother) approaches you. Introduce yourself, congratulate her on the wedding, and compliment the food.\n\nAnticipated Mistakes:\n- I Naveen friend. -> Move to full sentences! Say: 'I AM Naveen's friend'.\n- Food super ide. -> Try: 'The food is EXCELLENT' or 'The food is DELICIOUS'.\n- I work with him together. -> Simply say: 'We work together'. It's shorter and more natural.\n\nPronunciation Focus: Beautiful (Think of the Kannada 'ಬ್ಯೂ'. Say 'Byoo-tee-ful'. Don't drop the 't' in the middle!)"
+    },
+    "order_index": 0,
+    "created_at": "2026-03-28T11:03:39.096198+00:00",
+    "text_url": null
+  },
+  {
+    "id": "8d8d1bf1-7216-459a-a787-cb3a46719e80",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "At the Workplace: Explaining Tasks",
+      "kn": "ಕೆಲಸದ ಸ್ಥಳದಲ್ಲಿ: ದೈನಂದಿನ ಕೆಲಸಗಳ ಬಗ್ಗೆ ವಿವರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Workplace Communication: Moving from simple words to structured sentences to describe work progress and daily routines.",
+      "kn": "Workplace Communication: Moving from simple words to structured sentences to describe work progress and daily routines."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695833740_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Mr. Rao: Good morning Meera. What are you working on right now? | ಶುಭೋದಯ ಮೀರಾ. ನೀನು ಈಗ ಯಾವುದರ ಮೇಲೆ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೀಯಾ?\nMeera: Good morning sir. I am checking the new stock files. I finished the reports yesterday. | ಶುಭೋದಯ ಸರ್. ನಾನು ಹೊಸ ಸ್ಟಾಕ್ ಫೈಲ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ. ನಾನು ನಿನ್ನೆ ವರದಿಗಳನ್ನು ಮುಗಿಸಿದ್ದೇನೆ.\nMr. Rao: Great. When will you finish the stock check? | ಉತ್ತಮ. ಸ್ಟಾಕ್ ಪರಿಶೀಲನೆಯನ್ನು ಯಾವಾಗ ಮುಗಿಸುತ್ತೀಯಾ?\nMeera: I will finish it by 2 PM. After that, I will send you an email. | ನಾನು ಅದನ್ನು ಮಧ್ಯಾಹ್ನ 2 ಗಂಟೆಯೊಳಗೆ ಮುಗಿಸುತ್ತೇನೆ. ಅದರ ನಂತರ, ನಾನು ನಿಮಗೆ ಇಮೇಲ್ ಕಳುಹಿಸುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೇನೆ' (Doing work). In English, we use the **'-ING'** form for current tasks: 'I am work**ing**'. When talking about yesterday, we add **'-ED'**: 'I finish**ed**'. This small change helps your boss understand exactly *when* the work happened!\n\n📚 KEY PHRASES:\n- I am working on...: Used to describe a task that is currently in progress.\n  Example: \"I am working on the customer list.\"\n- I finished...: Used to talk about a task that is already completed (Past Tense).\n  Example: \"I finished the billing.\"\n- By [Time]...: Used to set a deadline or target time.\n  Example: \"I will call you by 5 PM.\"\n\n🗣️ PRONUNCIATION:\n- Finished (ಫಿನಿಶ್ಡ್): The 'ed' at the end sounds like a soft 't'. Say 'Fi-nish-t'.\n- Report (ರಿಪೋರ್ಟ್): Keep the 'O' long. Say 'Re-poh-rt'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Good morning. I am **working** on the daily **tasks**. I **finished** the stock check **yesterday**. I will **send** the email **by** this evening. Thank you, **sir**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Your AI Supervisor asks: 'What is the status of your work?'. Tell the AI that you are 'working on the files' and you will 'finish by 4 PM'.",
+        "kn": "Your AI Supervisor asks: 'What is the status of your work?'. Tell the AI that you are 'working on the files' and you will 'finish by 4 PM'."
+      },
+      "objectiveStr": "Your AI Supervisor asks: 'What is the status of your work?'. Tell the AI that you are 'working on the files' and you will 'finish by 4 PM'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Your AI Supervisor asks: 'What is the status of your work?'. Tell the AI that you are 'working on the files' and you will 'finish by 4 PM'.\n\nAnticipated Mistakes:\n- I work on files now. -> Since you are doing it right now, add '-ing'. Say: 'I am WORK-ING on the files'.\n- Yesterday I finish work. -> For past work, add '-ed'. Say: 'Yesterday I FINISH-ED the work'.\n- I tell you after 1 hour. -> Try using 'In' or 'By'. Say: 'I will tell you IN one hour'.\n\nPronunciation Focus: Working (Focus on the 'W'. Say 'Wur-king'. Don't make it sound like 'Vur-king'.)"
+    },
+    "order_index": 1,
+    "created_at": "2026-03-28T11:03:57.683994+00:00",
+    "text_url": null
+  },
+  {
+    "id": "42bb4f17-53b8-49f8-ba44-bda7287e96b4",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Shopping Mall: Sizes, Trials & Billing",
+      "kn": "ಶಾಪಿಂಗ್ ಮಾಲ್: ಅಳತೆಗಳು, ಟ್ರಯಲ್ ಮತ್ತು ಬಿಲ್ಲಿಂಗ್ ಕೌಂಟರ್"
+    },
+    "notes": {
+      "en": "Social Interaction: Navigating a retail environment, asking for specific sizes, using trial rooms, and handling the billing process.",
+      "kn": "Social Interaction: Navigating a retail environment, asking for specific sizes, using trial rooms, and handling the billing process."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Shailaja: Excuse me, do you have this shirt in a larger size? This looks small. | ಕ್ಷಮಿಸಿ, ಈ ಶರ್ಟ್‌ನಲ್ಲಿ ದೊಡ್ಡ ಸೈಜ್ ಇದೆಯೇ? ಇದು ಚಿಕ್ಕದಾಗಿ ಕಾಣುತ್ತಿದೆ.\nAssistant: Yes, Madam. I will get you a 'Large'. Would you like to try it on? | ಹೌದು ಮೇಡಂ. ನಾನು ನಿಮಗೆ 'ಲಾರ್ಜ್' ಸೈಜ್ ತರುತ್ತೇನೆ. ನೀವು ಇದನ್ನು ಟ್ರಯಲ್ ನೋಡಲು ಬಯಸುವಿರಾ?\nShailaja: Yes, where is the trial room? ... Also, is there any discount on this? | ಹೌದು, ಟ್ರಯಲ್ ರೂಮ್ ಎಲ್ಲಿದೆ? ... ಹಾಗೆಯೇ, ಇದರ ಮೇಲೆ ಏನಾದರೂ ರಿಯಾಯಿತಿ ಇದೆಯೇ?\nAssistant: The trial room is on the left. There is a ten percent discount today. | ಟ್ರಯಲ್ ರೂಮ್ ಎಡಭಾಗದಲ್ಲಿದೆ. ಇಂದು ಶೇಕಡಾ ಹತ್ತರಷ್ಟು ರಿಯಾಯಿತಿ ಇದೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ದೊಡ್ಡದು' (Doddadu) or 'ಸಣ್ಣದು' (Sannadu). In English shopping, we use 'Larger' or 'Smaller'. When you want to check the fit, don't just say 'Trial room'—say 'Can I **TRY IT ON**?'. It makes you sound like a natural speaker!\n\n📚 KEY PHRASES:\n- Do you have this in...?: Used to ask for a different size or color of an item.\n  Example: \"Do you have this in blue?\"\n- Try it on: The phrase used for testing if clothes fit you.\n  Example: \"Can I try this on?\"\n- Is there a discount?: A polite way to ask for a price reduction or offer.\n  Example: \"Is there a discount on these shoes?\"\n\n🗣️ PRONUNCIATION:\n- Discount (ಡಿಸ್ಕೌಂಟ್): Put the stress on 'Dis'. Say 'DIS-count'.\n- Size (ಸೈಜ್): Make sure the 'z' sound buzzes like a bee. Not 'Sais', but 'Saiz'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Excuse me, I **need** a **larger** size. Where is the **trial** room? Is there a **discount**? I will **pay** by **card**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You are at a shoe store. Tell the AI Assistant you like the shoes but need a 'Size 8'. Ask where the trial area is and ask for the final price.",
+        "kn": "You are at a shoe store. Tell the AI Assistant you like the shoes but need a 'Size 8'. Ask where the trial area is and ask for the final price."
+      },
+      "objectiveStr": "You are at a shoe store. Tell the AI Assistant you like the shoes but need a 'Size 8'. Ask where the trial area is and ask for the final price.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are at a shoe store. Tell the AI Assistant you like the shoes but need a 'Size 8'. Ask where the trial area is and ask for the final price.\n\nAnticipated Mistakes:\n- This size not correct. -> Try: 'This size doesn't fit' or 'I need a different size'.\n- Trial room where? -> Polite way: 'Where is the trial room?'\n- How much less? -> Use the shopping word: 'Is there any DISCOUNT?'\n\nPronunciation Focus: Receipt (The 'P' is silent! Say 'Re-seet' (ರಿ-ಸೀಟ್). Don't say 'Re-sept'.)"
+    },
+    "order_index": 2,
+    "created_at": "2026-03-28T11:04:15.458667+00:00",
+    "text_url": null
+  },
+  {
+    "id": "ef170d15-8df9-4003-9d8c-ff65330ebde2",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Mobile/Tech Issues: At the Service Center",
+      "kn": "ಮೊಬೈಲ್/ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆಗಳು: ಸರ್ವಿಸ್ ಸೆಂಟರ್‌ನಲ್ಲಿ"
+    },
+    "notes": {
+      "en": "Social Interaction: Describing specific technical problems, asking about repair time, and understanding warranty/cost terms.",
+      "kn": "Social Interaction: Describing specific technical problems, asking about repair time, and understanding warranty/cost terms."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Executive: Hello! How can I help you today? | ನಮಸ್ಕಾರ! ನಾನು ನಿಮಗೆ ಇಂದು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?\nKiran: My phone has two problems. The screen is flickering and the battery is draining very fast. | ನನ್ನ ಫೋನಿನಲ್ಲಿ ಎರಡು ಸಮಸ್ಯೆಗಳಿವೆ. ಸ್ಕ್ರೀನ್ ಮಿನುಗುತ್ತಿದೆ ಮತ್ತು ಬ್ಯಾಟರಿ ತುಂಬಾ ಬೇಗ ಖಾಲಿಯಾಗುತ್ತಿದೆ.\nExecutive: I see. Is it under warranty? Also, did you drop it in water? | ಗಮನಿಸಿದೆ. ಇದು ವಾರಂಟಿಯಲ್ಲಿದೆಯೇ? ಹಾಗೆಯೇ, ನೀವು ಇದನ್ನು ನೀರಿನಲ್ಲಿ ಹಾಕಿದ್ದೀರಾ?\nKiran: No, I did not drop it. Yes, it is under warranty. How long will it take to repair? | ಇಲ್ಲ, ನಾನು ಕೆಳಗೆ ಹಾಕಿಲ್ಲ. ಹೌದು, ಇದು ವಾರಂಟಿಯಲ್ಲಿದೆ. ರಿಪೇರಿ ಮಾಡಲು ಎಷ್ಟು ಸಮಯ ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಬ್ಯಾಟರಿ ಖಾಲಿ ಆಗ್ತಿದೆ' (Battery is becoming empty). In English, for technology, we use the word **'DRAINING'**. Also, for screen problems, use **'FLICKERING'** (ಮಿನುಗುವಿಕೆ). Using these specific words helps the technician understand the problem instantly!\n\n📚 KEY PHRASES:\n- It is not working.: A general way to say a device has a problem.\n  Example: \"My camera is not working.\"\n- Draining fast: Specifically used when a battery loses power quickly.\n  Example: \"My laptop battery is draining fast.\"\n- Under warranty: Meaning the company will fix it for free within a certain period.\n  Example: \"Is my phone still under warranty?\"\n\n🗣️ PRONUNCIATION:\n- Battery (ಬ್ಯಾಟರಿ): Say 'Bat-tree'. Don't stretch the middle. Not 'Ba-tta-ree'.\n- Warranty (ವಾರಂಟಿ): Start with a 'W' sound (ವ). Say 'Warr-an-tee'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "My **phone** is not **working** properly. The **screen** is **flickering**. Is it **under** warranty? How **much** will it **cost** to fix?",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Your AI Technician asks: 'What is the issue with your device?'. Tell the AI that your 'speaker is not working' and ask 'How long will it take?'.",
+        "kn": "Your AI Technician asks: 'What is the issue with your device?'. Tell the AI that your 'speaker is not working' and ask 'How long will it take?'."
+      },
+      "objectiveStr": "Your AI Technician asks: 'What is the issue with your device?'. Tell the AI that your 'speaker is not working' and ask 'How long will it take?'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Your AI Technician asks: 'What is the issue with your device?'. Tell the AI that your 'speaker is not working' and ask 'How long will it take?'.\n\nAnticipated Mistakes:\n- My phone screen jumping. -> The professional word is 'FLICKERING'. Try: 'My phone screen is flickering'.\n- I want repair. -> Say: 'I need to GET my phone REPAIRED' or 'Can you fix this?'\n- Battery gone. -> If it's just finishing fast, say: 'The battery is DRAINING fast'.\n\nPronunciation Focus: Repair (Think of the Kannada 'ರಿಪೇರಿ'. In English, say 'Re-pair' (ರಿ-ಪೇರ್). Keep the 'R' soft at the end.)"
+    },
+    "order_index": 3,
+    "created_at": "2026-03-28T11:04:36.270888+00:00",
+    "text_url": null
+  },
+  {
+    "id": "f8a4e91e-a419-4483-8c95-d403632369c7",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Commute/Travel: Cabs & Directions",
+      "kn": "ಪ್ರಯಾಣ: ಕ್ಯಾಬ್ ಮತ್ತು ದಾರಿ ತೋರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Booking a ride, confirming the destination, and giving specific turn-by-turn directions in English.",
+      "kn": "Social Interaction: Booking a ride, confirming the destination, and giving specific turn-by-turn directions in English."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695891155_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Driver: Hello sir, where do you want to go? Please share the OTP. | ಹಲೋ ಸರ್, ನೀವು ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕು? ದಯವಿಟ್ಟು OTP ಹಂಚಿಕೊಳ್ಳಿ.\nAnand: The destination is MG Road. My OTP is 1-2-3-4. | ಮಾರ್ಗ ಎಂಜಿ ರಸ್ತೆ. ನನ್ನ OTP 1-2-3-4.\nAnand: Driver, please go straight. Take the next left turn near the petrol bunk. | ಡ್ರೈವರ್, ದಯವಿಟ್ಟು ನೇರವಾಗಿ ಹೋಗಿ. ಪೆಟ್ರೋಲ್ ಬಂಕ್ ಹತ್ತಿರ ಮುಂದಿನ ಎಡ ತಿರುವು ತೆಗೆದುಕೊಳ್ಳಿ.\nDriver: Should I stop after the signal? | ನಾನು ಸಿಗ್ನಲ್ ನಂತರ ನಿಲ್ಲಿಸಬೇಕೆ?\nAnand: Yes, stop just before the main gate. Thank you. | ಹೌದು, ಮೇನ್ ಗೇಟ್‌ನ ಸ್ವಲ್ಪ ಮೊದಲು ನಿಲ್ಲಿಸಿ. ಧನ್ಯವಾದಗಳು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಸಿಗ್ನಲ್ ಹತ್ರ ನಿಲ್ಲಿಸಿ' (Signal hatra nillisi). In English, to be more precise, we use **'JUST BEFORE'** (ಸ್ವಲ್ಪ ಮೊದಲು) or **'JUST AFTER'** (ಸ್ವಲ್ಪ ನಂತರ). This helps the driver stop exactly where you want without confusion!\n\n📚 KEY PHRASES:\n- Take a left/right: To give a specific turning instruction.\n  Example: \"Take a right at the circle.\"\n- Just before / Just after: Used to give exact stopping points.\n  Example: \"Stop just after the park.\"\n- Go straight: To indicate moving forward without turning.\n  Example: \"Go straight for two kilometers.\"\n\n🗣️ PRONUNCIATION:\n- Destination (ಡೆಸ್ಟಿನೇಷನ್): Say 'Des-ti-nay-shun'. Focus on the 'shun' sound at the end.\n- Straight (ಸ್ಟ್ರೈಟ್): One quick sound. Avoid saying 'Is-traight'. Start with a sharp 'S'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Please **go straight**. Take a **right** turn at the **corner**. **Stop** the car **just before** the gate. My **OTP** is four-five-six-seven.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Your AI Cab Driver asks: 'Where should I turn?'. Tell the AI to 'Take the next left' and then tell him to 'Stop after the temple'.",
+        "kn": "Your AI Cab Driver asks: 'Where should I turn?'. Tell the AI to 'Take the next left' and then tell him to 'Stop after the temple'."
+      },
+      "objectiveStr": "Your AI Cab Driver asks: 'Where should I turn?'. Tell the AI to 'Take the next left' and then tell him to 'Stop after the temple'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Your AI Cab Driver asks: 'Where should I turn?'. Tell the AI to 'Take the next left' and then tell him to 'Stop after the temple'.\n\nAnticipated Mistakes:\n- Left turn kodi. -> Say: 'TAKE a left turn' or 'TURN left'.\n- Stop back of temple. -> To be clearer, say: 'Stop BEHIND the temple' or 'Stop AFTER the temple'.\n- Straight hogi. -> Use the English word: 'GO STRAIGHT'.\n\nPronunciation Focus: Signal (Think of the Kannada 'ಸಿಗ್ನಲ್'. Say 'Sig-nul'. Don't make the 'nal' sound too long.)"
+    },
+    "order_index": 4,
+    "created_at": "2026-03-28T11:04:56.525282+00:00",
+    "text_url": null
+  },
+  {
+    "id": "a8f5a2f9-df5e-4a2f-bbde-c9515d92c623",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Restaurant Dining: Errors & Requests",
+      "kn": "ಹೋಟೆಲ್‌ನಲ್ಲಿ ಊಟ: ಆರ್ಡರ್ ತಪ್ಪುಗಳ ನಿರ್ವಹಣೆ ಮತ್ತು ಬಿಲ್ ಕೇಳುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Handling service errors politely, making specific requests, and managing the payment process in a seated dining setting.",
+      "kn": "Social Interaction: Handling service errors politely, making specific requests, and managing the payment process in a seated dining setting."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695913300_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Waiter: Here is your Veg Fried Rice, sir. Enjoy your meal. | ಇಲ್ಲಿದೆ ನಿಮ್ಮ ವೆಜ್ ಫ್ರೈಡ್ ರೈಸ್, ಸರ್. ಊಟವನ್ನು ಆನಂದಿಸಿ.\nPrakash: Excuse me, I think there is a mistake. I ordered Chicken Fried Rice, not Veg. | ಕ್ಷಮಿಸಿ, ಇಲ್ಲಿ ಏನೋ ತಪ್ಪಾಗಿದೆ ಎಂದು ತೋರುತ್ತದೆ. ನಾನು ಚಿಕನ್ ಫ್ರೈಡ್ ರೈಸ್ ಆರ್ಡರ್ ಮಾಡಿದ್ದೆ, ವೆಜ್ ಅಲ್ಲ.\nWaiter: Oh, I am very sorry, sir. I will change it immediately. | ಓಹ್, ಕ್ಷಮಿಸಿ ಸರ್. ನಾನು ಅದನ್ನು ತಕ್ಷಣ ಬದಲಾಯಿಸುತ್ತೇನೆ.\nPrakash: Thank you. Also, can I have some extra tissues? | ಧನ್ಯವಾದಗಳು. ಹಾಗೆಯೇ, ನನಗೆ ಕೆಲವು ಹೆಚ್ಚುವರಿ ಟಿಶ್ಯೂಗಳು ಸಿಗಬಹುದೇ?\nPrakash: Waitress, could you bring the bill, please? I am ready to pay. | ವೇಟ್ರೆಸ್, ದಯವಿಟ್ಟು ಬಿಲ್ ತರುತ್ತೀರಾ? ನಾನು ಹಣ ಪಾವತಿಸಲು ಸಿದ್ಧನಿದ್ದೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might say 'ಇದು ನಾನು ಹೇಳಿದ್ದಲ್ಲ' (Idu naanu heliddalla). In English, to be polite but firm, we start with **'I THINK THERE IS A MISTAKE'**. It sounds professional and helps the waiter fix the error without feeling insulted. Also, for things like tissues or water, use **'EXTRA'** instead of 'More' for a better flow.\n\n📚 KEY PHRASES:\n- I think there is a mistake.: The most polite way to tell someone they did something wrong.\n  Example: \"I think there is a mistake in the bill.\"\n- I ordered...: Used to remind the waiter of your original request.\n  Example: \"I ordered a cold coffee, not hot.\"\n- Can I have some extra...?: Used to ask for more of something like salt, water, or tissues.\n  Example: \"Can I have some extra spoons?\"\n\n🗣️ PRONUNCIATION:\n- Mistake (ಮಿಸ್ಟೇಕ್): Say 'Mis-take'. Stress the 'Take' part slightly.\n- Immediately (ಇಮ್ಮಿಡಿಯೇಟ್ಲಿ): Say 'Im-mee-dee-ut-lee'. It’s a long word, so break it into four small parts.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Excuse me**, I think there is a **mistake**. I **ordered** a coffee. Can I have some **extra** sugar? The bill, **please**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "The AI Waiter brings you 'Tea' but you wanted 'Juice'. Tell the AI about the mistake, ask for 'extra napkins', and then ask for the bill.",
+        "kn": "The AI Waiter brings you 'Tea' but you wanted 'Juice'. Tell the AI about the mistake, ask for 'extra napkins', and then ask for the bill."
+      },
+      "objectiveStr": "The AI Waiter brings you 'Tea' but you wanted 'Juice'. Tell the AI about the mistake, ask for 'extra napkins', and then ask for the bill.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: The AI Waiter brings you 'Tea' but you wanted 'Juice'. Tell the AI about the mistake, ask for 'extra napkins', and then ask for the bill.\n\nAnticipated Mistakes:\n- This is wrong food. -> Try a softer opening: 'I think there is a MISTAKE' or 'This is NOT what I ordered'.\n- Bring bill. -> In a restaurant, it is more polite to say: 'Could you bring the BILL, PLEASE?'\n- Give extra tissues. -> A more conversational way is: 'CAN I HAVE some extra tissues?'\n\nPronunciation Focus: Order (Think of the Kannada 'ಆರ್ಡರ್'. Say 'Or-der'. Make the 'Or' sound round, like the 'O' in 'Orange'.)"
+    },
+    "order_index": 5,
+    "created_at": "2026-03-28T11:05:17.549386+00:00",
+    "text_url": null
+  },
+  {
+    "id": "4fa6e87b-7c67-43cd-8ba3-b2685cb9243c",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Small Talk: Weather, Movies & Sports",
+      "kn": "ಹರಟೆ: ಹವಾಮಾನ, ಚಲನಚಿತ್ರ ಮತ್ತು ಕ್ರಿಕೆಟ್ ಬಗ್ಗೆ ಮಾತನಾಡುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Learning to start and sustain casual conversations with colleagues or acquaintances.",
+      "kn": "Social Interaction: Learning to start and sustain casual conversations with colleagues or acquaintances."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695933155_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Sunil: It is so hot today, right? I think it will rain in the evening. | ಇವತ್ತು ತುಂಬಾ ಸೆಖೆ ಇದೆ ಅಲ್ವಾ? ಸಂಜೆ ಮಳೆ ಬರಬಹುದು ಅನ್ನಿಸುತ್ತೆ.\nRahul: Yes, the weather is very unpredictable. By the way, did you watch the match last night? | ಹೌದು, ಹವಾಮಾನವನ್ನು ನಂಬಕ್ಕಾಗಲ್ಲ. ಅಂದಹಾಗೆ, ನಿನ್ನೆ ರಾತ್ರಿ ಪಂದ್ಯ ನೋಡಿದ್ರಾ?\nSunil: No, I missed it. Who won the game? | ಇಲ್ಲ, ನಾನು ನೋಡಲಾಗಲಿಲ್ಲ. ಯಾರು ಗೆದ್ದರು?\nRahul: India won! It was a very exciting finish. You should watch the highlights. | ಭಾರತ ಗೆದ್ದಿತು! ಇದು ತುಂಬಾ ರೋಮಾಂಚಕವಾಗಿತ್ತು. ನೀವು ಹೈಲೈಟ್ಸ್ ನೋಡಬೇಕು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we use 'ಅಂದಹಾಗೆ' (Andahage) to change the topic. In English, we use **'BY THE WAY'**. Also, when talking about the weather, we use the word **'UNPREDICTABLE'** (ಊಹಿಸಲು ಸಾಧ್ಯವಿಲ್ಲದ) to describe how it changes suddenly. It sounds very natural and advanced!\n\n📚 KEY PHRASES:\n- By the way...: A 'bridge' phrase used to change the topic to something else.\n  Example: \"By the way, have you seen my keys?\"\n- Did you see/watch...?: A great way to start a conversation about a shared interest like movies or sports.\n  Example: \"Did you watch the new movie?\"\n- I think so / I don't think so.: Short ways to agree or disagree with an opinion.\n  Example: \"I think it will rain.\"\n\n🗣️ PRONUNCIATION:\n- Weather (ವೆದರ್): Say 'We-ther'. The 'th' is soft like 'ದ' (da).\n- Exciting (ಎಕ್ಸೈಟಿಂಗ್): Stress the 'cite' part. Say 'Ek-SITE-ing'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "The **weather** is very **hot** today. **By the way**, did you **watch** the match? It was very **exciting**. Who **won** the game?",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Your AI Colleague starts talking about the rain. Agree with them, then use 'By the way' to ask if they have seen a recent movie.",
+        "kn": "Your AI Colleague starts talking about the rain. Agree with them, then use 'By the way' to ask if they have seen a recent movie."
+      },
+      "objectiveStr": "Your AI Colleague starts talking about the rain. Agree with them, then use 'By the way' to ask if they have seen a recent movie.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Your AI Colleague starts talking about the rain. Agree with them, then use 'By the way' to ask if they have seen a recent movie.\n\nAnticipated Mistakes:\n- Today weather super. -> Try: 'The weather is GREAT today' or 'The weather is BEAUTIFUL'.\n- Match who win? -> For something that happened in the past, say: 'Who WON the match?'\n- I no watch movie. -> Say: 'I DID NOT watch the movie' or 'I missed it'.\n\nPronunciation Focus: Highlights (Think of the Kannada 'ಹೈ'. Say 'High-lights'. Keep the 'H' clear and sharp.)"
+    },
+    "order_index": 6,
+    "created_at": "2026-03-28T11:05:37.096388+00:00",
+    "text_url": null
+  },
+  {
+    "id": "318b2bdc-c9bb-458f-ba62-6c0e441283c0",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "The Job Interview: Entry Level",
+      "kn": "ಉದ್ಯೋಗ ಸಂದರ್ಶನ: ಆರಂಭಿಕ ಹಂತ"
+    },
+    "notes": {
+      "en": "Fluency: Reducing translation lag and structuring professional responses for common interview questions like 'Tell me about yourself'.",
+      "kn": "Fluency: Reducing translation lag and structuring professional responses for common interview questions like 'Tell me about yourself'."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022627420_AL1_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Mr. Khan: Welcome, Anusha. To start off, could you please tell me a little bit about yourself? | ಸುಸ್ವಾಗತ, ಅನುಷಾ. ಆರಂಭಿಸಲು, ನಿಮ್ಮ ಬಗ್ಗೆ ಸ್ವಲ್ಪ ಹೇಳುತ್ತೀರಾ?\nAnusha: Certainly, sir. I recently graduated from Mysore University. I am a hardworking person with a passion for helping customers. During my college fest, I managed the sponsorship team, which improved my communication skills. | ಖಂಡಿತ ಸರ್. ನಾನು ಇತ್ತೀಚೆಗೆ ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾಲಯದಿಂದ ಪದವಿ ಮುಗಿಸಿದ್ದೇನೆ. ನಾನು ಕಠಿಣ ಪರಿಶ್ರಮಿ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ ಸಹಾಯ ಮಾಡುವ ಆಸಕ್ತಿ ಹೊಂದಿದ್ದೇನೆ. ಕಾಲೇಜು ಹಬ್ಬದ ಸಮಯದಲ್ಲಿ, ನಾನು ಸ್ಪಾನ್ಸರ್‌ಶಿಪ್ ತಂಡವನ್ನು ನಿರ್ವಹಿಸಿದೆ, ಇದು ನನ್ನ ಸಂವಹನ ಕೌಶಲ್ಯವನ್ನು ಸುಧಾರಿಸಿತು.\nMr. Khan: That sounds interesting. Why do you want to work with our company? | ಅದು ಆಸಕ್ತಿದಾಯಕವಾಗಿದೆ. ನೀವು ನಮ್ಮ ಕಂಪನಿಯಲ್ಲಿ ಏಕೆ ಕೆಲಸ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might say 'ನನಗೆ ತುಂಬಾ ಇಷ್ಟ' (I like it very much). In an interview, use **'I AM PASSIONATE ABOUT'**. It sounds more professional. Also, instead of saying 'I learned speaking', use **'IMPROVED MY COMMUNICATION SKILLS'**. This tells the employer you are ready for the corporate world.\n\n📚 KEY PHRASES:\n- I recently graduated from...: A professional way to mention your education without saying 'My study over'.\n  Example: \"I recently graduated from Kuvempu University.\"\n- I am passionate about...: Shows enthusiasm for a specific type of work.\n  Example: \"I am passionate about technology.\"\n- Improved my skills: Used to show growth or learning from a past experience.\n  Example: \"Working in a team improved my leadership skills.\"\n\n🗣️ PRONUNCIATION:\n- University (ಯೂನಿವರ್ಸಿಟಿ): Start with a 'Y' sound like 'ಯೂ'. Say 'Yoo-ni-ver-si-tee'.\n- Communication (ಕಮ್ಯುನಿಕೇಷನ್): Say 'Kum-myoo-ni-kay-shun'. Stress the 'kay' part.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I recently **graduated** with a degree in Commerce. I am a **hardworking** person and I am **passionate** about sales. My previous **experience** helped me **improve** my skills. I am **eager** to join your **company**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "The AI Interviewer asks: 'Tell me about yourself'. Respond by mentioning your degree, one strength (e.g., hardworking), and why you like this field.",
+        "kn": "The AI Interviewer asks: 'Tell me about yourself'. Respond by mentioning your degree, one strength (e.g., hardworking), and why you like this field."
+      },
+      "objectiveStr": "The AI Interviewer asks: 'Tell me about yourself'. Respond by mentioning your degree, one strength (e.g., hardworking), and why you like this field.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: The AI Interviewer asks: 'Tell me about yourself'. Respond by mentioning your degree, one strength (e.g., hardworking), and why you like this field.\n\nAnticipated Mistakes:\n- My degree over in 2025. -> Try: 'I COMPLETED my degree in 2025' or 'I GRADUATED in 2025'.\n- I like talk to people. -> Use: 'I have good COMMUNICATION SKILLS' or 'I enjoy INTERACTING with people'.\n- Give me chance. -> In an interview, say: 'I am EAGER to CONTRIBUTE to your team'.\n\nPronunciation Focus: Strength (Think of the Kannada 'ಸ್ರೆ'. Say 'Streng-th'. Don't forget the 'th' sound at the end, like 'ಥ'.)"
+    },
+    "order_index": 0,
+    "created_at": "2026-04-01T05:50:31.877195+00:00",
+    "text_url": null
+  },
+  {
+    "id": "90f04cca-9ad4-45e4-b6f3-71836d6c7f98",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Workplace Conflict: Disagreeing Politely",
+      "kn": "ಕೆಲಸದ ಸ್ಥಳದ ಭಿನ್ನಾಭಿಪ್ರಾಯ: ಸಭ್ಯವಾಗಿ ಅಸಮ್ಮತಿ ಸೂಚಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Fluency: Mastering the art of 'Professional Disagreement' without sounding rude, focusing on phrases that bridge different opinions.",
+      "kn": "Fluency: Mastering the art of 'Professional Disagreement' without sounding rude, focusing on phrases that bridge different opinions."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022657518_AL2_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Rajesh: I think we should all work this Sunday to finish the project on time. | ಪ್ರಾಜೆಕ್ಟ್ ಅನ್ನು ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ಮುಗಿಸಲು ನಾವೆಲ್ಲರೂ ಈ ಭಾನುವಾರ ಕೆಲಸ ಮಾಡಬೇಕು ಎಂದು ನನಗನ್ನಿಸುತ್ತದೆ.\nKavya: I see your point, Rajesh, but I feel that working seven days a week might make the team tired. Perhaps we can stay an extra hour on weekdays instead? | ನಿಮ್ಮ ಪಾಯಿಂಟ್ ನನಗೆ ಅರ್ಥವಾಯಿತು ರಾಜೇಶ್, ಆದರೆ ವಾರದಲ್ಲಿ ಏಳೂ ದಿನ ಕೆಲಸ ಮಾಡುವುದರಿಂದ ತಂಡಕ್ಕೆ ಆಯಾಸವಾಗಬಹುದು ಎಂದು ನನಗನ್ನಿಸುತ್ತದೆ. ಬದಲಾಗಿ ನಾವು ವಾರದ ದಿನಗಳಲ್ಲಿ ಒಂದು ಗಂಟೆ ಹೆಚ್ಚು ಕಾಲ ಉಳಿಯಬಹುದೇ?\nRajesh: That is a valid suggestion. Let's see what the manager thinks. | ಅದು ಸರಿಯಾದ ಸಲಹೆ. ಮ್ಯಾನೇಜರ್ ಏನು ಯೋಚಿಸುತ್ತಾರೆಂದು ನೋಡೋಣ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, direct disagreement can sometimes sound like an argument (ಉದಾ: 'ಅದು ತಪ್ಪು'). In English professional settings, we use **'SOFTENERS'**. Instead of saying 'No', we say **'I SEE YOUR POINT, BUT...'**. This acknowledges the colleague's effort while letting you offer a better solution.\n\n📚 KEY PHRASES:\n- I see your point, but...: Used to acknowledge the other person's idea before giving your own.\n  Example: \"I see your point, but the cost is too high.\"\n- I feel that...: A softer way to state an opinion compared to 'I think'.\n  Example: \"I feel that we need more time.\"\n- Perhaps we can...: A polite way to offer an alternative suggestion.\n  Example: \"Perhaps we can try a different method.\"\n\n🗣️ PRONUNCIATION:\n- Suggestion (ಸಜೆಷನ್): Say 'Sug-jes-shun'. The 'gg' sounds like a soft 'ಜ' (ja).\n- Perhaps (ಪರ್ಹ್ಯಾಪ್ಸ್): Say 'Per-haps'. The 'H' is slightly heard. Don't say 'Per-paps'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I **see** your point, but I **feel** we should consider the **cost**. That is a **valid** suggestion, however, **perhaps** we can try a **different** approach? What do you **think**?",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Your AI Colleague suggests a very expensive marketing plan. Disagree politely using 'I see your point, but...' and suggest a 'cheaper alternative'.",
+        "kn": "Your AI Colleague suggests a very expensive marketing plan. Disagree politely using 'I see your point, but...' and suggest a 'cheaper alternative'."
+      },
+      "objectiveStr": "Your AI Colleague suggests a very expensive marketing plan. Disagree politely using 'I see your point, but...' and suggest a 'cheaper alternative'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Your AI Colleague suggests a very expensive marketing plan. Disagree politely using 'I see your point, but...' and suggest a 'cheaper alternative'.\n\nAnticipated Mistakes:\n- You are wrong. -> In meetings, try: 'I DISAGREE' or more politely, 'I HAVE A DIFFERENT VIEW'.\n- Your plan not good. -> Be more specific: 'I have some CONCERNS about this plan'.\n- I no like this. -> Try: 'I FEEL that this might be difficult to do'.\n\nPronunciation Focus: Valid (Think of the Kannada 'ವ್ಯಾ'. Say 'Va-lid'. Make sure the 'V' sound is distinct from a 'B' sound.)"
+    },
+    "order_index": 1,
+    "created_at": "2026-04-01T05:50:59.426734+00:00",
+    "text_url": null
+  },
+  {
+    "id": "ea180b2e-7f80-4fbf-b773-756ad0657076",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Product Pitch: Explaining an Idea",
+      "kn": "ಉತ್ಪನ್ನದ ವಿವರಣೆ: ಒಂದು ವ್ಯಾಪಾರ ಕಲ್ಪನೆಯನ್ನು ವಿವರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Fluency: Articulating a vision, explaining the 'Problem vs. Solution' framework, and using persuasive language.",
+      "kn": "Fluency: Articulating a vision, explaining the 'Problem vs. Solution' framework, and using persuasive language."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Ganesh: Many students in Karnataka feel that English is a wall. They study grammar for years but still cannot speak confidently. | ಕರ್ನಾಟಕದ ಅನೇಕ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಇಂಗ್ಲಿಷ್ ಒಂದು ತಡೆಗೋಡೆಯಂತೆ ಭಾಸವಾಗುತ್ತದೆ. ಅವರು ವರ್ಷಗಟ್ಟಲೆ ವ್ಯಾಕರಣವನ್ನು ಓದುತ್ತಾರೆ ಆದರೆ ಇನ್ನೂ ಆತ್ಮವಿಶ್ವಾಸದಿಂದ ಮಾತನಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.\nPartner: That is true. So, how is your product different? | ಅದು ನಿಜ. ಹಾಗಾದರೆ, ನಿಮ್ಮ ಉತ್ಪನ್ನ ಹೇಗೆ ಭಿನ್ನವಾಗಿದೆ?\nGanesh: We use 'Simplish'. It is a bilingual coach that uses Kannada support to build fluency. Our goal is to turn that wall into a door by focusing on real-world scenarios. | ನಾವು 'ಸಿಂಪ್ಲಿಷ್' ಬಳಸುತ್ತೇವೆ. ಇದು ನಿರರ್ಗಳತೆಯನ್ನು ಬೆಳೆಸಲು ಕನ್ನಡದ ಬೆಂಬಲವನ್ನು ಬಳಸುವ ದ್ವಿಭಾಷಾ ತರಬೇತುದಾರ. ನೈಜ ಪ್ರಪಂಚದ ಸನ್ನಿವೇಶಗಳ ಮೇಲೆ ಕೇಂದ್ರೀಕರಿಸುವ ಮೂಲಕ ಆ ತಡೆಗೋಡೆಯನ್ನು ಬಾಗಿಲಾಗಿ ಪರಿವರ್ತಿಸುವುದು ನಮ್ಮ ಗುರಿಯಾಗಿದೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, when we explain a business, we might say 'ನನ್ನ ಐಡಿಯಾ ಹೀಗಿದೆ' (My idea is like this). In a pitch, use the **'PROBLEM vs. SOLUTION'** flow. Start by stating the gap (**The problem is...**) and then bridge it with your idea (**Our goal is to...**). This makes your English sound logical and persuasive.\n\n📚 KEY PHRASES:\n- The problem is...: Used to identify the specific gap or pain point you are solving.\n  Example: \"The problem is that existing apps are too expensive.\"\n- Our solution offers...: Used to highlight the key features or benefits of your idea.\n  Example: \"Our solution offers 24/7 support.\"\n- Turn X into Y: A powerful metaphor to show transformation.\n  Example: \"We turn mistakes into learning opportunities.\"\n\n🗣️ PRONUNCIATION:\n- Scenario (ಸಿನಾರಿಯೋ): Say 'Si-nair-ee-oh'. The 'air' part should be clear.\n- Focusing (ಫೋಕಸಿಂಗ್): Keep the 'F' soft. Say 'Foh-kus-ing'. Don't use a hard 'P' sound.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "The **problem** is that English feels like a **wall**. Our **goal** is to turn it into a **door**. We provide **localized** support and **real-world** practice. This is how we **democratize** learning.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Pitch your 'Simplish' idea to the AI Investor. Explain the 'wall' problem and how your 'bilingual coach' is the solution.",
+        "kn": "Pitch your 'Simplish' idea to the AI Investor. Explain the 'wall' problem and how your 'bilingual coach' is the solution."
+      },
+      "objectiveStr": "Pitch your 'Simplish' idea to the AI Investor. Explain the 'wall' problem and how your 'bilingual coach' is the solution.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Pitch your 'Simplish' idea to the AI Investor. Explain the 'wall' problem and how your 'bilingual coach' is the solution.\n\nAnticipated Mistakes:\n- I make English easy. -> Try: 'Our product SIMPLIFIES English learning' or 'We make it ACCESSIBLE'.\n- People fear of English. -> Say: 'People HAVE A FEAR of English' or 'English is INTIMIDATING for many'.\n- It is Kannada and English mix. -> Use the professional term: 'It is a BILINGUAL approach'.\n\nPronunciation Focus: Democratize (Think of the Kannada 'ಡೆಮಾಕ್ರಟೈಸ್'. Say 'De-mok-ra-tyze'. It's a big word, but it shows big vision!)"
+    },
+    "order_index": 2,
+    "created_at": "2026-04-01T05:51:19.037378+00:00",
+    "text_url": null
+  },
+  {
+    "id": "d66af83c-0ccc-4354-8939-674b9aab1944",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Customer Support: Delivery & Refunds",
+      "kn": "ಗ್ರಾಹಕ ಸೇವೆ: ವಿಳಂಬಿತ ಡೆಲಿವರಿ ಮತ್ತು ಮರುಪಾವತಿ"
+    },
+    "notes": {
+      "en": "Fluency: Mastering professional empathy, handling frustration, and providing clear resolutions over the phone or in person.",
+      "kn": "Fluency: Mastering professional empathy, handling frustration, and providing clear resolutions over the phone or in person."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Customer: Hello, I am very frustrated! My order was supposed to be delivered yesterday, but I haven't received anything yet. | ಹಲೋ, ನನಗೆ ತುಂಬಾ ಬೇಸರವಾಗುತ್ತಿದೆ! ನನ್ನ ಆರ್ಡರ್ ನಿನ್ನೆ ಡೆಲಿವರಿ ಆಗಬೇಕಿತ್ತು, ಆದರೆ ನನಗೆ ಇನ್ನೂ ಏನೂ ಸಿಕ್ಕಿಲ್ಲ.\nKarthik: I sincerely apologize for the inconvenience, sir. I understand how frustrating this must be. Could you please provide your order ID so I can track it for you? | ನಿಮಗಾದ ಅನಾನುಕೂಲಕ್ಕೆ ನಾನು ಪ್ರಾಮಾಣಿಕವಾಗಿ ಕ್ಷಮೆಯಾಚಿಸುತ್ತೇನೆ, ಸರ್. ಇದು ಎಷ್ಟು ನಿರಾಶಾದಾಯಕವಾಗಿದೆ ಎಂದು ನನಗೆ ಅರ್ಥವಾಗುತ್ತದೆ. ನಾನು ಅದನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ನಿಮ್ಮ ಆರ್ಡರ್ ಐಡಿಯನ್ನು ನೀಡುವಿರಾ?\nKarthik: Thank you. It looks like there was a delay at the hub. I will escalate this right away and ensure it reaches you by tomorrow evening. | ಧನ್ಯವಾದಗಳು. ಹಬ್‌ನಲ್ಲಿ ವಿಳಂಬವಾಗಿದೆ ಎಂದು ತೋರುತ್ತದೆ. ನಾನು ಇದನ್ನು ತಕ್ಷಣವೇ ಮೇಲಧಿಕಾರಿಗಳ ಗಮನಕ್ಕೆ ತರುತ್ತೇನೆ ಮತ್ತು ನಾಳೆ ಸಂಜೆಯೊಳಗೆ ಅದು ನಿಮಗೆ ತಲುಪುವಂತೆ ನೋಡಿಕೊಳ್ಳುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಕ್ಷಮಿಸಿ' (Kshamisi). In professional English, we use **'I APOLOGIZE FOR THE INCONVENIENCE'**. It is a longer phrase that sounds much more formal. Also, instead of saying 'I will tell my boss', use **'I WILL ESCALATE THIS'**. It sounds like you are a professional who knows how to handle systems.\n\n📚 KEY PHRASES:\n- I apologize for the inconvenience.: The standard professional way to say sorry for a problem.\n  Example: \"I apologize for the delay in your refund.\"\n- I will escalate this...: Used to show that you are taking a problem to a higher level to solve it faster.\n  Example: \"I will escalate this to my manager.\"\n- Right away / Immediately: Used to give the customer confidence that you are acting now.\n  Example: \"I will check the status right away.\"\n\n🗣️ PRONUNCIATION:\n- Inconvenience (ಇನ್-ಕನ್-ವೀನಿಯನ್ಸ್): Break it: In-con-vee-nee-unce. Focus on the 'Vee' sound.\n- Apologize (ಅಪಾಲಜೈಸ್): Say 'A-pol-o-jyze'. The 'g' sounds like 'ಜ' (ja).\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I **sincerely** apologize for the **delay**. I **understand** your **frustration**. I will **escalate** your request **immediately**. You will receive a **refund** within two **business** days.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "An angry AI Customer calls because their 'refund is not credited'. Empathize with them, ask for their 'transaction details', and promise to 'escalate the issue'.",
+        "kn": "An angry AI Customer calls because their 'refund is not credited'. Empathize with them, ask for their 'transaction details', and promise to 'escalate the issue'."
+      },
+      "objectiveStr": "An angry AI Customer calls because their 'refund is not credited'. Empathize with them, ask for their 'transaction details', and promise to 'escalate the issue'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: An angry AI Customer calls because their 'refund is not credited'. Empathize with them, ask for their 'transaction details', and promise to 'escalate the issue'.\n\nAnticipated Mistakes:\n- Don't worry, it will come. -> This sounds too casual. Try: 'I ASSURE you that we are working on it' or 'Please be PATIENT while I check'.\n- Wait 2 days. -> Use the professional term: 'It will take two BUSINESS days'.\n- I am sorry for this. -> Use the full phrase: 'I APOLOGIZE for the INCONVENIENCE caused'.\n\nPronunciation Focus: Escalate (Think of the Kannada 'ಎಸ್'. Say 'Es-ka-late'. Make sure the 'late' at the end is clear.)"
+    },
+    "order_index": 3,
+    "created_at": "2026-04-01T05:51:37.44569+00:00",
+    "text_url": null
+  },
+  {
+    "id": "78580150-355d-4d1b-afb4-4e6a7cc1dfc1",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Explaining a Process: Instructions & Tutorials",
+      "kn": "ಪ್ರಕ್ರಿಯೆಯನ್ನು ವಿವರಿಸುವುದು: ಸೂಚನೆಗಳು ಮತ್ತು ಮಾರ್ಗದರ್ಶನ"
+    },
+    "notes": {
+      "en": "Fluency: Using sequential markers (First, Next, Then) to explain a complex task clearly and logically.",
+      "kn": "Fluency: Using sequential markers (First, Next, Then) to explain a complex task clearly and logically."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Shiva: First, you need to log in to the portal using your credentials. Next, click on the 'Upload' button located at the top right corner. | ಮೊದಲಿಗೆ, ನಿಮ್ಮ ಕ್ರೆಡೆನ್ಶಿಯಲ್‌ಗಳನ್ನು ಬಳಸಿ ಪೋರ್ಟಲ್‌ಗೆ ಲಾಗ್ ಇನ್ ಆಗಬೇಕು. ಮುಂದೆ, ಮೇಲಿನ ಬಲ ಮೂಲೆಯಲ್ಲಿರುವ 'ಅಪ್‌ಲೋಡ್' ಬಟನ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.\nIntern: Got it. What do I do after selecting the file? | ಅರ್ಥವಾಯಿತು. ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಿದ ನಂತರ ನಾನು ಏನು ಮಾಡಬೇಕು?\nShiva: Then, wait for the progress bar to reach one hundred percent. Finally, make sure to click 'Save' to complete the process. | ನಂತರ, ಪ್ರೋಗ್ರೆಸ್ ಬಾರ್ ನೂರಕ್ಕೆ ನೂರರಷ್ಟು ತಲುಪುವವರೆಗೆ ಕಾಯಿರಿ. ಕೊನೆಯದಾಗಿ, ಪ್ರಕ್ರಿಯೆಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು 'ಸೇವ್' ಕ್ಲಿಕ್ ಮಾಡುವುದನ್ನು ಮರೆಯಬೇಡಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often use 'ಆಮೇಲೆ' (Aamele) repeatedly. In English, to sound more fluent, we vary our words. We use **'FIRST'** for the start, **'NEXT'** or **'THEN'** for middle steps, and **'FINALLY'** for the end. This structure helps the other person follow your logic without getting confused.\n\n📚 KEY PHRASES:\n- First, / Next, / Then,: Sequential markers used to guide the listener through steps.\n  Example: \"First, open the app. Next, sign up.\"\n- Make sure to...: Used to emphasize an important step that shouldn't be forgotten.\n  Example: \"Make sure to lock the door.\"\n- Once you have...: Used to describe what happens after a specific step is finished.\n  Example: \"Once you have paid, you will get a receipt.\"\n\n🗣️ PRONUNCIATION:\n- Credentials (ಕ್ರೆಡೆನ್ಶಿಯಲ್ಸ್): Say 'Kre-den-shuls'. The 'tials' sounds like 'shuls'.\n- Process (ಪ್ರಾಸೆಸ್): Say 'Pro-sess'. Keep the 'O' sound clear, like in 'Office'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**First**, open the settings. **Next**, select the language. **Then**, click on 'Apply'. **Finally**, restart the device to **complete** the process. **Make sure to** save your work.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Teach the AI Intern how to 'make a cup of tea'. Use at least three sequential markers (First, Next, Finally) and one 'Make sure to' tip.",
+        "kn": "Teach the AI Intern how to 'make a cup of tea'. Use at least three sequential markers (First, Next, Finally) and one 'Make sure to' tip."
+      },
+      "objectiveStr": "Teach the AI Intern how to 'make a cup of tea'. Use at least three sequential markers (First, Next, Finally) and one 'Make sure to' tip.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Teach the AI Intern how to 'make a cup of tea'. Use at least three sequential markers (First, Next, Finally) and one 'Make sure to' tip.\n\nAnticipated Mistakes:\n- And then... and then... and then... -> Try to vary your words! Use: 'FIRST', 'NEXT', 'AFTER THAT', and 'FINALLY'.\n- Don't forget sugar. -> Use the instructional phrase: 'MAKE SURE TO add sugar'.\n- Once finish, drink. -> Try: 'ONCE you have finished, you can serve the tea'.\n\nPronunciation Focus: Progress (Think of the Kannada 'ಪ್ರಾ'. Say 'Pro-gress'. Stress the first part 'Pro'.)"
+    },
+    "order_index": 4,
+    "created_at": "2026-04-01T05:51:54.517352+00:00",
+    "text_url": null
+  },
+  {
+    "id": "8f026bcf-4fb6-44c1-8d4f-5718897f7121",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Sharing an Experience: Proud Moments",
+      "kn": "ಅನುಭವವನ್ನು ಹಂಚಿಕೊಳ್ಳುವುದು: ಹೆಮ್ಮೆಯ ಕ್ಷಣಗಳು"
+    },
+    "notes": {
+      "en": "Fluency: Learning to connect past events using descriptive language and emotional markers to tell a compelling story.",
+      "kn": "Fluency: Learning to connect past events using descriptive language and emotional markers to tell a compelling story."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022731066_AL6_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Colleague: Santhosh, I heard you received an award in your hometown. What happened? | ಸಂತೋಷ್, ನಿಮ್ಮ ಊರಿನಲ್ಲಿ ನಿಮಗೆ ಪ್ರಶಸ್ತಿ ಬಂದಿದೆ ಎಂದು ಕೇಳಿದೆ. ಏನಾಯಿತು?\nSanthosh: A few years ago, there was a heavy flood in my village. At that time, many families were stuck in their homes. I decided to use my small boat to move people to a safe place. | ಕೆಲವು ವರ್ಷಗಳ ಹಿಂದೆ, ನಮ್ಮ ಊರಿನಲ್ಲಿ ಭಾರಿ ಪ್ರವಾಹ ಬಂದಿತ್ತು. ಆ ಸಮಯದಲ್ಲಿ, ಅನೇಕ ಕುಟುಂಬಗಳು ತಮ್ಮ ಮನೆಗಳಲ್ಲಿ ಸಿಲುಕಿಕೊಂಡಿದ್ದರು. ಜನರನ್ನು ಸುರಕ್ಷಿತ ಸ್ಥಳಕ್ಕೆ ಸ್ಥಳಾಂತರಿಸಲು ನನ್ನ ಸಣ್ಣ ದೋಣಿಯನ್ನು ಬಳಸಲು ನಾನು ನಿರ್ಧರಿಸಿದೆ.\nSanthosh: It was a very challenging night, but we saved twenty people. Honestly, it was the proudest moment of my life. | ಅದು ತುಂಬಾ ಸವಾಲಿನ ರಾತ್ರಿಯಾಗಿತ್ತು, ಆದರೆ ನಾವು ಇಪ್ಪತ್ತು ಜನರನ್ನು ಉಳಿಸಿದೆವು. ಪ್ರಾಮಾಣಿಕವಾಗಿ ಹೇಳಬೇಕೆಂದರೆ, ಅದು ನನ್ನ ಜೀವನದ ಅತ್ಯಂತ ಹೆಮ್ಮೆಯ ಕ್ಷಣವಾಗಿತ್ತು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often use 'ಆಗ' (Aaga) for everything in the past. In English, we use **'AT THAT TIME'** to bring the listener into the moment. Also, instead of saying 'Very happy', use **'THE PROUDEST MOMENT'**. It adds more weight and emotion to your story, making you sound like a natural storyteller.\n\n📚 KEY PHRASES:\n- A few years ago...: A classic way to start a story or a past narration.\n  Example: \"A few years ago, I started my first business.\"\n- At that time...: Used to describe the specific situation or context of the story.\n  Example: \"At that time, I did not have a car.\"\n- The proudest moment of my life: Used to highlight a major achievement or emotional peak.\n  Example: \"Graduating college was the proudest moment of my life.\"\n\n🗣️ PRONUNCIATION:\n- Challenging (ಚಾಲೆಂಜಿಂಗ್): Start with 'Cha' (ಚ). Say 'Chal-len-jing'. Don't say 'Shal-len-jing'.\n- Honestly (ಆನೆಸ್ಟ್ಲಿ): The 'H' is silent! Do not say 'Hon-est-ly'. Say 'On-est-lee'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**A few years ago**, I faced a **challenging** situation. **At that time**, I worked very **hard** to solve it. It was a **proud** moment when I **succeeded**. **Honestly**, I will never **forget** that day.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "The AI Coach asks: 'Tell me about a time you felt proud'. Describe an experience (like helping someone or winning a prize) using 'A few years ago' and 'At that time'.",
+        "kn": "The AI Coach asks: 'Tell me about a time you felt proud'. Describe an experience (like helping someone or winning a prize) using 'A few years ago' and 'At that time'."
+      },
+      "objectiveStr": "The AI Coach asks: 'Tell me about a time you felt proud'. Describe an experience (like helping someone or winning a prize) using 'A few years ago' and 'At that time'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: The AI Coach asks: 'Tell me about a time you felt proud'. Describe an experience (like helping someone or winning a prize) using 'A few years ago' and 'At that time'.\n\nAnticipated Mistakes:\n- I was very happy proud. -> Try to separate them: 'I was very HAPPY and felt PROUD' or 'It was a PROUD moment'.\n- That time I do hard work. -> Since it's in the past, use '-ed': 'At that time, I WORK-ED hard'.\n- Story start now. -> Use a narrative opener: 'Let me tell you about a time...' or 'A few years ago...'\n\nPronunciation Focus: Succeeded (Think of the Kannada 'ಸಕ್'. Say 'Suk-seed-ed'. Make sure to emphasize the 'seed' part.)"
+    },
+    "order_index": 5,
+    "created_at": "2026-04-01T05:52:18.187351+00:00",
+    "text_url": null
+  },
+  {
+    "id": "1dc680b8-8a57-4df7-bc37-78c81050cbf6",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Giving Advice: Career & Education",
+      "kn": "ಸಲಹೆ ನೀಡುವುದು: ವೃತ್ತಿ ಮತ್ತು ಶಿಕ್ಷಣದ ಬಗ್ಗೆ"
+    },
+    "notes": {
+      "en": "Fluency: Using modal verbs (should, could, might) and suggestive phrases to give influential yet polite advice.",
+      "kn": "Fluency: Using modal verbs (should, could, might) and suggestive phrases to give influential yet polite advice."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022756217_AL7_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Preeti: Brother, I am confused. Should I go for a traditional Engineering degree or a specialized course in Data Science? | ಅಣ್ಣ, ನನಗೆ ಗೊಂದಲವಿದೆ. ನಾನು ಸಾಂಪ್ರದಾಯಿಕ ಇಂಜಿನಿಯರಿಂಗ್ ಪದವಿಗೆ ಹೋಗಬೇಕೆ ಅಥವಾ ಡೇಟಾ ಸೈನ್ಸ್‌ನಲ್ಲಿ ವಿಶೇಷ ಕೋರ್ಸ್ ಮಾಡಬೇಕೆ?\nManjunath: In my opinion, you should build a strong foundation first. If I were in your shoes, I would choose Engineering and then take a certification in Data Science later. | ನನ್ನ ಅಭಿಪ್ರಾಯದಲ್ಲಿ, ನೀವು ಮೊದಲು ಬಲವಾದ ಅಡಿಪಾಯವನ್ನು ನಿರ್ಮಿಸಬೇಕು. ನಾನು ನಿಮ್ಮ ಜಾಗದಲ್ಲಿ ಇದ್ದಿದ್ದರೆ, ನಾನು ಇಂಜಿನಿಯರಿಂಗ್ ಆರಿಸಿಕೊಳ್ಳುತ್ತಿದ್ದೆ ಮತ್ತು ನಂತರ ಡೇಟಾ ಸೈನ್ಸ್‌ನಲ್ಲಿ ಸರ್ಟಿಫಿಕೇಶನ್ ಮಾಡುತ್ತಿದ್ದೆ.\nManjunath: You might find it difficult to handle advanced topics without the basics. Why don't you talk to some seniors before deciding? | ಮೂಲ ವಿಷಯಗಳಿಲ್ಲದೆ ಮುಂದುವರಿದ ವಿಷಯಗಳನ್ನು ನಿರ್ವಹಿಸುವುದು ನಿಮಗೆ ಕಷ್ಟವಾಗಬಹುದು. ನಿರ್ಧರಿಸುವ ಮೊದಲು ನೀವು ಕೆಲವು ಹಿರಿಯರೊಂದಿಗೆ ಏಕೆ ಮಾತನಾಡಬಾರದು?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often use 'ಮಾಡು' (Do it) or 'ಮಾಡಬೇಡ' (Don't do it). In English, direct commands can sound too bossy. We use **'MODAL VERBS'** like **'SHOULD'** (ಮಾಡಬೇಕು) or **'COULD'** (ಮಾಡಬಹುದು). The phrase **'IF I WERE IN YOUR SHOES'** is a powerful 'Simplish' tool to show empathy while giving strong advice.\n\n📚 KEY PHRASES:\n- In my opinion...: A professional way to introduce your perspective.\n  Example: \"In my opinion, this plan is better.\"\n- If I were in your shoes...: A very common English idiom meaning 'If I were you'.\n  Example: \"If I were in your shoes, I would take the job.\"\n- Why don't you...?: A polite way to suggest an action without sounding like you are giving an order.\n  Example: \"Why don't you try calling them again?\"\n\n🗣️ PRONUNCIATION:\n- Shoes (ಶೂಸ್): Keep the 'Sh' soft and long. Not 'Suse', but 'Shooz'.\n- Opinion (ಅಪಿನಿಯನ್): Say 'O-pin-yun'. Don't say 'O-pie-nion'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**In my opinion**, you **should** focus on your skills. **If I were in your shoes**, I would **choose** this course. **Why don't you** check the **details** online? It **might** be **helpful** for your career.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "The AI Student is confused about choosing a career in 'Arts' or 'Science'. Give them advice using 'In my opinion' and 'Why don't you'.",
+        "kn": "The AI Student is confused about choosing a career in 'Arts' or 'Science'. Give them advice using 'In my opinion' and 'Why don't you'."
+      },
+      "objectiveStr": "The AI Student is confused about choosing a career in 'Arts' or 'Science'. Give them advice using 'In my opinion' and 'Why don't you'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: The AI Student is confused about choosing a career in 'Arts' or 'Science'. Give them advice using 'In my opinion' and 'Why don't you'.\n\nAnticipated Mistakes:\n- You do Science. -> Try to be more suggestive: 'You SHOULD choose Science' or 'I SUGGEST Science'.\n- In my point... -> The correct phrase is 'In my OPINION' or 'From my POINT OF VIEW'.\n- I am in your shoes. -> Add the 'If': 'IF I were in your shoes...' (It means you are imagining being them).\n\nPronunciation Focus: Decision (Think of the Kannada 'ಡಿ'. Say 'De-si-zhun'. The 'si' sounds like a soft 'ಝ' (zha).)"
+    },
+    "order_index": 6,
+    "created_at": "2026-04-01T05:52:41.849773+00:00",
+    "text_url": null
+  },
+  {
+    "id": "ae1b4cdb-6e36-4211-be4c-aa56b1e7c8a3",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "The Formal Interview: Behavioral Questions",
+      "kn": "ಸಂದರ್ಶನ: ವರ್ತನೆಯ ಆಧಾರಿತ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the STAR (Situation, Task, Action, Result) method to answer complex questions like 'Tell me about a time you failed'.",
+      "kn": "Professionalism: Mastering the STAR (Situation, Task, Action, Result) method to answer complex questions like 'Tell me about a time you failed'."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Interviewer: Rahul, tell me about a time you had to handle a difficult client. How did you manage the situation? | ರಾಹುಲ್, ನೀವು ಕಷ್ಟಕರವಾದ ಗ್ರಾಹಕರನ್ನು ನಿಭಾಯಿಸಬೇಕಾದ ಸಮಯದ ಬಗ್ಗೆ ತಿಳಿಸಿ. ಆ ಪರಿಸ್ಥಿತಿಯನ್ನು ನೀವು ಹೇಗೆ ನಿರ್ವಹಿಸಿದ್ದೀರಿ?\nRahul: Certainly. In my previous role, a client was angry due to a delayed report (Situation). My task was to calm them and provide the data (Task). I scheduled a direct call to explain the delay and offered a temporary workaround (Action). Consequently, the client was satisfied and renewed their contract (Result). | ಖಂಡಿತ. ನನ್ನ ಹಿಂದಿನ ಉದ್ಯೋಗದಲ್ಲಿ, ವಿಳಂಬವಾದ ವರದಿಯಿಂದಾಗಿ ಗ್ರಾಹಕರು ಕೋಪಗೊಂಡಿದ್ದರು (ಪರಿಸ್ಥಿತಿ). ಅವರನ್ನು ಸಮಾಧಾನಪಡಿಸುವುದು ಮತ್ತು ಡೇಟಾ ಒದಗಿಸುವುದು ನನ್ನ ಕೆಲಸವಾಗಿತ್ತು (ಕಾರ್ಯ). ವಿಳಂಬವನ್ನು ವಿವರಿಸಲು ನಾನು ನೇರ ಕರೆ ಮಾಡಿದೆ ಮತ್ತು ತಾತ್ಕಾಲಿಕ ಪರಿಹಾರವನ್ನು ನೀಡಿದೆ (ಕ್ರಮ). ಪರಿಣಾಮವಾಗಿ, ಗ್ರಾಹಕರು ತೃಪ್ತರಾದರು ಮತ್ತು ಅವರ ಒಪ್ಪಂದವನ್ನು ನವೀಕರಿಸಿದರು (ಫಲಿತಾಂಶ).",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we tend to tell stories chronologically. In professional English, we use the **STAR** structure. Instead of saying 'ಆಮೇಲೆ ಹೀಗಾಯ್ತು' (Aamele hegaytu), we use logical connectors like **'CONSEQUENTLY'** or **'THEREFORE'**. This makes your answer sound calculated and high-impact.\n\n📚 KEY PHRASES:\n- In my previous role...: A professional way to reference past experience.\n  Example: \"In my previous role, I led a team of five.\"\n- Consequently / As a result...: High-level transition words to show the outcome of your work.\n  Example: \"Consequently, our sales increased by 20%.\"\n- I took the initiative to...: Shows leadership and proactive behavior.\n  Example: \"I took the initiative to simplify the filing system.\"\n\n🗣️ PRONUNCIATION:\n- Consequently (ಕಾನ್ಸಿಕ್ವೆಂಟ್ಲಿ): Say 'Kon-si-kwent-lee'. Stress the first part 'Kon'.\n- Initiative (ಇನಿಶಿಯೇಟಿವ್): Say 'In-i-sha-tiv'. The 'tiative' part is fast.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**In my previous role**, I faced a **challenging** client. I took the **initiative** to solve the issue. **Consequently**, the project was a **success**. I am **confident** I can bring the same **results** here.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "The AI Executive asks: 'Tell me about a time you showed leadership'. Use the STAR method to describe a situation where you helped a team or solved a big problem.",
+        "kn": "The AI Executive asks: 'Tell me about a time you showed leadership'. Use the STAR method to describe a situation where you helped a team or solved a big problem."
+      },
+      "objectiveStr": "The AI Executive asks: 'Tell me about a time you showed leadership'. Use the STAR method to describe a situation where you helped a team or solved a big problem.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: The AI Executive asks: 'Tell me about a time you showed leadership'. Use the STAR method to describe a situation where you helped a team or solved a big problem.\n\nAnticipated Mistakes:\n- I did good work there. -> Be more specific. Say: 'I ACHIEVED significant RESULTS in my previous role'.\n- Client was happy at last. -> Use professional results: 'The client was SATISFIED and we met the DEADLINE'.\n- So then I called him... -> Use professional connectors: 'SUBSEQUENTLY, I contacted the stakeholder'.\n\nPronunciation Focus: Stakeholder (Think of the Kannada 'ಸ್ಟೇಕ್'. Say 'Stake-hold-er'. Don't drop the 'H'.)"
+    },
+    "order_index": 0,
+    "created_at": "2026-04-01T05:53:00.313538+00:00",
+    "text_url": null
+  },
+  {
+    "id": "445742a3-1232-4d7d-b3e3-d9fec9c760d0",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Leading a Meeting: Opening & Summarizing",
+      "kn": "ಸಭೆಯನ್ನು ಮುನ್ನಡೆಸುವುದು: ಆರಂಭ ಮತ್ತು ಸಾರಾಂಶ"
+    },
+    "notes": {
+      "en": "Professionalism: Using 'Signposting' language to control the flow of a meeting and ensure everyone is aligned.",
+      "kn": "Professionalism: Using 'Signposting' language to control the flow of a meeting and ensure everyone is aligned."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Shakti: Good morning everyone. Let’s get started. The main objective of today’s meeting is to finalize the budget. | ಎಲ್ಲರಿಗೂ ಶುಭೋದಯ. ಪ್ರಾರಂಭಿಸೋಣ. ಇಂದಿನ ಸಭೆಯ ಮುಖ್ಯ ಉದ್ದೇಶ ಬಜೆಟ್ ಅನ್ನು ಅಂತಿಮಗೊಳಿಸುವುದು.\nShakti: Moving on to the next point, we need to discuss the timeline. (Later...) To wrap up, we have agreed to the new costs and the deadline is Friday. | ಮುಂದಿನ ವಿಷಯಕ್ಕೆ ಹೋಗೋಣ, ನಾವು ಸಮಯದ ಬಗ್ಗೆ ಚರ್ಚಿಸಬೇಕಾಗಿದೆ. (ನಂತರ...) ಮುಕ್ತಾಯಗೊಳಿಸಲು, ನಾವು ಹೊಸ ವೆಚ್ಚಗಳಿಗೆ ಒಪ್ಪಿದ್ದೇವೆ ಮತ್ತು ಗಡುವು ಶುಕ್ರವಾರವಾಗಿದೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might use 'ಆಯ್ತು' (Aytu) or 'ನೆಕ್ಸ್ಟ್' (Next) to change topics. In Expert English, we use **'SIGNPOSTING'**. Phrases like **'MOVING ON TO'** or **'TURNING OUR ATTENTION TO'** act like traffic signals for your listeners. They know exactly where the conversation is going.\n\n📚 KEY PHRASES:\n- Let’s get started.: A professional way to call the meeting to order.\n  Example: \"If everyone is here, let's get started.\"\n- Moving on to...: Signposting language to move from one topic to the next.\n  Example: \"Moving on to the marketing updates.\"\n- To wrap up / In summary...: Used to conclude and repeat the most important points.\n  Example: \"To wrap up, please send the files by EOD.\"\n\n🗣️ PRONUNCIATION:\n- Objective (ಅಬ್ಜೆಕ್ಟಿವ್): Say 'Ob-jek-tiv'. Don't emphasize the 'O' too much.\n- Agenda (ಅಜೆಂಡಾ): Say 'A-jen-da'. The 'g' is a soft 'ಜ' (ja).\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Good morning**. Let's **get started**. The **objective** is clear. **Moving on** to the next item on the **agenda**. To **wrap up**, we need to **finish** by Friday.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Lead a mock meeting with the AI Team. Open the meeting, announce the topic (New Project), and summarize the tasks at the end.",
+        "kn": "Lead a mock meeting with the AI Team. Open the meeting, announce the topic (New Project), and summarize the tasks at the end."
+      },
+      "objectiveStr": "Lead a mock meeting with the AI Team. Open the meeting, announce the topic (New Project), and summarize the tasks at the end.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Lead a mock meeting with the AI Team. Open the meeting, announce the topic (New Project), and summarize the tasks at the end.\n\nAnticipated Mistakes:\n- Meeting start now. -> Use: 'LET'S GET STARTED' or 'I’D LIKE TO COMMENCE the meeting'.\n- Next talk about money. -> Use signposting: 'MOVING ON TO the financial discussion'.\n- Finish, bye. -> Use a wrap-up phrase: 'TO SUMMARIZE the key action points before we close...'\n\nPronunciation Focus: Summarize (Think of the Kannada 'ಸಮ'. Say 'Sum-ma-ryze'. The 'z' at the end should buzz.)"
+    },
+    "order_index": 1,
+    "created_at": "2026-04-01T05:53:15.619745+00:00",
+    "text_url": null
+  },
+  {
+    "id": "bbc88dde-dcc3-4712-b361-6bb93622a6c5",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Negotiation: Salary & Contracts",
+      "kn": "ಸಮಾಲೋಚನೆ: ಸಂಬಳ ಮತ್ತು ಒಪ್ಪಂದದ ನಿಯಮಗಳು"
+    },
+    "notes": {
+      "en": "Professionalism: Using persuasive logic and 'Conditional Language' (if/then) to negotiate terms without appearing demanding.",
+      "kn": "Professionalism: Using persuasive logic and 'Conditional Language' (if/then) to negotiate terms without appearing demanding."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Ms. Deepa: We are excited to offer you the position at sixty thousand rupees per month. What are your thoughts? | ನಿಮಗೆ ತಿಂಗಳಿಗೆ ಅರವತ್ತು ಸಾವಿರ ರೂಪಾಯಿ ಸಂಬಳದೊಂದಿಗೆ ಈ ಹುದ್ದೆಯನ್ನು ನೀಡಲು ನಾವು ಉತ್ಸುಕರಾಗಿದ್ದೇವೆ. ನಿಮ್ಮ ಅಭಿಪ್ರಾಯವೇನು?\nVinay: Thank you for the offer. Based on my five years of experience in this niche, I was expecting something closer to seventy thousand. Is there any flexibility in the budget? | ಆಫರ್‌ಗಾಗಿ ಧನ್ಯವಾದಗಳು. ಈ ಕ್ಷೇತ್ರದಲ್ಲಿ ನನ್ನ ಐದು ವರ್ಷಗಳ ಅನುಭವದ ಆಧಾರದ ಮೇಲೆ, ನಾನು ಎಪ್ಪತ್ತು ಸಾವಿರದ ಆಸುಪಾಸಿನಲ್ಲಿ ನಿರೀಕ್ಷಿಸುತ್ತಿದ್ದೆ. ಬಜೆಟ್‌ನಲ್ಲಿ ಏನಾದರೂ ಬದಲಾವಣೆಗೆ ಅವಕಾಶವಿದೆಯೇ?\nMs. Deepa: That is a bit higher than our range. What if we offer a performance bonus instead? | ಅದು ನಮ್ಮ ಮಿತಿಗಿಂತ ಸ್ವಲ್ಪ ಹೆಚ್ಚಾಯಿತು. ಬದಲಾಗಿ ನಾವು ಕಾರ್ಯಕ್ಷಮತೆಯ ಬೋನಸ್ ನೀಡಿದರೆ ಹೇಗಿರುತ್ತದೆ?\nVinay: If we can settle on sixty-five thousand as the base pay, then I would be happy to accept the offer immediately. | ನಾವು ಅರವತ್ತೈದು ಸಾವಿರ ಮೂಲ ವೇತನಕ್ಕೆ ಒಪ್ಪುವುದಾದರೆ, ನಾನು ತಕ್ಷಣವೇ ಆಫರ್ ಸ್ವೀಕರಿಸಲು ಸಂತೋಷಪಡುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might feel shy to ask for more money or say 'ನನಗೆ ಇಷ್ಟು ಬೇಕು' (I want this much). In Expert English, we use **'ANCHORING'**. Instead of 'wanting' money, we say **'BASED ON THE MARKET'** or **'BASED ON MY EXPERIENCE'**. This moves the conversation from 'feelings' to 'facts'. Also, use the word **'FLEXIBILITY'** (ನಮ್ಯತೆ/ಬದಲಾವಣೆ) instead of 'Change'—it sounds much more professional.\n\n📚 KEY PHRASES:\n- Is there any flexibility...?: A very polite way to ask if a price or salary can be changed.\n  Example: \"Is there any flexibility in the joining date?\"\n- Based on my experience...: Provides a logical reason for your demand so it doesn't look like greed.\n  Example: \"Based on my skills, I deserve a higher role.\"\n- If we can... then I would...: Conditional logic used to close a deal by offering a compromise.\n  Example: \"If you provide transport, then I would accept the night shift.\"\n\n🗣️ PRONUNCIATION:\n- Negotiation (ನೆಗೋಷಿಯೇಷನ್): Say 'Ne-go-shee-ay-shun'. The 'ti' sounds like 'ಶ' (sha).\n- Flexibility (ಫ್ಲೆಕ್ಸಿಬಿಲಿಟಿ): Keep the 'F' and 'L' together. Say 'Flex-i-bil-i-tee'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Thank you for the **offer**. **Based on** my skills, I was **expecting** a higher **salary**. Is there any **flexibility** in the **budget**? **If** we can agree on this, **then** I am ready to **join**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Negotiate your salary with the AI HR. The AI offers '50k'. Use 'Based on my experience' to ask for '60k' and use 'If/Then' logic to find a middle ground.",
+        "kn": "Negotiate your salary with the AI HR. The AI offers '50k'. Use 'Based on my experience' to ask for '60k' and use 'If/Then' logic to find a middle ground."
+      },
+      "objectiveStr": "Negotiate your salary with the AI HR. The AI offers '50k'. Use 'Based on my experience' to ask for '60k' and use 'If/Then' logic to find a middle ground.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Negotiate your salary with the AI HR. The AI offers '50k'. Use 'Based on my experience' to ask for '60k' and use 'If/Then' logic to find a middle ground.\n\nAnticipated Mistakes:\n- I want more money. -> Try: 'I was EXPECTING a higher COMPENSATION based on my profile'.\n- Give 60k, I come. -> Use conditional logic: 'IF we can SETTLE on 60k, THEN I would be happy to join'.\n- Salary very low. -> Be more professional: 'The current offer is below the MARKET STANDARD for this role'.\n\nPronunciation Focus: Expectation (Think of the Kannada 'ಎಕ್ಸ್'. Say 'Ex-pek-tay-shun'. Focus on the 'tay' sound.)"
+    },
+    "order_index": 2,
+    "created_at": "2026-04-01T05:53:31.748597+00:00",
+    "text_url": null
+  },
+  {
+    "id": "509d979b-9aa5-4a62-b94d-be9f94156a3d",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Public Speaking: Speeches & Presentations",
+      "kn": "ಸಾರ್ವಜನಿಕ ಭಾಷಣ: ಭಾಷಣ ಮತ್ತು ಪ್ರೆಸೆಂಟೇಶನ್"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the 'Hook-Body-Close' structure, using rhetorical pauses, and projecting confidence to an audience.",
+      "kn": "Professionalism: Mastering the 'Hook-Body-Close' structure, using rhetorical pauses, and projecting confidence to an audience."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Manasa: Good evening, everyone. Standing here today, I am reminded of a simple truth: success is never a solo journey. | ಎಲ್ಲರಿಗೂ ಶುಭ ಸಂಜೆ. ಇಂದು ಇಲ್ಲಿ ನಿಂತಿರುವಾಗ, ನನಗೆ ಒಂದು ಸರಳ ಸತ್ಯ ನೆನಪಾಗುತ್ತಿದೆ: ಯಶಸ್ಸು ಎಂಬುದು ಎಂದಿಗೂ ಒಬ್ಬಂಟಿ ಪ್ರಯಾಣವಲ್ಲ.\nManasa: I want to express my deepest gratitude to my mentors and my hardworking team. Without your support, this achievement would not be possible. | ನನ್ನ ಮಾರ್ಗದರ್ಶಕರಿಗೆ ಮತ್ತು ನನ್ನ ಕಠಿಣ ಪರಿಶ್ರಮಿ ತಂಡಕ್ಕೆ ನನ್ನ ಆಳವಾದ ಕೃತಜ್ಞತೆಯನ್ನು ವ್ಯಕ್ತಪಡಿಸಲು ನಾನು ಬಯಸುತ್ತೇನೆ. ನಿಮ್ಮ ಬೆಂಬಲವಿಲ್ಲದೆ, ಈ ಸಾಧನೆ ಸಾಧ್ಯವಾಗುತ್ತಿರಲಿಲ್ಲ.\nManasa: As we move forward, let us continue to turn every challenge into an opportunity. Thank you once again for this incredible honor. | ನಾವು ಮುಂದೆ ಸಾಗುತ್ತಿರುವಾಗ, ಪ್ರತಿಯೊಂದು ಸವಾಲನ್ನು ಅವಕಾಶವಾಗಿ ಪರಿವರ್ತಿಸುವುದನ್ನು ಮುಂದುವರಿಸೋಣ. ಈ ಅದ್ಭುತ ಗೌರವಕ್ಕಾಗಿ ಮತ್ತೊಮ್ಮೆ ಧನ್ಯವಾದಗಳು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often start speeches with long lists of names (ಅಧ್ಯಕ್ಷರೇ, ಅತಿಥಿಗಳೇ...). In English public speaking, we start with a **'HOOK'**—a thought or a quote that captures attention immediately. Instead of just saying 'Thank you', use **'EXPRESS MY GRATITUDE'**. It fills the room with more emotion and professional weight.\n\n📚 KEY PHRASES:\n- I am reminded of...: A powerful way to start a speech with a reflection or a story (The Hook).\n  Example: \"I am reminded of my first day at this office.\"\n- Express my deepest gratitude: A formal and high-impact way to say 'Thank you'.\n  Example: \"I want to express my deepest gratitude to my parents.\"\n- Incredible honor: Used to describe a significant award or recognition.\n  Example: \"It is an incredible honor to lead this project.\"\n\n🗣️ PRONUNCIATION:\n- Honor (ಆನರ್): The 'H' is silent! Say 'On-er'. Just like 'Honestly'.\n- Gratitude (ಗ್ರಾಟಿಟ್ಯೂಡ್): Say 'Gra-ti-tyood'. Stress the first syllable 'Gra'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Good evening**. I am **reminded** of a simple **truth**. Success is a **journey**. I want to **express** my **gratitude** to everyone. Thank you for this **incredible honor**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Give a 30-second 'Thank You' speech to the AI Audience. Use a 'Hook' to start, thank your 'Team', and end with a 'Future Vision'.",
+        "kn": "Give a 30-second 'Thank You' speech to the AI Audience. Use a 'Hook' to start, thank your 'Team', and end with a 'Future Vision'."
+      },
+      "objectiveStr": "Give a 30-second 'Thank You' speech to the AI Audience. Use a 'Hook' to start, thank your 'Team', and end with a 'Future Vision'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Give a 30-second 'Thank You' speech to the AI Audience. Use a 'Hook' to start, thank your 'Team', and end with a 'Future Vision'.\n\nAnticipated Mistakes:\n- I am very happy for award. -> Try: 'I am HONORED to receive this award' or 'I am DEEPLY GRATEFUL for this recognition'.\n- Thanks for all. -> Use a stronger closing: 'THANK YOU ALL for your support and belief in me'.\n- I tell one thing... -> Use the hook phrase: 'I am REMINDED of...' or 'Let me SHARE a quick thought...'\n\nPronunciation Focus: Incredible (Think of the Kannada 'ಇನ್'. Say 'In-kred-i-bul'. Don't say 'In-kred-ay-bal'.)"
+    },
+    "order_index": 3,
+    "created_at": "2026-04-01T05:53:50.487896+00:00",
+    "text_url": null
+  },
+  {
+    "id": "0d4624cb-75a3-47e0-b484-208e24c673bb",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Professional Networking: Making an Impression",
+      "kn": "ವೃತ್ತಿಪರ ನೆಟ್‌ವರ್ಕಿಂಗ್: ಪ್ರಭಾವಶಾಲಿ ಪರಿಚಯ"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the 'Elevator Pitch' and 'Open-Ended Questions' to build meaningful connections at events.",
+      "kn": "Professionalism: Mastering the 'Elevator Pitch' and 'Open-Ended Questions' to build meaningful connections at events."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Suman: Hello Mr. Hegde, I really enjoyed your talk on digital literacy. I am Suman, and I am building an AI platform called Simplish. | ಹಲೋ ಮಿಸ್ಟರ್ ಹೆಗಡೆ, ಡಿಜಿಟಲ್ ಸಾಕ್ಷರತೆಯ ಕುರಿತು ನಿಮ್ಮ ಮಾತು ನನಗೆ ತುಂಬಾ ಇಷ್ಟವಾಯಿತು. ನಾನು ಸುಮನ್, ನಾನು ಸಿಂಪ್ಲಿಷ್ ಎಂಬ ಎಐ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅನ್ನು ನಿರ್ಮಿಸುತ್ತಿದ್ದೇನೆ.\nMr. Hegde: Nice to meet you, Suman. What does Simplish do exactly? | ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿದ್ದಕ್ಕೆ ಸಂತೋಷ ಸುಮನ್. ಸಿಂಪ್ಲಿಷ್ ನಿಖರವಾಗಿ ಏನು ಮಾಡುತ್ತದೆ?\nSuman: We help Kannada speakers overcome the 'English wall' through bilingual AI coaching. I’d love to hear your thoughts on how we can scale this in rural areas. | ದ್ವಿಭಾಷಾ ಎಐ ತರಬೇತಿಯ ಮೂಲಕ ನಾವು ಕನ್ನಡಿಗರು 'ಇಂಗ್ಲಿಷ್ ತಡೆಗೋಡೆ'ಯನ್ನು ಜಯಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತೇವೆ. ಗ್ರಾಮೀಣ ಪ್ರದೇಶಗಳಲ್ಲಿ ನಾವು ಇದನ್ನು ಹೇಗೆ ವಿಸ್ತರಿಸಬಹುದು ಎಂಬ ಬಗ್ಗೆ ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಕೇಳಲು ನಾನು ಇಷ್ಟಪಡುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada networking, we sometimes wait for others to speak first. In Expert English, we use a **'COMPLIMENT HOOK'**. Start by praising something they did (**I enjoyed your talk...**). This opens the 'door' immediately. Also, instead of asking 'Yes/No' questions, use **'YOUR THOUGHTS ON'**. It forces a deeper conversation and shows you are a thinker.\n\n📚 KEY PHRASES:\n- I really enjoyed your talk on...: A perfect 'Icebreaker' to start a conversation with a speaker or guest.\n  Example: \"I really enjoyed your talk on rural innovation.\"\n- I'd love to hear your thoughts on...: An open-ended request that makes the other person feel valued and keeps the conversation going.\n  Example: \"I'd love to hear your thoughts on the new education policy.\"\n- Let's stay in touch.: The professional way to suggest continuing the connection later (via LinkedIn or email).\n  Example: \"It was great meeting you; let's stay in touch.\"\n\n🗣️ PRONUNCIATION:\n- Literacy (ಲಿಟರಸಿ): Say 'Lit-er-a-see'. Keep the 'Lit' short and sharp.\n- Rural (ರೂರಲ್): Say 'Roo-rul'. It's a tricky 'R' sound—try not to say 'Lural'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello! I **really** enjoyed your **presentation**. I am **building** a platform for **learners**. I'd **love** to hear your **thoughts** on our **vision**. Let's stay in **touch**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Approach the AI Industry Expert. Compliment their 'session', introduce your 'business idea', and ask for their 'thoughts' on rural growth.",
+        "kn": "Approach the AI Industry Expert. Compliment their 'session', introduce your 'business idea', and ask for their 'thoughts' on rural growth."
+      },
+      "objectiveStr": "Approach the AI Industry Expert. Compliment their 'session', introduce your 'business idea', and ask for their 'thoughts' on rural growth.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Approach the AI Industry Expert. Compliment their 'session', introduce your 'business idea', and ask for their 'thoughts' on rural growth.\n\nAnticipated Mistakes:\n- I am Suman. I want talk. -> Try a smoother opening: 'Pardon me, I am Suman. I’d LOVE TO CONNECT with you'.\n- Give me your number. -> In high-level networking, say: 'CAN WE CONNECT on LinkedIn?' or 'Could I have your BUSINESS CARD?'\n- My idea is super. -> Use professional confidence: 'I am building a HIGH-IMPACT platform for the community'.\n\nPronunciation Focus: Platform (Think of the Kannada 'ಪ್ಲಾಟ್‌ಫಾರ್ಮ್'. Say 'Plat-form'. Keep the 'O' round.)"
+    },
+    "order_index": 4,
+    "created_at": "2026-04-01T06:06:26.791326+00:00",
+    "text_url": null
+  },
+  {
+    "id": "468dab25-472b-49b0-829d-ff24cc1950cc",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Giving Feedback: The Sandwich Method",
+      "kn": "ಅಭಿಪ್ರಾಯ ನೀಡುವುದು: ಸ್ಯಾಂಡ್‌ವಿಚ್ ವಿಧಾನ"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the 'Sandwich Method' (Positive-Negative-Positive) to correct mistakes without demotivating the team.",
+      "kn": "Professionalism: Mastering the 'Sandwich Method' (Positive-Negative-Positive) to correct mistakes without demotivating the team."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Vidyadhar: Arpan, your design for the client presentation was excellent and very creative. | ಅರ್ಪಣ್, ಕ್ಲೈಂಟ್ ಪ್ರೆಸೆಂಟೇಶನ್‌ಗಾಗಿ ನಿಮ್ಮ ವಿನ್ಯಾಸವು ಅತ್ಯುತ್ತಮವಾಗಿತ್ತು ಮತ್ತು ಬಹಳ ಸೃಜನಾತ್ಮಕವಾಗಿತ್ತು.\nVidyadhar: However, I noticed a few spelling errors in the final slides. We need to be more careful with the details to maintain our professional image. | ಆದರೆ, ಅಂತಿಮ ಸ್ಲೈಡ್‌ಗಳಲ್ಲಿ ನಾನು ಕೆಲವು ಕಾಗುಣಿತ ತಪ್ಪುಗಳನ್ನು ಗಮನಿಸಿದೆ. ನಮ್ಮ ವೃತ್ತಿಪರ ಇಮೇಜ್ ಉಳಿಸಿಕೊಳ್ಳಲು ನಾವು ವಿವರಗಳ ಬಗ್ಗೆ ಹೆಚ್ಚು ಜಾಗರೂಕರಾಗಿರಬೇಕು.\nVidyadhar: Overall, your hard work really showed. Keep up the great spirit and just double-check the text next time! | ಒಟ್ಟಾರೆಯಾಗಿ, ನಿಮ್ಮ ಕಠಿಣ ಪರಿಶ್ರಮ ಎದ್ದು ಕಾಣುತ್ತಿತ್ತು. ಇದೇ ಉತ್ಸಾಹವನ್ನು ಮುಂದುವರಿಸಿ ಮತ್ತು ಮುಂದಿನ ಬಾರಿ ಪಠ್ಯವನ್ನು ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸಿ!",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, when someone makes a mistake, we might be very direct (ಉದಾ: 'ತಪ್ಪು ಮಾಡಿದ್ದೀಯಾ'). In Expert English, we use the **'SANDWICH METHOD'**. We 'sandwich' the correction between two layers of praise. This ensures the person listens to the feedback instead of getting defensive. Instead of 'You made a mistake', use **'I NOTICED'**—it focuses on the observation, not the person.\n\n📚 KEY PHRASES:\n- I noticed that...: A neutral way to point out an error without sounding like an accusation.\n  Example: \"I noticed that the report was late.\"\n- However, we need to...: The 'middle' of the sandwich; used to introduce the correction.\n  Example: \"However, we need to improve our response time.\"\n- Keep up the great work!: A positive closing to ensure the employee feels valued.\n  Example: \"You are doing well, keep up the great work!\"\n\n🗣️ PRONUNCIATION:\n- Creative (ಕ್ರಿಯೇಟಿವ್): Say 'Kree-ay-tiv'. Don't say 'Kray-tive'.\n- Maintain (ಮೇಂಟೇನ್): Keep the 'Main' long. Say 'Main-tayn'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Your **design** was **excellent**. **However**, I **noticed** a few **errors**. We **need** to be **careful**. Overall, you are doing a **great** job. **Keep** it up!",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "Give feedback to the AI Intern who was late for a meeting but brought a great report. Use the Sandwich Method: Praise the report, address the lateness, and end with a positive note.",
+        "kn": "Give feedback to the AI Intern who was late for a meeting but brought a great report. Use the Sandwich Method: Praise the report, address the lateness, and end with a positive note."
+      },
+      "objectiveStr": "Give feedback to the AI Intern who was late for a meeting but brought a great report. Use the Sandwich Method: Praise the report, address the lateness, and end with a positive note.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Give feedback to the AI Intern who was late for a meeting but brought a great report. Use the Sandwich Method: Praise the report, address the lateness, and end with a positive note.\n\nAnticipated Mistakes:\n- You are late, don't do it. -> Try the sandwich: 'Your report was GREAT. HOWEVER, I noticed you were LATE. Please be ON TIME next time. KEEP UP the good work!'\n- Report super, but you slow. -> Be more professional: 'The quality of your work is HIGH, but we need to work on PUNCTUALITY'.\n- Mistake happens, no problem. -> As a leader, be firm but kind: 'I noticed some SLIPS, but I’m CONFIDENT you will fix them'.\n\nPronunciation Focus: Spelling (Think of the Kannada 'ಸ್ಪೆ'. Say 'Spel-ling'. Don't add an 'E' sound at the start like 'Ee-spel-ling'.)"
+    },
+    "order_index": 5,
+    "created_at": "2026-04-01T06:06:42.555818+00:00",
+    "text_url": null
+  },
+  {
+    "id": "9bd839f5-652d-4f67-b4fe-3a4feea5f5a0",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Email to Speech: Formal Briefing",
+      "kn": "ಇಮೇಲ್‌ನಿಂದ ಮೌಖಿಕ ವಿವರಣೆ: ವೃತ್ತಿಪರ ಬ್ರೀಫಿಂಗ್"
+    },
+    "notes": {
+      "en": "Professionalism: Learning to convert a dry, formal email into a natural, authoritative verbal briefing for a team.",
+      "kn": "Professionalism: Learning to convert a dry, formal email into a natural, authoritative verbal briefing for a team."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Anand (Reading Email): Dear All, please note that according to the new policy, unauthorized access to the server room is strictly prohibited. | ಎಲ್ಲರಿಗೂ ನಮಸ್ಕಾರ, ಹೊಸ ನೀತಿಯ ಪ್ರಕಾರ, ಸರ್ವರ್ ರೂಮ್‌ಗೆ ಅನಧಿಕೃತ ಪ್ರವೇಶವನ್ನು ಕಟ್ಟುನಿಟ್ಟಾಗಿ ನಿಷೇಧಿಸಲಾಗಿದೆ ಎಂಬುದನ್ನು ದಯವಿಟ್ಟು ಗಮನಿಸಿ.\nAnand (Verbal Briefing): Hi Team, just a quick update on security. From today, please do not enter the server room without permission. We need to keep our data safe. If you have questions, let me know. | ಹಾಯ್ ಟೀಮ್, ಭದ್ರತೆಯ ಬಗ್ಗೆ ಒಂದು ಸಣ್ಣ ಅಪ್‌ಡೇಟ್. ಇಂದಿನಿಂದ, ದಯವಿಟ್ಟು ಅನುಮತಿಯಿಲ್ಲದೆ ಸರ್ವರ್ ರೂಮ್ ಪ್ರವೇಶಿಸಬೇಡಿ. ನಮ್ಮ ಡೇಟಾವನ್ನು ನಾವು ಸುರಕ್ಷಿತವಾಗಿಡಬೇಕು. ನಿಮಗೇನಾದರೂ ಪ್ರಶ್ನೆಗಳಿದ್ದರೆ, ನನಗೆ ತಿಳಿಸಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we use different 'levels' for writing (ಗ್ರಾಂಥಿಕ) and speaking (ಆಡುಭಾಷೆ). English is the same! An email uses big words like **'PROHIBITED'** or **'UNAUTHORIZED'**. But when you speak, use 'Simplish'—say **'PLEASE DO NOT ENTER'** or **'WITHOUT PERMISSION'**. This makes you sound like a human leader, not a robot reading a document.\n\n📚 KEY PHRASES:\n- Just a quick update...: A casual yet professional way to start a verbal briefing.\n  Example: \"Just a quick update on the project status.\"\n- What this means is...: Used to explain the 'real-world' meaning of a formal rule.\n  Example: \"What this means is we should finish the work by 5 PM.\"\n- Let me know if...: An open invitation for feedback or questions.\n  Example: \"Let me know if you need more time.\"\n\n🗣️ PRONUNCIATION:\n- Unauthorized (ಅನ್-ಆಥರೈಸ್ಡ್): Break it: Un-au-tho-ryzed. Focus on the 'th' like 'ಥ'.\n- Permission (ಪರ್ಮಿಷನ್): Say 'Per-mi-shun'. Stress the middle 'mi'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hi **Team**. Just a **quick** update. From **today**, we have a **new** security **policy**. What this **means** is, we need to be **careful**. Let me **know** if you have **questions**.",
+    "scenario": {
+      "character": {
+        "en": "AI Coach",
+        "kn": "AI Coach"
+      },
+      "objective": {
+        "en": "You just sent an email about 'No food at desks'. Briefly explain this to the AI Team in the morning huddle using 'Just a quick update' and 'What this means is'.",
+        "kn": "You just sent an email about 'No food at desks'. Briefly explain this to the AI Team in the morning huddle using 'Just a quick update' and 'What this means is'."
+      },
+      "objectiveStr": "You just sent an email about 'No food at desks'. Briefly explain this to the AI Team in the morning huddle using 'Just a quick update' and 'What this means is'.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You just sent an email about 'No food at desks'. Briefly explain this to the AI Team in the morning huddle using 'Just a quick update' and 'What this means is'.\n\nAnticipated Mistakes:\n- Email say no eating. -> Speak naturally: 'JUST A QUICK UPDATE, the new policy says we shouldn't EAT at our desks'.\n- Food is prohibited strictly. -> Save the big words for paper. Say: 'PLEASE DO NOT have food while working'.\n- I told you in email. -> Avoid sounding rude. Say: 'I wanted to HIGHLIGHT the email I sent earlier'.\n\nPronunciation Focus: Briefing (Think of the Kannada 'ಬ್ರೀ'. Say 'Bree-fing'. Keep the 'f' sound light.)"
+    },
+    "order_index": 6,
+    "created_at": "2026-04-01T06:07:00.384749+00:00",
+    "text_url": null
+  }
+]

@@ -77,10 +77,10 @@ const PlacementTest: React.FC = () => {
     }
   }, [session, step]);
 
-  const handleAudioComplete = async (blob: Blob) => {
+  const handleAudioComplete = async (blob: Blob, durationSeconds?: number) => {
     setLoading(true);
     try {
-      const result = await evaluateSpeech(blob, READING_PARAGRAPH.en);
+      const result = await evaluateSpeech(blob, READING_PARAGRAPH.en, durationSeconds);
       setFormData({ ...formData, readingSpeech: result });
       setStep(4);
     } catch (err) {

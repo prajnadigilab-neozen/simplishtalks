@@ -288,7 +288,7 @@ export async function evaluatePlacement(data: {
 /**
  * Speech evaluation via Supabase Edge Function.
  */
-export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
+export async function evaluateSpeech(audioBlob: Blob, targetText: string, durationSeconds?: number) {
   try {
     // Convert blob to base64 for the Edge Function
     const reader = new FileReader();
@@ -309,14 +309,25 @@ export async function evaluateSpeech(audioBlob: Blob, targetText: string) {
 
     const result = await invokeFunction('evaluate', { type: 'speech', audioBase64, targetText });
 
-    // Log real usage as chat to avoid conflating tokens with voice seconds
+    // Log real usage as chat under TALKS
     if (result.usage) {
       telemetry.logUsage({
         api_type: 'chat', 
         model_name: result.model || 'gemini-speech',
         input_units: result.usage.promptTokenCount,
         output_units: result.usage.candidatesTokenCount,
-        total_units: result.usage.totalTokenCount
+        total_units: result.usage.totalTokenCount,
+        package_type: 'TALKS'
+      });
+    }
+
+    // Log the voice duration under TALKS (Pronunciation check seconds)
+    if (durationSeconds && durationSeconds > 0) {
+      telemetry.logUsage({
+        api_type: 'voice',
+        model_name: 'pronunciation-check',
+        total_units: durationSeconds,
+        package_type: 'TALKS'
       });
     }
 

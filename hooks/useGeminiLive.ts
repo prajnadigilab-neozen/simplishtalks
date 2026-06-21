@@ -3,6 +3,7 @@ import { useRef, useState, useCallback } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
 import { encodeBase64 } from '../utils/audioUtils';
 import { telemetry } from '../services/telemetryService';
+import { quotaGuard } from '../utils/QuotaMiddleware';
 
 // ─── Transliteration Utility ────────────────────────────────────
 // Forces Indian scripts (Devanagari, Bengali, Telugu, Tamil, Malayalam) into Kannada script
@@ -116,7 +117,15 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
         activeIdRef.current = connectionId;
 
         try {
-            const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+            // Check API Guardrail
+            const guard = await quotaGuard('gemini-2.5-flash-native-audio-latest', systemInstruction, 'chat');
+            if (!guard.isAllowed) {
+                setError(guard.message || 'Rate limit/billing limit reached. Connection refused.');
+                setIsConnecting(false);
+                return;
+            }
+
+            const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY_SNEHI || import.meta.env.VITE_GEMINI_API_KEY });
 
             const sessionPromise = ai.live.connect({
                 model: 'gemini-2.5-flash-native-audio-latest',
@@ -240,7 +249,8 @@ export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveR
                 telemetry.logUsage({
                     api_type: 'voice',
                     model_name: 'gemini-live',
-                    total_units: durationSeconds
+                    total_units: durationSeconds,
+                    package_type: 'SNEHI'
                 });
             }
             sessionStartTimeRef.current = null;

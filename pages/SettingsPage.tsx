@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { useTheme } from '../components/ThemeContext';
-import { getUserSession, updateProfile, getAllUsers, deleteUser, deleteOwnAccount } from '../services/authService';
+import { getUserSession, updateProfile, getAllUsers, deleteUser, deleteOwnAccount, changePassword } from '../services/authService';
 import { UserRole, PackageType } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAppStore } from '../store/useAppStore';
@@ -30,6 +30,9 @@ const SettingsPage: React.FC = () => {
   const [costPerMinute, setCostPerMinute] = useState(2.0);
   const [topUpAmount, setTopUpAmount] = useState<number>(0);
   const [isTopUpProcessing, setIsTopUpProcessing] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordSaving, setPasswordSaving] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -172,6 +175,43 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setMessage({
+        type: 'error',
+        text: t({ en: 'Passwords do not match!', kn: 'ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ!' })
+      });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setMessage({
+        type: 'error',
+        text: t({ en: 'Password must be at least 6 characters!', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳಿರಬೇಕು!' })
+      });
+      return;
+    }
+
+    setPasswordSaving(true);
+    setMessage({ type: '', text: '' });
+
+    const result = await changePassword(newPassword);
+    if (result.success) {
+      setMessage({
+        type: 'success',
+        text: t({ en: 'Password updated successfully!', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!' })
+      });
+      setNewPassword('');
+      setConfirmPassword('');
+    } else {
+      setMessage({
+        type: 'error',
+        text: result.error || t({ en: 'Failed to update password', kn: 'ಪಾಸ್‌ವರ್ಡ್ ನವೀಕರಿಸಲು ವಿಫಲವಾಗಿದೆ' })
+      });
+    }
+    setPasswordSaving(false);
+  };
+
   if (loading || !user) return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
       <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
@@ -293,95 +333,145 @@ const SettingsPage: React.FC = () => {
         </div>
 
         <div className="lg:col-span-2">
-          <form onSubmit={handleSave} className="bg-slate-50 dark:bg-slate-800/50 p-10 md:p-14 rounded-[4rem] border-2 border-slate-100 dark:border-slate-800 space-y-10 shadow-inner">
-            <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-8">
-              <span className="text-4xl bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">✏️</span>
+          <form onSubmit={handleSave} className="bg-slate-50 dark:bg-slate-800/50 p-8 md:p-10 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 space-y-8 shadow-inner">
+            <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-6">
+              <span className="text-3xl bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm">✏️</span>
               <div>
-                <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Edit Profile', kn: 'ಪ್ರೊಫೈಲ್ ತಿದ್ದಿ' })}</h3>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Keep your details updated', kn: 'ಮಾಹಿತಿಯನ್ನು ನವೀಕರಿಸಿ' })}</p>
+                <h3 className="text-xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Edit Profile', kn: 'ಪ್ರೊಫೈಲ್ ತಿದ್ದಿ' })}</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Keep your details updated', kn: 'ಮಾಹಿತಿಯನ್ನು ನವೀಕರಿಸಿ' })}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Full Name', kn: 'ಪೂರ್ಣ ಹೆಸರು' })}</label>
-                <input type="text" className="w-full p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 shadow-sm" value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
+                <input type="text" className="w-full py-4 px-5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-slate-100 shadow-sm" value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
               </div>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Village / City', kn: 'ಊರು / ನಗರ' })}</label>
-                <input type="text" className="w-full p-6 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 shadow-sm" value={formData.place} onChange={e => setFormData({ ...formData, place: e.target.value })} />
+                <input type="text" className="w-full py-4 px-5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-slate-100 shadow-sm" value={formData.place} onChange={e => setFormData({ ...formData, place: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Phone Number', kn: 'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ' })}</label>
+                <input type="text" disabled className="w-full py-4 px-5 bg-slate-100/50 dark:bg-slate-900/50 border-2 border-slate-100 dark:border-slate-800 rounded-2xl outline-none font-bold text-sm text-slate-400 dark:text-slate-500 shadow-inner cursor-not-allowed" value={user?.phone || ''} />
               </div>
             </div>
 
-            <div className="pt-6">
-              <button type="submit" disabled={saving} className="w-full bg-orange-500 text-white py-8 rounded-[2.5rem] font-black text-2xl uppercase tracking-widest shadow-2xl hover:bg-orange-600 hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-4 disabled:opacity-50 border-b-8 border-orange-700">
-                {saving ? <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div> : <> {t({ en: 'Update Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್ ನವೀಕರಿಸಿ' })} <span>✨</span> </>}
+            <div className="pt-2">
+              <button type="submit" disabled={saving} className="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-orange-600 hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 border-b-4 border-orange-700">
+                {saving ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <> {t({ en: 'Update Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್ ನವೀಕರಿಸಿ' })} <span>✨</span> </>}
+              </button>
+            </div>
+          </form>
+
+          {/* Change Password Section */}
+          <form onSubmit={handleChangePassword} className="mt-8 bg-slate-50 dark:bg-slate-800/50 p-8 md:p-10 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 space-y-6 shadow-inner">
+            <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-700 pb-6">
+              <span className="text-3xl bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm">🔒</span>
+              <div>
+                <h3 className="text-xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Change Password', kn: 'ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ' })}</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Update your security credentials', kn: 'ನಿಮ್ಮ ಭದ್ರತಾ ರುಜುವಾತುಗಳನ್ನು ನವೀಕರಿಸಿ' })}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'New Password', kn: 'ಹೊಸ ಪಾಸ್‌ವರ್ಡ್' })}</label>
+                <input 
+                  type="password" 
+                  required
+                  placeholder="••••••••"
+                  className="w-full py-4 px-5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-slate-100 shadow-sm" 
+                  value={newPassword} 
+                  onChange={e => setNewPassword(e.target.value)} 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Confirm New Password', kn: 'ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ' })}</label>
+                <input 
+                  type="password" 
+                  required
+                  placeholder="••••••••"
+                  className="w-full py-4 px-5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:border-blue-500 outline-none transition-all font-bold text-sm text-slate-800 dark:text-slate-100 shadow-sm" 
+                  value={confirmPassword} 
+                  onChange={e => setConfirmPassword(e.target.value)} 
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button 
+                type="submit" 
+                disabled={passwordSaving} 
+                className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2 border-b-4 border-blue-800"
+              >
+                {passwordSaving ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '💾'} {t({ en: 'Update Password', kn: 'ಪಾಸ್‌ವರ್ಡ್ ನವೀಕರಿಸಿ' })}
               </button>
             </div>
           </form>
 
           {/* Voice Time Top-up Section - Restricted to SNEHI/BOTH */}
           {(user?.package_type === PackageType.SNEHI || user?.package_type === PackageType.BOTH) && (
-            <div className="mt-12 bg-blue-50 dark:bg-blue-900/10 p-10 md:p-14 rounded-[4rem] border-2 border-blue-100 dark:border-blue-900/30">
-              <div className="flex items-center gap-4 mb-8">
-                <span className="text-4xl bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm">🎙️</span>
+            <div className="mt-8 bg-blue-50 dark:bg-blue-900/10 p-8 md:p-10 rounded-[2rem] border-2 border-blue-100 dark:border-blue-900/30">
+              <div className="flex items-center gap-4 mb-6">
+                <span className="text-3xl bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm">🎙️</span>
                 <div>
-                  <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Voice Time Top-up', kn: 'ಧ್ವನಿ ಸಮಯ ಟಾಪ್-ಅಪ್' })}</h3>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Add custom voice practice minutes', kn: 'ಹೆಚ್ಚುವರಿ ಧ್ವನಿ ಅಭ್ಯಾಸದ ನಿಮಿಷಗಳನ್ನು ಸೇರಿಸಿ' })}</p>
+                  <h3 className="text-xl font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">{t({ en: 'Voice Time Top-up', kn: 'ಧ್ವನಿ ಸಮಯ ಟಾಪ್-ಅಪ್' })}</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t({ en: 'Add custom voice practice minutes', kn: 'ಹೆಚ್ಚುವರಿ ಧ್ವನಿ ಅಭ್ಯಾಸದ ನಿಮಿಷಗಳನ್ನು ಸೇರಿಸಿ' })}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-                <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                <div className="space-y-2">
                   <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-2">{t({ en: 'Enter Amount (₹)', kn: 'ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ (₹)' })}</label>
                   <div className="relative">
-                      <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-black text-slate-400">₹</span>
+                      <span className="absolute left-5 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">₹</span>
                       <input 
                         type="number" 
                         value={topUpAmount || ''} 
                         onChange={e => setTopUpAmount(Math.max(0, parseInt(e.target.value) || 0))}
-                        className="w-full p-6 pl-12 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-[2rem] focus:border-blue-500 outline-none transition-all font-black text-2xl text-slate-800 dark:text-slate-100 shadow-sm" 
+                        className="w-full py-4 px-5 pl-10 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:border-blue-500 outline-none transition-all font-black text-sm text-slate-800 dark:text-slate-100 shadow-sm" 
                         placeholder="0"
                       />
                   </div>
                 </div>
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 flex flex-col justify-center">
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t({ en: 'Estimated Time', kn: 'ಅಂದಾಜು ಸಮಯ' })}</p>
-                   <p className="text-3xl font-black text-blue-600 dark:text-blue-400">
-                     {Math.floor(topUpAmount / costPerMinute)} <span className="text-sm uppercase tracking-tighter opacity-60">Min</span>
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 flex flex-col justify-center">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t({ en: 'Estimated Time', kn: 'ಅಂದಾಜು ಸಮಯ' })}</p>
+                   <p className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                     {Math.floor(topUpAmount / costPerMinute)} <span className="text-xs uppercase tracking-tighter opacity-60">Min</span>
                    </p>
-                   <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">@ ₹{costPerMinute}/minute</p>
+                   <p className="text-[8px] font-bold text-slate-400 uppercase">@ ₹{costPerMinute}/minute</p>
                 </div>
               </div>
 
               <button 
                   onClick={handleTopUp}
                   disabled={isTopUpProcessing || topUpAmount <= 0}
-                  className="w-full mt-8 bg-blue-600 text-white py-6 rounded-[2rem] font-black text-xl uppercase tracking-widest shadow-xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full mt-6 bg-blue-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2 border-b-4 border-blue-800"
               >
                 {isTopUpProcessing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '💳'} {t({ en: 'Buy Minutes Now', kn: 'ನಿಮಿಷಗಳನ್ನು ಈಗಲೇ ಖರೀದಿಸಿ' })}
               </button>
             </div>
           )}
 
-          <div className="mt-12 p-10 bg-red-50 dark:bg-red-900/10 rounded-[4rem] border-2 border-red-100 dark:border-red-900/30">
+          <div className="mt-8 p-8 bg-red-50 dark:bg-red-900/10 rounded-[2rem] border-2 border-red-100 dark:border-red-900/30">
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-3xl">⚠️</span>
+              <span className="text-3xl bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm">⚠️</span>
               <div>
-                <h3 className="text-xl font-black text-red-700 dark:text-red-400 uppercase tracking-tight">{t({ en: 'Danger Zone', kn: 'ಅಪಾಯಕಾರಿ ವಲಯ' })}</h3>
-                <p className="text-xs font-bold text-red-500/60 uppercase tracking-widest">{t({ en: 'Account Management', kn: 'ಖಾತೆ ನಿರ್ವಹಣೆ' })}</p>
+                <h3 className="text-lg font-black text-red-700 dark:text-red-400 uppercase tracking-tight">{t({ en: 'Danger Zone', kn: 'ಅಪಾಯಕಾರಿ ವಲಯ' })}</h3>
+                <p className="text-[10px] font-bold text-red-500/60 uppercase tracking-widest">{t({ en: 'Account Management', kn: 'ಖಾತೆ ನಿರ್ವಹಣೆ' })}</p>
               </div>
             </div>
-            <p className="text-sm text-red-600 dark:text-red-400/70 font-medium mb-8 leading-relaxed">
+            <p className="text-xs text-red-600 dark:text-red-400/70 font-medium mb-6 leading-relaxed">
               {t({
                 en: "Deleting your account will remove your personal progress, profile, and chat messages. Note: Your initial registration date, revenue, and total usage time will be retained for platform reports. Your chat/voice messages will be archived for AI training purposes. You can re-register with the same phone number at any time.",
-                kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಪ್ರಗತಿ, ಪ್ರೊಫೈಲ್ ಮತ್ತು ಚಾಟ್ ಸಂದೇಶಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ. ಗಮನಿಸಿ: ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ವರದಿಗಳಿಗಾಗಿ ನಿಮ್ಮ ಆರಂಭಿಕ ನೋಂದಣಿ ದಿನಾಂಕ, ಆದಾಯ ಮತ್ತು ಒಟ್ಟು ಬಳಕೆಯ ಸಮಯವನ್ನು ಉಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಚಾಟ್/ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು AI ತರಬೇತಿ ಉದ್ದೇಶಗಳಿಗಾಗಿ ಆರ್ಕೈವ್ ಮಾಡಲಾಗುತ್ತದೆ. ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಅದೇ ಫೋನ್ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಮರು-ನೋಂದಾಯಿಸಿಕೊಳ್ಳಬಹುದು."
+                kn: "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಪ್ರಗತಿ, ಪ್ರೊಫೈಲ್ ಮತ್ತು ಚಾಟ್ ಸಂದೇಶಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ. ಗಮನಿಸಿ: ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ವರದಿಗಳಿಗಾಗಿ ನಿಮ್ಮ ಆರಂಭಿಕ ನೋಂದಣಿ ದಿನಾಂಕ, ಆದಾಯ ಮತ್ತು ಒಟ್ಟು ಬಳಕೆಯ ಸಮಯವನ್ನು ಉಳಿಸಿಕೊಳ್ಳಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಚಾಟ್/ಧ್ವನಿ ಸಂದೇಶಗಳನ್ನು AI ತರಬೇತಿ ഉദ്ದೇಶಗಳಿಗಾಗಿ ಆರ್ಕೈವ್ ಮಾಡಲಾಗುತ್ತದೆ. ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಅದೇ ಫೋನ್ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಮರು-ನೋಂದಾಯಿಸಿಕೊಳ್ಳಬಹುದು."
               })}
             </p>
             <button
               onClick={handleDeleteAccount}
               disabled={saving}
-              className="px-8 py-4 bg-white dark:bg-slate-900 border-2 border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-red-600 hover:text-white transition-all shadow-md active:scale-95 disabled:opacity-50"
+              className="px-6 py-3 bg-white dark:bg-slate-900 border-2 border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-600 hover:text-white transition-all shadow-md active:scale-95 disabled:opacity-50"
             >
               {t({ en: 'Delete My Account Permanently', kn: 'ನನ್ನ ಖಾತೆಯನ್ನು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಿ' })}
             </button>

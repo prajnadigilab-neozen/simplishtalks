@@ -11,6 +11,7 @@ export const MODEL_QUOTAS: Record<string, ModelQuota> = {
     'gemini-1.5-flash': { rpm: 15, tpm: 1000000, rpd: 1500 },
     'gemini-1.5-pro': { rpm: 2, tpm: 32000, rpd: 50 },
     'gemini-2.0-flash-exp': { rpm: 10, tpm: 1000000, rpd: 1500 },
+    'gemini-2.5-flash-native-audio-latest': { rpm: 10, tpm: 1000000, rpd: 1500 },
 };
 
 export const getModelQuota = (model: string): ModelQuota => {

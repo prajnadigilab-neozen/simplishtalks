@@ -1,0 +1,91 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - img "SIMPLISH" [ref=e7]
+      - generic [ref=e8]: SIMPLISH
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - button "EN" [ref=e11] [cursor=pointer]
+        - button "ಕನ್ನಡ" [ref=e12] [cursor=pointer]
+      - button "Switch to Dark Mode" [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - button "Sign In" [ref=e16] [cursor=pointer]
+  - banner [ref=e17]:
+    - generic [ref=e18]:
+      - generic [ref=e19]: Your Success Language
+      - heading "English is Just a Language, Not a Measure of Your Worth." [level=1] [ref=e20]:
+        - text: English is Just a Language,
+        - text: Not a Measure of Your Worth.
+      - paragraph [ref=e21]: Turn your fear into freedom. Join Karnataka’s most welcoming English speaking course for Kannada speakers. We use your mother tongue to guide you from "Zero to Confident"—no shame, no pressure.
+      - generic [ref=e22]:
+        - button "Start Learning Fundamentals" [ref=e23] [cursor=pointer]
+        - button "Start Speaking Now" [ref=e24] [cursor=pointer]
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - heading "Two Simple Ways to Master English" [level=2] [ref=e28]
+      - paragraph [ref=e29]: Choose your path or excel in both.
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - img "SIMPLISH" [ref=e33]
+        - heading "SIMPLISH (The Foundation)" [level=3] [ref=e34]
+        - paragraph [ref=e35]: Your Bilingual English Coach
+        - paragraph [ref=e36]: Don't struggle with complicated rules. We teach you English through Kannada. Step-by-step, master basic grammar and sentence creation.
+        - paragraph [ref=e37]: "\"Yavagalu anumanisabedi, nimminda sadyavide.\""
+      - generic [ref=e38]:
+        - img "SIMPLISH - Talks" [ref=e40]
+        - heading "SIMPLISH - Talks (The Action)" [level=3] [ref=e41]
+        - paragraph [ref=e42]: Practice Without Judgement
+        - paragraph [ref=e43]: Practice speaking anytime with friendly AI agents. Engage in real-life situations without any pressure of physical classes.
+        - generic [ref=e44]:
+          - generic [ref=e45]: Zero to Simple English
+          - generic [ref=e46]: No Physical Class Needed
+  - generic [ref=e48]:
+    - heading "Breaking the Wall" [level=2] [ref=e49]
+    - paragraph [ref=e50]: For too long, English has been a "wall" keeping hard-working people away from the jobs, respect, and opportunities they deserve. At SIMPLISH, we are breaking that wall down and building a door.
+    - paragraph [ref=e51]: We believe rural empowerment starts with accessible education. You don't need to forget Kannada to learn English—your mother tongue is your greatest strength.
+    - generic [ref=e52]:
+      - generic [ref=e53]: 🚪
+      - generic [ref=e54]: Your Door to Opportunity
+  - generic [ref=e56]:
+    - heading "Real Results for the Real World" [level=2] [ref=e57]
+    - generic [ref=e58]:
+      - generic [ref=e59]:
+        - img [ref=e60]
+        - heading "Workplace Success" [level=4] [ref=e63]
+        - paragraph [ref=e64]: Build confidence to clear interviews and get the job you deserve.
+      - generic [ref=e65]:
+        - img [ref=e66]
+        - heading "Pass Exams" [level=4] [ref=e69]
+        - paragraph [ref=e70]: Understand questions accurately and express answers clearly.
+      - generic [ref=e71]:
+        - img [ref=e72]
+        - heading "No More Shyness" [level=4] [ref=e77]
+        - paragraph [ref=e78]: Empower yourself with bilingual training that removes the fear of judgment.
+  - generic [ref=e80]:
+    - heading "Answers to Your Questions" [level=2] [ref=e81]
+    - generic [ref=e82]:
+      - button "Is it okay if I only know Kannada?" [ref=e84] [cursor=pointer]:
+        - heading "Is it okay if I only know Kannada?" [level=4] [ref=e85]
+        - img [ref=e86]
+      - button "How does the AI coach work?" [ref=e89] [cursor=pointer]:
+        - heading "How does the AI coach work?" [level=4] [ref=e90]
+        - img [ref=e91]
+      - button "Is this for true beginners?" [ref=e94] [cursor=pointer]:
+        - heading "Is this for true beginners?" [level=4] [ref=e95]
+        - img [ref=e96]
+      - button "Do I need to attend live classes?" [ref=e99] [cursor=pointer]:
+        - heading "Do I need to attend live classes?" [level=4] [ref=e100]
+        - img [ref=e101]
+  - contentinfo [ref=e103]:
+    - generic [ref=e104]:
+      - img "SIMPLISH" [ref=e106]
+      - generic [ref=e107]: SIMPLISH
+    - paragraph [ref=e108]: Empowering Kannada speakers with simple, accessible English.
+    - generic [ref=e109]:
+      - link "Contact Us" [ref=e110] [cursor=pointer]:
+        - /url: "#"
+      - link "Privacy Policy" [ref=e111] [cursor=pointer]:
+        - /url: "#"
+      - link "Terms of Service" [ref=e112] [cursor=pointer]:
+        - /url: "#"
+    - generic [ref=e113]: © 2026 SIMPLISH - A Movement for Rural Excellence

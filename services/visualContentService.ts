@@ -24,19 +24,14 @@ export async function fetchDiscoveryFeed(limit: number = 50): Promise<VisualCont
  * @param path Storage file path
  * @param width Desired width in pixels
  */
-export function getOptimizedImageUrl(path: string, width: number): string {
+export function getOptimizedImageUrl(path: string, _width?: number): string {
   if (!path) return '';
   // If it's already an external URL (e.g. dummy data), just return it
   if (path.startsWith('http')) return path;
 
   const { data } = supabase.storage
     .from('visual-content')
-    .getPublicUrl(path, {
-      transform: {
-        width,
-        resize: 'contain'
-      }
-    });
+    .getPublicUrl(path);
   
   return data.publicUrl;
 }

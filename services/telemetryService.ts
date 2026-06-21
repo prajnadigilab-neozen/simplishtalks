@@ -1,5 +1,5 @@
 /** V 1.0 */
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 
 interface TelemetryData {
     tti?: number;
@@ -113,15 +113,42 @@ class TelemetryService {
         input_units?: number;
         output_units?: number;
         total_units?: number;
+        package_type?: 'TALKS' | 'SNEHI';
     }) {
         try {
-            const { data: session } = await supabase.auth.getSession();
-            const user = session?.session?.user;
+            const { data: sessionData } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+            const user = session?.user;
+            const accessToken = session?.access_token;
 
-            await supabase.from('api_usage').insert({
+            if (!supabaseUrl || !supabaseAnonKey) {
+                console.warn('Supabase URL or Anon Key is missing');
+                return;
+            }
+
+            const body = JSON.stringify({
                 user_id: user?.id || null,
                 ...usage
             });
+
+            const headers: Record<string, string> = {
+                'apikey': supabaseAnonKey,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            };
+
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+
+            // Using keepalive: true to ensure telemetry is sent even if page is unloaded (like during test teardowns)
+            await fetch(`${supabaseUrl}/rest/v1/api_usage`, {
+                method: 'POST',
+                headers,
+                body,
+                keepalive: true
+            });
+
             // NOTE: user_usage and profiles are kept in sync by the DB trigger
             // on api_usage (see 20260316_auto_sync_user_usage.sql).
             // Do NOT add increments here to avoid double-counting.

@@ -1,6 +1,7 @@
 /** V 1.0 */
 import { supabase } from "../lib/supabase";
 import { CoachMessage } from "../types";
+import { quotaGuard } from "../utils/QuotaMiddleware";
 
 /**
  * Common grammar error patterns and their fast-track corrections.
@@ -134,6 +135,18 @@ export async function chatWithCoach(message: string, history: { role: 'user' | '
   const compressedHistory = compressHistory(history);
 
   try {
+    const guard = await quotaGuard('gemini-3-flash-preview', message, 'chat');
+    if (!guard.isAllowed) throw new Error(guard.message);
+    if (guard.mockData) {
+      const mock = guard.mockData.data;
+      return {
+        replyEn: mock.content,
+        suggestion: mock.correction !== "None" ? `Try saying: ${mock.correction}` : "",
+        kannadaGuide: mock.kannada_guide,
+        correction: mock.correction !== "None" ? mock.correction : "",
+      };
+    }
+
     const data = await invokeCoachFunction('coach-chat', { message, history: compressedHistory });
     // result is already JSON
     return data;

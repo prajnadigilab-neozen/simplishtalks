@@ -100,25 +100,38 @@ const AdminDashboard: React.FC = () => {
 
       const stats = await getGlobalStats();
 
+      // Fetch total refunded amount
+      const { supabase } = await import('../lib/supabase');
+      const { data: refunds } = await supabase.from('refunds').select('refund_amount, status');
+      const totalRefunded = (refunds || [])
+        .filter((r: any) => r.status === 'completed')
+        .reduce((sum: number, r: any) => sum + Number(r.refund_amount || 0), 0);
+
       // Calculate Revenue and Package Counts from all users list (including deleted for historical tallying)
+      const priceTalks = config?.price_talks || 299;
+      const priceSnehi = config?.price_snehi || 499;
+
       let totalRevenue = 0;
       let talksCount = 0;
       let snehiCount = 0;
 
       allUsers.forEach(u => {
         if (u.package_type === PackageType.TALKS) {
-          totalRevenue += 299;
+          totalRevenue += priceTalks;
           talksCount++;
         } else if (u.package_type === PackageType.SNEHI) {
-          totalRevenue += 499;
+          totalRevenue += priceSnehi;
           snehiCount++;
         } else if (u.package_type === PackageType.BOTH) {
-          totalRevenue += (299 + 499);
+          totalRevenue += (priceTalks + priceSnehi);
           talksCount++;
           snehiCount++;
         }
         totalRevenue += (u.topup_amount || 0);
       });
+
+      // Deduct refunded amounts from the total revenue
+      totalRevenue = Math.max(0, totalRevenue - totalRefunded);
 
       const topupRevenue = allUsers.reduce((sum, u) => sum + (u.topup_amount || 0), 0);
 
@@ -1337,62 +1350,141 @@ const AdminDashboard: React.FC = () => {
 
       {activeTab === 'config' && currentUser?.role === UserRole.SUPER_ADMIN && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl">
-             <div className="flex justify-between items-start mb-10">
-              <div>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t({ en: 'Global System Settings', kn: 'ಜಾಗತಿಕ ಸಿಸ್ಟಮ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು' })}</h3>
-                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest text-[10px]">{t({ en: 'Configure universal free limits and pricing defaults.', kn: 'ಯೂನಿವರ್ಸಲ್ ಉಚಿತ ಮಿತಿಗಳು ಮತ್ತು ಬೆಲೆಗಳನ್ನು ಕಾನ್ಫಿಗರ್ ಮಾಡಿ.' })}</p>
-              </div>
-              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
-                <span className="text-2xl">⚙️</span>
-              </div>
-             </div>
-
              {systemConfig ? (
-               <form onSubmit={handleUpdateConfig} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Universal Free Seconds', kn: 'ಯೂನಿವರ್ಸಲ್ ಉಚಿತ ಸಮಯ (ಸೆಕೆಂಡ್‌ಗಳು)' })}</label>
-                    <input 
-                      type="number"
-                      value={systemConfig.universal_free_seconds}
-                      onChange={e => setSystemConfig({...systemConfig, universal_free_seconds: parseInt(e.target.value)})}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
-                    />
-                    <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Free time given to every user (e.g. 180 = 3 mins).</p>
+               <form onSubmit={handleUpdateConfig} className="space-y-8">
+                 {/* Card 1: General System Settings */}
+                 <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl">
+                   <div className="flex justify-between items-start mb-10">
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{t({ en: 'Global System Settings', kn: 'ಜಾಗತಿಕ ಸಿಸ್ಟಮ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು' })}</h3>
+                      <p className="text-sm text-slate-500 font-bold uppercase tracking-widest text-[10px]">{t({ en: 'Configure universal free limits and pricing defaults.', kn: 'ಯೂನಿವರ್ಸಲ್ ಉಚಿತ ಮಿತಿಗಳು ಮತ್ತು ಬೆಲೆಗಳನ್ನು ಕಾನ್ಫಿಗರ್ ಮಾಡಿ.' })}</p>
+                    </div>
+                    <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
+                      <span className="text-2xl">⚙️</span>
+                    </div>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Universal Free Seconds', kn: 'ಯೂನಿವರ್ಸಲ್ ಉಚಿತ ಸಮಯ (ಸೆಕೆಂಡ್‌ಗಳು)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.universal_free_seconds}
+                          onChange={e => setSystemConfig({...systemConfig, universal_free_seconds: parseInt(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                        <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Free time given to every user (e.g. 180 = 3 mins).</p>
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Cost Per Minute (₹)', kn: 'ನಿಮಿಷಕ್ಕೆ ಬೆಲೆ (₹)' })}</label>
+                        <input 
+                          type="number" step="0.1"
+                          value={systemConfig.cost_per_minute}
+                          onChange={e => setSystemConfig({...systemConfig, cost_per_minute: parseFloat(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                        <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Basis for credit calculation (Price / Cost = Minutes).</p>
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Snehi Package Price (₹)', kn: 'ಸ್ನೇಹಿ ಪ್ಯಾಕೇಜ್ ಬೆಲೆ (₹)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.price_snehi}
+                          onChange={e => setSystemConfig({...systemConfig, price_snehi: parseFloat(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Talks Package Price (₹)', kn: 'ಟಾಕ್ಸ್ ಪ್ಯಾಕೇಜ್ ಬೆಲೆ (₹)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.price_talks}
+                          onChange={e => setSystemConfig({...systemConfig, price_talks: parseFloat(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                     </div>
+                   </div>
                  </div>
 
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Cost Per Minute (₹)', kn: 'ನಿಮಿಷಕ್ಕೆ ಬೆಲೆ (₹)' })}</label>
-                    <input 
-                      type="number" step="0.1"
-                      value={systemConfig.cost_per_minute}
-                      onChange={e => setSystemConfig({...systemConfig, cost_per_minute: parseFloat(e.target.value)})}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
-                    />
-                    <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Basis for credit calculation (Price / Cost = Minutes).</p>
+                 {/* Card 2: SIMPLISH Talks - Topup */}
+                 <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl animate-in fade-in duration-500">
+                   <div className="flex justify-between items-start mb-8">
+                     <div>
+                       <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t({ en: 'SIMPLISH Talks - Topup', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ - ಟಾಪ್-ಅಪ್' })}</h3>
+                       <p className="text-sm text-slate-500 font-bold uppercase tracking-widest text-[9px]">{t({ en: 'Configure Talks top-up price and duration limits.', kn: 'ಟಾಕ್ಸ್ ಟಾಪ್-ಅಪ್ ಬೆಲೆ ಮತ್ತು ಅವಧಿಯನ್ನು ಕಾನ್ಫಿಗರ್ ಮಾಡಿ.' })}</p>
+                     </div>
+                     <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-2xl">
+                       <span className="text-xl">⚡</span>
+                     </div>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Subscription Price (₹)', kn: 'ಚಂದಾದಾರಿಕೆ ಬೆಲೆ (₹)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.subscription_price || 0}
+                          onChange={e => setSystemConfig({...systemConfig, subscription_price: parseFloat(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                        <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Price charged for Talks top-up.</p>
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Topup Duration (Days)', kn: 'ಟಾಪ್‌ಅಪ್ ಅವಧಿ (ದಿನಗಳು)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.topup_duration_days || 0}
+                          onChange={e => setSystemConfig({...systemConfig, topup_duration_days: parseInt(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                        <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Number of days extended per Talks top-up.</p>
+                     </div>
+                   </div>
                  </div>
 
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Snehi Package Price (₹)', kn: 'ಸ್ನೇಹಿ ಪ್ಯಾಕೇಜ್ ಬೆಲೆ (₹)' })}</label>
-                    <input 
-                      type="number"
-                      value={systemConfig.price_snehi}
-                      onChange={e => setSystemConfig({...systemConfig, price_snehi: parseFloat(e.target.value)})}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
-                    />
+                 {/* Card 3: SIMPLISH SNEHI - Topup */}
+                 <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl animate-in fade-in duration-500">
+                   <div className="flex justify-between items-start mb-8">
+                     <div>
+                       <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1">{t({ en: 'SIMPLISH SNEHI - Topup', kn: 'ಸಿಂಪ್ಲಿಷ್ ಸ್ನೇಹಿ - ಟಾಪ್-ಅಪ್' })}</h3>
+                       <p className="text-sm text-slate-500 font-bold uppercase tracking-widest text-[9px]">{t({ en: 'Configure Snehi top-up price and minutes allocated.', kn: 'ಸ್ನೇಹಿ ಟಾಪ್-ಅಪ್ ಬೆಲೆ ಮತ್ತು ನಿಮಿಷಗಳನ್ನು ಕಾನ್ಫಿಗರ್ ಮಾಡಿ.' })}</p>
+                     </div>
+                     <div className="bg-orange-50 dark:bg-orange-900/30 p-3 rounded-2xl">
+                       <span className="text-xl">🎙️</span>
+                     </div>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Subscription Price (₹)', kn: 'ಚಂದಾದಾರಿಕೆ ಬೆಲೆ (₹)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.snehi_subscription_price !== undefined ? systemConfig.snehi_subscription_price : 99}
+                          onChange={e => setSystemConfig({...systemConfig, snehi_subscription_price: parseFloat(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                        <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Price charged for Snehi top-up.</p>
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Topup Duration (Mins)', kn: 'ಟಾಪ್‌ಅಪ್ ಅವಧಿ (ನಿಮಿಷಗಳು)' })}</label>
+                        <input 
+                          type="number"
+                          value={systemConfig.snehi_topup_duration_mins !== undefined ? systemConfig.snehi_topup_duration_mins : 60}
+                          onChange={e => setSystemConfig({...systemConfig, snehi_topup_duration_mins: parseInt(e.target.value)})}
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
+                        />
+                        <p className="text-[9px] text-slate-400 font-bold uppercase italic mt-1">Number of voice practice minutes added per Snehi top-up.</p>
+                     </div>
+                   </div>
                  </div>
 
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t({ en: 'Talks Package Price (₹)', kn: 'ಟಾಕ್ಸ್ ಪ್ಯಾಕೇಜ್ ಬೆಲೆ (₹)' })}</label>
-                    <input 
-                      type="number"
-                      value={systemConfig.price_talks}
-                      onChange={e => setSystemConfig({...systemConfig, price_talks: parseFloat(e.target.value)})}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-4 rounded-2xl font-black text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-all"
-                    />
-                 </div>
-
-                 <div className="md:col-span-2 pt-6">
+                 {/* Submit Button */}
+                 <div className="pt-6">
                     <button 
                       type="submit"
                       disabled={isUpdatingConfig}
@@ -1408,20 +1500,19 @@ const AdminDashboard: React.FC = () => {
                  <p className="text-[10px] font-black uppercase tracking-widest mt-4">Loading system config...</p>
                </div>
              )}
-          </div>
 
-          {/* Calculated Examples for verification */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-white dark:border-slate-800 shadow-sm">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Example Calculation</span>
-                <div className="font-black text-slate-900 dark:text-white text-xl">
-                  ₹{systemConfig?.price_snehi} / ₹{systemConfig?.cost_per_minute}/min
-                </div>
-                <div className="text-blue-600 font-black text-2xl mt-1">
-                  = {systemConfig ? Math.floor(systemConfig.price_snehi / systemConfig.cost_per_minute) : 0} Minutes
+             {/* Calculated Examples for verification */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-white dark:border-slate-800 shadow-sm">
+                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Example Calculation</span>
+                   <div className="font-black text-slate-900 dark:text-white text-xl">
+                     ₹{systemConfig?.price_snehi} / ₹{systemConfig?.cost_per_minute}/min
+                   </div>
+                   <div className="text-blue-600 font-black text-2xl mt-1">
+                     = {systemConfig ? Math.floor(systemConfig.price_snehi / systemConfig.cost_per_minute) : 0} Minutes
+                   </div>
                 </div>
              </div>
-          </div>
         </div>
       )}
       {activeTab === 'custom_scenarios' && (

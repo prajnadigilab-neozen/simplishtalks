@@ -11,7 +11,7 @@ import {
 } from '../utils/recordingStore';
 
 interface AudioRecorderProps {
-  onRecordingComplete: (blob: Blob) => void;
+  onRecordingComplete: (blob: Blob, durationSeconds?: number) => void;
   lessonId?: string;
   hideHistory?: boolean;
 }
@@ -105,7 +105,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({ onRecordingComplete, less
         });
         setPlaybackUrls(urls);
 
-        onRecordingComplete(audioBlob);
+        onRecordingComplete(audioBlob, recordingSeconds);
       };
 
       mediaRecorder.start();

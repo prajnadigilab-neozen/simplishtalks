@@ -1,12 +1,16 @@
 export interface TrendData {
   date: string;
-  voice: number;
-  chat: number;
+  talksChat: number;
+  talksVoice: number;
+  snehiChat: number;
+  snehiVoice: number;
 }
 
 export interface APIStats {
-  voice_usage: number; // seconds
-  chat_usage: number; // tokens
+  voice_usage: number; // SNEHI voice seconds
+  chat_usage: number; // SNEHI chat tokens
+  talks_chat_usage: number; // TALKS chat tokens
+  talks_voice_usage: number; // TALKS voice seconds (pronunciation check)
   total_limit: number; // normalized units
   expiry_date: string;
   is_auto_renew: boolean;
@@ -15,7 +19,6 @@ export interface APIStats {
 }
 
 export const normalizeUsage = (voice_usage: number, chat_usage: number): number => {
-  // Total Usage = (voice_usage / 60 * 10) + (chat_tokens * 1)
   return (voice_usage / 60 * 10) + (chat_usage * 1);
 };
 

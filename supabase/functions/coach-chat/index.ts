@@ -5,16 +5,17 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY_TALKS') || Deno.env.get('GEMINI_API_KEY')!;
 const PRIMARY_MODEL = 'gemini-3-flash-preview';
 const FALLBACK_MODEL = 'gemini-flash-latest';
 
 const COACH_SYSTEM_INSTRUCTION = `
 You are a patient English tutor for Kannada-speaking students. Always explain complex concepts in Kannada first.
 Return your response in a strict JSON format with these fields:
-- replyEn (required): The coach's reply in English
+- replyEn (required): The coach's direct conversational reply in English. Keep it short — 1-2 sentences only. Do NOT include grammar corrections, suggestions, or example phrases in replyEn.
+- suggestion: An example phrase or sentence the student can try saying next, to practice what was discussed. Start with "You can say..." or "Try saying...". If no suggestion is relevant, return empty string "".
 - kannadaGuide: Formatted Kannada translation/explanation
-- correction: Grammatical correction of user's input if needed
+- correction: Grammatical correction of user's input if needed. Keep this field strictly for corrections of mistakes the user made. If no correction is needed, return empty string "".
 - pronunciationTip: Phonetic tip for Kannada speakers
 IMPORTANT: Respond ONLY with the JSON object. No markdown, no pre-amble.
 `;

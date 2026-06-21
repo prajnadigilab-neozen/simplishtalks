@@ -5,16 +5,19 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
+const GLOBAL_FALLBACK = Deno.env.get('GEMINI_API_KEY')!;
+const GEMINI_API_KEY_TALKS = Deno.env.get('GEMINI_API_KEY_TALKS') || GLOBAL_FALLBACK;
+const GEMINI_API_KEY_SNEHI = Deno.env.get('GEMINI_API_KEY_SNEHI') || GLOBAL_FALLBACK;
+
 const PRIMARY_MODEL = 'gemini-3-flash-preview';
 const FALLBACK_MODEL = 'gemini-flash-latest';
 
-async function callGemini(model: string, contents: any, config: any) {
-    if (!GEMINI_API_KEY) {
-        throw new Error('GEMINI_API_KEY is missing in Edge Function environment variables.');
+async function callGemini(model: string, contents: any, config: any, apiKey: string) {
+    if (!apiKey) {
+        throw new Error('Gemini API key is missing in Edge Function environment variables.');
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const body = { contents, generationConfig: config };
 
     try {
@@ -56,7 +59,7 @@ async function callGemini(model: string, contents: any, config: any) {
 
 // ── Placement Evaluation ─────────────────────────────────────────────────────
 
-async function handlePlacement(body: any) {
+async function handlePlacement(body: any, apiKey: string) {
     const { name, place, introduction, mcqScore, readingTranscription, readingAccuracy } = body;
 
     const prompt = `
@@ -95,12 +98,12 @@ async function handlePlacement(body: any) {
     const contents = [{ role: 'user', parts: [{ text: prompt }] }];
 
     try {
-        const result = await callGemini(PRIMARY_MODEL, contents, config);
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
         return result;
     } catch (err: any) {
         const msg = err.message?.toLowerCase() || '';
         if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
-            return await callGemini(FALLBACK_MODEL, contents, config);
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
         }
         throw err;
     }
@@ -108,7 +111,7 @@ async function handlePlacement(body: any) {
 
 // ── Speech Evaluation ────────────────────────────────────────────────────────
 
-async function handleSpeech(body: any) {
+async function handleSpeech(body: any, apiKey: string) {
     const { audioBase64, targetText } = body;
 
     const contents = {
@@ -146,12 +149,12 @@ async function handleSpeech(body: any) {
     };
 
     try {
-        const result = await callGemini(PRIMARY_MODEL, [contents], config);
+        const result = await callGemini(PRIMARY_MODEL, [contents], config, apiKey);
         return result;
     } catch (err: any) {
         const msg = err.message?.toLowerCase() || '';
         if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
-            return await callGemini(FALLBACK_MODEL, [contents], config);
+            return await callGemini(FALLBACK_MODEL, [contents], config, apiKey);
         }
         throw err;
     }
@@ -159,7 +162,7 @@ async function handleSpeech(body: any) {
 
 // ── Lesson Generation ────────────────────────────────────────────────────────
 
-async function handleGenerateLesson(body: any) {
+async function handleGenerateLesson(body: any, apiKey: string) {
     const { promptText } = body;
 
     const prompt = `
@@ -204,12 +207,12 @@ async function handleGenerateLesson(body: any) {
     const contents = [{ role: 'user', parts: [{ text: prompt }] }];
 
     try {
-        const result = await callGemini(PRIMARY_MODEL, contents, config);
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
         return result;
     } catch (err: any) {
         const msg = err.message?.toLowerCase() || '';
         if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
-            return await callGemini(FALLBACK_MODEL, contents, config);
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
         }
         throw err;
     }
@@ -217,7 +220,7 @@ async function handleGenerateLesson(body: any) {
 
 // ── Snehi Scorecard Evaluation ───────────────────────────────────────────────
 
-async function handleSnehiScorecard(body: any) {
+async function handleSnehiScorecard(body: any, apiKey: string) {
     const { transcript } = body;
 
     const prompt = `
@@ -258,12 +261,12 @@ async function handleSnehiScorecard(body: any) {
     const contents = [{ role: 'user', parts: [{ text: prompt }] }];
 
     try {
-        const result = await callGemini(PRIMARY_MODEL, contents, config);
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
         return result;
     } catch (err: any) {
         const msg = err.message?.toLowerCase() || '';
         if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
-            return await callGemini(FALLBACK_MODEL, contents, config);
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
         }
         throw err;
     }
@@ -271,7 +274,7 @@ async function handleSnehiScorecard(body: any) {
 
 // ── Custom Scenario Generation ───────────────────────────────────────────────
 
-async function handleGenerateCustomScenario(body: any) {
+async function handleGenerateCustomScenario(body: any, apiKey: string) {
     const { category, promptText } = body;
 
     const prompt = `
@@ -311,12 +314,12 @@ async function handleGenerateCustomScenario(body: any) {
     const contents = [{ role: 'user', parts: [{ text: prompt }] }];
 
     try {
-        const result = await callGemini(PRIMARY_MODEL, contents, config);
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
         return result;
     } catch (err: any) {
         const msg = err.message?.toLowerCase() || '';
         if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
-            return await callGemini(FALLBACK_MODEL, contents, config);
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
         }
         throw err;
     }
@@ -333,21 +336,17 @@ Deno.serve(async (req) => {
         const body = await req.json();
         const { type } = body;
 
-        if (!GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY environment variable is not set');
-        }
-
         let result: any;
         if (type === 'placement') {
-            result = await handlePlacement(body);
+            result = await handlePlacement(body, GEMINI_API_KEY_TALKS);
         } else if (type === 'speech') {
-            result = await handleSpeech(body);
+            result = await handleSpeech(body, GEMINI_API_KEY_TALKS);
         } else if (type === 'generate_lesson') {
-            result = await handleGenerateLesson(body);
+            result = await handleGenerateLesson(body, GEMINI_API_KEY_TALKS);
         } else if (type === 'snehi_scorecard') {
-            result = await handleSnehiScorecard(body);
+            result = await handleSnehiScorecard(body, GEMINI_API_KEY_SNEHI);
         } else if (type === 'generate_custom_scenario') {
-            result = await handleGenerateCustomScenario(body);
+            result = await handleGenerateCustomScenario(body, GEMINI_API_KEY_SNEHI);
         } else {
             return new Response(JSON.stringify({ error: `Unknown evaluation type: ${type}` }), {
                 status: 400,

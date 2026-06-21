@@ -147,11 +147,11 @@ const LessonView: React.FC = () => {
     }
   };
 
-  const handleAudioComplete = async (blob: Blob) => {
+  const handleAudioComplete = async (blob: Blob, durationSeconds?: number) => {
     setAiLoading(true);
     try {
       const targetText = t(lesson.title);
-      const result = await evaluateSpeech(blob, targetText);
+      const result = await evaluateSpeech(blob, targetText, durationSeconds);
       setFeedback({ ...result, targetText });
     } catch (error) {
       console.error("Failed to evaluate speech:", error);

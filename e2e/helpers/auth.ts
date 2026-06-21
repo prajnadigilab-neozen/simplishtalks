@@ -8,7 +8,7 @@ export async function loginAs(page: Page, phone: string, password: string): Prom
   await page.goto('/#/login');
 
   // Ensure the Sign In tab is active (toggle tab switcher)
-  const signInTab = page.locator('button', { hasText: 'Sign In' }).first();
+  const signInTab = page.locator('button', { hasText: /Sign In|ಲಾಗಿನ್/i }).first();
   await signInTab.waitFor({ state: 'visible' });
   await signInTab.click();
 
@@ -33,4 +33,6 @@ export async function loginAs(page: Page, phone: string, password: string): Prom
  */
 export async function waitForSPA(page: Page, timeout = 8000): Promise<void> {
   await page.waitForLoadState('networkidle', { timeout });
+  // Settle delay to let background log requests/keepalive fetch calls settle
+  await page.waitForTimeout(500);
 }

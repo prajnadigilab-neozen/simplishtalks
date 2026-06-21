@@ -442,32 +442,66 @@ const VoiceCoach: React.FC = () => {
                   <p className="text-xs font-medium leading-relaxed">{sessionError.msg}</p>
                 </div>
               )}
-              {messages.map((m, idx) => (
-                <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4`}>
-                  <div className={`flex flex-col gap-2 ${m.role === 'user' ? 'items-end max-w-[85%]' : 'items-start max-w-[92%]'}`}>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">{m.role === 'user' ? 'You' : 'Snehi'} • {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    <div className={`px-5 py-4 rounded-[1.5rem] border transition-all ${m.role === 'user' ? "bg-indigo-600 border-indigo-500/40 text-white rounded-tr-none" : "bg-white/5 border-white/5 text-white/90 rounded-tl-none"}`}>
-                      <p className="text-[14px] leading-relaxed font-medium whitespace-pre-wrap">{m.text}</p>
-                      {(m.correction || m.kannadaGuide || m.pronunciationTip) && (
-                        <div className={`mt-5 space-y-4 border-t pt-4 ${m.role === 'user' ? 'border-indigo-400/30' : 'border-white/5'}`}>
-                          {m.correction && <p className="text-[11px] font-bold text-amber-400">✨ {m.correction}</p>}
-                          {m.kannadaGuide && session?.prefersTranslation !== false && (
-                            <p className={`text-[10px] p-3 rounded-xl ${m.role === 'user' ? 'bg-indigo-700/50 text-indigo-100' : 'text-white/60 bg-indigo-950/30'}`}>
-                              {m.kannadaGuide}
-                            </p>
-                          )}
-                          {m.pronunciationTip && m.role === 'coach' && (
-                            <div className="flex items-center justify-between gap-4 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
-                              <p className="text-[10px] text-emerald-200 italic">“{m.pronunciationTip}”</p>
-                              <button onClick={() => speakTip(m.pronunciationTip!, `v-${idx}`)} className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20">{fetchingTipId === `v-${idx}` ? <Spin c="border-emerald-400" /> : <IcoVol />}</button>
+              {messages.map((m, idx) => {
+                const correctionTriggers = [
+                  /\b(remember to say)\b/i,
+                  /\b(instead of)\b/i
+                ];
+                let displayCorrection = m.correction;
+                let displayPronunciationTip = m.pronunciationTip;
+                if (!displayCorrection && displayPronunciationTip) {
+                  const isCorrection = correctionTriggers.some(t => t.test(displayPronunciationTip!));
+                  if (isCorrection) {
+                    displayCorrection = displayPronunciationTip;
+                    displayPronunciationTip = undefined;
+                  }
+                }
+
+                return (
+                  <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4`}>
+                    <div className={`flex flex-col gap-2 ${m.role === 'user' ? 'items-end max-w-[85%]' : 'items-start max-w-[92%]'}`}>
+                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">{m.role === 'user' ? 'You' : 'Snehi'} • {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <div className={`px-5 py-4 rounded-[1.5rem] border transition-all ${m.role === 'user' ? "bg-indigo-600 border-indigo-500/40 text-white rounded-tr-none" : "bg-white/5 border-white/5 text-white/90 rounded-tl-none"}`}>
+                        {m.role === 'coach' ? (
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-start gap-2.5">
+                              <span className="text-base shrink-0 select-none">💬</span>
+                              <p className="text-[14px] leading-relaxed font-medium flex-1 whitespace-pre-wrap">{m.text}</p>
                             </div>
-                          )}
-                        </div>
-                      )}
+                            {displayCorrection && (
+                              <div className="flex items-start gap-2.5 pt-3 border-t border-white/5 animate-in fade-in duration-200">
+                                <span className="text-base shrink-0 select-none">✏️</span>
+                                <div className="flex-1">
+                                  <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest leading-none">{t({ en: 'Sentence Correction', kn: 'ವಾಕ್ಯ ತಿದ್ದುಪಡಿ' })}</p>
+                                  <p className="text-xs font-bold text-amber-200 italic mt-1 leading-relaxed bg-amber-500/5 p-2 rounded-xl border border-amber-500/10">{displayCorrection}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-[14px] leading-relaxed font-medium whitespace-pre-wrap">{m.text}</p>
+                        )}
+                        
+                        {(m.kannadaGuide || displayPronunciationTip) && (
+                          <div className={`mt-5 space-y-4 border-t pt-4 ${m.role === 'user' ? 'border-indigo-400/30' : 'border-white/5'}`}>
+                            {m.kannadaGuide && session?.prefersTranslation !== false && (
+                              <p className={`text-[10px] p-3 rounded-xl ${m.role === 'user' ? 'bg-indigo-700/50 text-indigo-100' : 'text-white/60 bg-indigo-950/30'}`}>
+                                {m.kannadaGuide}
+                              </p>
+                            )}
+                            {displayPronunciationTip && m.role === 'coach' && (
+                              <div className="flex items-center justify-between gap-4 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
+                                <p className="text-[10px] text-emerald-200 italic">“{displayPronunciationTip}”</p>
+                                <button onClick={() => speakTip(displayPronunciationTip!, `v-${idx}`)} className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20">{fetchingTipId === `v-${idx}` ? <Spin c="border-emerald-400" /> : <IcoVol />}</button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {pendingUserText && <div className="flex justify-end pr-4"><div className="bg-indigo-600/20 px-5 py-3 rounded-2xl text-white/50 italic text-sm">{pendingUserText}▌</div></div>}
               {isAiThinking && <div className="flex justify-start pl-4"><div className="bg-white/5 px-6 py-4 rounded-2xl text-white/60 italic text-sm animate-pulse">Snehi is thinking...</div></div>}
               {pendingCoachText && <div className="flex justify-start pl-4"><div className="bg-white/5 px-6 py-4 rounded-2xl text-white/60 italic text-sm">{pendingCoachText}▌</div></div>}

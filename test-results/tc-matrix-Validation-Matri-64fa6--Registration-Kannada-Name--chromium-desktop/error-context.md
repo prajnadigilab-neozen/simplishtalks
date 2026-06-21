@@ -1,0 +1,73 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic:
+    - img "SIMPLISH Talks Hero"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e7] [cursor=pointer]:
+        - generic [ref=e8]: SIMPLISH
+        - generic [ref=e9]: Talks
+      - generic [ref=e10]:
+        - navigation [ref=e11]:
+          - button "ಮುಖಪುಟ" [ref=e12] [cursor=pointer]
+        - generic [ref=e13]:
+          - button "🌙" [ref=e14] [cursor=pointer]
+          - button "En" [ref=e15] [cursor=pointer]
+        - generic [ref=e17]:
+          - button "ಲಾಗಿನ್" [ref=e18] [cursor=pointer]
+          - button "ಸೇರಿ" [ref=e19] [cursor=pointer]
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e26]:
+            - img "SIMPLISH Symbol" [ref=e28]
+            - heading "SIMPLISH Talks" [level=1] [ref=e29]:
+              - text: SIMPLISH
+              - generic [ref=e30]: Talks
+            - paragraph [ref=e31]: ಕನ್ನಡದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ಕಲಿಯಿರಿ.
+          - generic [ref=e32]:
+            - generic [ref=e33]:
+              - generic [ref=e34]: 🎙️
+              - generic [ref=e35]: ಧ್ವನಿ ಅಭ್ಯಾಸ ಸೆಷನ್‌ಗಳು
+            - generic [ref=e36]:
+              - generic [ref=e37]: 💬
+              - generic [ref=e38]: ದ್ವಿಭಾಷಾ AI ತರಬೇತಿ
+            - generic [ref=e39]:
+              - generic [ref=e40]: 📚
+              - generic [ref=e41]: ಕ್ರಮಬದ್ಧ ಕಲಿಕೆ
+          - paragraph [ref=e42]: ಕನ್ನಡಿಗರಿಗಾಗಿ ಇಂಗ್ಲಿಷ್
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - button "ಲಾಗಿನ್" [ref=e47] [cursor=pointer]
+            - button "ನೋಂದಣಿ" [ref=e48] [cursor=pointer]
+          - generic [ref=e49]:
+            - heading "ಖಾತೆ ತೆರೆಯಿರಿ ✨" [level=2] [ref=e50]
+            - paragraph [ref=e51]: ಸಾವಿರಾರು ಕನ್ನಡಿಗರೊಂದಿಗೆ ಸೇರಿ.
+          - generic [ref=e52]:
+            - generic [ref=e54]:
+              - generic [ref=e55]: ಪೂರ್ಣ ಹೆಸರು
+              - textbox "ನಿಮ್ಮ ಹೆಸರು" [active] [ref=e57]: ರಮೇಶ್
+            - generic [ref=e58]:
+              - generic [ref=e59]: ಫೋನ್ ಸಂಖ್ಯೆ
+              - textbox "98765 43210" [ref=e61]
+            - generic [ref=e63]:
+              - generic [ref=e64]: ಪಾಸ್‌ವರ್ಡ್
+              - generic [ref=e65]:
+                - textbox "••••••••" [ref=e66]
+                - button "Show password" [ref=e68] [cursor=pointer]:
+                  - img [ref=e69]
+            - generic [ref=e72]:
+              - generic [ref=e73]: ನಿಮ್ಮ ಊರು
+              - 'textbox "ಉದಾ: ಮೈಸೂರು, ಬೆಂಗಳೂರು..." [ref=e75]'
+            - button "▸ ಅಡ್ಮಿನ್ ಕೋಡ್ ಇದೆಯೇ?" [ref=e77] [cursor=pointer]:
+              - generic [ref=e78]: ▸
+              - text: ಅಡ್ಮಿನ್ ಕೋಡ್ ಇದೆಯೇ?
+            - button "ಖಾತೆ ತೆರೆಯಿರಿ ✨" [ref=e79] [cursor=pointer]:
+              - text: ಖಾತೆ ತೆರೆಯಿರಿ
+              - generic [ref=e80]: ✨
+          - paragraph [ref=e81]:
+            - text: ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?
+            - button "ಲಾಗಿನ್ ಆಗಿ" [ref=e82] [cursor=pointer]
+```

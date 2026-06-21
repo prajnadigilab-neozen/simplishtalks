@@ -12,6 +12,16 @@ CREATE TABLE IF NOT EXISTS public.deleted_users_archive (
   total_messages bigint DEFAULT 0
 );
 
+-- Enable RLS
+ALTER TABLE public.deleted_users_archive ENABLE ROW LEVEL SECURITY;
+
+-- Allow ADMIN and SUPER_ADMIN roles to view the archive data
+DROP POLICY IF EXISTS "Admins can view deleted users archive" ON public.deleted_users_archive;
+CREATE POLICY "Admins can view deleted users archive" ON public.deleted_users_archive
+  FOR SELECT USING (
+    (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'SUPER_ADMIN')
+  );
+
 -- ADD MISSING COLUMNS IF TABLE ALREADY EXISTED
 DO $$
 BEGIN
@@ -28,12 +38,24 @@ $$;
 -- We set user_id to NULL on delete so history stays but isn't linked to a live user.
 ALTER TABLE public.user_usage_events ALTER COLUMN user_id DROP NOT NULL;
 ALTER TABLE public.user_usage_events DROP CONSTRAINT IF EXISTS user_usage_events_user_id_fkey;
+
+-- Clean up orphaned references before adding the constraint
+UPDATE public.user_usage_events
+SET user_id = NULL
+WHERE user_id IS NOT NULL AND user_id NOT IN (SELECT id FROM public.profiles);
+
 ALTER TABLE public.user_usage_events ADD CONSTRAINT user_usage_events_user_id_fkey 
   FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE SET NULL;
 
 -- 3. Ensure Chat History is Retained (For training as requested)
 ALTER TABLE public.chat_history ALTER COLUMN user_id DROP NOT NULL;
 ALTER TABLE public.chat_history DROP CONSTRAINT IF EXISTS chat_history_user_id_fkey;
+
+-- Clean up orphaned references before adding the constraint
+UPDATE public.chat_history
+SET user_id = NULL
+WHERE user_id IS NOT NULL AND user_id NOT IN (SELECT id FROM public.profiles);
+
 ALTER TABLE public.chat_history ADD CONSTRAINT chat_history_user_id_fkey 
   FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE SET NULL;
 

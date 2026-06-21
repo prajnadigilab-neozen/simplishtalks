@@ -5,6 +5,7 @@ import { useAppStore } from '../store/useAppStore';
 import { clearProfileCache } from '../services/authService';
 import { getSystemConfig } from '../services/systemConfigService';
 import { applyMockLocalFulfillmentDB, resolveUpgradedPackage, calculateBonusCredits } from '../services/paymentService';
+import { supabase } from '../lib/supabase';
 
 // --- CONFIGURATION CONSTANTS ---
 const PACKAGE_CONFIG: Record<PackageType, { label: string; price: number; displayPrice: string }> = {
@@ -68,12 +69,27 @@ const PaymentPage: React.FC = () => {
     const isProcessing = paymentStep === 'processing';
     
     const [costPerMinute, setCostPerMinute] = useState<number>(DEFAULT_COST_PER_MINUTE);
+    const [prices, setPrices] = useState<Record<PackageType, number>>({
+        [PackageType.TALKS]: 299,
+        [PackageType.SNEHI]: 499,
+        [PackageType.BOTH]: 798,
+        [PackageType.NONE]: 0
+    });
+    const [paymentMethod, setPaymentMethod] = useState<'mock' | 'wallet'>('mock');
 
     useEffect(() => {
         mounted.current = true;
         let active = true;
         getSystemConfig().then(cfg => {
-            if (active && mounted.current && cfg) setCostPerMinute(cfg.cost_per_minute);
+            if (active && mounted.current && cfg) {
+                setCostPerMinute(cfg.cost_per_minute);
+                setPrices({
+                    [PackageType.TALKS]: cfg.price_talks || 299,
+                    [PackageType.SNEHI]: cfg.price_snehi || 499,
+                    [PackageType.BOTH]: (cfg.price_talks || 299) + (cfg.price_snehi || 499),
+                    [PackageType.NONE]: 0
+                });
+            }
         });
         return () => { 
             active = false;
@@ -85,9 +101,15 @@ const PaymentPage: React.FC = () => {
     const isValidPackage = Object.values(PackageType).includes(selectedPackage);
     const safePackageKey = isValidPackage ? selectedPackage : PackageType.NONE;
     
-    const config = PACKAGE_CONFIG[safePackageKey];
-    const packageLabel = config.label;
-    const packagePrice = config.displayPrice;
+    const currentPrice = prices[safePackageKey] || 0;
+    const packageLabel = safePackageKey === PackageType.TALKS 
+        ? 'SIMPLISH - TALKS' 
+        : safePackageKey === PackageType.SNEHI 
+            ? 'SIMPLISH SNEHI' 
+            : safePackageKey === PackageType.BOTH 
+                ? 'PREMIUM BUNDLE' 
+                : 'NONE';
+    const packagePrice = `₹${currentPrice}`;
 
     useEffect(() => {
         if (!session) {
@@ -102,6 +124,51 @@ const PaymentPage: React.FC = () => {
         setPaymentStep('processing');
 
         try {
+            if (paymentMethod === 'wallet') {
+                const userBalance = session?.topupAmount || 0;
+                if (userBalance < currentPrice) {
+                    throw new Error('Insufficient wallet balance.');
+                }
+                
+                const { error: walletError } = await supabase.rpc('pay_package_with_wallet', {
+                    p_user_id: session!.id,
+                    p_package_type: safePackageKey,
+                    p_amount: currentPrice
+                });
+
+                if (walletError) throw walletError;
+
+                // Optimistically update Zustand store
+                const newPackageType = resolveUpgradedPackage(session?.packageType, safePackageKey);
+                const safeCostPerMinute = (costPerMinute && costPerMinute > 0) ? costPerMinute : DEFAULT_COST_PER_MINUTE;
+                const addedCredits = calculateBonusCredits(safePackageKey, currentPrice, safeCostPerMinute);
+
+                const currentSession = useAppStore.getState().session;
+                if (currentSession) {
+                    useAppStore.getState().setSession({
+                        ...currentSession,
+                        packageType: newPackageType,
+                        packageStatus: PackageStatus.ACTIVE,
+                        topupAmount: Math.max(0, (currentSession.topupAmount || 0) - currentPrice),
+                        agentCredits: (currentSession.agentCredits || 0) + addedCredits,
+                        packageEndDate: new Date(Date.now() + SUBSCRIPTION_DAYS_DURATION * MS_IN_A_DAY).toISOString()
+                    });
+                }
+                
+                clearProfileCache();
+                try {
+                     await useAppStore.getState().refreshSession();
+                } catch (e) {
+                     console.error("Failed to re-sync optimistic UI session state", e);
+                }
+
+                setPaymentStep('success');
+                setTimeout(() => {
+                    if (mounted.current) navigate('/dashboard', { replace: true });
+                }, 2000);
+                return;
+            }
+
             // SECURITY (REMEDIATION): Server-Side Tokenization & Fulfillment.
             // In a production environment, we MUST NEVER update the profiles table directly
             // from the frontend, as this is a Critical Privilege Escalation vulnerability.
@@ -162,7 +229,7 @@ const PaymentPage: React.FC = () => {
         // PURE MATH & LOGIC EXTRACTED TO SERVICE LAYER
         const safeCostPerMinute = (costPerMinute && costPerMinute > 0) ? costPerMinute : DEFAULT_COST_PER_MINUTE;
         const newPackageType = resolveUpgradedPackage(session?.packageType, safePackageKey);
-        const addedCredits = calculateBonusCredits(safePackageKey, config.price, safeCostPerMinute);
+        const addedCredits = calculateBonusCredits(safePackageKey, currentPrice, safeCostPerMinute);
 
         const currentCredits = session?.agentCredits || 0;
         const now = new Date();
@@ -181,7 +248,7 @@ const PaymentPage: React.FC = () => {
         const transactionLog = {
             user_id: session!.id,
             package_type: safePackageKey,
-            amount: config.price,
+            amount: currentPrice,
             payment_provider: 'simulated_backend_tokenized'
         };
 

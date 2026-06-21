@@ -17,17 +17,25 @@ interface TrendChartProps {
 
 const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
     return (
-        <div className="h-[400px] w-full rounded-2xl bg-slate-900 p-6 shadow-xl border border-slate-800">
-            <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white">Usage Trends</h3>
-                <div className="flex space-x-4">
+        <div className="h-[450px] w-full rounded-2xl bg-slate-900 p-6 shadow-xl border border-slate-800">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <h3 className="text-lg font-bold text-white">API Usage Trends</h3>
+                <div className="flex flex-wrap gap-4">
                     <div className="flex items-center space-x-2">
                         <div className="h-3 w-3 rounded-full bg-blue-500" />
-                        <span className="text-xs text-slate-400 font-medium">Chat API</span>
+                        <span className="text-xs text-slate-400 font-medium">TALKS Chat (Tokens)</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <div className="h-3 w-3 rounded-full bg-indigo-500" />
-                        <span className="text-xs text-slate-400 font-medium">Voice API</span>
+                        <div className="h-3 w-3 rounded-full bg-cyan-500" />
+                        <span className="text-xs text-slate-400 font-medium">TALKS Voice (Seconds)</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <div className="h-3 w-3 rounded-full bg-orange-500" />
+                        <span className="text-xs text-slate-400 font-medium">SNEHI Chat (Tokens)</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                        <span className="text-xs text-slate-400 font-medium">SNEHI Voice (Seconds)</span>
                     </div>
                 </div>
             </div>
@@ -38,20 +46,20 @@ const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
                     <XAxis
                         dataKey="date"
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={(value) => new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis
                         stroke="#64748b"
-                        fontSize={12}
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
                     />
                     <Tooltip
                         contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#f8fafc' }}
-                        itemStyle={{ fontSize: '12px' }}
+                        itemStyle={{ fontSize: '11px' }}
                     />
                     <Legend
                         verticalAlign="top"
@@ -60,19 +68,35 @@ const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
                     />
                     <Line
                         type="monotone"
-                        dataKey="chat"
+                        dataKey="talksChat"
                         stroke="#3b82f6"
-                        strokeWidth={3}
-                        dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4, stroke: '#0f172a' }}
-                        activeDot={{ r: 6, strokeWidth: 0 }}
+                        strokeWidth={2.5}
+                        dot={{ fill: '#3b82f6', strokeWidth: 1.5, r: 3, stroke: '#0f172a' }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
                     />
                     <Line
                         type="monotone"
-                        dataKey="voice"
-                        stroke="#6366f1"
-                        strokeWidth={3}
-                        dot={{ fill: '#6366f1', strokeWidth: 2, r: 4, stroke: '#0f172a' }}
-                        activeDot={{ r: 6, strokeWidth: 0 }}
+                        dataKey="talksVoice"
+                        stroke="#06b6d4"
+                        strokeWidth={2.5}
+                        dot={{ fill: '#06b6d4', strokeWidth: 1.5, r: 3, stroke: '#0f172a' }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
+                    />
+                    <Line
+                        type="monotone"
+                        dataKey="snehiChat"
+                        stroke="#f97316"
+                        strokeWidth={2.5}
+                        dot={{ fill: '#f97316', strokeWidth: 1.5, r: 3, stroke: '#0f172a' }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
+                    />
+                    <Line
+                        type="monotone"
+                        dataKey="snehiVoice"
+                        stroke="#eab308"
+                        strokeWidth={2.5}
+                        dot={{ fill: '#eab308', strokeWidth: 1.5, r: 3, stroke: '#0f172a' }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
                     />
                 </LineChart>
             </ResponsiveContainer>

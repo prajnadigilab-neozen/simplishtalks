@@ -6,6 +6,7 @@ import { Module, LevelStatus, PackageType, CourseLevel, PackageStatus, UserRole 
 
 import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
+import { getSystemConfig } from '../services/systemConfigService';
 
 const Dashboard: React.FC = () => {
   const { session, modules, scenarios, progress, evaluationHistory, loading, initialized } = useAppStore();
@@ -515,8 +516,36 @@ const Dashboard: React.FC = () => {
 
 const PackageCardCompact: React.FC<{ type: PackageType; isActive: boolean; children?: React.ReactNode }> = ({ type, isActive, children }) => {
   const { t } = useLanguage();
+  const { session } = useAppStore();
   const isTalks = type === PackageType.TALKS;
   const activeClass = isTalks ? 'bg-white dark:bg-slate-900 border-blue-500 shadow-xl shadow-blue-900/5' : 'bg-white dark:bg-slate-900 border-orange-500 shadow-xl shadow-orange-900/5';
+
+  const [prices, setPrices] = useState({ talks: 299, snehi: 499 });
+
+  useEffect(() => {
+    getSystemConfig().then(cfg => {
+      if (cfg) {
+        setPrices({
+          talks: cfg.price_talks || 299,
+          snehi: cfg.price_snehi || 499
+        });
+      }
+    });
+  }, []);
+
+  // Calculate remaining days
+  let daysLeft = 0;
+  if (session?.packageEndDate) {
+    const diff = new Date(session.packageEndDate).getTime() - new Date().getTime();
+    daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }
+
+  const topupAmount = session?.topupAmount || 0;
+  const remainingMins = session?.agentCredits || 0;
+
+  // Total amount = Package Price + Topup Amount
+  const packagePrice = isTalks ? prices.talks : prices.snehi;
+  const totalAmount = packagePrice + topupAmount;
 
   return (
     <div className={`relative p-6 rounded-[2rem] border-2 flex flex-col gap-4 ${isActive ? activeClass : 'bg-slate-100 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 opacity-60'}`}>
@@ -534,6 +563,32 @@ const PackageCardCompact: React.FC<{ type: PackageType; isActive: boolean; child
           <div className="w-8 h-8 rounded-full bg-green-500 shrink-0 flex items-center justify-center text-white shadow-lg">✓</div>
         )}
       </div>
+
+      {/* Validity Info Strip */}
+      {isActive && (
+        <div className={`flex items-center gap-2 flex-wrap mt-1 ${isTalks ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>
+          {/* Recharge Amount */}
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${isTalks ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40' : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/40'}`}>
+            <span>💰</span>
+            <span>₹{totalAmount}</span>
+          </div>
+
+          {/* Remaining Days */}
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${isTalks ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40' : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/40'}`}>
+            <span>📅</span>
+            <span>{daysLeft} {t({ en: 'Days', kn: 'ದಿನ' })}</span>
+          </div>
+
+          {/* Remaining Minutes (SNEHI only) */}
+          {!isTalks && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/40">
+              <span>⏱️</span>
+              <span>{remainingMins} {t({ en: 'Mins', kn: 'ನಿಮಿ' })}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {children && (
         <div className="mt-2 w-full">
           {children}

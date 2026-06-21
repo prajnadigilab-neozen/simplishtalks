@@ -194,30 +194,20 @@ ALTER TABLE public.ai_instructions_history ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view AI Instructions" ON public.ai_instructions FOR SELECT USING (true);
 
 CREATE POLICY "Admins manage AI Instructions" ON public.ai_instructions FOR ALL USING (
-  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
-  OR 
-  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR'))
 )
 WITH CHECK (
-  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
-  OR 
-  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR'))
 );
 
 CREATE POLICY "Admins view AI Instructions History" ON public.ai_instructions_history FOR SELECT USING (
-  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
-  OR 
-  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR'))
 );
 CREATE POLICY "Admins manage AI Instructions History" ON public.ai_instructions_history FOR ALL USING (
-  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
-  OR 
-  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR'))
 )
 WITH CHECK (
-  (auth.jwt() -> 'user_metadata' ->> 'role') IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')
-  OR 
-  (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR')))
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('ADMIN', 'SUPER_ADMIN', 'MODERATOR'))
 );
 -- 8. User Lesson Recordings (Audio Practice)
 CREATE TABLE public.user_lesson_recordings (

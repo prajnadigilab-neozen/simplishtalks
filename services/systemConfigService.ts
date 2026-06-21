@@ -6,6 +6,10 @@ export interface SystemConfig {
     cost_per_minute: number;
     price_talks: number;
     price_snehi: number;
+    subscription_price: number;
+    topup_duration_days: number;
+    snehi_subscription_price: number;
+    snehi_topup_duration_mins: number;
     visual_categories: string[];
     updated_at: string;
     updated_by: string | null;

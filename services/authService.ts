@@ -300,6 +300,19 @@ export async function verifyOTPAndResetPassword(phone: string, token: string, ne
     return { success: false, error: error.message };
   }
 }
+
+export async function changePassword(newPassword: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+    if (error) throw error;
+    return { success: true };
+  } catch (error: any) {
+    console.error("changePassword Error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
 // ───────────────────────────────────────────────────────────────────────────────
 
 export async function getAllUsers(): Promise<any[]> {

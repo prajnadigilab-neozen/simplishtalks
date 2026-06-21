@@ -21,7 +21,7 @@ export default defineConfig({
   ],
   use: {
     baseURL: 'http://localhost:3000',
-    headless: false,          // Show browser during test runs for debugging
+    headless: true,          // Show browser during test runs for debugging
     viewport: { width: 1280, height: 800 },
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

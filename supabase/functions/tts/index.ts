@@ -5,7 +5,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')!;
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY_TALKS') || Deno.env.get('GEMINI_API_KEY')!;
 // Use the TTS-specific preview model found in the list
 const MODEL = 'gemini-1.5-flash-8b';
 

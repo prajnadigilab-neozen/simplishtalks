@@ -21,3 +21,6 @@
 - **No hardcoded roles**: Always use the `UserRole` enum.
 - **No plain colors**: Use the defined palette (Blues/Slates for UI, Oranges/Ambers for primary actions).
 - **No ignored SQL errors**: If a Supabase query returns an error, it must be handled or logged.
+
+# Rules
+- Do NOT automatically run tests or verification scripts after making code changes. Only run tests if the user explicitly asks you to.

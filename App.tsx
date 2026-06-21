@@ -44,6 +44,7 @@ interface NavigationProps {
   session: any;
 }
 
+
 const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
   const { t, toggleLang, lang } = useLanguage();
   const { theme, toggleTheme } = useTheme();
@@ -87,13 +88,14 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
                   <NavButton to="/dashboard" label={t({ en: 'Dashboard', kn: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್' })} active={location.pathname === '/dashboard'} light={isLanding} />
                   <NavButton to="/curriculum" label={t({ en: 'Curriculum', kn: 'ಪಠ್ಯಕ್ರಮ' })} active={location.pathname === '/curriculum'} light={isLanding} />
                   <NavButton to="/discover" label={t({ en: 'Discover', kn: 'ಅನ್ವೇಷಿಸಿ' })} active={location.pathname === '/discover'} light={isLanding} />
-                  <NavButton to="/packages" label={t({ en: 'Product', kn: 'ಉತ್ಪನ್ನ' })} active={location.pathname === '/packages'} light={isLanding} />
+                  <NavButton to="/packages" label={t({ en: 'Go Premium', kn: 'ಪ್ರೀಮಿಯಂ ಪಡೆಯಿರಿ' })} active={location.pathname === '/packages'} light={isLanding} />
                 </>
               )}
               <NavButton to="/settings" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} active={location.pathname === '/settings'} light={isLanding} />
             </>
           )}
         </nav>
+
 
         <div className="flex items-center gap-1 md:gap-2">
           <button
@@ -373,7 +375,7 @@ const AppContent: React.FC = () => {
               {(session?.packageType === PackageType.TALKS || session?.packageType === PackageType.BOTH) && (
                 <MobileNavItem icon="💬" label={t({ en: 'Chat', kn: 'ಚಾಟ್' })} to="/coachchat" />
               )}
-              <MobileNavItem icon="🛍️" label={t({ en: 'Product', kn: 'ಉತ್ಪನ್ನ' })} to="/packages" />
+              <MobileNavItem icon="🛍️" label={t({ en: 'Go Premium', kn: 'ಪ್ರೀಮಿಯಂ ಪಡೆಯಿರಿ' })} to="/packages" />
               <MobileNavItem icon="⚙️" label={t({ en: 'Settings', kn: 'ಸೆಟ್ಟಿಂಗ್ಸ್' })} to="/settings" />
             </>
           )}

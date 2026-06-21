@@ -109,6 +109,7 @@ export interface CoachMessage {
   dbId?: string; // Database ID for deletion
   role: 'user' | 'coach';
   text: string;
+  suggestion?: string;  // Example phrase the student can try
   correction?: string;
   kannadaGuide?: string;
   pronunciationTip?: string;

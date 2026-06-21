@@ -9,6 +9,109 @@ import { playPCM, AudioStore } from '../utils/audioUtils';
 import { CoachMessage } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
+import { estimateTokens } from '../services/apiGuardrail';
+import { quotaGuard } from '../utils/QuotaMiddleware';
+
+interface ParsedMessage {
+  reply: string;
+  suggestion?: string;
+  correction?: string;
+  kannadaGuide?: string;
+  pronunciationTip?: string;
+}
+
+const parseCoachMessage = (m: CoachMessage): ParsedMessage => {
+  const text = m.text || '';
+  
+  const suggestionTriggers = [
+    /\b(you can say)\b/i,
+    /\b(try saying)\b/i,
+    /\b(to ask me, you can say)\b/i,
+    /\b(please say)\b/i,
+    /\b(it is better to say)\b/i,
+    /\b(try to say)\b/i
+  ];
+
+  const correctionTriggers = [
+    /\b(remember to say)\b/i,
+    /\b(instead of)\b/i
+  ];
+
+  const maskQuotes = (str: string) => {
+    return str.replace(/('([^']*)'|"([^"]*)")/g, (match) => {
+      return match
+        .replace(/\./g, '__DOT__')
+        .replace(/!/g, '__EXCL__')
+        .replace(/\?/g, '__QUEST__');
+    });
+  };
+
+  const unmaskQuotes = (str: string) => {
+    return str
+      .replace(/__DOT__/g, '.')
+      .replace(/__EXCL__/g, '!')
+      .replace(/__QUEST__/g, '?');
+  };
+
+  const masked = maskQuotes(text);
+  const sentenceRegex = /[^.!?]+(?:[?!]+|\.(?!\d))(?:\s+|$)/g;
+  const matches = masked.match(sentenceRegex) || [masked];
+
+  const suggestions: string[] = [];
+  const corrections: string[] = [];
+
+  const processed = matches.map(s => {
+    const unmasked = unmaskQuotes(s);
+    const trimmed = unmasked.trim();
+    
+    const isSuggestion = suggestionTriggers.some(t => t.test(trimmed));
+    const isCorrection = correctionTriggers.some(t => t.test(trimmed));
+    
+    if (isSuggestion) {
+      suggestions.push(trimmed);
+      const trailingSpaceMatch = unmasked.match(/\s+$/);
+      const trailingSpace = trailingSpaceMatch ? trailingSpaceMatch[0] : '';
+      return `(${trimmed})${trailingSpace}`;
+    }
+    if (isCorrection) {
+      corrections.push(trimmed);
+      const trailingSpaceMatch = unmasked.match(/\s+$/);
+      const trailingSpace = trailingSpaceMatch ? trailingSpaceMatch[0] : '';
+      return `(${trimmed})${trailingSpace}`;
+    }
+    return unmasked;
+  });
+
+  let finalCorrection = m.correction || (corrections.length > 0 ? corrections.join(' ') : undefined);
+  let finalPronunciationTip = m.pronunciationTip || undefined;
+
+  if (!finalCorrection && finalPronunciationTip) {
+    const isCorrection = correctionTriggers.some(t => t.test(finalPronunciationTip!));
+    if (isCorrection) {
+      finalCorrection = finalPronunciationTip;
+      finalPronunciationTip = undefined;
+    }
+  }
+
+  return {
+    reply: processed.join(''),
+    suggestion: m.suggestion || (suggestions.length > 0 ? suggestions.join(' ') : undefined),
+    correction: finalCorrection,
+    kannadaGuide: m.kannadaGuide || undefined,
+    pronunciationTip: finalPronunciationTip,
+  };
+};
+
+
+function getStreamingReply(text: string): string {
+  try {
+    const match = text.match(/"replyEn"\s*:\s*"([^"]*)"?/);
+    if (match && match[1]) {
+      return match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+    }
+  } catch (e) {}
+  return text;
+}
 
 const CoachChat: React.FC = () => {
   const { t } = useLanguage();
@@ -57,11 +160,28 @@ const CoachChat: React.FC = () => {
 
   const [streamingText, setStreamingText] = useState('');
 
+  const logChatUsage = (userInput: string, responseObj: any) => {
+    const promptTokens = estimateTokens(userInput) + 150;
+    const responseStr = typeof responseObj === 'string' ? responseObj : JSON.stringify(responseObj);
+    const responseTokens = estimateTokens(responseStr);
+    const totalTokens = promptTokens + responseTokens;
+
+    telemetry.logUsage({
+      api_type: 'chat',
+      model_name: 'gemini-3-flash-preview',
+      input_units: promptTokens,
+      output_units: responseTokens,
+      total_units: totalTokens,
+      package_type: 'TALKS'
+    });
+  };
+
   const handleSend = async () => {
     if (totalChatMessages >= CHAT_QUOTA) return;
     if (isSendingRef.current || !input.trim() || isTyping || !userId) return;
     isSendingRef.current = true;
 
+    const currentInput = input;
     const userMsg: CoachMessage = {
       role: 'user',
       text: input,
@@ -78,24 +198,46 @@ const CoachChat: React.FC = () => {
     setMessages(prev => prev.map(m => m.timestamp === userMsg.timestamp ? { ...m, dbId: dbId || undefined } : m));
 
     // Update usage and sync UI
-    telemetry.logUsage({ api_type: 'chat', total_units: 1 });
     syncUsage('chat', 1);
 
-    // Compression and Fast-Track handled in coachService
-    const historyForAI = messages.slice(-10).map(m => ({
-      role: m.role === 'user' ? 'user' as const : 'model' as const,
-      parts: [{
-        text: m.role === 'coach' && m.correction
-          ? `${m.text} [Correction: ${m.correction}]`
-          : m.text
-      }]
-    }));
-
     try {
+      // Check API Guardrail
+      const guard = await quotaGuard('gemini-3-flash-preview', currentInput, 'chat');
+      if (!guard.isAllowed) {
+        throw new Error(guard.message);
+      }
+      if (guard.mockData) {
+        const mockResponse = guard.mockData.data;
+        const coachMsg: CoachMessage = {
+          role: 'coach',
+          text: mockResponse.content,
+          suggestion: mockResponse.correction !== "None" ? `Try saying: ${mockResponse.correction}` : "",
+          kannadaGuide: mockResponse.kannada_guide,
+          correction: mockResponse.correction !== "None" ? mockResponse.correction : "",
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, coachMsg]);
+        setIsTyping(false);
+        if (userId) saveChatMessage(userId, coachMsg, undefined, 'chat');
+        isSendingRef.current = false;
+        setTotalChatMessages(prev => prev + 1);
+        return;
+      }
+
+      // Compression and Fast-Track handled in coachService
+      const historyForAI = messages.slice(-10).map(m => ({
+        role: m.role === 'user' ? 'user' as const : 'model' as const,
+        parts: [{
+          text: m.role === 'coach' && m.correction
+            ? `${m.text} [Correction: ${m.correction}]`
+            : m.text
+        }]
+      }));
+
       // 1. Invoke function
       const { data, error } = await supabase.functions.invoke('coach-chat', {
         body: { 
-          message: input, 
+          message: currentInput, 
           history: historyForAI,
           prefersTranslation: session?.prefersTranslation ?? true,
           prefersPronunciation: session?.prefersPronunciation ?? true
@@ -110,12 +252,14 @@ const CoachChat: React.FC = () => {
         const coachMsg: CoachMessage = {
           role: 'coach',
           text: data.replyEn,
+          suggestion: data.suggestion,
           kannadaGuide: data.kannadaGuide,
           correction: data.correction,
           timestamp: Date.now()
         };
         setMessages(prev => [...prev, coachMsg]);
         setIsTyping(false);
+        logChatUsage(currentInput, data);
       } else if (data instanceof ReadableStream) {
         // Handle Streaming
         const reader = data.getReader();
@@ -140,6 +284,7 @@ const CoachChat: React.FC = () => {
           const coachMsg: CoachMessage = {
             role: 'coach',
             text: result.replyEn,
+            suggestion: result.suggestion,
             kannadaGuide: result.kannadaGuide,
             correction: result.correction,
             pronunciationTip: result.pronunciationTip,
@@ -151,6 +296,7 @@ const CoachChat: React.FC = () => {
           const coachDbId = await saveChatMessage(userId, coachMsg, undefined, 'chat');
           setMessages(prev => prev.map(m => m.timestamp === coachMsg.timestamp ? { ...m, dbId: coachDbId || undefined } : m));
           if (!getTTSQuotaStatus()) prefetchAudio(coachMsg, messages.length + 1);
+          logChatUsage(currentInput, result);
         } catch (e) {
           console.error("Failed to parse final JSON", e);
         }
@@ -159,6 +305,7 @@ const CoachChat: React.FC = () => {
         const coachMsg: CoachMessage = {
           role: 'coach',
           text: data.replyEn,
+          suggestion: data.suggestion,
           kannadaGuide: data.kannadaGuide,
           correction: data.correction,
           pronunciationTip: data.pronunciationTip,
@@ -166,10 +313,17 @@ const CoachChat: React.FC = () => {
         };
         setMessages(prev => [...prev, coachMsg]);
         setIsTyping(false);
+        logChatUsage(currentInput, data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Coach Interaction Error:", err);
       setIsTyping(false);
+      const coachMsg: CoachMessage = {
+        role: 'coach',
+        text: err.message || "I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.",
+        timestamp: Date.now()
+      };
+      setMessages(prev => [...prev, coachMsg]);
     }
 
     isSendingRef.current = false;
@@ -216,8 +370,9 @@ const CoachChat: React.FC = () => {
   const prefetchAudio = async (msg: CoachMessage, index: number) => {
     if (getTTSQuotaStatus()) return;
 
-    if (msg.text) {
-      textToSpeech(msg.text, 'Aoede', dataSaverMode).then(audio => {
+    const parsed = parseCoachMessage(msg);
+    if (parsed.reply) {
+      textToSpeech(parsed.reply, 'Aoede', dataSaverMode).then(audio => {
         if (audio) {
           setMessages(prev => {
             const updated = [...prev];
@@ -244,8 +399,9 @@ const CoachChat: React.FC = () => {
   const handleSpeak = async (msg: CoachMessage, type: 'en' | 'tip', uniqueId: string) => {
     if (playingId !== null) return;
 
+    const parsed = parseCoachMessage(msg);
     const cachedAudio = type === 'en' ? msg.audioEn : msg.audioTip;
-    const textToConvert = type === 'en' ? msg.text : `Pronunciation tip: ${msg.pronunciationTip}`;
+    const textToConvert = type === 'en' ? parsed.reply : `Pronunciation tip: ${parsed.pronunciationTip}`;
 
     const isCached = !!cachedAudio || AudioStore.has(textToConvert);
 
@@ -397,24 +553,46 @@ const CoachChat: React.FC = () => {
             </div>
           )}
 
-          {messages.map((m, idx) => (
-            <div
-              key={m.dbId || m.timestamp + idx}
-              className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-2 duration-300 group/msg`}
-            >
-              <div className={`relative max-w-[85%] rounded-3xl p-4 shadow-sm ${m.role === 'user'
-                ? 'bg-blue-800 text-white rounded-tr-none'
-                : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-100 dark:border-slate-700 rounded-tl-none'
-                }`}>
-                <div className="flex justify-between items-start gap-4">
-                  <p className="font-bold leading-relaxed flex-1 whitespace-pre-wrap">{m.text}</p>
-                  <div className="flex flex-col gap-2">
-                    {m.role === 'coach' && (
+          {messages.map((m, idx) => {
+            const parsed = parseCoachMessage(m);
+            return (
+              <div
+                key={m.dbId || m.timestamp + idx}
+                className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-2 duration-300 group/msg`}
+              >
+                {m.role === 'user' ? (
+                  /* ── USER BUBBLE ── */
+                  <div className="relative max-w-[85%] rounded-3xl p-4 shadow-sm bg-blue-800 text-white rounded-tr-none">
+                    <div className="flex justify-between items-start gap-4">
+                      <p className="font-bold leading-relaxed flex-1 whitespace-pre-wrap">{m.text}</p>
+                      {m.dbId && (
+                        <button
+                          onClick={() => handleDeleteMessage(m)}
+                          className="opacity-100 md:opacity-0 group-hover/msg:opacity-100 p-2 text-blue-300 hover:text-red-300 transition-all rounded-lg shrink-0"
+                          title="Delete message"
+                        >
+                          <IcoBin />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* ── COACH RESPONSE ── */
+                  <div className="max-w-[88%] flex flex-col gap-3">
+
+                    {/* Box 1: Agent Reply */}
+                    <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl rounded-tl-none shadow-sm flex items-start gap-3 p-4">
+                      <div className="flex-1 min-w-0 flex items-start gap-2.5">
+                        <span className="text-base shrink-0 select-none mt-0.5">💬</span>
+                        <p className="font-bold leading-relaxed text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
+                          {parsed.reply}
+                        </p>
+                      </div>
                       <button
                         onClick={() => handleSpeak(m, 'en', `${idx}-main`)}
-                        disabled={quotaReached && !m.audioEn && !AudioStore.has(m.text)}
-                        className={`shrink-0 p-2 rounded-xl transition-all 
-                          ${(quotaReached && !m.audioEn && !AudioStore.has(m.text)) ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-blue-50 dark:bg-slate-900 text-blue-600 dark:text-blue-400 hover:scale-110 active:scale-95'}
+                        disabled={quotaReached && !m.audioEn && !AudioStore.has(parsed.reply)}
+                        className={`shrink-0 p-2 rounded-xl transition-all
+                          ${(quotaReached && !m.audioEn && !AudioStore.has(parsed.reply)) ? 'opacity-20 cursor-not-allowed grayscale' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-blue-400 hover:scale-110 active:scale-95'}
                           ${playingId === `${idx}-main` ? 'bg-blue-600 text-white animate-pulse shadow-inner' : fetchingId === `${idx}-main` ? 'bg-blue-100 text-blue-600' : ''}`}
                       >
                         {fetchingId === `${idx}-main` ? (
@@ -425,57 +603,74 @@ const CoachChat: React.FC = () => {
                           </svg>
                         )}
                       </button>
-                    )}
-                    {m.role === 'user' && m.dbId && (
-                      <button
-                        onClick={() => handleDeleteMessage(m)}
-                        className="opacity-100 md:opacity-0 group-hover/msg:opacity-100 p-2 text-red-300 hover:text-red-500 transition-all rounded-lg"
-                        title="Delete message"
-                      >
-                        <IcoBin />
-                      </button>
-                    )}
-                  </div>
-                </div>
+                    </div>
 
-                {m.role === 'coach' && (m.kannadaGuide || m.correction || m.pronunciationTip) && (
-                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-3">
-                    {m.kannadaGuide && (
-                      <div className="bg-blue-50 dark:bg-slate-900 p-3 rounded-2xl">
-                        <p className="text-xs font-bold text-blue-800 dark:text-blue-400 mb-1 uppercase tracking-tighter">
-                          {t({ en: 'ಸಹಾಯ (Help)', kn: 'ಸಹಾಯ (Help)' })}
-                        </p>
-                        <p className="text-sm text-blue-900 dark:text-blue-200 whitespace-pre-line">{m.kannadaGuide}</p>
+                    {/* Box 2: Unified Suggestion/Help Box */}
+                    {(parsed.suggestion || parsed.kannadaGuide || parsed.pronunciationTip) && (
+                      <div className="bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-850/40 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+                        
+                        {/* Suggestion Header (Orange bg) */}
+                        {parsed.suggestion && (
+                          <div className="px-4 py-3 bg-orange-50 dark:bg-orange-950/20 border-b border-orange-100 dark:border-orange-900/30 animate-in fade-in duration-300">
+                            <p className="text-sm font-semibold text-orange-900 dark:text-orange-200 leading-relaxed">
+                              {parsed.suggestion}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Kannada Guide */}
+                        {parsed.kannadaGuide && (
+                          <div className="px-4 py-3 bg-white dark:bg-slate-800">
+                            <p className="text-xs font-bold text-blue-700 dark:text-blue-400 mb-1 uppercase tracking-tighter">
+                              {t({ en: 'ಸಹಾಯ (Help)', kn: 'ಸಹಾಯ (Help)' })}
+                            </p>
+                            <p className="text-sm text-blue-900 dark:text-blue-200 whitespace-pre-line">
+                              {parsed.kannadaGuide}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Pronunciation Tip */}
+                        {parsed.pronunciationTip && (
+                          <div className="px-4 py-3 bg-green-50/70 dark:bg-green-900/20 border-t border-slate-100 dark:border-slate-700 flex justify-between items-start gap-2">
+                            <div className="flex-1">
+                              <p className="text-xs font-bold text-green-700 dark:text-green-400 mb-1 uppercase tracking-tighter">
+                                {t({ en: 'Pronunciation Tip 🎙️', kn: 'ಉಚ್ಚಾರಣಾ ಸಲಹೆ 🎙️' })}
+                              </p>
+                              <p className="text-sm text-green-900 dark:text-green-200">
+                                {parsed.pronunciationTip}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleSpeak(m, 'tip', `${idx}-tip`)}
+                              className="shrink-0 p-2 rounded-lg transition-all bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-400"
+                            >
+                              <IcoVol />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {m.correction && (
-                      <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-2xl border border-amber-100/50 dark:border-amber-900/50">
-                        <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-tighter">{t({ en: 'Correction', kn: 'ತಿದ್ದುಪಡಿ' })}</p>
-                        <p className="text-sm text-amber-900 dark:text-amber-200 italic">{m.correction}</p>
-                      </div>
-                    )}
-                    {m.pronunciationTip && (
-                      <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-2xl border border-green-100/50 dark:border-green-900/50 flex justify-between items-start gap-2">
-                        <div className="flex-1">
-                          <p className="text-xs font-bold text-green-700 dark:text-green-400 mb-1 uppercase tracking-tighter">{t({ en: 'Pronunciation Tip 🎙️', kn: 'ಉಚ್ಚಾರಣಾ ಸಲಹೆ 🎙️' })}</p>
-                          <p className="text-sm text-green-900 dark:text-green-200">{m.pronunciationTip}</p>
+
+                    {/* Box 3: Correction */}
+                    {parsed.correction && (
+                      <div className="bg-amber-50 dark:bg-amber-900/15 border border-amber-200/60 dark:border-amber-700/40 rounded-2xl px-4 py-3 flex items-start gap-3 animate-in fade-in duration-300">
+                        <span className="text-base shrink-0 select-none mt-0.5">✏️</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-0.5">{t({ en: 'Correction', kn: 'ತಿದ್ದುಪಡಿ' })}</p>
+                          <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 leading-relaxed">{parsed.correction}</p>
                         </div>
-                        <button
-                          onClick={() => handleSpeak(m, 'tip', `${idx}-tip`)}
-                          className={`shrink-0 p-2 rounded-lg transition-all bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-400`}
-                        >
-                          <IcoVol />
-                        </button>
                       </div>
                     )}
+
                   </div>
                 )}
+                <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1 px-2">
+                  {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
               </div>
-              <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1 px-2">
-                {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          ))}
+            );
+          })}
 
           {isTyping && !streamingText && (
             <div className="flex items-start gap-2 animate-pulse">
@@ -491,9 +686,10 @@ const CoachChat: React.FC = () => {
 
           {streamingText && (
             <div className="flex items-start gap-2 animate-in fade-in duration-300">
-              <div className="bg-white dark:bg-slate-800 p-4 rounded-3xl rounded-tl-none border border-blue-100 dark:border-slate-700 shadow-sm max-w-[85%]">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-3xl rounded-tl-none border border-slate-200 dark:border-slate-700 shadow-sm max-w-[85%] flex items-start gap-2.5">
+                <span className="text-base shrink-0 select-none mt-0.5">💬</span>
                 <p className="font-bold leading-relaxed text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
-                  {streamingText}
+                  {getStreamingReply(streamingText)}
                   <span className="w-1.5 h-4 bg-blue-500 inline-block ml-1 animate-pulse" />
                 </p>
               </div>
