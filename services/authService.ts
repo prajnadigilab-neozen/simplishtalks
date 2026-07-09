@@ -421,9 +421,9 @@ export async function getUserSession(providedSession?: any, forceRefresh?: boole
       return { data: null, error: e };
     });
 
-    // 400 Error Recovery: If the full query failed, try a minimal "safe" query
-    if (error && (error as any).status === 400) {
-      console.warn("⚠️ Full profile fetch failed (400). Retrying with minimal safe columns...");
+    // Error Recovery: If the full query failed or timed out, retry with a fast, minimal "safe" query to get basic role/identity
+    if (error) {
+      console.warn("⚠️ Full profile fetch failed or timed out. Retrying with minimal safe columns...");
       const safeQuery = supabase
         .from('profiles')
         .select('full_name, place, role, is_restricted, avatar_url, snehi_access_enabled')
