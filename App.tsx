@@ -41,6 +41,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { useAppStore } from './store/useAppStore';
 import { initSyncAndListen } from './services/syncService';
 import NotificationToast from './components/NotificationToast';
+import { usePwaStore } from './store/usePwaStore';
+import { PwaInstallBanner } from './components/PwaInstallBanner';
 import { getUserNotifications, markNotificationsAsRead } from './services/notificationService';
 import { InAppNotification } from './types';
 import { useNotificationStore } from './store/useNotificationStore';
@@ -371,6 +373,26 @@ const AppContent: React.FC = () => {
     // Explicitly reference telemetry to ensure it initializes
     console.log("Telemetry Initialized:", !!telemetry);
 
+    // Listen for PWA installation prompt
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      usePwaStore.getState().setPrompt(e);
+    };
+    
+    // Listen for successful installation
+    const handleAppInstalled = () => {
+      usePwaStore.getState().clearPrompt();
+      if (typeof window !== 'undefined' && (window as any).telemetry?.track) {
+        (window as any).telemetry.track('pwa_installed', { method: 'browser_native' });
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+    
+    // Trigger initial check for standalone display mode
+    usePwaStore.getState().checkStandalone();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (isExitingRef.current) return;
       // INITIAL_SESSION is handled by initialize() — skip to avoid double-fetch + lock race
@@ -417,6 +439,8 @@ const AppContent: React.FC = () => {
     return () => {
       cleanupSync();
       subscription.unsubscribe();
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
@@ -474,6 +498,7 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-white dark:bg-slate-900 flex flex-col max-w-[1280px] mx-auto border-x border-gray-100 dark:border-slate-800 shadow-sm transition-all duration-300 overflow-x-hidden">
       <Navigation onSignOut={handleSignOut} session={session} />
       <NotificationToast />
+      <PwaInstallBanner />
 
       <main className={`flex-1 overflow-y-auto ${session && !session.isRestricted ? 'pb-24 md:pb-0' : ''}`}>
         {session?.isRestricted ? (

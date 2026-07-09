@@ -361,23 +361,33 @@ const Dashboard: React.FC = () => {
           <div className={`transition-all duration-500 ${!isTalksActive ? 'opacity-40 grayscale pointer-events-none scale-[0.98]' : 'scale-100'}`}>
             <PackageCardCompact type={PackageType.TALKS} isActive={isTalksActive || isNone}>
               {(isTalksActive || isNone) && (
-                <button
-                  disabled={isNone}
-                  onClick={() => {
-                    const path = getSmartRedirectPath();
-                    if (path === '/dashboard') {
-                      alert(t({
-                        en: 'No lessons found for your level yet. Please check back later!',
-                        kn: 'ನಿಮ್ಮ ಹಂತಕ್ಕೆ ಇನ್ನು ಯಾವುದೇ ಪಾಠಗಳು ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪರಿಶೀಲಿಸಿ!'
-                      }));
-                    } else {
-                      navigate(path);
-                    }
-                  }}
-                  className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95 disabled:bg-slate-400"
-                >
-                  {completedLessons === 0 ? t({ en: 'Go to SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್‌ಗೆ ಹೋಗಿ' }) : t({ en: 'Continue SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಮುಂದುವರಿಸಿ' })}
-                </button>
+                <div className="flex flex-col gap-2 w-full">
+                  <button
+                    disabled={isNone}
+                    onClick={() => {
+                      const path = getSmartRedirectPath();
+                      if (path === '/dashboard') {
+                        alert(t({
+                          en: 'No lessons found for your level yet. Please check back later!',
+                          kn: 'ನಿಮ್ಮ ಹಂತಕ್ಕೆ ಇನ್ನು ಯಾವುದೇ ಪಾಠಗಳು ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪರಿಶೀಲಿಸಿ!'
+                        }));
+                      } else {
+                        navigate(path);
+                      }
+                    }}
+                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg active:scale-95 disabled:bg-slate-400"
+                  >
+                    {completedLessons === 0 ? t({ en: 'Go to SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್‌ಗೆ ಹೋಗಿ' }) : t({ en: 'Continue SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಮುಂದುವರಿಸಿ' })}
+                  </button>
+                  <button
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('simplish-trigger-pwa-install'));
+                    }}
+                    className="w-full py-2.5 border-2 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                  >
+                    <span>📥</span> {t({ en: 'Download App', kn: 'ಆಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ' })}
+                  </button>
+                </div>
               )}
             </PackageCardCompact>
           </div>
@@ -386,48 +396,60 @@ const Dashboard: React.FC = () => {
               const snehiState = session?.snehiAccessEnabled ? 'ACTIVE' : (snehiRequest?.status || 'None');
               return (
                 <PackageCardCompact type={PackageType.SNEHI} isActive={snehiState === 'ACTIVE'}>
-                  {snehiState === 'ACTIVE' && (
-                    <button
-                      onClick={() => navigate('/talk')}
-                      className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
-                    >
-                      {t({ en: 'Go to SNEHI', kn: 'ಸ್ನೇಹಿಗೆ ಹೋಗಿ' })}
-                    </button>
-                  )}
-                  {snehiState === 'None' && (
-                    <button
-                      onClick={handleRequestAccess}
-                      disabled={loadingRequest || isNone}
-                      className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
-                    >
-                      {loadingRequest && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
-                      {t({ en: 'Request Access', kn: 'ಪ್ರವೇಶ ವಿನಂತಿಸಿ' })}
-                    </button>
-                  )}
-                  {snehiState === 'PENDING' && (
-                    <button
-                      disabled
-                      className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed border border-slate-200 dark:border-slate-700"
-                    >
-                      {t({ en: '⏳ Under Review', kn: '⏳ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ' })}
-                    </button>
-                  )}
-                  {snehiState === 'AWAITING_PMT' && (
-                    <button
-                      onClick={() => setShowCheckoutModal(true)}
-                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
-                    >
-                      {t({ en: '💳 Pay Now', kn: '💳 ಪಾವತಿಸಿ' })}
-                    </button>
-                  )}
-                  {(snehiState === 'DISABLED' || snehiState === 'REJECTED') && (
-                    <button
-                      disabled
-                      className="w-full py-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed border border-red-200/50 dark:border-red-800/50"
-                    >
-                      {t({ en: '🔒 Access Restricted', kn: '🔒 ಪ್ರವೇಶ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ' })}
-                    </button>
-                  )}
+                  <div className="flex flex-col gap-2 w-full">
+                    {snehiState === 'ACTIVE' && (
+                      <button
+                        onClick={() => navigate('/talk')}
+                        className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
+                        {t({ en: 'Go to SNEHI', kn: 'ಸ್ನೇಹಿಗೆ ಹೋಗಿ' })}
+                      </button>
+                    )}
+                    {snehiState === 'None' && (
+                      <button
+                        onClick={handleRequestAccess}
+                        disabled={loadingRequest || isNone}
+                        className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      >
+                        {loadingRequest && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                        {t({ en: 'Request Access', kn: 'ಪ್ರವೇಶ ವಿನಂತಿಸಿ' })}
+                      </button>
+                    )}
+                    {snehiState === 'PENDING' && (
+                      <button
+                        disabled
+                        className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed border border-slate-200 dark:border-slate-700"
+                      >
+                        {t({ en: '⏳ Under Review', kn: '⏳ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ' })}
+                      </button>
+                    )}
+                    {snehiState === 'AWAITING_PMT' && (
+                      <button
+                        onClick={() => setShowCheckoutModal(true)}
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
+                        {t({ en: '💳 Pay Now', kn: '💳 ಪಾವತಿಸಿ' })}
+                      </button>
+                    )}
+                    {(snehiState === 'DISABLED' || snehiState === 'REJECTED') && (
+                      <button
+                        disabled
+                        className="w-full py-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed border border-red-200/50 dark:border-red-800/50"
+                      >
+                        {t({ en: '🔒 Access Restricted', kn: '🔒 ಪ್ರವೇಶ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ' })}
+                      </button>
+                    )}
+                    {(snehiState === 'ACTIVE' || snehiState === 'AWAITING_PMT') && (
+                      <button
+                        onClick={() => {
+                          window.dispatchEvent(new CustomEvent('simplish-trigger-pwa-install'));
+                        }}
+                        className="w-full py-2.5 border-2 border-orange-200 dark:border-orange-800 text-orange-600 dark:text-orange-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                      >
+                        <span>📥</span> {t({ en: 'Download App', kn: 'ಆಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ' })}
+                      </button>
+                    )}
+                  </div>
                 </PackageCardCompact>
               );
             })()}
