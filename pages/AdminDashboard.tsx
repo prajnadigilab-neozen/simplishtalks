@@ -11,6 +11,7 @@ import { clearAllRecordings } from '../utils/recordingStore';
 import { getSystemConfig, updateSystemConfig, SystemConfig } from '../services/systemConfigService';
 import { VisualContentAdmin } from '../components/VisualContentAdmin';
 import { getAllAccessRequests, approveAccessRequest, rejectAccessRequest, disableAccessRequest, issueSnehiRefund } from '../services/snehiAccessService';
+import { supabase } from '../lib/supabase';
 
 interface Notification {
   id: string;
@@ -342,12 +343,10 @@ const AdminDashboard: React.FC = () => {
     // This runs before any data fetch that could throw. Keeps role-gated tabs
     // visible even if downstream fetches (refunds, reports, etc.) fail.
     try {
-      const { data: { session: earlySession } } = await import('../lib/supabase').then(m => m.supabase.auth.getSession());
+      const { data: { session: earlySession } } = await supabase.auth.getSession();
       if (earlySession) {
         // Use maybeSingle() — .single() throws if RLS returns 0 rows (even when row exists)
-        const { data: earlyProfile } = await import('../lib/supabase').then(m =>
-          m.supabase.from('profiles').select('role').eq('id', earlySession.user.id).maybeSingle()
-        );
+        const { data: earlyProfile } = await supabase.from('profiles').select('role').eq('id', earlySession.user.id).maybeSingle();
         const earlyRole = mapRole(earlyProfile?.role || earlySession.user.user_metadata?.role);
         console.log("📊 AdminDashboard Early Role (pre-fetch):", earlyRole);
         setCurrentUser({ ...earlySession.user, role: earlyRole });
@@ -373,10 +372,10 @@ const AdminDashboard: React.FC = () => {
       setSystemConfig(config);
 
       // Re-verify session after data load (keeps the role label accurate)
-      const { data: { session } } = await import('../lib/supabase').then(m => m.supabase.auth.getSession());
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // Use maybeSingle() — .single() throws if RLS returns 0 rows
-        const { data: profile, error: pError } = await import('../lib/supabase').then(m => m.supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle());
+        const { data: profile, error: pError } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
         console.log("📊 AdminDashboard Current Session User:", session.user);
         console.log("📊 AdminDashboard Current Profile Fetch:", profile, pError);
         const mappedRole = mapRole(profile?.role || session.user.user_metadata?.role);
@@ -387,7 +386,6 @@ const AdminDashboard: React.FC = () => {
       const stats = await getGlobalStats();
 
       // Fetch total refunded amount — wrapped to prevent crashing the whole load
-      const { supabase } = await import('../lib/supabase');
       const { data: refunds } = await supabase.from('refunds').select('refund_amount, status').catch(() => ({ data: [] })) as { data: any[] };
       const totalRefunded = (refunds || [])
         .filter((r: any) => r.status === 'completed')
