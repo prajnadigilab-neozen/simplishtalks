@@ -1,0 +1,7 @@
+{
+  "name": "SIMPLISH - Talks: English for Kannada Speakers",
+  "description": "A self-paced English learning platform designed specifically for Kannada speakers with a mobile-first approach, gated levels, and AI-powered evaluation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

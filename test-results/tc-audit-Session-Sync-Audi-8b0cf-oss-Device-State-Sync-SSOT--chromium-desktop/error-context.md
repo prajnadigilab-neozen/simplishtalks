@@ -1,0 +1,53 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic:
+    - img "SIMPLISH Talks Hero"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e7] [cursor=pointer]:
+        - generic [ref=e8]: SIMPLISH
+        - generic [ref=e9]: Talks
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - button "🌙" [ref=e12] [cursor=pointer]
+          - button "En" [ref=e13] [cursor=pointer]
+        - button "ಲಾಗಿನ್" [ref=e16] [cursor=pointer]
+    - main [ref=e17]:
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - img "SIMPLISH Symbol" [ref=e22]
+          - heading "SIMPLISH Talks" [level=1] [ref=e23]:
+            - text: SIMPLISH
+            - generic [ref=e24]: Talks
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - button "ಲಾಗಿನ್" [ref=e28] [cursor=pointer]
+            - button "ನೋಂದಣಿ" [ref=e29] [cursor=pointer]
+          - generic [ref=e30]:
+            - heading "ಮರಳಿ ಸ್ವಾಗತ 👋" [level=2] [ref=e31]
+            - paragraph [ref=e32]: ನಿಮ್ಮ ಕಲಿಕೆ ಮುಂದುವರಿಸಿ.
+          - generic [ref=e33]:
+            - generic [ref=e34]: ⚠️
+            - paragraph [ref=e36]: Invalid login credentials
+            - button "×" [ref=e37] [cursor=pointer]
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - generic [ref=e40]: ಫೋನ್ ಸಂಖ್ಯೆ
+              - textbox "98765 43210" [ref=e42]: "1234567890"
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - generic [ref=e45]: ಪಾಸ್‌ವರ್ಡ್
+                - generic [ref=e46]:
+                  - textbox "••••••••" [ref=e47]: "123456"
+                  - button "Show password" [ref=e49] [cursor=pointer]:
+                    - img [ref=e50]
+              - button "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ?" [ref=e53] [cursor=pointer]
+            - button "ಸೈನ್ ಇನ್ →" [ref=e54] [cursor=pointer]:
+              - text: ಸೈನ್ ಇನ್
+              - generic [ref=e55]: →
+          - paragraph [ref=e56]:
+            - text: ಖಾತೆ ಇಲ್ಲವೇ?
+            - button "ಈಗಲೇ ನೋಂದಾಯಿಸಿ" [ref=e57] [cursor=pointer]
+```

@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Block WordPress admin / login / install scanner probes instantly with 403 Forbidden
+  # Intercepting these common automated scans at the web server layer saves resources and bandwidth.
+  RewriteCond %{REQUEST_URI} ^/wp-(admin|login|content|includes|config|install) [NC,OR]
+  RewriteCond %{REQUEST_URI} wp-login\.php [NC,OR]
+  RewriteCond %{REQUEST_URI} xmlrpc\.php [NC]
+  RewriteRule .* - [F,L]
+
+  # 2. Support React SPA routing (forward all non-file/non-directory requests to index.html)
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

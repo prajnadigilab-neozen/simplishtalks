@@ -1,0 +1,418 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.8";
+
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const GLOBAL_FALLBACK = Deno.env.get('GEMINI_API_KEY')!;
+const GEMINI_API_KEY_TALKS = Deno.env.get('GEMINI_API_KEY_TALKS') || GLOBAL_FALLBACK;
+const GEMINI_API_KEY_SNEHI = Deno.env.get('GEMINI_API_KEY_SNEHI') || GLOBAL_FALLBACK;
+
+const PRIMARY_MODEL = 'gemini-3-flash-preview';
+const FALLBACK_MODEL = 'gemini-flash-latest';
+
+async function callGemini(model: string, contents: any, config: any, apiKey: string) {
+    if (!apiKey) {
+        throw new Error('Gemini API key is missing in Edge Function environment variables.');
+    }
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const body = { contents, generationConfig: config };
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.error(`Gemini ${model} API Error (Status ${res.status}):`, JSON.stringify(data, null, 2));
+            const errorMessage = data.error?.message || 'Unknown Gemini API Error';
+            const errorReason = data.error?.status || 'UNKNOWN';
+
+            // Check if it's a model deprecation error to pass back up cleanly
+            if (res.status === 404 && errorMessage.toLowerCase().includes('not found')) {
+                throw new Error(`MODEL_DEPRECATED: The selected AI model ${model} is not available. Please update your AI settings.`);
+            }
+
+            throw new Error(`Gemini ${model} ${errorReason}: ${errorMessage}`);
+        }
+
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const usage = data.usageMetadata;
+
+        if (!text) {
+            console.error(`Gemini ${model} returned empty response:`, JSON.stringify(data, null, 2));
+            throw new Error(`Gemini ${model} returned an empty or invalid response structure.`);
+        }
+
+        return { text, usage };
+    } catch (err: any) {
+        console.error(`Fetch/Parse error in callGemini (${model}):`, err.message);
+        throw err;
+    }
+}
+
+// ── Placement Evaluation ─────────────────────────────────────────────────────
+
+async function handlePlacement(body: any, apiKey: string) {
+    const { name, place, introduction, mcqScore, readingTranscription, readingAccuracy } = body;
+
+    const prompt = `
+    Evaluate this student's English proficiency for placement.
+    
+    STUDENT DATA:
+    - Name: ${name}
+    - Location: ${place}
+    - MCQ Score: ${mcqScore}/5 (Testing basic grammar/vocab)
+    - Reading Aloud Transcription: "${readingTranscription || 'N/A'}" (Accuracy: ${readingAccuracy || 0}/5)
+    - Written Introduction: "${introduction}"
+    
+    TASKS:
+    1. Assign one level: BASIC, INTERMEDIATE, ADVANCED, EXPERT.
+    2. Provide a 1-10 numerical score.
+    3. Give a short, encouraging reasoning in English.
+    4. Give a same reasoning/feedback in Kannada script.
+    
+    Return JSON format.
+  `;
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                suggestedLevel: { type: 'STRING' },
+                reasoning: { type: 'STRING' },
+                reasoningKn: { type: 'STRING' },
+                score: { type: 'NUMBER' },
+            },
+            required: ['suggestedLevel', 'reasoning', 'reasoningKn', 'score'],
+        },
+    };
+
+    const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
+        }
+        throw err;
+    }
+}
+
+// ── Speech Evaluation ────────────────────────────────────────────────────────
+
+async function handleSpeech(body: any, apiKey: string) {
+    const { audioBase64, targetText } = body;
+
+    const contents = {
+        role: 'user',
+        parts: [
+            {
+                inlineData: {
+                    mimeType: 'audio/webm',
+                    data: audioBase64,
+                },
+            },
+            {
+                text: `Analyze this audio recording. The user is trying to say: "${targetText}".
+        1. Transcribe what the user actually said.
+        2. Compare it to the target text.
+        3. Rate accuracy from 1 to 5.
+        4. Provide a friendly tip in Kannada (written in Kannada script) to improve pronunciation or grammar.
+        Return JSON.`,
+            },
+        ],
+    };
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                transcription: { type: 'STRING' },
+                accuracy: { type: 'NUMBER' },
+                feedbackKn: { type: 'STRING' },
+                feedbackEn: { type: 'STRING' },
+            },
+            required: ['transcription', 'accuracy', 'feedbackKn', 'feedbackEn'],
+        },
+    };
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, [contents], config, apiKey);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, [contents], config, apiKey);
+        }
+        throw err;
+    }
+}
+
+// ── Lesson Generation ────────────────────────────────────────────────────────
+
+async function handleGenerateLesson(body: any, apiKey: string) {
+    const { promptText } = body;
+
+    const prompt = `
+    You are an AI Curriculum Designer for a language learning app called "Simplish".
+    Generate a JSON lesson object based on the following instructions from the user.
+    The lesson MUST adhere to a "safe-to-fail", encouraging, and bilingual (English/Kannada) philosophy.
+    
+    USER INSTRUCTIONS:
+    ${promptText}
+    
+    OUTPUT REQUIREMENTS:
+    Return a strictly formatted JSON object matching the requested schema.
+    Ensure "titleStr", "notesStr", "textContent", "studyTextContent", "speakTextContent" are fully generated.
+    Ensure "scenario" contains "characterStr", "objectiveStr", "systemInstruction", and "initialMessage".
+    `;
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                titleStr: { type: 'STRING' },
+                notesStr: { type: 'STRING' },
+                textContent: { type: 'STRING' },
+                studyTextContent: { type: 'STRING' },
+                speakTextContent: { type: 'STRING' },
+                scenario: {
+                    type: 'OBJECT',
+                    properties: {
+                        characterStr: { type: 'STRING' },
+                        objectiveStr: { type: 'STRING' },
+                        systemInstruction: { type: 'STRING' },
+                        initialMessage: { type: 'STRING' }
+                    },
+                    required: ["characterStr", "objectiveStr", "systemInstruction", "initialMessage"]
+                }
+            },
+            required: ['titleStr', 'notesStr', 'textContent', 'studyTextContent', 'speakTextContent', 'scenario'],
+        },
+    };
+
+    const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
+        }
+        throw err;
+    }
+}
+
+// ── Snehi Scorecard Evaluation ───────────────────────────────────────────────
+
+async function handleSnehiScorecard(body: any, apiKey: string) {
+    const { transcript } = body;
+
+    const prompt = `
+    You are an AI English Coach for a conversational practice app.
+    Review the following chat transcript between the USER and the AI ("Snehi").
+    The AI may have provided corrections or pronunciation tips during the chat.
+    
+    TRANSCRIPT:
+    ${transcript}
+    
+    TASKS:
+    Evaluate the USER's performance on a scale of 1 to 10 for each of the following four pillars:
+    1. p_score (Pronunciation): Focus on clarity and any target sounds corrected.
+    2. f_score (Flow & Reduction): Focus on rhythm, natural flow, and use of connected speech.
+    3. c_score (Confidence): Focus on responsiveness and lack of filler words (um, uh).
+    4. a_score (Accuracy): Focus on grammatical correctness and vocabulary.
+    
+    Provide a short encouraging generic feedback message (max 2 sentences) summarizing their performance and offering a quick tip.
+
+    Return JSON format.
+    `;
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                p_score: { type: 'NUMBER' },
+                f_score: { type: 'NUMBER' },
+                c_score: { type: 'NUMBER' },
+                a_score: { type: 'NUMBER' },
+                evaluation_feedback: { type: 'STRING' },
+            },
+            required: ['p_score', 'f_score', 'c_score', 'a_score', 'evaluation_feedback'],
+        },
+    };
+
+    const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
+        }
+        throw err;
+    }
+}
+
+// ── Custom Scenario Generation ───────────────────────────────────────────────
+
+async function handleGenerateCustomScenario(body: any, apiKey: string) {
+    const { category, promptText } = body;
+
+    const prompt = `
+    You are an AI English Coach for a conversational practice app.
+    Generate a JSON object for a custom roleplay scenario based on the following context and category.
+    The category is: "${category}".
+    User's instructions/idea (might be in Kannada or English): "${promptText}"
+    
+    TASKS:
+    1. Create a clear 'title' object with 'en' and 'kn' (Kannada) translations.
+    2. Write a comprehensive 'systemInstruction'. It must tell the AI how to act, what the user's goal is, and strictly remind the AI to be helpful, concise, and provide bilingual translations if needed. DO NOT use markdown in systemInstruction, keep it plain text.
+    3. Provide an 'initialMessage' (the first thing the AI will say to start the conversation, to get the user speaking).
+
+    Output must be valid JSON matching the schema.
+    `;
+
+    const config = {
+        responseMimeType: 'application/json',
+        responseSchema: {
+            type: 'OBJECT',
+            properties: {
+                title: {
+                    type: 'OBJECT',
+                    properties: {
+                        en: { type: 'STRING' },
+                        kn: { type: 'STRING' }
+                    },
+                    required: ['en', 'kn']
+                },
+                systemInstruction: { type: 'STRING' },
+                initialMessage: { type: 'STRING' }
+            },
+            required: ['title', 'systemInstruction', 'initialMessage']
+        }
+    };
+
+    const contents = [{ role: 'user', parts: [{ text: prompt }] }];
+
+    try {
+        const result = await callGemini(PRIMARY_MODEL, contents, config, apiKey);
+        return result;
+    } catch (err: any) {
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('not found') || msg.includes('404') || msg.includes('503')) {
+            return await callGemini(FALLBACK_MODEL, contents, config, apiKey);
+        }
+        throw err;
+    }
+}
+
+// ── Router ───────────────────────────────────────────────────────────────────
+
+Deno.serve(async (req) => {
+    if (req.method === 'OPTIONS') {
+        return new Response('ok', { headers: corsHeaders });
+    }
+
+    try {
+        const body = await req.json();
+        const { type } = body;
+
+        if (type === 'snehi_scorecard' || type === 'generate_custom_scenario') {
+            const authHeader = req.headers.get('Authorization');
+            if (!authHeader) {
+                return new Response(JSON.stringify({ error: 'Missing Authorization header' }), {
+                    status: 401,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                });
+            }
+
+            const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+            const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+            const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+                global: { headers: { Authorization: authHeader } }
+            });
+
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            if (authError || !user) {
+                return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
+                    status: 401,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                });
+            }
+
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('snehi_access_enabled')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError || !profile || !profile.snehi_access_enabled) {
+                return new Response(JSON.stringify({ error: 'Access to SIMPLISH SNEHI is restricted. Approval required.' }), {
+                    status: 403,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                });
+            }
+        }
+
+        let result: any;
+        if (type === 'placement') {
+            result = await handlePlacement(body, GEMINI_API_KEY_TALKS);
+        } else if (type === 'speech') {
+            result = await handleSpeech(body, GEMINI_API_KEY_TALKS);
+        } else if (type === 'generate_lesson') {
+            result = await handleGenerateLesson(body, GEMINI_API_KEY_TALKS);
+        } else if (type === 'snehi_scorecard') {
+            result = await handleSnehiScorecard(body, GEMINI_API_KEY_SNEHI);
+        } else if (type === 'generate_custom_scenario') {
+            result = await handleGenerateCustomScenario(body, GEMINI_API_KEY_SNEHI);
+        } else {
+            return new Response(JSON.stringify({ error: `Unknown evaluation type: ${type}` }), {
+                status: 400,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+        }
+
+        // result is now { text, usage } from callGemini
+        return new Response(JSON.stringify({
+            data: typeof result.text === 'string' ? JSON.parse(result.text) : result.text,
+            usage: result.usage,
+            model: PRIMARY_MODEL // explicitly return model used
+        }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+    } catch (err: any) {
+        console.error('Evaluate Edge Function Error:', err.message);
+
+        // Return a proper error status so the client (supabase-js) throws a FunctionsHttpError
+        return new Response(
+            JSON.stringify({
+                error: err.message,
+                details: err.stack || 'No stack trace available'
+            }),
+            {
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+        );
+    }
+});

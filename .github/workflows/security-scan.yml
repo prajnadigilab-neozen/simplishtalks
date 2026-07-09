@@ -1,0 +1,68 @@
+name: Security Scans (Snyk & ZAP)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * 1' # Run weekly on Mondays
+
+jobs:
+  snyk-sca-scan:
+    name: Snyk Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      # Snyk Software Composition Analysis (SCA)
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=high
+
+  zap-dast-scan:
+    name: OWASP ZAP Dynamic Application Security Testing
+    runs-on: ubuntu-latest
+    # Wait for dependencies and basic checks before running dynamic tests
+    needs: snyk-sca-scan 
+    steps:
+      - uses: actions/checkout@v4
+      
+      # ZAP needs the application to be running or a target URL
+      # Assuming Vercel/similar creates a deployment URL, or we run it locally in the runner
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and Build Application
+        run: |
+          npm ci
+          npm run build
+          
+      - name: Start Application in Background
+        run: |
+          npm run preview &
+          sleep 10 # Wait for the server to start
+          
+      # OWASP ZAP Baseline Scan (DAST)
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:4173'
+          fail_action: false # Initially set to false so it doesn't break CI while you triage existing issues
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'

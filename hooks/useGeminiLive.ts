@@ -1,0 +1,335 @@
+
+import { useRef, useState, useCallback } from 'react';
+import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
+import { encodeBase64 } from '../utils/audioUtils';
+import { telemetry } from '../services/telemetryService';
+import { quotaGuard } from '../utils/QuotaMiddleware';
+
+// ─── Transliteration Utility ────────────────────────────────────
+// Forces Indian scripts (Devanagari, Bengali, Telugu, Tamil, Malayalam) into Kannada script
+// based on standard ISCII Unicode block alignments.
+const forceKannadaScript = (text: string): string => {
+    return text.split('').map(char => {
+        const code = char.charCodeAt(0);
+        // Devanagari (Hindi/Marathi) block -> Kannada
+        if (code >= 0x0900 && code <= 0x097F) return String.fromCharCode(code + 0x0380);
+        // Bengali block -> Kannada
+        if (code >= 0x0980 && code <= 0x09FF) return String.fromCharCode(code + 0x0300);
+        // Telugu block -> Kannada
+        if (code >= 0x0C00 && code <= 0x0C7F) return String.fromCharCode(code + 0x0080);
+        // Tamil block -> Kannada
+        if (code >= 0x0B80 && code <= 0x0BFF) return String.fromCharCode(code + 0x0100);
+        // Malayalam block -> Kannada
+        if (code >= 0x0D00 && code <= 0x0D7F) return String.fromCharCode(code - 0x0080);
+        return char;
+    }).join('');
+};
+
+const provideFeedbackTool: FunctionDeclaration = {
+    name: 'provide_feedback',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'MANDATORY TOOL: You must call this tool on EVERY turn to ensure the application receives the english translation (user_english_transcript) of what the user said, even if their speech was already in perfect English. Also provide linguistic feedback.',
+        properties: {
+            correction: { type: Type.STRING, description: 'The corrected English sentence if the user made a mistake.' },
+            kannada_guide: { type: Type.STRING, description: 'A brief explanation in Kannada.' },
+            pronunciation_tip: { type: Type.STRING, description: 'A phonetic tip for words the user struggled with.' },
+            user_english_transcript: { type: Type.STRING, description: 'The accurate English translation or transcription of what the user just said.' },
+            user_kannada_transcript: { type: Type.STRING, description: 'The Kannada translation of what the user just said.' }
+        }
+    }
+};
+
+// ─── Types ──────────────────────────────────────────────────────
+export interface FeedbackData {
+    correction?: string;
+    kannadaGuide?: string;
+    pronunciationTip?: string;
+    userEnglishTranscript?: string;
+    userKannadaTranscript?: string;
+}
+
+export interface UseGeminiLiveCallbacks {
+    onAudioChunk: (base64: string) => void;
+    onTranscription: (type: 'input' | 'output', text: string) => void;
+    onTurnComplete: (userText: string, coachText: string, feedback: FeedbackData) => void;
+    onInterrupted: () => void;
+}
+
+export interface UseGeminiLiveReturn {
+    connect: (systemInstruction: string, voiceName: string) => Promise<void>;
+    disconnect: () => void;
+    sendPcmData: (pcmBytes: Uint8Array) => void;
+    isConnected: boolean;
+    isConnecting: boolean;
+    isReconnecting: boolean;
+    error: string | null;
+    clearError: () => void;
+}
+
+// ── Suppress specific SDK console noise ─────────────────────────
+// The Gemini SDK internally calls console.error("WebSocket is already in
+// CLOSING or CLOSED state") from its send() path. This is NOT a thrown
+// exception so try/catch cannot intercept it. We install a one-time,
+// permanent filter that simply drops that specific message.
+const _origConsoleError = console.error;
+console.error = (...args: any[]) => {
+    if (typeof args[0] === 'string' && (args[0].includes('CLOSING') || args[0].includes('CLOSED'))) return;
+    _origConsoleError.apply(console, args);
+};
+
+// ─── Hook ───────────────────────────────────────────────────────
+export function useGeminiLive(callbacks: UseGeminiLiveCallbacks): UseGeminiLiveReturn {
+    const [isConnected, setIsConnected] = useState(false);
+    const [isConnecting, setIsConnecting] = useState(false);
+    const [isReconnecting, setIsReconnecting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const sessionRef = useRef<any>(null);
+    const activeIdRef = useRef<number>(0);
+    const userInitiatedCloseRef = useRef(false);
+    const canSendRef = useRef(false); // Blocks sendPcmData during teardown
+
+    // Transcription buffers — accumulated per turn, flushed on turnComplete
+    const inputBuf = useRef('');
+    const outputBuf = useRef('');
+    const feedbackBuf = useRef<FeedbackData>({});
+
+    // Store last config for reconnection
+    const lastConfigRef = useRef<{ instruction: string; voice: string } | null>(null);
+    const reconnectAttemptsRef = useRef(0);
+    const MAX_RECONNECTS = 3;
+    const sessionStartTimeRef = useRef<number | null>(null);
+
+    const clearError = useCallback(() => setError(null), []);
+
+    const connect = useCallback(async (systemInstruction: string, voiceName: string) => {
+        // Prevent double-connect
+        if (sessionRef.current) return;
+
+        setIsConnecting(true);
+        setError(null);
+        userInitiatedCloseRef.current = false;
+        canSendRef.current = false; // Will be enabled in onopen
+        lastConfigRef.current = { instruction: systemInstruction, voice: voiceName };
+
+        const connectionId = Date.now();
+        activeIdRef.current = connectionId;
+
+        try {
+            // Check API Guardrail
+            const guard = await quotaGuard('gemini-2.5-flash-native-audio-latest', systemInstruction, 'chat');
+            if (!guard.isAllowed) {
+                setError(guard.message || 'Rate limit/billing limit reached. Connection refused.');
+                setIsConnecting(false);
+                return;
+            }
+
+            const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY_SNEHI || import.meta.env.VITE_GEMINI_API_KEY });
+
+            const sessionPromise = ai.live.connect({
+                model: 'gemini-2.5-flash-native-audio-latest',
+                callbacks: {
+                    onopen: () => {
+                        canSendRef.current = true; // Gate open: now safe to send PCM
+                        setIsConnected(true);
+                        setIsConnecting(false);
+                        setIsReconnecting(false);
+                        reconnectAttemptsRef.current = 0;
+                        sessionStartTimeRef.current = Date.now();
+                    },
+
+                    onmessage: async (message: LiveServerMessage) => {
+                        // ── Tool Calls ──
+                        if (message.toolCall) {
+                            for (const fc of message.toolCall.functionCalls) {
+                                if (fc.name === 'provide_feedback') {
+                                    const args = fc.args as any;
+                                    feedbackBuf.current = {
+                                        correction: args.correction,
+                                        kannadaGuide: args.kannada_guide,
+                                        pronunciationTip: args.pronunciation_tip,
+                                        userEnglishTranscript: args.user_english_transcript,
+                                        userKannadaTranscript: args.user_kannada_transcript
+                                    };
+                                    sessionPromise.then(s => s.sendToolResponse({
+                                        functionResponses: { id: fc.id, name: fc.name, response: { status: 'logged' } },
+                                    }));
+                                }
+                            }
+                        }
+
+                        // ── Transcriptions ──
+                        const sanitize = (t: string) => t.replace(/<ctrl\d+>/g, '');
+                        if (message.serverContent?.outputTranscription) {
+                            const chunk = sanitize(message.serverContent.outputTranscription.text);
+                            outputBuf.current += chunk;
+                            callbacks.onTranscription('output', chunk);
+                        } else if (message.serverContent?.inputTranscription) {
+                            // Enforce Kannada script on STT inputs to prevent Devanagari/Bengali
+                            const rawChunk = sanitize(message.serverContent.inputTranscription.text);
+                            const chunk = forceKannadaScript(rawChunk);
+                            inputBuf.current += chunk;
+                            callbacks.onTranscription('input', chunk);
+                        }
+
+                        // ── Turn Complete ──
+                        if (message.serverContent?.turnComplete) {
+                            const userText = inputBuf.current.trim();
+                            const coachText = outputBuf.current.trim();
+                            callbacks.onTurnComplete(userText, coachText, { ...feedbackBuf.current });
+                            inputBuf.current = '';
+                            outputBuf.current = '';
+                            feedbackBuf.current = {};
+                        }
+
+                        // ── Audio Chunks ──
+                        const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
+                        if (base64Audio) {
+                            callbacks.onAudioChunk(base64Audio);
+                        }
+
+                        // ── Interruption ──
+                        if (message.serverContent?.interrupted) {
+                            callbacks.onInterrupted();
+                        }
+                    },
+
+                    onerror: (e: any) => {
+                        console.warn('Live Error:', e);
+                        if (activeIdRef.current !== connectionId) return;
+
+                        const msg = e?.message?.includes('Requested entity was not found')
+                            ? 'API Key error. Please check your Gemini API key.'
+                            : 'Connection failed. Please check your internet and try again.';
+                        setError(msg);
+                        cleanupInternal();
+                    },
+
+                    onclose: () => {
+                        console.log('Gemini Session Closed');
+                        if (activeIdRef.current !== connectionId) return;
+
+                        cleanupInternal();
+
+                        // Auto-reconnect if user didn't initiate the close
+                        if (!userInitiatedCloseRef.current && lastConfigRef.current && reconnectAttemptsRef.current < MAX_RECONNECTS) {
+                            attemptReconnect();
+                        }
+                    },
+                },
+                config: {
+                    responseModalities: [Modality.AUDIO],
+                    inputAudioTranscription: {},
+                    outputAudioTranscription: {},
+                    tools: [{ functionDeclarations: [provideFeedbackTool] }],
+                    speechConfig: {
+                        voiceConfig: { prebuiltVoiceConfig: { voiceName } },
+                    },
+                    systemInstruction,
+                } as any,
+            });
+
+            sessionRef.current = await sessionPromise;
+        } catch (err: any) {
+            console.error('Session start error:', err);
+            setError('Failed to start conversation. Please check your internet and API key.');
+            setIsConnecting(false);
+            setIsReconnecting(false);
+        }
+    }, [callbacks]);
+
+    const cleanupInternal = useCallback(() => {
+        canSendRef.current = false; // Immediately stop PCM sends
+
+        // Log duration before clearing
+        if (sessionStartTimeRef.current) {
+            const durationSeconds = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);
+            if (durationSeconds > 0) {
+                telemetry.logUsage({
+                    api_type: 'voice',
+                    model_name: 'gemini-live',
+                    total_units: durationSeconds,
+                    package_type: 'SNEHI'
+                });
+            }
+            sessionStartTimeRef.current = null;
+        }
+
+        sessionRef.current = null;
+        setIsConnected(false);
+        setIsConnecting(false);
+    }, []);
+
+    const disconnect = useCallback(() => {
+        // CRITICAL: Set flags BEFORE closing session to avoid race with onclose callback
+        userInitiatedCloseRef.current = true;
+        canSendRef.current = false; // Immediately block all pending PCM sends
+        reconnectAttemptsRef.current = MAX_RECONNECTS; // Prevent auto-reconnect
+        if (sessionRef.current) {
+            try { sessionRef.current.close(); } catch (e) { console.debug('Error closing session:', e); }
+            sessionRef.current = null;
+        }
+        setIsConnected(false);
+        setIsConnecting(false);
+        setIsReconnecting(false);
+    }, []);
+
+    const attemptReconnect = useCallback(async () => {
+        if (!lastConfigRef.current) return;
+        reconnectAttemptsRef.current += 1;
+        const attempt = reconnectAttemptsRef.current;
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+
+        console.log(`Reconnect attempt ${attempt}/${MAX_RECONNECTS} in ${delay}ms...`);
+        setIsReconnecting(true);
+
+        await new Promise(r => setTimeout(r, delay));
+
+        // Check if user manually disconnected during the wait
+        if (userInitiatedCloseRef.current) {
+            setIsReconnecting(false);
+            return;
+        }
+
+        try {
+            await connect(lastConfigRef.current.instruction, lastConfigRef.current.voice);
+        } catch {
+            if (reconnectAttemptsRef.current >= MAX_RECONNECTS) {
+                setError('Connection lost. Please try again.');
+                setIsReconnecting(false);
+            }
+        }
+    }, [connect]);
+
+    const sendPcmData = useCallback((pcmBytes: Uint8Array) => {
+        // Guard: do not attempt to send if we are in teardown or not connected
+        if (!canSendRef.current || !sessionRef.current) return;
+        try {
+            sessionRef.current.sendRealtimeInput({
+                media: {
+                    data: encodeBase64(pcmBytes),
+                    mimeType: 'audio/pcm;rate=16000',
+                },
+            });
+        } catch (e: any) {
+            // Silently ignore expected socket closing errors during teardown
+            if (e?.message?.includes('CLOSING') || e?.message?.includes('CLOSED')) {
+                canSendRef.current = false; // Ensure flag stays off
+                return;
+            }
+            console.debug('Failed to send PCM:', e);
+        }
+    }, []);
+
+    return {
+        connect,
+        disconnect,
+        sendPcmData,
+        isConnected,
+        isConnecting,
+        isReconnecting,
+        error,
+        clearError,
+    };
+}

@@ -1,0 +1,1549 @@
+[
+  {
+    "id": "49bb8042-983c-425a-ac23-3652678da399",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Self-Introduction",
+      "kn": "ನನ್ನ ಪರಿಚಯ"
+    },
+    "notes": {
+      "en": "To introduce oneself confidently using simple 'I am' structures.",
+      "kn": "To introduce oneself confidently using simple 'I am' structures."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602530194_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Arjun: Hello! I am Arjun. What is your name? | ನಮಸ್ಕಾರ! ನಾನು ಅರ್ಜುನ್. ನಿಮ್ಮ ಹೆಸರೇನು?\nRavi: Hi! My name is Ravi. | ಹಾಯ್! ನನ್ನ ಹೆಸರು ರವಿ.\nArjun: Nice to meet you, Ravi. Where are you from? | ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿದ್ದಕ್ಕೆ ಸಂತೋಷ, ರವಿ. ನೀವು ಎಲ್ಲಿಯವರು?\nRavi: I am from Mandya. I am a student. | ನಾನು ಮಂಡ್ಯದವನು. ನಾನು ಒಬ್ಬ ವಿದ್ಯಾರ್ಥಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ನಾನು ವಿದ್ಯಾರ್ಥಿ' (Naanu Vidyarthi). In English, we must add 'am' and 'a'. So it becomes 'I AM A student'. Without 'AM', the sentence feels incomplete to an English speaker.\n\n📚 KEY PHRASES:\n- I am...: Used to describe yourself (name, job, or state).\n  Example: \"I am a teacher.\"\n- My name is...: A clear, polite way to share your identity.\n  Example: \"My name is Shanti.\"\n- I am from...: Used to tell someone your hometown or village.\n  Example: \"I am from Belagavi.\"\n\n🗣️ PRONUNCIATION:\n- Student (ಸ್ಟೂಡೆಂಟ್): Start with a soft 'Sss' sound, not 'Ee-stoo-dent'.\n- Name (ನೇಮ್): Ends with a closed mouth 'M' sound, like the end of 'Amma'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello! **My** name is [User Name]. I **am** from [User Place]. I am a **student** / I **work** in [User Work]. It is **nice** to meet you.",
+    "scenario": {
+      "character": {
+        "en": "Ravi (Student Partner)",
+        "kn": "ರವಿ (ಸಹಪಾಠಿ)"
+      },
+      "objective": {
+        "en": "Introduce yourself to your practice partner Ravi. Tell him your name, where you are from, and what you do.",
+        "kn": "ನಿಮ್ಮ ಸಹಪಾಠಿ ರವಿಗೆ ನಿಮ್ಮನ್ನು ಪರಿಚಯಿಸಿಕೊಳ್ಳಿ. ನಿಮ್ಮ ಹೆಸರು, ಊರು ಮತ್ತು ವೃತ್ತಿಯನ್ನು ತಿಳಿಸಿ."
+      },
+      "objectiveStr": "Introduce yourself to your practice partner Ravi. Tell him your name, where you are from, and what you do.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Introduce yourself to your practice partner Ravi. Tell him your name, where you are from, and what you do.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 0,
+    "created_at": "2026-03-09T09:09:32.773501+00:00",
+    "text_url": null
+  },
+  {
+    "id": "69713478-448d-41da-bda1-156d5a1b616c",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "The Marketplace: Buying Vegetables & Groceries",
+      "kn": "ಮಾರುಕಟ್ಟೆ: ತರಕಾರಿ ಮತ್ತು ದಿನಸಿ ಖರೀದಿ"
+    },
+    "notes": {
+      "en": "Survival English: Asking for prices and quantities using simple, direct sentences.",
+      "kn": "Survival English: Asking for prices and quantities using simple, direct sentences."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602552407_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Radha: Hello! How much is one kg of onions? | ನಮಸ್ಕಾರ! ಒಂದು ಕೆಜಿ ಈರುಳ್ಳಿಗೆ ಎಷ್ಟು ಬೆಲೆ?\nVendor: It is forty rupees, Madam. | ಇದು ನಲವತ್ತು ರೂಪಾಯಿ, ಮೇಡಂ.\nRadha: Okay. Give me two kg of onions and one kg of potatoes. | ಸರಿ. ನನಗೆ ಎರಡು ಕೆಜಿ ಈರುಳ್ಳಿ ಮತ್ತು ಒಂದು ಕೆಜಿ ಆಲೂಗಡ್ಡೆ ಕೊಡಿ.\nVendor: Anything else? | ಇನ್ನೇನಾದರೂ ಬೇಕೆ?\nRadha: No, thank you. What is the total? | ಇಲ್ಲ, ಧನ್ಯವಾದಗಳು. ಒಟ್ಟು ಎಷ್ಟು?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಎಷ್ಟು?' (Eshtu?). In English, when asking for a price, we say 'How much'. If you are talking about one item, use 'is' (How much IS this?). If you are talking about many items, use 'are' (How much ARE these?).\n\n📚 KEY PHRASES:\n- How much is...?: Used to ask the price of something.\n  Example: \"How much is this pen?\"\n- Give me...: A direct but polite way to ask for an item.\n  Example: \"Give me one liter of milk.\"\n- What is the total?: Used to ask for the final bill amount.\n  Example: \"What is the total for these bags?\"\n\n🗣️ PRONUNCIATION:\n- Forty (ಫೋರ್ಟಿ): Focus on the 'F' sound—keep it soft like blowing air, not a hard 'P' sound.\n- Potato (ಪೊಟೇಟೋ): Say 'Po-Tay-Toe'. Don't rush the middle 'Tay' sound.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello! **How much** is this? Give me **two** kg of [Vegetable Name]. **What** is the total **price**? Thank you!",
+    "scenario": {
+      "character": {
+        "en": "Vegetable Vendor",
+        "kn": "ತರಕಾರಿ ವ್ಯಾಪಾರಿ"
+      },
+      "objective": {
+        "en": "You are at a vegetable stall. Ask the vendor for the price of onions, order onions and potatoes, and ask for the total bill.",
+        "kn": "ನೀವು ತರಕಾರಿ ಅಂಗಡಿಯಲ್ಲಿದ್ದೀರಿ. ವ್ಯಾಪಾರಿಗೆ ಈರುಳ್ಳಿ ಬೆಲೆ ಕೇಳಿ, ಈರುಳ್ಳಿ ಮತ್ತು ಆಲೂಗಡ್ಡೆ ಕೊಡುವಂತೆ ಹೇಳಿ, ನಂತರ ಒಟ್ಟು ಎಷ್ಟು ಎಂದು ಕೇಳಿ."
+      },
+      "objectiveStr": "You are at a vegetable stall. Ask the vendor for the price of onions, order onions and potatoes, and ask for the total bill.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You are at a vegetable stall. Ask the vendor for the price of onions, order onions and potatoes, and ask for the total bill.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 1,
+    "created_at": "2026-03-09T09:09:32.920354+00:00",
+    "text_url": null
+  },
+  {
+    "id": "07f341a3-c736-4c37-a9ca-246b7e7d1d9d",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Asking for Help: Finding Places",
+      "kn": "ಸಹಾಯ ಕೇಳುವುದು: ಸ್ಥಳಗಳನ್ನು ಹುಡುಕುವುದು"
+    },
+    "notes": {
+      "en": "Survival English: Learning to ask for directions to essential locations like bus stands and hospitals.",
+      "kn": "Survival English: Learning to ask for directions to essential locations like bus stands and hospitals."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602609772_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Manjunath: Excuse me, I need help. Where is the hospital? | ಕ್ಷಮಿಸಿ, ನನಗೆ ಸಹಾಯ ಬೇಕು. ಆಸ್ಪತ್ರೆ ಎಲ್ಲಿದೆ?\nStranger: The hospital is straight and then take a left. | ಆಸ್ಪತ್ರೆ ನೇರವಾಗಿದೆ ಮತ್ತು ನಂತರ ಎಡಕ್ಕೆ ತಿರುಗಿ.\nManjunath: Is it near the bus stand? | ಅದು ಬಸ್ ನಿಲ್ದಾಣದ ಹತ್ತಿರವಿದೆಯೇ?\nStranger: Yes, it is very near. | ಹೌದು, ಅದು ತುಂಬಾ ಹತ್ತಿರದಲ್ಲಿದೆ.\nManjunath: Thank you so much! | ತುಂಬಾ ಧನ್ಯವಾದಗಳು!",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we put the place first: 'ಆಸ್ಪತ್ರೆ (Hospital) ಎಲ್ಲಿದೆ (Where is)?'. In English, we flip it: 'Where is the hospital?'. Always start with 'Where is' when looking for a door to your destination!\n\n📚 KEY PHRASES:\n- Excuse me...: The most polite way to get someone's attention before asking a question.\n  Example: \"Excuse me, what is the time?\"\n- Where is...?: Used to ask the location of a place.\n  Example: \"Where is the bus stand?\"\n- I am looking for...: Used when you are searching for a specific address or building.\n  Example: \"I am looking for the Railway Station.\"\n\n🗣️ PRONUNCIATION:\n- Hospital (ಹಾಸ್ಪಿಟಲ್): Keep the 'H' sound clear. Do not say 'Aas-pi-tal'. It should be 'Hoss-pi-tal'.\n- Straight (ಸ್ಟ್ರೈಟ್): One smooth sound. Think of the Kannada word 'ಸ್ರೈಟ್'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Excuse me**, I am **looking for** the bus stand. **Where** is it? Is it **straight**? Thank you for your **help**.",
+    "scenario": {
+      "character": {
+        "en": "Stranger in City",
+        "kn": "ಪರಿಚಯವಿಲ್ಲದ ವ್ಯಕ್ತಿ"
+      },
+      "objective": {
+        "en": "Ask a stranger for directions to the hospital and check if it is near the bus stand.",
+        "kn": "ದಾರಿಹೋಕರ ಬಳಿ ಆಸ್ಪತ್ರೆ ಎಲ್ಲಿದೆ ಎಂದು ದಾರಿ ಕೇಳಿ ಮತ್ತು ಅದು ಬಸ್ ನಿಲ್ದಾಣದ ಹತ್ತಿರವಿದೆಯೇ ಎಂದು ತಿಳಿಯಿರಿ."
+      },
+      "objectiveStr": "Ask a stranger for directions to the hospital and check if it is near the bus stand.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Ask a stranger for directions to the hospital and check if it is near the bus stand.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 2,
+    "created_at": "2026-03-27T09:10:14.705106+00:00",
+    "text_url": null
+  },
+  {
+    "id": "57af267a-1458-4ba5-8c77-135bc1c4f8e4",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Time & Date: Appointments & Schedules",
+      "kn": "ಸಮಯ ಮತ್ತು ದಿನಾಂಕ: ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಮತ್ತು ವೇಳಾಪಟ್ಟಿ"
+    },
+    "notes": {
+      "en": "Survival English: Asking about bus timings, setting meeting times, and understanding days of the week.",
+      "kn": "Survival English: Asking about bus timings, setting meeting times, and understanding days of the week."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602652878_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Kumar: Excuse me, when is the next bus to Mysuru? | ಕ್ಷಮಿಸಿ, ಮೈಸೂರಿಗೆ ಮುಂದಿನ ಬಸ್ ಯಾವಾಗ?\nCounter Staff: The next bus is at ten-thirty AM. | ಮುಂದಿನ ಬಸ್ ಬೆಳಿಗ್ಗೆ ಹತ್ತು-ವರೆಗೆ ಇದೆ.\nKumar: What time will it reach Mysuru? | ಅದು ಎಷ್ಟು ಗಂಟೆಗೆ ಮೈಸೂರು ತಲುಪುತ್ತದೆ?\nCounter Staff: It will reach at one PM. | ಅದು ಮಧ್ಯಾಹ್ನ ಒಂದು ಗಂಟೆಗೆ ತಲುಪುತ್ತದೆ.\nKumar: Is there a bus on Sunday also? | ಭಾನುವಾರವೂ ಬಸ್ ಇದೆಯೇ?\nCounter Staff: Yes, buses are available every day. | ಹೌದು, ಬಸ್‌ಗಳು ಪ್ರತಿದಿನ ಲಭ್ಯವಿವೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಯಾವಾಗ' (Yavaga) for 'When'. In English, we often use 'When is...' for days/dates and 'What time...' for clock time. Remember: Use 'at' before the time (at 10 o'clock) just like you use 'ಗೆ' in Kannada (ಹತ್ತಕ್ಕೆ).\n\n📚 KEY PHRASES:\n- When is...?: Used to ask about the time of an event.\n  Example: \"When is the meeting?\"\n- What time...?: Used to ask for a specific clock time.\n  Example: \"What time is it now?\"\n- At [Time] AM/PM: Used to specify morning (AM) or afternoon/night (PM).\n  Example: \"I will come at 5 PM.\"\n\n🗣️ PRONUNCIATION:\n- Schedule (ಶೆಡ್ಯೂಲ್): Focus on the 'She' sound. Say 'She-dyool'.\n- Wednesday (ವೆನ್ಸ್‌ಡೇ): The 'd' in the middle is silent! Don't say 'Wed-nes-day'. Say 'Wenz-day'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**When** is the next bus? It is at **nine** AM. **What** time is the **appointment**? See you on **Monday**.",
+    "scenario": {
+      "character": {
+        "en": "Counter Clerk",
+        "kn": "ಕೌಂಟರ್ ಕ್ಲರ್ಕ್"
+      },
+      "objective": {
+        "en": "Ask the counter clerk for the timing of the next bus to Mysuru, its arrival time, and if buses run on Sunday.",
+        "kn": "ಕೌಂಟರ್ ಸಿಬ್ಬಂದಿಗೆ ಮೈಸೂರಿಗೆ ಮುಂದಿನ ಬಸ್ ಯಾವಾಗ, ಅದು ತಲುಪುವ ಸಮಯ ಮತ್ತು ಭಾನುವಾರ ಬಸ್ ಲಭ್ಯತೆಯ ಬಗ್ಗೆ ಕೇಳಿ."
+      },
+      "objectiveStr": "Ask the counter clerk for the timing of the next bus to Mysuru, its arrival time, and if buses run on Sunday.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Ask the counter clerk for the timing of the next bus to Mysuru, its arrival time, and if buses run on Sunday.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 3,
+    "created_at": "2026-03-27T09:11:08.404936+00:00",
+    "text_url": null
+  },
+  {
+    "id": "dd380eda-c8f7-4068-83a8-7b41f80eb6db",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "At the Bank: Forms & Cash",
+      "kn": "ಬ್ಯಾಂಕ್‌ನಲ್ಲಿ: ಫಾರ್ಮ್‌ಗಳು ಮತ್ತು ನಗದು ಚಲಾವಣೆ"
+    },
+    "notes": {
+      "en": "Survival English: Understanding bank terminology and asking for help with deposits, withdrawals, and form filling.",
+      "kn": "Survival English: Understanding bank terminology and asking for help with deposits, withdrawals, and form filling."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602681976_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Latha: Excuse me, I want to deposit cash. Which form should I fill? | ಕ್ಷಮಿಸಿ, ನಾನು ಹಣ ಜಮೆ ಮಾಡಬೇಕು. ಯಾವ ಫಾರ್ಮ್ ಭರ್ತಿ ಮಾಡಬೇಕು?\nStaff: Please use this pay-in slip. You need to write your account number here. | ದಯವಿಟ್ಟು ಈ ಪೇ-ಇನ್ ಸ್ಲಿಪ್ ಬಳಸಿ. ನಿಮ್ಮ ಖಾತೆ ಸಂಖ್ಯೆಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಬೇಕು.\nLatha: Can you help me? Where should I sign? | ನನಗೆ ಸಹಾಯ ಮಾಡುವಿರಾ? ನಾನು ಎಲ್ಲಿ ಸಹಿ ಮಾಡಬೇಕು?\nStaff: Sign at the bottom, right here. | ಕೆಳಭಾಗದಲ್ಲಿ, ಇಲ್ಲೇ ಸಹಿ ಮಾಡಿ.\nLatha: Thank you. Where is the cash counter? | ಧನ್ಯವಾದಗಳು. ನಗದು ಕೌಂಟರ್ ಎಲ್ಲಿದೆ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಸಹಿ' (Sahi). In English, we say 'Sign' (ಕ್ರಿಯೆ/Action) or 'Signature' (ನಾಮಪದ/Noun). Also, notice that instead of saying 'Money put', we use the professional word 'Deposit'. It makes you sound more confident!\n\n📚 KEY PHRASES:\n- Deposit cash: To put money into your bank account.\n  Example: \"I want to deposit five thousand rupees.\"\n- Withdraw money: To take money out of your bank account.\n  Example: \"Where can I withdraw money?\"\n- Account Number: The unique number for your bank account.\n  Example: \"Please write your account number clearly.\"\n\n🗣️ PRONUNCIATION:\n- Deposit (ಡಿಪಾಸಿಟ್): Say 'De-pos-it'. Don't say 'Day-po-sit'.\n- Cashier (ಕ್ಯಾಶಿಯರ್): The 'Sh' is soft like 'ಶ'. Say 'Cash-eer'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I want to **deposit** cash. Where is the **slip**? Please help me fill my **account number**. Where do I **sign**?",
+    "scenario": {
+      "character": {
+        "en": "Bank Staff",
+        "kn": "ಬ್ಯಾಂಕ್ ಸಿಬ್ಬಂದಿ"
+      },
+      "objective": {
+        "en": "Ask the bank staff which form to fill to deposit cash, where to sign, and locate the cash counter.",
+        "kn": "ಹಣ ಜಮೆ ಮಾಡಲು ಯಾವ ಚಲನ್ ಭರ್ತಿ ಮಾಡಬೇಕು, ಎಲ್ಲಿ ಸಹಿ ಮಾಡಬೇಕು ಮತ್ತು ಕ್ಯಾಶ್ ಕೌಂಟರ್ ಎಲ್ಲಿದೆ ಎಂದು ಸಿಬ್ಬಂದಿಯನ್ನು ಕೇಳಿ."
+      },
+      "objectiveStr": "Ask the bank staff which form to fill to deposit cash, where to sign, and locate the cash counter.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Ask the bank staff which form to fill to deposit cash, where to sign, and locate the cash counter.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 4,
+    "created_at": "2026-03-27T09:11:32.023344+00:00",
+    "text_url": null
+  },
+  {
+    "id": "563432b4-5fcd-408c-a086-0005be12fe7f",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Emergency: Seeking Help & Reporting Loss",
+      "kn": "ತುರ್ತು ಸಂದರ್ಭ: ವೈದ್ಯಕೀಯ ಸಹಾಯ ಮತ್ತು ವಸ್ತು ಕಳೆದುಹೋಗಿರುವ ಬಗ್ಗೆ ವರದಿ ಮಾಡುವುದು"
+    },
+    "notes": {
+      "en": "Survival English: Using urgent, short sentences to get medical help or report a missing item (like a bag or phone).",
+      "kn": "Survival English: Using urgent, short sentences to get medical help or report a missing item (like a bag or phone)."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602706992_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Suresh: Help! I am not feeling well. I need a doctor. | ಸಹಾಯ ಮಾಡಿ! ನನಗೆ ಆರಾಮವಿಲ್ಲ. ನನಗೆ ವೈದ್ಯರ ಅಗತ್ಯವಿದೆ.\nBystander: Sit down. I will call an ambulance. | ಕುಳಿತುಕೊಳ್ಳಿ. ನಾನು ಆಂಬ್ಯುಲೆನ್ಸ್ ಕರೆಯುತ್ತೇನೆ.\nDeepa: Excuse me, I lost my bag. It is a black bag. | ಕ್ಷಮಿಸಿ, ನನ್ನ ಬ್ಯಾಗ್ ಕಳೆದುಹೋಗಿದೆ. ಅದು ಕಪ್ಪು ಬಣ್ಣದ ಬ್ಯಾಗ್.\nGuard: Don't worry. Where did you leave it? | ಚಿಂತಿಸಬೇಡಿ. ನೀವು ಅದನ್ನು ಎಲ್ಲಿ ಬಿಟ್ಟಿದ್ದೀರಿ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ನನಗೆ ಆರಾಮವಿಲ್ಲ' (Nanage aaraamavilla). In English, we say 'I am NOT feeling well.' In an emergency, don't worry about long sentences. Just say the main words: 'NEED DOCTOR' or 'LOST BAG'—people will understand you!\n\n📚 KEY PHRASES:\n- I need help!: The most important phrase to use in any emergency.\n  Example: \"I need help! Call the police.\"\n- I lost my...: Used when you cannot find an item.\n  Example: \"I lost my phone.\"\n- Call a doctor.: Direct request for medical assistance.\n  Example: \"Please call a doctor quickly.\"\n\n🗣️ PRONUNCIATION:\n- Emergency (ಎಮರ್ಜೆನ್ಸಿ): Start with 'E' like in 'Egg'. Say 'E-mer-jen-see'.\n- Police (ಪೊಲೀಸ್): Keep the 'O' sound short. Say 'Pu-leece', not 'Po-layss'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Help** me! I am **not** feeling well. **Call** a doctor. I **lost** my black **bag**. Please **help** me find it.",
+    "scenario": {
+      "character": {
+        "en": "Security Guard",
+        "kn": "ಭದ್ರತಾ ಸಿಬ್ಬಂದಿ"
+      },
+      "objective": {
+        "en": "You lost your bag. Tell the security guard about the loss, describe it as a black bag, and ask for help.",
+        "kn": "ನಿಮ್ಮ ಬ್ಯಾಗ್ ಕಳೆದುಹೋಗಿದೆ. ಭದ್ರತಾ ಸಿಬ್ಬಂದಿಗೆ ಬ್ಯಾಗ್ ಕಳೆದಿರುವುದನ್ನು ತಿಳಿಸಿ, ಅದು ಕಪ್ಪು ಬ್ಯಾಗ್ ಎಂದು ವಿವರಿಸಿ ಮತ್ತು ಸಹಾಯ ಕೇಳಿ."
+      },
+      "objectiveStr": "You lost your bag. Tell the security guard about the loss, describe it as a black bag, and ask for help.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: You lost your bag. Tell the security guard about the loss, describe it as a black bag, and ask for help.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 5,
+    "created_at": "2026-03-27T09:11:52.818448+00:00",
+    "text_url": null
+  },
+  {
+    "id": "adb711a8-938a-48d9-89a5-c455e4471e56",
+    "module_id": "11111111-1111-4111-a111-111111111111",
+    "title": {
+      "en": "Food & Drink: Ordering at a Hotel",
+      "kn": "ಹೋಟೆಲ್‌ನಲ್ಲಿ ಊಟ ಮತ್ತು ತಿಂಡಿ ಆರ್ಡರ್ ಮಾಡುವುದು"
+    },
+    "notes": {
+      "en": "Survival English: Ordering food/beverages, specifying preferences (like less sugar), and asking for the bill.",
+      "kn": "Survival English: Ordering food/beverages, specifying preferences (like less sugar), and asking for the bill."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774602726856_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Waiter: Good morning! What do you want, sir? | ಶುಭೋದಯ! ತಮಗೆ ಏನು ಬೇಕು, ಸರ್?\nShivanna: Give me one Masala Dosa and one Coffee. | ನನಗೆ ಒಂದು ಮಸಾಲ ದೋಸೆ ಮತ್ತು ಒಂದು ಕಾಫಿ ಕೊಡಿ.\nShivanna: In coffee, put less sugar please. | ಕಾಫಿಯಲ್ಲಿ ಸಕ್ಕರೆ ಕಡಿಮೆ ಇರಲಿ.\nWaiter: Sure. Anything else? | ಖಂಡಿತ. ಇನ್ನೇನಾದರೂ ಬೇಕೆ?\nShivanna: No. Give me the bill. | ಇಲ್ಲ. ಬಿಲ್ ಕೊಡಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಸಕ್ಕರೆ ಕಡಿಮೆ ಇರಲಿ' (Sakkare kadime irali). In English, you don't need a long sentence. Just say 'Less sugar'. Also, notice we use 'Give me'—it is direct and common in local hotels, though adding 'please' at the end makes it much more polite!\n\n📚 KEY PHRASES:\n- I want...: A simple way to express what you wish to eat.\n  Example: \"I want an idli.\"\n- Less sugar / No sugar: Important for specifying how you like your drink.\n  Example: \"One tea, no sugar please.\"\n- The bill, please.: The standard way to ask for the check at the end.\n  Example: \"Excuse me, the bill please.\"\n\n🗣️ PRONUNCIATION:\n- Coffee (ಕಾಫಿ): Touch your top teeth to your bottom lip for the 'F' sound. It is not 'Koppee'.\n- Sugar (ಶುಗರ್): Use the soft 'Sh' sound like in 'ಶುಂಠಿ' (Shunthi). Say 'Shu-gar'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I **want** one tea. Please **put** less sugar. **Give** me one **plate** of meals. How **much** is the **bill**?",
+    "scenario": {
+      "character": {
+        "en": "Hotel Waiter",
+        "kn": "ಹೋಟೆಲ್ ವೇಟರ್"
+      },
+      "objective": {
+        "en": "Order a Masala Dosa and Coffee with less sugar at a hotel, and ask for the bill at the end.",
+        "kn": "ಹೋಟೆಲ್‌ನಲ್ಲಿ ಮಸಾಲ ದೋಸೆ ಮತ್ತು ಕಡಿಮೆ ಸಕ್ಕರೆಯ ಕಾಫಿ ಆರ್ಡರ್ ಮಾಡಿ, ನಂತರ ಬಿಲ್ ಕೇಳಿ."
+      },
+      "objectiveStr": "Order a Masala Dosa and Coffee with less sugar at a hotel, and ask for the bill at the end.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Order a Masala Dosa and Coffee with less sugar at a hotel, and ask for the bill at the end.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 6,
+    "created_at": "2026-03-27T09:12:15.491421+00:00",
+    "text_url": null
+  },
+  {
+    "id": "dafe5df5-f8c7-4a9d-9b1d-31a06242d913",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Socializing: Meeting Family & Weddings",
+      "kn": "ಸಾಮಾಜಿಕ ಒಡನಾಟ: ಸ್ನೇಹಿತರ ಕುಟುಂಬವನ್ನು ಭೇಟಿ ಮಾಡುವುದು ಅಥವಾ ಮದುವೆಗೆ ಹೋಗುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Moving from single phrases to full sentences while expressing emotions and social etiquette.",
+      "kn": "Social Interaction: Moving from single phrases to full sentences while expressing emotions and social etiquette."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695810176_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Naveen (Your Friend): Hey Vikas! Thanks for making it. Look, my uncle is standing right there by the stage. Let me introduce you to him. Come over! | ಹೇ ವಿಕಾಸ್! ಬಂದಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು. ನೋಡು, ನನ್ನ ಮಾವ ಸ್ಟೇಜ್ ಪಕ್ಕದಲ್ಲೇ ನಿಂತಿದ್ದಾರೆ. ನಿನಗೆ ಅವರನ್ನು ಪರಿಚಯಿಸುತ್ತೇನೆ. ಇಲ್ಲಿ ಬಾ!\nVikas: Sure, lead the way! I would love to meet your uncle. | ಖಂಡಿತ, ನಡೆ! ನಿಮ್ಮ ಮಾವನನ್ನು ಭೇಟಿ ಮಾಡಲು ನನಗೆ ಇಷ್ಟ.\nNaveen's Uncle: Hello young man! Naveen tells me you two are working on some very exciting projects together. How are you enjoying the grand celebration? | ಹಲೋ ಯುವಕನೇ! ನೀವು ಇಬ್ಬರೂ ಒಟ್ಟಿಗೆ ಕೆಲವು ರೋಮಾಂಚಕಾರಿ ಪ್ರಾಜೆಕ್ಟ್ಗಳಲ್ಲಿ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೀರಿ ಎಂದು ನವೀನ್ ಹೇಳುತ್ತಿದ್ದ. ಮದುವೆ ಸಂಭ್ರಮ ಹೇಗೆ ಅನಿಸುತ್ತಿದೆ?\nVikas: Namaste Uncle. It is wonderful! The atmosphere is full of life and the decorations are stunning. | ನಮಸ್ತೆ ಅಂಕಲ್. ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ! ಇಲ್ಲಿನ ವಾತಾವರಣವು ಉತ್ಸಾಹದಿಂದ ಕೂಡಿದೆ ಮತ್ತು ಅಲಂಕಾರಗಳು ಅದ್ಭುತವಾಗಿವೆ.\nNaveen's Uncle: Glad to hear that! Our family worked really hard on this. Have you had a chance to congratulate the bride and groom on the stage yet? | ಕೇಳಿ ಸಂತೋಷವಾಯಿತು! ನಮ್ಮ ಕುಟುಂಬ ಇದಕ್ಕಾಗಿ ನಿಜವಾಗಿಯೂ ಶ್ರಮಿಸಿದೆ. ವೇದಿಕೆಯ ಮೇಲಿರುವ ವಧು-ವರರಿಗೆ ಅಭಿನಂದನೆ ಸಲ್ಲಿಸಲು ನಿಮಗೆ ಅವಕಾಶ ಸಿಕ್ಕಿತೇ?\nVikas: Not yet, the line is quite long. I will wait a bit and go up when it clears out. | ಇನ್ನೂ ಇಲ್ಲ, ಸಾಲು ತುಂಬಾ ಉದ್ದವಾಗಿದೆ. ನಾನು ಸ್ವಲ್ಪ ಕಾಯ್ದು, ಜನ ಕಡಿಮೆಯಾದಾಗ ಮೇಲೆ ಹೋಗುತ್ತೇನೆ.\nNaveen: Hey Vikas, look! The line just got shorter. Let's go up quickly before it gets crowded again. Do you have the gift box with you? | ಹೇ ವಿಕಾಸ್, ನೋಡು! ಕ್ಯೂ ಈಗ ತಾನೇ ಚಿಕ್ಕದಾಯಿತು. ಮತ್ತೆ ಜನ ಸೇರುವ ಮುನ್ನ ಬೇಗ ಮೇಲೆ ಹೋಗೋಣ. ಗಿಫ್ಟ್ ಬಾಕ್ಸ್ ನಿನ್ನ ಬಳಿ ಇದೆಯಾ?\nVikas: Yes, I have it right here in my hand. Let's head up. | ಹೌದು, ಅದು ಇಲ್ಲೇ ನನ್ನ ಕೈಯಲ್ಲಿದೆ. ನಡಿ ಮೇಲೆ ಹೋಗೋಣ.\nThe Bride & Groom: Vikas! Thank you so much for coming all the way to bless us. We really appreciate your presence! | ವಿಕಾಸ್! ನಮಗೆ ಆಶೀರ್ವದಿಸಲು ಇಷ್ಟು ದೂರ ಬಂದಿದ್ದಕ್ಕಾಗಿ ತುಂಬಾ ಧನ್ಯವಾದಗಳು. ನೀವು ಬಂದಿದ್ದು ನಮಗೆ ತುಂಬಾ ಸಂತೋಷ ತಂದಿದೆ!\nVikas: The pleasure is all mine! Wishing you both a lifetime of love, happiness, and togetherness. | ನನ್ನದೂ ಅಷ್ಟೇ ಸಂತೋಷ! ನಿಮ್ಮಿಬ್ಬರಿಗೂ ಆಜೀವ ಪ್ರೀತಿ, ಸಂತೋಷ ಮತ್ತು ಒಟ್ಟಿಗೆ ಬಾಳುವ ಶುಭ ಹಾರೈಕೆಗಳು.\nNaveen: Alright, now that we successfully congratulated them, my stomach is growling! Shall we head over to the dinner counters? | ಸರಿ, ಈಗ ಅವರಿಗೆ ಯಶಸ್ವಿಯಾಗಿ ಶುಭ ಹಾರೈಸಿಯಾಯಿತು, ನನ್ನ ಹೊಟ್ಟೆ ಚುರುಗುಟ್ಟುತ್ತಿದೆ! ಊಟದ ಕೌಂಟರ್ಗಳ ಕಡೆಗೆ ಹೋಗೋಣವೇ?\nVikas: Lead the way! I have been smelling that delicious traditional catering since I arrived. | ನಡೆ ಮುಂದೆ! ನಾನು ಬಂದಾಗಿನಿಂದಲೂ ಆ ರುಚಿಕರವಾದ ಸಾಂಪ್ರದಾಯಿಕ ಅಡುಗೆಯ ವಾಸನೆ ಬರುತ್ತಿದೆ.",
+    "study_text_content": "🌟 CULTURAL & IDIOMATIC CONTEXT:\nIn Indian social contexts, especially weddings, small talk moves very fast from introductions to hospitality. While a Kannada speaker might say 'ಬಂದಿದ್ದಕ್ಕೆ ತುಂಬಾ ಸಂತೋಷ' (Bandiddakke tumba santosha), the English equivalent uses warm hospitality phrases like 'Thank you for having me' or 'It's an honor to be here'. When talking about the grand arrangements or crowd at a wedding, native English speakers often use the idiom 'the more, the merrier' (ಹೆಚ್ಚು ಜನರಿದ್ದಷ್ಟೂ ಹೆಚ್ಚು ಮಜಾ). Another highly common phrase is 'tie the knot' which simply means to get married. Instead of saying 'My friend is getting married today', using 'My friend is tying the knot today' makes your English sound incredibly natural and fluid.\n\n🌟 KANNADA BRIDGE:\nIn Kannada culture, we ask 'ಊಟ ಹೇಗಿತ್ತು?' to show care. In English, when complimenting the food layout or catering arrangement, we say 'The spread looks amazing!' or 'You have quite a spread here!'. 'Spread' refers to a large, beautiful display of different food items. Avoid translating word-for-word like 'Food items are sitting nicely'.\n\n📚 KEY VOCABULARY:\n- Hospitality: The friendly and generous reception and entertainment of guests.\n  Kannada Equivalent: ಆತಿಥ್ಯ (Aatithya)\n  Example: \"Thank you for your wonderful hospitality tonight, Aunty.\"\n- Festivities: The events and celebrations surrounding a special occasion.\n  Kannada Equivalent: ಸಂಭ್ರಮಾಚರಣೆಗಳು (Sambhramaacharanegalu)\n  Example: \"I am so glad to be a part of these wedding festivities.\"\n- Catering: The provision of food and drink at a social event or gathering.\n  Kannada Equivalent: ಅಡುಗೆ ಮತ್ತು ಊಟದ ವ್ಯವಸ್ಥೆ (Aduge mattu ootada vyavasthe)\n  Example: \"The catering at this venue is absolutely exceptional.\"",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "{\"english_text_to_read\":\"The wedding hall is packed with happy guests, and the energy is incredible. Naveen’s family is finally seeing months of planning come to life. As the music plays loudly, old friends gather around the stage to take group photos with the lovely couple. Everyone is laughing, exchanging warm blessings, and waiting eagerly to head toward the main dining area for the grand wedding feast.\",\"transcription_to_read_kannada_phonetic\":\"ದ ವೆಡ್ಡಿಂಗ್ ಹಾಲ್ ಇಸ್ ಪ್ಯಾಕ್ಡ್ ವಿತ್ ಹ್ಯಾಪಿ ಗೆಸ್ಟ್ಸ್, ಆಂಡ್ ದ ಎನರ್ಜಿ ಇಸ್ ಇನ್ಕ್ರೆಡಿಬಲ್. ನವೀನ್ಸ್ ಫ್ಯಾಮಿಲಿ ಇಸ್ ಫೈನಲಿ ಸೀಯಿಂಗ್ ಮಂತ್ಸ್ ಆಫ್ ಪ್ಲಾನಿಂಗ್ ಕಮ್ ಟು ಲೈಫ್. ಆಸ್ ದ ಮ್ಯೂಸಿಕ್ ಪ್ಲೇಸ್ ಲೌಡ್ಲಿ, ಓಲ್ಡ್ ಫ್ರೆಂಡ್ಸ್ ಗ್ಯಾದರ್ ಅರೌಂಡ್ ದ ಸ್ಟೇಜ್ ಟು ಟೇಕ್ ಗ್ರೂಪ್ ಫೋಟೋಸ್ ವಿತ್ ದ ಲವ್ಲಿ ಕಪಲ್. ಎವ್ರಿವನ್ ಇಸ್ ಲಾಫಿಂಗ್, ಎಕ್ಸ್ಚೇಂಜಿಂಗ್ ವಾರ್ಮ್ ಬ್ಲೆಸ್ಸಿಂಗ್ಸ್, ಆಂಡ್ ವೇಟಿಂಗ್ ಈಗರ್ಲಿ ಟು ಹೆಡ್ ಟುವರ್ಡ್ ದ ಮೇನ್ ಡೈನಿಂಗ್ ಏರಿಯಾ ಫಾರ್ ದ ಗ್ರಾಂಡ್ ವೆಡ್ಡಿಂಗ್ ಫೀಸ್ಟ್.\",\"instruction\":\"Practice reading this 76-word paragraph aloud multiple times. Focus on your breathing, sentence pacing, and rhythmic cadence. Use the phonetic Kannada script below if you need a quick boost of confidence with the word flow!\"}",
+    "scenario": {
+      "character": {
+        "en": "Naveen & Family",
+        "kn": "ನವೀನ್ ಮತ್ತು ಕುಟುಂಬ"
+      },
+      "objective": {
+        "en": "You are navigating the dining area and stage at the wedding venue. Interact with different family members through a 6-turn adaptive conversational tree to master polite requests, greeting elders, and managing choices under social expectations.",
+        "kn": "ಮದುವೆ ಮಂಟಪದಲ್ಲಿ ನವೀನ್ ಮತ್ತು ಕುಟುಂಬದವರ ಜೊತೆ ಮಾತನಾಡಿ. ೬-ಹಂತದ ಸಾಂದರ್ಭಿಕ ಸಂಭಾಷಣೆಯ ಮೂಲಕ ಹಿರಿಯರನ್ನು ಗೌರವಿಸುವುದು ಮತ್ತು ಸಾಮಾಜಿಕ ಸೌಜನ್ಯಗಳನ್ನು ಕಲಿಯಿರಿ."
+      },
+      "objectiveStr": "You are navigating the dining area and stage at the wedding venue. Interact with different family members through a 6-turn adaptive conversational tree to master polite requests, greeting elders, and managing choices under social expectations.",
+      "initialMessage": "Hey Vikas! Thanks for making it. Look, my uncle is standing right there by the stage. Let me introduce you to him. Come over!",
+      "systemInstruction": "You are Naveen, his Uncle, and the Bride/Groom. Vikas is attending the wedding.",
+      "choice_based_roleplay": [
+        {
+          "turn": 1,
+          "ai_prompt": {
+            "english": "Hey Vikas! Thanks for making it. Look, my uncle is standing right there by the stage. Let me introduce you to him. Come over!",
+            "kannada": "ಹೇ ವಿಕಾಸ್! ಬಂದಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು. ನೋಡು, ನನ್ನ ಮಾವ ಸ್ಟೇಜ್ ಪಕ್ಕದಲ್ಲೇ ನಿಂತಿದ್ದಾರೆ. ನಿನಗೆ ಅವರನ್ನು ಪರಿಚಯಿಸುತ್ತೇನೆ. ಇಲ್ಲಿ ಬಾ!",
+            "transliteration": "Hey Vikas! Bandiddakkaagi dhanyavaadagalu. Nodu, nanna maava stage pakkadalle nintiddare. Nimage avarannu parichayisuttene. Illi baa!"
+          },
+          "options": [
+            {
+              "option_id": "1A",
+              "english": "Sure, lead the way! I would love to meet your uncle.",
+              "kannada": "ಖಂಡಿತ, ನಡೆ! ನಿಮ್ಮ ಮಾವನನ್ನು ಭೇಟಿ ಮಾಡಲು ನನಗೆ ಇಷ್ಟ.",
+              "feedback": "Perfect! 'Lead the way' is a highly natural idiomatic expression showing readiness."
+            },
+            {
+              "option_id": "1B",
+              "english": "Okay, I will come behind you.",
+              "kannada": "ಸರಿ, ನಾನು ನಿನ್ನ ಹಿಂದೆ ಬರುತ್ತೇನೆ.",
+              "feedback": "Grammatically fine, but a bit plain. Try 'Lead the way' or 'After you' to sound more natural."
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "ai_prompt": {
+            "english": "Hello young man! Naveen tells me you two are working on some very exciting projects together. How are you enjoying the grand celebration?",
+            "kannada": "ಹಲೋ ಯುವಕನೇ! ನೀವು ಇಬ್ಬರೂ ಒಟ್ಟಿಗೆ ಕೆಲವು ರೋಮಾಂಚಕಾರಿ ಪ್ರಾಜೆಕ್ಟ್ಗಳಲ್ಲಿ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೀರಿ ಎಂದು ನವೀನ್ ಹೇಳುತ್ತಿದ್ದ. ಮದುವೆ ಸಂಭ್ರಮ ಹೇಗೆ ಅನಿಸುತ್ತಿದೆ?",
+            "transliteration": "Hello yuvakane! Neevu ibbaroo ottige kelavu romanchakari project-galalli kelasa maaduttiddiri endu Naveen heluttidda. Maduve sambhrama hege anisuttide?"
+          },
+          "options": [
+            {
+              "option_id": "2A",
+              "english": "Namaste Uncle. It is wonderful! The atmosphere is full of life and the decorations are stunning.",
+              "kannada": "ನಮಸ್ತೆ ಅಂಕಲ್. ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ! ಇಲ್ಲಿನ ವಾತಾವರಣವು ಉತ್ಸಾಹದಿಂದ ಕೂಡಿದೆ ಮತ್ತು ಅಲಂಕಾರಗಳು ಅದ್ಭುತವಾಗಿವೆ.",
+              "feedback": "Excellent phrase choices! 'Full of life' perfectly translates the joyful wedding vibe."
+            },
+            {
+              "option_id": "2B",
+              "english": "Namaste. Celebration is very big and good.",
+              "kannada": "ನಮಸ್ತೆ. ಸಂಭ್ರಮವು ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ ಮತ್ತು ಒಳ್ಳೆಯದಾಗಿದೆ.",
+              "feedback": "A bit repetitive. Use descriptive adjectives like 'wonderful', 'grand', or 'stunning' instead of just 'big and good'."
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "ai_prompt": {
+            "english": "Glad to hear that! Our family worked really hard on this. Have you had a chance to congratulate the bride and groom on the stage yet?",
+            "kannada": "ಕೇಳಿ ಸಂತೋಷವಾಯಿತು! ನಮ್ಮ ಕುಟುಂಬ ಇದಕ್ಕಾಗಿ ನಿಜವಾಗಿಯೂ ಶ್ರಮಿಸಿದೆ. ವೇದಿಕೆಯ ಮೇಲಿರುವ ವಧು-ವರರಿಗೆ ಅಭಿನಂದನೆ ಸಲ್ಲಿಸಲು ನಿಮಗೆ ಅವಕಾಶ ಸಿಕ್ಕಿತೇ?",
+            "transliteration": "Keli santoshavayitu! Namma kutumba idakkaagi nijavagloo shramiside. Vedikeya meliruva vadhu-vararige abhinandane sallisalu nimage avakasha sikkite?"
+          },
+          "options": [
+            {
+              "option_id": "3A",
+              "english": "Not yet, the line is quite long. I will wait a bit and go up when it clears out.",
+              "kannada": "ಇನ್ನೂ ಇಲ್ಲ, ಸಾಲು ತುಂಬಾ ಉದ್ದವಾಗಿದೆ. ನಾನು ಸ್ವಲ್ಪ ಕಾಯ್ದು, ಜನ ಕಡಿಮೆಯಾದಾಗ ಮೇಲೆ ಹೋಗುತ್ತೇನೆ.",
+              "feedback": "Wonderful. 'When it clears out' shows excellent command over conversational English phrasal verbs."
+            },
+            {
+              "option_id": "3B",
+              "english": "No, because too many people are standing on the stage.",
+              "kannada": "ಇಲ್ಲ, ಯಾಕೆಂದರೆ ಸ್ಟೇಜ್ ಮೇಲೆ ತುಂಬಾ ಜನ ನಿಂತಿದ್ದಾರೆ.",
+              "feedback": "Using 'because' here sounds slightly complaining. Phrasing it as 'the line is long' is more polite."
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "ai_prompt": {
+            "english": "Hey Vikas, look! The line just got shorter. Let's go up quickly before it gets crowded again. Do you have the gift box with you?",
+            "kannada": "ಹೇ ವಿಕಾಸ್, ನೋಡು! ಕ್ಯೂ ಈಗ ತಾನೇ ಚಿಕ್ಕದಾಯಿತು. ಮತ್ತೆ ಜನ ಸೇರುವ ಮುನ್ನ ಬೇಗ ಮೇಲೆ ಹೋಗೋಣ. ಗಿಫ್ಟ್ ಬಾಕ್ಸ್ ನಿನ್ನ ಬಳಿ ಇದೆಯಾ?",
+            "transliteration": "Hey Vikas, nodu! Queue eega taane chikkadaayitu. Matte jana seruva munna bega mele hogona. Gift box ninna bali ideya?"
+          },
+          "options": [
+            {
+              "option_id": "4A",
+              "english": "Yes, I have it right here in my hand. Let's head up.",
+              "kannada": "ಹೌದು, ಅದು ಇಲ್ಲೇ ನನ್ನ ಕೈಯಲ್ಲಿದೆ. ನಡಿ ಮೇಲೆ ಹೋಗೋಣ.",
+              "feedback": "Spot on. Direct, clear, and perfectly pairs with the quick-paced situation."
+            },
+            {
+              "option_id": "4B",
+              "english": "Yes, gift is with me only.",
+              "kannada": "ಹೌದು, ಗಿಫ್ಟ್ ನನ್ನ ಬಳಿಯೇ ಇದೆ.",
+              "feedback": "Avoid using 'with me only' as a literal translation of 'ನನ್ನ ಹತ್ರನೇ ಇದೆ'. Use 'right here in my hand' or 'I have it right here'."
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "ai_prompt": {
+            "english": "Vikas! Thank you so much for coming all the way to bless us. We really appreciate your presence!",
+            "kannada": "ವಿಕಾಸ್! ನಮಗೆ ಆಶೀರ್ವದಿಸಲು ಇಷ್ಟು ದೂರ ಬಂದಿದ್ದಕ್ಕಾಗಿ ತುಂಬಾ ಧನ್ಯವಾದಗಳು. ನೀವು ಬಂದಿದ್ದು ನಮಗೆ ತುಂಬಾ ಸಂತೋಷ ತಂದಿದೆ!",
+            "transliteration": "Vikas! Namage aasheervadisaalu ishtu doora bandiddakkaagi tumba dhanyavaadagalu. Neevu bandiddu namage tumba santoshavagide!"
+          },
+          "options": [
+            {
+              "option_id": "5A",
+              "english": "The pleasure is all mine! Wishing you both a lifetime of love, happiness, and togetherness.",
+              "kannada": "ನನ್ನದೂ ಅಷ್ಟೇ ಸಂತೋಷ! ನಿಮ್ಮಿಬ್ಬರಿಗೂ ಆಜೀವ ಪ್ರೀತಿ, ಸಂತೋಷ ಮತ್ತು ಒಟ್ಟಿಗೆ ಬಾಳುವ ಶುಭ ಹಾರೈಕೆಗಳು.",
+              "feedback": "Beautifully done. 'The pleasure is all mine' is a stellar native response to someone thanking you."
+            },
+            {
+              "option_id": "5B",
+              "english": "Thank you. Happy married life to both of you.",
+              "kannada": "ಧನ್ಯವಾದಗಳು. ನಿಮ್ಮಿಬ್ಬರಿಗೂ ಸುಖಿ ದಾಂಪತ್ಯ ಜೀವನದ ಶುಭಾಶಯಗಳು.",
+              "feedback": "Good, but a little standard. Adding a warm opening phrase like 'Congratulations!' or 'The pleasure is mine!' elevates it."
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "ai_prompt": {
+            "english": "Alright, now that we successfully congratulated them, my stomach is growling! Shall we head over to the dinner counters?",
+            "kannada": "ಸರಿ, ಈಗ ಅವರಿಗೆ ಯಶಸ್ವಿಯಾಗಿ ಶುಭ ಹಾರೈಸಿಯಾಯಿತು, ನನ್ನ ಹೊಟ್ಟೆ ಚುರುಗುಟ್ಟುತ್ತಿದೆ! ಊಟದ ಕೌಂಟರ್ಗಳ ಕಡೆಗೆ ಹೋಗೋಣವೇ?",
+            "transliteration": "Sari, eega avarige yashasviyaagi shubha haraisiyayitu, nanna hotte churuguttuttide! Ootada counter-gala kadege hogonave?"
+          },
+          "options": [
+            {
+              "option_id": "6A",
+              "english": "Lead the way! I have been smelling that delicious traditional catering since I arrived.",
+              "kannada": "ನಡೆ ಮುಂದೆ! ನಾನು ಬಂದಾಗಿನಿಂದಲೂ ಆ ರುಚಿಕರವಾದ ಸಾಂಪ್ರದಾಯಿಕ ಅಡುಗೆಯ ವಾಸನೆ ಬರುತ್ತಿದೆ.",
+              "feedback": "Fantastic! This wraps up the conversation loop smoothly while using terms practiced in the study section."
+            },
+            {
+              "option_id": "6B",
+              "english": "Yes, I am also very hungry. Let's eat food.",
+              "kannada": "ಹೌದು, ನನಗೂ ತುಂಬಾ ಹಸಿಯುತ್ತಿದೆ. ನಡೆ ಊಟ ಮಾಡೋಣ.",
+              "feedback": "Simple and correct, though adding a descriptive mention of the food or catering makes the sentence flow much better socially."
+            }
+          ]
+        }
+      ]
+    },
+    "order_index": 0,
+    "created_at": "2026-03-28T11:03:39.096198+00:00",
+    "text_url": null,
+    "english_text_to_read": "The wedding hall is packed with happy guests, and the energy is incredible. Naveen’s family is finally seeing months of planning come to life. As the music plays loudly, old friends gather around the stage to take group photos with the lovely couple. Everyone is laughing, exchanging warm blessings, and waiting eagerly to head toward the main dining area for the grand wedding feast.",
+    "transcription_to_read_kannada_phonetic": "ದ ವೆಡ್ಡಿಂಗ್ ಹಾಲ್ ಇಸ್ ಪ್ಯಾಕ್ಡ್ ವಿತ್ ಹ್ಯಾಪಿ ಗೆಸ್ಟ್ಸ್, ಆಂಡ್ ದ ಎನರ್ಜಿ ಇಸ್ ಇನ್ಕ್ರೆಡಿಬಲ್. ನವೀನ್ಸ್ ಫ್ಯಾಮಿಲಿ ಇಸ್ ಫೈನಲಿ ಸೀಯಿಂಗ್ ಮಂತ್ಸ್ ಆಫ್ ಪ್ಲಾನಿಂಗ್ ಕಮ್ ಟು ಲೈಫ್. ಆಸ್ ದ ಮ್ಯೂಸಿಕ್ ಪ್ಲೇಸ್ ಲೌಡ್ಲಿ, ಓಲ್ಡ್ ಫ್ರೆಂಡ್ಸ್ ಗ್ಯಾದರ್ ಅರೌಂಡ್ ದ ಸ್ಟೇಜ್ ಟು ಟೇಕ್ ಗ್ರೂಪ್ ಫೋಟೋಸ್ ವಿತ್ ದ ಲವ್ಲಿ ಕಪಲ್. ಎವ್ರಿವನ್ ಇಸ್ ಲಾಫಿಂಗ್, ಎಕ್ಸ್ಚೇಂಜಿಂಗ್ ವಾರ್ಮ್ ಬ್ಲೆಸ್ಸಿಂಗ್ಸ್, ಆಂಡ್ ವೇಟಿಂಗ್ ಈಗರ್ಲಿ ಟು ಹೆಡ್ ಟುವರ್ಡ್ ದ ಮೇನ್ ಡೈನಿಂಗ್ ಏರಿಯಾ ಫಾರ್ ದ ಗ್ರಾಂಡ್ ವೆಡ್ಡಿಂಗ್ ಫೀಸ್ಟ್.",
+    "transcription_to_read_transliteration": ""
+  },
+  {
+    "id": "8d8d1bf1-7216-459a-a787-cb3a46719e80",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "At the Workplace: Explaining Tasks",
+      "kn": "ಕೆಲಸದ ಸ್ಥಳದಲ್ಲಿ: ದೈನಂದಿನ ಕೆಲಸಗಳ ಬಗ್ಗೆ ವಿವರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Workplace Communication: Moving from simple words to structured sentences to describe work progress and daily routines.",
+      "kn": "Workplace Communication: Moving from simple words to structured sentences to describe work progress and daily routines."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695833740_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Mr. Rao: Good morning Meera. What are you working on right now? | ಶುಭೋದಯ ಮೀರಾ. ನೀನು ಈಗ ಯಾವುದರ ಮೇಲೆ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೀಯಾ?\nMeera: Good morning sir. I am checking the new stock files. I finished the reports yesterday. | ಶುಭೋದಯ ಸರ್. ನಾನು ಹೊಸ ಸ್ಟಾಕ್ ಫೈಲ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ. ನಾನು ನಿನ್ನೆ ವರದಿಗಳನ್ನು ಮುಗಿಸಿದ್ದೇನೆ.\nMr. Rao: Great. When will you finish the stock check? | ಉತ್ತಮ. ಸ್ಟಾಕ್ ಪರಿಶೀಲನೆಯನ್ನು ಯಾವಾಗ ಮುಗಿಸುತ್ತೀಯಾ?\nMeera: I will finish it by 2 PM. After that, I will send you an email. | ನಾನು ಅದನ್ನು ಮಧ್ಯಾಹ್ನ 2 ಗಂಟೆಯೊಳಗೆ ಮುಗಿಸುತ್ತೇನೆ. ಅದರ ನಂತರ, ನಾನು ನಿಮಗೆ ಇಮೇಲ್ ಕಳುಹಿಸುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೇನೆ' (Doing work). In English, we use the **'-ING'** form for current tasks: 'I am work**ing**'. When talking about yesterday, we add **'-ED'**: 'I finish**ed**'. This small change helps your boss understand exactly *when* the work happened!\n\n📚 KEY PHRASES:\n- I am working on...: Used to describe a task that is currently in progress.\n  Example: \"I am working on the customer list.\"\n- I finished...: Used to talk about a task that is already completed (Past Tense).\n  Example: \"I finished the billing.\"\n- By [Time]...: Used to set a deadline or target time.\n  Example: \"I will call you by 5 PM.\"\n\n🗣️ PRONUNCIATION:\n- Finished (ಫಿನಿಶ್ಡ್): The 'ed' at the end sounds like a soft 't'. Say 'Fi-nish-t'.\n- Report (ರಿಪೋರ್ಟ್): Keep the 'O' long. Say 'Re-poh-rt'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Good morning. I am **working** on the daily **tasks**. I **finished** the stock check **yesterday**. I will **send** the email **by** this evening. Thank you, **sir**.",
+    "scenario": {
+      "character": {
+        "en": "Supervisor Mr. Rao",
+        "kn": "ಮೇಲಧಿಕಾರಿ ರಾವ್"
+      },
+      "objective": {
+        "en": "Tell your supervisor that you are checking the stock files, state that you will finish by 2 PM, and mention you will send an email.",
+        "kn": "ನಿಮ್ಮ ಮ್ಯಾನೇಜರ್‌ಗೆ ನೀವು ಸ್ಟಾಕ್ ಫೈಲ್ ಪರಿಶೀಲಿಸುತ್ತಿರುವುದನ್ನು ತಿಳಿಸಿ, 2 ಗಂಟೆಯೊಳಗೆ ಮುಗಿಸಿ ಇಮೇಲ್ ಕಳುಹಿಸುವುದಾಗಿ ಹೇಳಿ."
+      },
+      "objectiveStr": "Tell your supervisor that you are checking the stock files, state that you will finish by 2 PM, and mention you will send an email.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Tell your supervisor that you are checking the stock files, state that you will finish by 2 PM, and mention you will send an email.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 1,
+    "created_at": "2026-03-28T11:03:57.683994+00:00",
+    "text_url": null
+  },
+  {
+    "id": "42bb4f17-53b8-49f8-ba44-bda7287e96b4",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Shopping Mall: Sizes, Trials & Billing",
+      "kn": "ಶಾಪಿಂಗ್ ಮಾಲ್: ಅಳತೆಗಳು, ಟ್ರಯಲ್ ಮತ್ತು ಬಿಲ್ಲಿಂಗ್ ಕೌಂಟರ್"
+    },
+    "notes": {
+      "en": "Social Interaction: Navigating a retail environment, asking for specific sizes, using trial rooms, and handling the billing process.",
+      "kn": "Social Interaction: Navigating a retail environment, asking for specific sizes, using trial rooms, and handling the billing process."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Shailaja: Excuse me, do you have this shirt in a larger size? This looks small. | ಕ್ಷಮಿಸಿ, ಈ ಶರ್ಟ್‌ನಲ್ಲಿ ದೊಡ್ಡ ಸೈಜ್ ಇದೆಯೇ? ಇದು ಚಿಕ್ಕದಾಗಿ ಕಾಣುತ್ತಿದೆ.\nAssistant: Yes, Madam. I will get you a 'Large'. Would you like to try it on? | ಹೌದು ಮೇಡಂ. ನಾನು ನಿಮಗೆ 'ಲಾರ್ಜ್' ಸೈಜ್ ತರುತ್ತೇನೆ. ನೀವು ಇದನ್ನು ಟ್ರಯಲ್ ನೋಡಲು ಬಯಸುವಿರಾ?\nShailaja: Yes, where is the trial room? ... Also, is there any discount on this? | ಹೌದು, ಟ್ರಯಲ್ ರೂಮ್ ಎಲ್ಲಿದೆ? ... ಹಾಗೆಯೇ, ಇದರ ಮೇಲೆ ಏನಾದರೂ ರಿಯಾಯಿತಿ ಇದೆಯೇ?\nAssistant: The trial room is on the left. There is a ten percent discount today. | ಟ್ರಯಲ್ ರೂಮ್ ಎಡಭಾಗದಲ್ಲಿದೆ. ಇಂದು ಶೇಕಡಾ ಹತ್ತರಷ್ಟು ರಿಯಾಯಿತಿ ಇದೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ದೊಡ್ಡದು' (Doddadu) or 'ಸಣ್ಣದು' (Sannadu). In English shopping, we use 'Larger' or 'Smaller'. When you want to check the fit, don't just say 'Trial room'—say 'Can I **TRY IT ON**?'. It makes you sound like a natural speaker!\n\n📚 KEY PHRASES:\n- Do you have this in...?: Used to ask for a different size or color of an item.\n  Example: \"Do you have this in blue?\"\n- Try it on: The phrase used for testing if clothes fit you.\n  Example: \"Can I try this on?\"\n- Is there a discount?: A polite way to ask for a price reduction or offer.\n  Example: \"Is there a discount on these shoes?\"\n\n🗣️ PRONUNCIATION:\n- Discount (ಡಿಸ್ಕೌಂಟ್): Put the stress on 'Dis'. Say 'DIS-count'.\n- Size (ಸೈಜ್): Make sure the 'z' sound buzzes like a bee. Not 'Sais', but 'Saiz'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Excuse me, I **need** a **larger** size. Where is the **trial** room? Is there a **discount**? I will **pay** by **card**.",
+    "scenario": {
+      "character": {
+        "en": "Store Assistant",
+        "kn": "ಅಂಗಡಿ ಸಹಾಯಕ"
+      },
+      "objective": {
+        "en": "Ask the store assistant for a Large size shirt, find the trial room, and ask about today's discount.",
+        "kn": "ಅಂಗಡಿ ಸಹಾಯಕರ ಬಳಿ ಲಾರ್ಜ್ ಸೈಜ್ ಶರ್ಟ್ ಕೇಳಿ, ಟ್ರಯಲ್ ರೂಮ್ ಎಲ್ಲಿದೆ ಎಂದು ತಿಳಿದುಕೊಂಡು ಇಂದಿನ ರಿಯಾಯಿತಿ ಬಗ್ಗೆ ಕೇಳಿ."
+      },
+      "objectiveStr": "Ask the store assistant for a Large size shirt, find the trial room, and ask about today's discount.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Ask the store assistant for a Large size shirt, find the trial room, and ask about today's discount.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 2,
+    "created_at": "2026-03-28T11:04:15.458667+00:00",
+    "text_url": null
+  },
+  {
+    "id": "ef170d15-8df9-4003-9d8c-ff65330ebde2",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Mobile/Tech Issues: At the Service Center",
+      "kn": "ಮೊಬೈಲ್/ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆಗಳು: ಸರ್ವಿಸ್ ಸೆಂಟರ್‌ನಲ್ಲಿ"
+    },
+    "notes": {
+      "en": "Social Interaction: Describing specific technical problems, asking about repair time, and understanding warranty/cost terms.",
+      "kn": "Social Interaction: Describing specific technical problems, asking about repair time, and understanding warranty/cost terms."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Executive: Hello! How can I help you today? | ನಮಸ್ಕಾರ! ನಾನು ನಿಮಗೆ ಇಂದು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?\nKiran: My phone has two problems. The screen is flickering and the battery is draining very fast. | ನನ್ನ ಫೋನಿನಲ್ಲಿ ಎರಡು ಸಮಸ್ಯೆಗಳಿವೆ. ಸ್ಕ್ರೀನ್ ಮಿನುಗುತ್ತಿದೆ ಮತ್ತು ಬ್ಯಾಟರಿ ತುಂಬಾ ಬೇಗ ಖಾಲಿಯಾಗುತ್ತಿದೆ.\nExecutive: I see. Is it under warranty? Also, did you drop it in water? | ಗಮನಿಸಿದೆ. ಇದು ವಾರಂಟಿಯಲ್ಲಿದೆಯೇ? ಹಾಗೆಯೇ, ನೀವು ಇದನ್ನು ನೀರಿನಲ್ಲಿ ಹಾಕಿದ್ದೀರಾ?\nKiran: No, I did not drop it. Yes, it is under warranty. How long will it take to repair? | ಇಲ್ಲ, ನಾನು ಕೆಳಗೆ ಹಾಕಿಲ್ಲ. ಹೌದು, ಇದು ವಾರಂಟಿಯಲ್ಲಿದೆ. ರಿಪೇರಿ ಮಾಡಲು ಎಷ್ಟು ಸಮಯ ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಬ್ಯಾಟರಿ ಖಾಲಿ ಆಗ್ತಿದೆ' (Battery is becoming empty). In English, for technology, we use the word **'DRAINING'**. Also, for screen problems, use **'FLICKERING'** (ಮಿನುಗುವಿಕೆ). Using these specific words helps the technician understand the problem instantly!\n\n📚 KEY PHRASES:\n- It is not working.: A general way to say a device has a problem.\n  Example: \"My camera is not working.\"\n- Draining fast: Specifically used when a battery loses power quickly.\n  Example: \"My laptop battery is draining fast.\"\n- Under warranty: Meaning the company will fix it for free within a certain period.\n  Example: \"Is my phone still under warranty?\"\n\n🗣️ PRONUNCIATION:\n- Battery (ಬ್ಯಾಟರಿ): Say 'Bat-tree'. Don't stretch the middle. Not 'Ba-tta-ree'.\n- Warranty (ವಾರಂಟಿ): Start with a 'W' sound (ವ). Say 'Warr-an-tee'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "My **phone** is not **working** properly. The **screen** is **flickering**. Is it **under** warranty? How **much** will it **cost** to fix?",
+    "scenario": {
+      "character": {
+        "en": "Service Executive",
+        "kn": "ಸೇವಾ ಕಾರ್ಯನಿರ್ವಾಹಕ"
+      },
+      "objective": {
+        "en": "Explain your phone battery and screen problems to the executive, confirm warranty status, and ask how long the repair will take.",
+        "kn": "ನಿಮ್ಮ ಫೋನಿನ ಬ್ಯಾಟರಿ ಮತ್ತು ಸ್ಕ್ರೀನ್ ಸಮಸ್ಯೆಯನ್ನು ಸಿಬ್ಬಂದಿಗೆ ವಿವರಿಸಿ, ಅದು ವಾರಂಟಿಯಲ್ಲಿದೆಯೇ ಎಂದು ದೃಢಪಡಿಸಿ ರಿಪೇರಿಗೆ ಎಷ್ಟು ಸಮಯ ಹಿಡಿಯುತ್ತದೆ ಎಂದು ಕೇಳಿ."
+      },
+      "objectiveStr": "Explain your phone battery and screen problems to the executive, confirm warranty status, and ask how long the repair will take.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Explain your phone battery and screen problems to the executive, confirm warranty status, and ask how long the repair will take.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 3,
+    "created_at": "2026-03-28T11:04:36.270888+00:00",
+    "text_url": null
+  },
+  {
+    "id": "f8a4e91e-a419-4483-8c95-d403632369c7",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Commute/Travel: Cabs & Directions",
+      "kn": "ಪ್ರಯಾಣ: ಕ್ಯಾಬ್ ಮತ್ತು ದಾರಿ ತೋರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Booking a ride, confirming the destination, and giving specific turn-by-turn directions in English.",
+      "kn": "Social Interaction: Booking a ride, confirming the destination, and giving specific turn-by-turn directions in English."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695891155_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Driver: Hello sir, where do you want to go? Please share the OTP. | ಹಲೋ ಸರ್, ನೀವು ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕು? ದಯವಿಟ್ಟು OTP ಹಂಚಿಕೊಳ್ಳಿ.\nAnand: The destination is MG Road. My OTP is 1-2-3-4. | ಮಾರ್ಗ ಎಂಜಿ ರಸ್ತೆ. ನನ್ನ OTP 1-2-3-4.\nAnand: Driver, please go straight. Take the next left turn near the petrol bunk. | ಡ್ರೈವರ್, ದಯವಿಟ್ಟು ನೇರವಾಗಿ ಹೋಗಿ. ಪೆಟ್ರೋಲ್ ಬಂಕ್ ಹತ್ತಿರ ಮುಂದಿನ ಎಡ ತಿರುವು ತೆಗೆದುಕೊಳ್ಳಿ.\nDriver: Should I stop after the signal? | ನಾನು ಸಿಗ್ನಲ್ ನಂತರ ನಿಲ್ಲಿಸಬೇಕೆ?\nAnand: Yes, stop just before the main gate. Thank you. | ಹೌದು, ಮೇನ್ ಗೇಟ್‌ನ ಸ್ವಲ್ಪ ಮೊದಲು ನಿಲ್ಲಿಸಿ. ಧನ್ಯವಾದಗಳು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಸಿಗ್ನಲ್ ಹತ್ರ ನಿಲ್ಲಿಸಿ' (Signal hatra nillisi). In English, to be more precise, we use **'JUST BEFORE'** (ಸ್ವಲ್ಪ ಮೊದಲು) or **'JUST AFTER'** (ಸ್ವಲ್ಪ ನಂತರ). This helps the driver stop exactly where you want without confusion!\n\n📚 KEY PHRASES:\n- Take a left/right: To give a specific turning instruction.\n  Example: \"Take a right at the circle.\"\n- Just before / Just after: Used to give exact stopping points.\n  Example: \"Stop just after the park.\"\n- Go straight: To indicate moving forward without turning.\n  Example: \"Go straight for two kilometers.\"\n\n🗣️ PRONUNCIATION:\n- Destination (ಡೆಸ್ಟಿನೇಷನ್): Say 'Des-ti-nay-shun'. Focus on the 'shun' sound at the end.\n- Straight (ಸ್ಟ್ರೈಟ್): One quick sound. Avoid saying 'Is-traight'. Start with a sharp 'S'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Please **go straight**. Take a **right** turn at the **corner**. **Stop** the car **just before** the gate. My **OTP** is four-five-six-seven.",
+    "scenario": {
+      "character": {
+        "en": "Cab Driver",
+        "kn": "ಕ್ಯಾಬ್ ಡ್ರೈವರ್"
+      },
+      "objective": {
+        "en": "Tell the cab driver your destination (MG Road) and share your OTP (1-2-3-4). Direct him to take the next left near the petrol bunk, and stop before the main gate.",
+        "kn": "ಡ್ರೈವರ್‌ಗೆ ಎಂಜಿ ರೋಡ್ ಎಂದು ತಲುಪಬೇಕಾದ ಸ್ಥಳ ತಿಳಿಸಿ, OTP (1-2-3-4) ಹಂಚಿಕೊಳ್ಳಿ. ಪೆಟ್ರೋಲ್ ಬಂಕ್ ಬಳಿ ಎಡಕ್ಕೆ ತಿರುಗಲು ಹೇಳಿ ಮತ್ತು ಮೇನ್ ಗೇಟ್ ಹತ್ತಿರ ನಿಲ್ಲಿಸಲು ತಿಳಿಸಿ."
+      },
+      "objectiveStr": "Tell the cab driver your destination (MG Road) and share your OTP (1-2-3-4). Direct him to take the next left near the petrol bunk, and stop before the main gate.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Tell the cab driver your destination (MG Road) and share your OTP (1-2-3-4). Direct him to take the next left near the petrol bunk, and stop before the main gate.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 4,
+    "created_at": "2026-03-28T11:04:56.525282+00:00",
+    "text_url": null
+  },
+  {
+    "id": "a8f5a2f9-df5e-4a2f-bbde-c9515d92c623",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Restaurant Dining: Errors & Requests",
+      "kn": "ಹೋಟೆಲ್‌ನಲ್ಲಿ ಊಟ: ಆರ್ಡರ್ ತಪ್ಪುಗಳ ನಿರ್ವಹಣೆ ಮತ್ತು ಬಿಲ್ ಕೇಳುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Handling service errors politely, making specific requests, and managing the payment process in a seated dining setting.",
+      "kn": "Social Interaction: Handling service errors politely, making specific requests, and managing the payment process in a seated dining setting."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695913300_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Waiter: Here is your Veg Fried Rice, sir. Enjoy your meal. | ಇಲ್ಲಿದೆ ನಿಮ್ಮ ವೆಜ್ ಫ್ರೈಡ್ ರೈಸ್, ಸರ್. ಊಟವನ್ನು ಆನಂದಿಸಿ.\nPrakash: Excuse me, I think there is a mistake. I ordered Chicken Fried Rice, not Veg. | ಕ್ಷಮಿಸಿ, ಇಲ್ಲಿ ಏನೋ ತಪ್ಪಾಗಿದೆ ಎಂದು ತೋರುತ್ತದೆ. ನಾನು ಚಿಕನ್ ಫ್ರೈಡ್ ರೈಸ್ ಆರ್ಡರ್ ಮಾಡಿದ್ದೆ, ವೆಜ್ ಅಲ್ಲ.\nWaiter: Oh, I am very sorry, sir. I will change it immediately. | ಓಹ್, ಕ್ಷಮಿಸಿ ಸರ್. ನಾನು ಅದನ್ನು ತಕ್ಷಣ ಬದಲಾಯಿಸುತ್ತೇನೆ.\nPrakash: Thank you. Also, can I have some extra tissues? | ಧನ್ಯವಾದಗಳು. ಹಾಗೆಯೇ, ನನಗೆ ಕೆಲವು ಹೆಚ್ಚುವರಿ ಟಿಶ್ಯೂಗಳು ಸಿಗಬಹುದೇ?\nPrakash: Waitress, could you bring the bill, please? I am ready to pay. | ವೇಟ್ರೆಸ್, ದಯವಿಟ್ಟು ಬಿಲ್ ತರುತ್ತೀರಾ? ನಾನು ಹಣ ಪಾವತಿಸಲು ಸಿದ್ಧನಿದ್ದೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might say 'ಇದು ನಾನು ಹೇಳಿದ್ದಲ್ಲ' (Idu naanu heliddalla). In English, to be polite but firm, we start with **'I THINK THERE IS A MISTAKE'**. It sounds professional and helps the waiter fix the error without feeling insulted. Also, for things like tissues or water, use **'EXTRA'** instead of 'More' for a better flow.\n\n📚 KEY PHRASES:\n- I think there is a mistake.: The most polite way to tell someone they did something wrong.\n  Example: \"I think there is a mistake in the bill.\"\n- I ordered...: Used to remind the waiter of your original request.\n  Example: \"I ordered a cold coffee, not hot.\"\n- Can I have some extra...?: Used to ask for more of something like salt, water, or tissues.\n  Example: \"Can I have some extra spoons?\"\n\n🗣️ PRONUNCIATION:\n- Mistake (ಮಿಸ್ಟೇಕ್): Say 'Mis-take'. Stress the 'Take' part slightly.\n- Immediately (ಇಮ್ಮಿಡಿಯೇಟ್ಲಿ): Say 'Im-mee-dee-ut-lee'. It’s a long word, so break it into four small parts.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Excuse me**, I think there is a **mistake**. I **ordered** a coffee. Can I have some **extra** sugar? The bill, **please**.",
+    "scenario": {
+      "character": {
+        "en": "Waiter",
+        "kn": "ವೇಟರ್"
+      },
+      "objective": {
+        "en": "Point out to the waiter that you received Veg Fried Rice instead of Chicken Fried Rice, ask for extra tissues, and request the bill.",
+        "kn": "ನೀವು ಆರ್ಡರ್ ಮಾಡಿದ ಚಿಕನ್ ಫ್ರೈಡ್ ರೈಸ್ ಬದಲು ವೆಜ್ ಫ್ರೈಡ್ ರೈಸ್ ತಂದಿದ್ದನ್ನು ವೇಟರ್‌ಗೆ ತಿಳಿಸಿ, ಹೆಚ್ಚುವರಿ ಟಿಶ್ಯೂಗಳನ್ನು ಕೇಳಿ ಮತ್ತು ಬಿಲ್ ತನ್ನಿ ಎಂದು ಹೇಳಿ."
+      },
+      "objectiveStr": "Point out to the waiter that you received Veg Fried Rice instead of Chicken Fried Rice, ask for extra tissues, and request the bill.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Point out to the waiter that you received Veg Fried Rice instead of Chicken Fried Rice, ask for extra tissues, and request the bill.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 5,
+    "created_at": "2026-03-28T11:05:17.549386+00:00",
+    "text_url": null
+  },
+  {
+    "id": "4fa6e87b-7c67-43cd-8ba3-b2685cb9243c",
+    "module_id": "22222222-2222-4222-a222-222222222222",
+    "title": {
+      "en": "Small Talk: Weather, Movies & Sports",
+      "kn": "ಹರಟೆ: ಹವಾಮಾನ, ಚಲನಚಿತ್ರ ಮತ್ತು ಕ್ರಿಕೆಟ್ ಬಗ್ಗೆ ಮಾತನಾಡುವುದು"
+    },
+    "notes": {
+      "en": "Social Interaction: Learning to start and sustain casual conversations with colleagues or acquaintances.",
+      "kn": "Social Interaction: Learning to start and sustain casual conversations with colleagues or acquaintances."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1774695933155_Timeline_1.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Sunil: It is so hot today, right? I think it will rain in the evening. | ಇವತ್ತು ತುಂಬಾ ಸೆಖೆ ಇದೆ ಅಲ್ವಾ? ಸಂಜೆ ಮಳೆ ಬರಬಹುದು ಅನ್ನಿಸುತ್ತೆ.\nRahul: Yes, the weather is very unpredictable. By the way, did you watch the match last night? | ಹೌದು, ಹವಾಮಾನವನ್ನು ನಂಬಕ್ಕಾಗಲ್ಲ. ಅಂದಹಾಗೆ, ನಿನ್ನೆ ರಾತ್ರಿ ಪಂದ್ಯ ನೋಡಿದ್ರಾ?\nSunil: No, I missed it. Who won the game? | ಇಲ್ಲ, ನಾನು ನೋಡಲಾಗಲಿಲ್ಲ. ಯಾರು ಗೆದ್ದರು?\nRahul: India won! It was a very exciting finish. You should watch the highlights. | ಭಾರತ ಗೆದ್ದಿತು! ಇದು ತುಂಬಾ ರೋಮಾಂಚಕವಾಗಿತ್ತು. ನೀವು ಹೈಲೈಟ್ಸ್ ನೋಡಬೇಕು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we use 'ಅಂದಹಾಗೆ' (Andahage) to change the topic. In English, we use **'BY THE WAY'**. Also, when talking about the weather, we use the word **'UNPREDICTABLE'** (ಊಹಿಸಲು ಸಾಧ್ಯವಿಲ್ಲದ) to describe how it changes suddenly. It sounds very natural and advanced!\n\n📚 KEY PHRASES:\n- By the way...: A 'bridge' phrase used to change the topic to something else.\n  Example: \"By the way, have you seen my keys?\"\n- Did you see/watch...?: A great way to start a conversation about a shared interest like movies or sports.\n  Example: \"Did you watch the new movie?\"\n- I think so / I don't think so.: Short ways to agree or disagree with an opinion.\n  Example: \"I think it will rain.\"\n\n🗣️ PRONUNCIATION:\n- Weather (ವೆದರ್): Say 'We-ther'. The 'th' is soft like 'ದ' (da).\n- Exciting (ಎಕ್ಸೈಟಿಂಗ್): Stress the 'cite' part. Say 'Ek-SITE-ing'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "The **weather** is very **hot** today. **By the way**, did you **watch** the match? It was very **exciting**. Who **won** the game?",
+    "scenario": {
+      "character": {
+        "en": "Colleague Sunil",
+        "kn": "ಸಹೋದ್ಯೋಗಿ ಸುನಿಲ್"
+      },
+      "objective": {
+        "en": "Agree with your colleague that the weather is unpredictable, and ask if he watched the sports match last night.",
+        "kn": "ನಿಮ್ಮ ಸಹೋದ್ಯೋಗಿಯೊಂದಿಗೆ ಹವಾಮಾನದ ಚಂಚಲತೆಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಿ, ನಂತರ ನಿನ್ನೆ ರಾತ್ರಿಯ ಮ್ಯಾಚ್ ನೋಡಿದ್ದೀರಾ ಎಂದು ಕೇಳಿ."
+      },
+      "objectiveStr": "Agree with your colleague that the weather is unpredictable, and ask if he watched the sports match last night.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Agree with your colleague that the weather is unpredictable, and ask if he watched the sports match last night.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 6,
+    "created_at": "2026-03-28T11:05:37.096388+00:00",
+    "text_url": null
+  },
+  {
+    "id": "318b2bdc-c9bb-458f-ba62-6c0e441283c0",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "The Job Interview: Entry Level",
+      "kn": "ಉದ್ಯೋಗ ಸಂದರ್ಶನ: ಆರಂಭಿಕ ಹಂತ"
+    },
+    "notes": {
+      "en": "Fluency: Reducing translation lag and structuring professional responses for common interview questions like 'Tell me about yourself'.",
+      "kn": "Fluency: Reducing translation lag and structuring professional responses for common interview questions like 'Tell me about yourself'."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022627420_AL1_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Mr. Khan: Welcome, Anusha. To start off, could you please tell me a little bit about yourself? | ಸುಸ್ವಾಗತ, ಅನುಷಾ. ಆರಂಭಿಸಲು, ನಿಮ್ಮ ಬಗ್ಗೆ ಸ್ವಲ್ಪ ಹೇಳುತ್ತೀರಾ?\nAnusha: Certainly, sir. I recently graduated from Mysore University. I am a hardworking person with a passion for helping customers. During my college fest, I managed the sponsorship team, which improved my communication skills. | ಖಂಡಿತ ಸರ್. ನಾನು ಇತ್ತೀಚೆಗೆ ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾಲಯದಿಂದ ಪದವಿ ಮುಗಿಸಿದ್ದೇನೆ. ನಾನು ಕಠಿಣ ಪರಿಶ್ರಮಿ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ ಸಹಾಯ ಮಾಡುವ ಆಸಕ್ತಿ ಹೊಂದಿದ್ದೇನೆ. ಕಾಲೇಜು ಹಬ್ಬದ ಸಮಯದಲ್ಲಿ, ನಾನು ಸ್ಪಾನ್ಸರ್‌ಶಿಪ್ ತಂಡವನ್ನು ನಿರ್ವಹಿಸಿದೆ, ಇದು ನನ್ನ ಸಂವಹನ ಕೌಶಲ್ಯವನ್ನು ಸುಧಾರಿಸಿತು.\nMr. Khan: That sounds interesting. Why do you want to work with our company? | ಅದು ಆಸಕ್ತಿದಾಯಕವಾಗಿದೆ. ನೀವು ನಮ್ಮ ಕಂಪನಿಯಲ್ಲಿ ಏಕೆ ಕೆಲಸ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might say 'ನನಗೆ ತುಂಬಾ ಇಷ್ಟ' (I like it very much). In an interview, use **'I AM PASSIONATE ABOUT'**. It sounds more professional. Also, instead of saying 'I learned speaking', use **'IMPROVED MY COMMUNICATION SKILLS'**. This tells the employer you are ready for the corporate world.\n\n📚 KEY PHRASES:\n- I recently graduated from...: A professional way to mention your education without saying 'My study over'.\n  Example: \"I recently graduated from Kuvempu University.\"\n- I am passionate about...: Shows enthusiasm for a specific type of work.\n  Example: \"I am passionate about technology.\"\n- Improved my skills: Used to show growth or learning from a past experience.\n  Example: \"Working in a team improved my leadership skills.\"\n\n🗣️ PRONUNCIATION:\n- University (ಯೂನಿವರ್ಸಿಟಿ): Start with a 'Y' sound like 'ಯೂ'. Say 'Yoo-ni-ver-si-tee'.\n- Communication (ಕಮ್ಯುನಿಕೇಷನ್): Say 'Kum-myoo-ni-kay-shun'. Stress the 'kay' part.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I recently **graduated** with a degree in Commerce. I am a **hardworking** person and I am **passionate** about sales. My previous **experience** helped me **improve** my skills. I am **eager** to join your **company**.",
+    "scenario": {
+      "character": {
+        "en": "Interviewer Mr. Khan",
+        "kn": "ಸಂದರ್ಶಕ ಮಿಸ್ಟರ್ ಖಾನ್"
+      },
+      "objective": {
+        "en": "Introduce yourself in a job interview: mention your graduation from Mysore University, your customer-focused mindset, and how you managed college fest sponsorships.",
+        "kn": "ಸಂದರ್ಶನದಲ್ಲಿ ನಿಮ್ಮನ್ನು ಪರಿಚಯಿಸಿಕೊಳ್ಳಿ: ಮೈಸೂರು ವಿವಿಯ ಪದವಿ, ನಿಮ್ಮ ಸಾಮರ್ಥ್ಯಗಳು ಮತ್ತು ಕಾಲೇಜು ಕಾರ್ಯಕ್ರಮದಲ್ಲಿ ಸಂಘಟನೆಯ ಅನುಭವವನ್ನು ಹಂಚಿಕೊಳ್ಳಿ."
+      },
+      "objectiveStr": "Introduce yourself in a job interview: mention your graduation from Mysore University, your customer-focused mindset, and how you managed college fest sponsorships.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Introduce yourself in a job interview: mention your graduation from Mysore University, your customer-focused mindset, and how you managed college fest sponsorships.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 0,
+    "created_at": "2026-04-01T05:50:31.877195+00:00",
+    "text_url": null
+  },
+  {
+    "id": "90f04cca-9ad4-45e4-b6f3-71836d6c7f98",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Workplace Conflict: Disagreeing Politely",
+      "kn": "ಕೆಲಸದ ಸ್ಥಳದ ಭಿನ್ನಾಭಿಪ್ರಾಯ: ಸಭ್ಯವಾಗಿ ಅಸಮ್ಮತಿ ಸೂಚಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Fluency: Mastering the art of 'Professional Disagreement' without sounding rude, focusing on phrases that bridge different opinions.",
+      "kn": "Fluency: Mastering the art of 'Professional Disagreement' without sounding rude, focusing on phrases that bridge different opinions."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022657518_AL2_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Rajesh: I think we should all work this Sunday to finish the project on time. | ಪ್ರಾಜೆಕ್ಟ್ ಅನ್ನು ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ಮುಗಿಸಲು ನಾವೆಲ್ಲರೂ ಈ ಭಾನುವಾರ ಕೆಲಸ ಮಾಡಬೇಕು ಎಂದು ನನಗನ್ನಿಸುತ್ತದೆ.\nKavya: I see your point, Rajesh, but I feel that working seven days a week might make the team tired. Perhaps we can stay an extra hour on weekdays instead? | ನಿಮ್ಮ ಪಾಯಿಂಟ್ ನನಗೆ ಅರ್ಥವಾಯಿತು ರಾಜೇಶ್, ಆದರೆ ವಾರದಲ್ಲಿ ಏಳೂ ದಿನ ಕೆಲಸ ಮಾಡುವುದರಿಂದ ತಂಡಕ್ಕೆ ಆಯಾಸವಾಗಬಹುದು ಎಂದು ನನಗನ್ನಿಸುತ್ತದೆ. ಬದಲಾಗಿ ನಾವು ವಾರದ ದಿನಗಳಲ್ಲಿ ಒಂದು ಗಂಟೆ ಹೆಚ್ಚು ಕಾಲ ಉಳಿಯಬಹುದೇ?\nRajesh: That is a valid suggestion. Let's see what the manager thinks. | ಅದು ಸರಿಯಾದ ಸಲಹೆ. ಮ್ಯಾನೇಜರ್ ಏನು ಯೋಚಿಸುತ್ತಾರೆಂದು ನೋಡೋಣ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, direct disagreement can sometimes sound like an argument (ಉದಾ: 'ಅದು ತಪ್ಪು'). In English professional settings, we use **'SOFTENERS'**. Instead of saying 'No', we say **'I SEE YOUR POINT, BUT...'**. This acknowledges the colleague's effort while letting you offer a better solution.\n\n📚 KEY PHRASES:\n- I see your point, but...: Used to acknowledge the other person's idea before giving your own.\n  Example: \"I see your point, but the cost is too high.\"\n- I feel that...: A softer way to state an opinion compared to 'I think'.\n  Example: \"I feel that we need more time.\"\n- Perhaps we can...: A polite way to offer an alternative suggestion.\n  Example: \"Perhaps we can try a different method.\"\n\n🗣️ PRONUNCIATION:\n- Suggestion (ಸಜೆಷನ್): Say 'Sug-jes-shun'. The 'gg' sounds like a soft 'ಜ' (ja).\n- Perhaps (ಪರ್ಹ್ಯಾಪ್ಸ್): Say 'Per-haps'. The 'H' is slightly heard. Don't say 'Per-paps'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I **see** your point, but I **feel** we should consider the **cost**. That is a **valid** suggestion, however, **perhaps** we can try a **different** approach? What do you **think**?",
+    "scenario": {
+      "character": {
+        "en": "Colleague Rajesh",
+        "kn": "ಸಹೋದ್ಯೋಗಿ ರಾಜೇಶ್"
+      },
+      "objective": {
+        "en": "Politely disagree with your colleague's idea to work on Sunday, explaining it might exhaust the team, and suggest staying an extra hour on weekdays instead.",
+        "kn": "ಭಾನುವಾರ ಕೆಲಸ ಮಾಡುವ ಸಹೋದ್ಯೋಗಿ ರಾಜೇಶ್ ಅವರ ಕಲ್ಪನೆಯನ್ನು ನಯವಾಗಿ ವಿರೋಧಿಸಿ, ವಾರದ ದಿನಗಳಲ್ಲಿ ಒಂದು ಗಂಟೆ ಹೆಚ್ಚು ಕೆಲಸ ಮಾಡುವ ಪರ್ಯಾಯ ನೀಡಿ."
+      },
+      "objectiveStr": "Politely disagree with your colleague's idea to work on Sunday, explaining it might exhaust the team, and suggest staying an extra hour on weekdays instead.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Politely disagree with your colleague's idea to work on Sunday, explaining it might exhaust the team, and suggest staying an extra hour on weekdays instead.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 1,
+    "created_at": "2026-04-01T05:50:59.426734+00:00",
+    "text_url": null
+  },
+  {
+    "id": "ea180b2e-7f80-4fbf-b773-756ad0657076",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Product Pitch: Explaining an Idea",
+      "kn": "ಉತ್ಪನ್ನದ ವಿವರಣೆ: ಒಂದು ವ್ಯಾಪಾರ ಕಲ್ಪನೆಯನ್ನು ವಿವರಿಸುವುದು"
+    },
+    "notes": {
+      "en": "Fluency: Articulating a vision, explaining the 'Problem vs. Solution' framework, and using persuasive language.",
+      "kn": "Fluency: Articulating a vision, explaining the 'Problem vs. Solution' framework, and using persuasive language."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Ganesh: Many students in Karnataka feel that English is a wall. They study grammar for years but still cannot speak confidently. | ಕರ್ನಾಟಕದ ಅನೇಕ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಇಂಗ್ಲಿಷ್ ಒಂದು ತಡೆಗೋಡೆಯಂತೆ ಭಾಸವಾಗುತ್ತದೆ. ಅವರು ವರ್ಷಗಟ್ಟಲೆ ವ್ಯಾಕರಣವನ್ನು ಓದುತ್ತಾರೆ ಆದರೆ ಇನ್ನೂ ಆತ್ಮವಿಶ್ವಾಸದಿಂದ ಮಾತನಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.\nPartner: That is true. So, how is your product different? | ಅದು ನಿಜ. ಹಾಗಾದರೆ, ನಿಮ್ಮ ಉತ್ಪನ್ನ ಹೇಗೆ ಭಿನ್ನವಾಗಿದೆ?\nGanesh: We use 'Simplish'. It is a bilingual coach that uses Kannada support to build fluency. Our goal is to turn that wall into a door by focusing on real-world scenarios. | ನಾವು 'ಸಿಂಪ್ಲಿಷ್' ಬಳಸುತ್ತೇವೆ. ಇದು ನಿರರ್ಗಳತೆಯನ್ನು ಬೆಳೆಸಲು ಕನ್ನಡದ ಬೆಂಬಲವನ್ನು ಬಳಸುವ ದ್ವಿಭಾಷಾ ತರಬೇತುದಾರ. ನೈಜ ಪ್ರಪಂಚದ ಸನ್ನಿವೇಶಗಳ ಮೇಲೆ ಕೇಂದ್ರೀಕರಿಸುವ ಮೂಲಕ ಆ ತಡೆಗೋಡೆಯನ್ನು ಬಾಗಿಲಾಗಿ ಪರಿವರ್ತಿಸುವುದು ನಮ್ಮ ಗುರಿಯಾಗಿದೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, when we explain a business, we might say 'ನನ್ನ ಐಡಿಯಾ ಹೀಗಿದೆ' (My idea is like this). In a pitch, use the **'PROBLEM vs. SOLUTION'** flow. Start by stating the gap (**The problem is...**) and then bridge it with your idea (**Our goal is to...**). This makes your English sound logical and persuasive.\n\n📚 KEY PHRASES:\n- The problem is...: Used to identify the specific gap or pain point you are solving.\n  Example: \"The problem is that existing apps are too expensive.\"\n- Our solution offers...: Used to highlight the key features or benefits of your idea.\n  Example: \"Our solution offers 24/7 support.\"\n- Turn X into Y: A powerful metaphor to show transformation.\n  Example: \"We turn mistakes into learning opportunities.\"\n\n🗣️ PRONUNCIATION:\n- Scenario (ಸಿನಾರಿಯೋ): Say 'Si-nair-ee-oh'. The 'air' part should be clear.\n- Focusing (ಫೋಕಸಿಂಗ್): Keep the 'F' soft. Say 'Foh-kus-ing'. Don't use a hard 'P' sound.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "The **problem** is that English feels like a **wall**. Our **goal** is to turn it into a **door**. We provide **localized** support and **real-world** practice. This is how we **democratize** learning.",
+    "scenario": {
+      "character": {
+        "en": "Partner",
+        "kn": "ಪಾಲುದಾರ"
+      },
+      "objective": {
+        "en": "Pitch your 'Simplish' product idea: explain the 'English wall' faced by Karnataka students and how a bilingual AI coach is the solution.",
+        "kn": "ನಿಮ್ಮ 'ಸಿಂಪ್ಲಿಷ್' ಯೋಜನೆಯನ್ನು ಹಂಚಿಕೊಳ್ಳಿ: ಕನ್ನಡದ ವಿದ್ಯಾರ್ಥಿಗಳು ಎದುರಿಸುವ ಇಂಗ್ಲಿಷ್ ಭಾಷೆಯ ಸಮಸ್ಯೆ ಮತ್ತು ದ್ವಿಭಾಷಾ ತರಬೇತಿಯ ಪರಿಹಾರವನ್ನು ವಿವರಿಸಿ."
+      },
+      "objectiveStr": "Pitch your 'Simplish' product idea: explain the 'English wall' faced by Karnataka students and how a bilingual AI coach is the solution.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Pitch your 'Simplish' product idea: explain the 'English wall' faced by Karnataka students and how a bilingual AI coach is the solution.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 2,
+    "created_at": "2026-04-01T05:51:19.037378+00:00",
+    "text_url": null
+  },
+  {
+    "id": "d66af83c-0ccc-4354-8939-674b9aab1944",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Customer Support: Delivery & Refunds",
+      "kn": "ಗ್ರಾಹಕ ಸೇವೆ: ವಿಳಂಬಿತ ಡೆಲಿವರಿ ಮತ್ತು ಮರುಪಾವತಿ"
+    },
+    "notes": {
+      "en": "Fluency: Mastering professional empathy, handling frustration, and providing clear resolutions over the phone or in person.",
+      "kn": "Fluency: Mastering professional empathy, handling frustration, and providing clear resolutions over the phone or in person."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Customer: Hello, I am very frustrated! My order was supposed to be delivered yesterday, but I haven't received anything yet. | ಹಲೋ, ನನಗೆ ತುಂಬಾ ಬೇಸರವಾಗುತ್ತಿದೆ! ನನ್ನ ಆರ್ಡರ್ ನಿನ್ನೆ ಡೆಲಿವರಿ ಆಗಬೇಕಿತ್ತು, ಆದರೆ ನನಗೆ ಇನ್ನೂ ಏನೂ ಸಿಕ್ಕಿಲ್ಲ.\nKarthik: I sincerely apologize for the inconvenience, sir. I understand how frustrating this must be. Could you please provide your order ID so I can track it for you? | ನಿಮಗಾದ ಅನಾನುಕೂಲಕ್ಕೆ ನಾನು ಪ್ರಾಮಾಣಿಕವಾಗಿ ಕ್ಷಮೆಯಾಚಿಸುತ್ತೇನೆ, ಸರ್. ಇದು ಎಷ್ಟು ನಿರಾಶಾದಾಯಕವಾಗಿದೆ ಎಂದು ನನಗೆ ಅರ್ಥವಾಗುತ್ತದೆ. ನಾನು ಅದನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ನಿಮ್ಮ ಆರ್ಡರ್ ಐಡಿಯನ್ನು ನೀಡುವಿರಾ?\nKarthik: Thank you. It looks like there was a delay at the hub. I will escalate this right away and ensure it reaches you by tomorrow evening. | ಧನ್ಯವಾದಗಳು. ಹಬ್‌ನಲ್ಲಿ ವಿಳಂಬವಾಗಿದೆ ಎಂದು ತೋರುತ್ತದೆ. ನಾನು ಇದನ್ನು ತಕ್ಷಣವೇ ಮೇಲಧಿಕಾರಿಗಳ ಗಮನಕ್ಕೆ ತರುತ್ತೇನೆ ಮತ್ತು ನಾಳೆ ಸಂಜೆಯೊಳಗೆ ಅದು ನಿಮಗೆ ತಲುಪುವಂತೆ ನೋಡಿಕೊಳ್ಳುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we say 'ಕ್ಷಮಿಸಿ' (Kshamisi). In professional English, we use **'I APOLOGIZE FOR THE INCONVENIENCE'**. It is a longer phrase that sounds much more formal. Also, instead of saying 'I will tell my boss', use **'I WILL ESCALATE THIS'**. It sounds like you are a professional who knows how to handle systems.\n\n📚 KEY PHRASES:\n- I apologize for the inconvenience.: The standard professional way to say sorry for a problem.\n  Example: \"I apologize for the delay in your refund.\"\n- I will escalate this...: Used to show that you are taking a problem to a higher level to solve it faster.\n  Example: \"I will escalate this to my manager.\"\n- Right away / Immediately: Used to give the customer confidence that you are acting now.\n  Example: \"I will check the status right away.\"\n\n🗣️ PRONUNCIATION:\n- Inconvenience (ಇನ್-ಕನ್-ವೀನಿಯನ್ಸ್): Break it: In-con-vee-nee-unce. Focus on the 'Vee' sound.\n- Apologize (ಅಪಾಲಜೈಸ್): Say 'A-pol-o-jyze'. The 'g' sounds like 'ಜ' (ja).\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "I **sincerely** apologize for the **delay**. I **understand** your **frustration**. I will **escalate** your request **immediately**. You will receive a **refund** within two **business** days.",
+    "scenario": {
+      "character": {
+        "en": "Frustrated Customer",
+        "kn": "ಕೋಪಗೊಂಡ ಗ್ರಾಹಕ"
+      },
+      "objective": {
+        "en": "Apologize to an angry customer for a delayed delivery, ask for their order ID, and promise to escalate the issue to deliver it by tomorrow evening.",
+        "kn": "ಆರ್ಡರ್ ತಡವಾಗಿದ್ದಕ್ಕೆ ಸಿಟ್ಟಾದ ಗ್ರಾಹಕರಲ್ಲಿ ಕ್ಷಮೆ ಕೇಳಿ, ಆರ್ಡರ್ ಐಡಿ ಪಡೆದುಕೊಂಡು ನಾಳೆ ಸಂಜೆಯೊಳಗೆ ತಲುಪುವಂತೆ ಮಾಡಲು ಮೇಲಧಿಕಾರಿಗೆ ತಿಳಿಸುವುದಾಗಿ ಭರವಸೆ ನೀಡಿ."
+      },
+      "objectiveStr": "Apologize to an angry customer for a delayed delivery, ask for their order ID, and promise to escalate the issue to deliver it by tomorrow evening.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Apologize to an angry customer for a delayed delivery, ask for their order ID, and promise to escalate the issue to deliver it by tomorrow evening.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 3,
+    "created_at": "2026-04-01T05:51:37.44569+00:00",
+    "text_url": null
+  },
+  {
+    "id": "78580150-355d-4d1b-afb4-4e6a7cc1dfc1",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Explaining a Process: Instructions & Tutorials",
+      "kn": "ಪ್ರಕ್ರಿಯೆಯನ್ನು ವಿವರಿಸುವುದು: ಸೂಚನೆಗಳು ಮತ್ತು ಮಾರ್ಗದರ್ಶನ"
+    },
+    "notes": {
+      "en": "Fluency: Using sequential markers (First, Next, Then) to explain a complex task clearly and logically.",
+      "kn": "Fluency: Using sequential markers (First, Next, Then) to explain a complex task clearly and logically."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Shiva: First, you need to log in to the portal using your credentials. Next, click on the 'Upload' button located at the top right corner. | ಮೊದಲಿಗೆ, ನಿಮ್ಮ ಕ್ರೆಡೆನ್ಶಿಯಲ್‌ಗಳನ್ನು ಬಳಸಿ ಪೋರ್ಟಲ್‌ಗೆ ಲಾಗ್ ಇನ್ ಆಗಬೇಕು. ಮುಂದೆ, ಮೇಲಿನ ಬಲ ಮೂಲೆಯಲ್ಲಿರುವ 'ಅಪ್‌ಲೋಡ್' ಬಟನ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.\nIntern: Got it. What do I do after selecting the file? | ಅರ್ಥವಾಯಿತು. ಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಿದ ನಂತರ ನಾನು ಏನು ಮಾಡಬೇಕು?\nShiva: Then, wait for the progress bar to reach one hundred percent. Finally, make sure to click 'Save' to complete the process. | ನಂತರ, ಪ್ರೋಗ್ರೆಸ್ ಬಾರ್ ನೂರಕ್ಕೆ ನೂರರಷ್ಟು ತಲುಪುವವರೆಗೆ ಕಾಯಿರಿ. ಕೊನೆಯದಾಗಿ, ಪ್ರಕ್ರಿಯೆಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು 'ಸೇವ್' ಕ್ಲಿಕ್ ಮಾಡುವುದನ್ನು ಮರೆಯಬೇಡಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often use 'ಆಮೇಲೆ' (Aamele) repeatedly. In English, to sound more fluent, we vary our words. We use **'FIRST'** for the start, **'NEXT'** or **'THEN'** for middle steps, and **'FINALLY'** for the end. This structure helps the other person follow your logic without getting confused.\n\n📚 KEY PHRASES:\n- First, / Next, / Then,: Sequential markers used to guide the listener through steps.\n  Example: \"First, open the app. Next, sign up.\"\n- Make sure to...: Used to emphasize an important step that shouldn't be forgotten.\n  Example: \"Make sure to lock the door.\"\n- Once you have...: Used to describe what happens after a specific step is finished.\n  Example: \"Once you have paid, you will get a receipt.\"\n\n🗣️ PRONUNCIATION:\n- Credentials (ಕ್ರೆಡೆನ್ಶಿಯಲ್ಸ್): Say 'Kre-den-shuls'. The 'tials' sounds like 'shuls'.\n- Process (ಪ್ರಾಸೆಸ್): Say 'Pro-sess'. Keep the 'O' sound clear, like in 'Office'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**First**, open the settings. **Next**, select the language. **Then**, click on 'Apply'. **Finally**, restart the device to **complete** the process. **Make sure to** save your work.",
+    "scenario": {
+      "character": {
+        "en": "Intern",
+        "kn": "ಇಂಟರ್ನ್ (ತರಬೇತುದಾರ)"
+      },
+      "objective": {
+        "en": "Teach the intern how to log in to the portal, upload files, wait for progress, and remember to click 'Save' to finish.",
+        "kn": "ಪೋರ್ಟಲ್‌ಗೆ ಲಾಗ್ ಇನ್ ಆಗುವುದು, ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಮಾಡುವುದು, ಪ್ರೋಗ್ರೆಸ್ ಕಾಯುವುದು ಮತ್ತು ಕೊನೆಯದಾಗಿ 'ಸೇವ್' ಮಾಡುವುದನ್ನು ಇಂಟರ್ನ್‌ಗೆ ಹಂತ ಹಂತವಾಗಿ ಕಲಿಸಿ."
+      },
+      "objectiveStr": "Teach the intern how to log in to the portal, upload files, wait for progress, and remember to click 'Save' to finish.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Teach the intern how to log in to the portal, upload files, wait for progress, and remember to click 'Save' to finish.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 4,
+    "created_at": "2026-04-01T05:51:54.517352+00:00",
+    "text_url": null
+  },
+  {
+    "id": "8f026bcf-4fb6-44c1-8d4f-5718897f7121",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Sharing an Experience: Proud Moments",
+      "kn": "ಅನುಭವವನ್ನು ಹಂಚಿಕೊಳ್ಳುವುದು: ಹೆಮ್ಮೆಯ ಕ್ಷಣಗಳು"
+    },
+    "notes": {
+      "en": "Fluency: Learning to connect past events using descriptive language and emotional markers to tell a compelling story.",
+      "kn": "Fluency: Learning to connect past events using descriptive language and emotional markers to tell a compelling story."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022731066_AL6_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Colleague: Santhosh, I heard you received an award in your hometown. What happened? | ಸಂತೋಷ್, ನಿಮ್ಮ ಊರಿನಲ್ಲಿ ನಿಮಗೆ ಪ್ರಶಸ್ತಿ ಬಂದಿದೆ ಎಂದು ಕೇಳಿದೆ. ಏನಾಯಿತು?\nSanthosh: A few years ago, there was a heavy flood in my village. At that time, many families were stuck in their homes. I decided to use my small boat to move people to a safe place. | ಕೆಲವು ವರ್ಷಗಳ ಹಿಂದೆ, ನಮ್ಮ ಊರಿನಲ್ಲಿ ಭಾರಿ ಪ್ರವಾಹ ಬಂದಿತ್ತು. ಆ ಸಮಯದಲ್ಲಿ, ಅನೇಕ ಕುಟುಂಬಗಳು ತಮ್ಮ ಮನೆಗಳಲ್ಲಿ ಸಿಲುಕಿಕೊಂಡಿದ್ದರು. ಜನರನ್ನು ಸುರಕ್ಷಿತ ಸ್ಥಳಕ್ಕೆ ಸ್ಥಳಾಂತರಿಸಲು ನನ್ನ ಸಣ್ಣ ದೋಣಿಯನ್ನು ಬಳಸಲು ನಾನು ನಿರ್ಧರಿಸಿದೆ.\nSanthosh: It was a very challenging night, but we saved twenty people. Honestly, it was the proudest moment of my life. | ಅದು ತುಂಬಾ ಸವಾಲಿನ ರಾತ್ರಿಯಾಗಿತ್ತು, ಆದರೆ ನಾವು ಇಪ್ಪತ್ತು ಜನರನ್ನು ಉಳಿಸಿದೆವು. ಪ್ರಾಮಾಣಿಕವಾಗಿ ಹೇಳಬೇಕೆಂದರೆ, ಅದು ನನ್ನ ಜೀವನದ ಅತ್ಯಂತ ಹೆಮ್ಮೆಯ ಕ್ಷಣವಾಗಿತ್ತು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often use 'ಆಗ' (Aaga) for everything in the past. In English, we use **'AT THAT TIME'** to bring the listener into the moment. Also, instead of saying 'Very happy', use **'THE PROUDEST MOMENT'**. It adds more weight and emotion to your story, making you sound like a natural storyteller.\n\n📚 KEY PHRASES:\n- A few years ago...: A classic way to start a story or a past narration.\n  Example: \"A few years ago, I started my first business.\"\n- At that time...: Used to describe the specific situation or context of the story.\n  Example: \"At that time, I did not have a car.\"\n- The proudest moment of my life: Used to highlight a major achievement or emotional peak.\n  Example: \"Graduating college was the proudest moment of my life.\"\n\n🗣️ PRONUNCIATION:\n- Challenging (ಚಾಲೆಂಜಿಂಗ್): Start with 'Cha' (ಚ). Say 'Chal-len-jing'. Don't say 'Shal-len-jing'.\n- Honestly (ಆನೆಸ್ಟ್ಲಿ): The 'H' is silent! Do not say 'Hon-est-ly'. Say 'On-est-lee'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**A few years ago**, I faced a **challenging** situation. **At that time**, I worked very **hard** to solve it. It was a **proud** moment when I **succeeded**. **Honestly**, I will never **forget** that day.",
+    "scenario": {
+      "character": {
+        "en": "Colleague",
+        "kn": "ಸಹೋದ್ಯೋಗಿ"
+      },
+      "objective": {
+        "en": "Tell your colleague about a proud moment a few years ago when you saved twenty people using your boat during a village flood.",
+        "kn": "ಕೆಲವು ವರ್ಷಗಳ ಹಿಂದೆ ಗ್ರಾಮದಲ್ಲಿ ಪ್ರವಾಹ ಬಂದಾಗ ನಿಮ್ಮ ದೋಣಿ ಬಳಸಿ 20 ಜನರನ್ನು ಉಳಿಸಿದ ಹೆಮ್ಮೆಯ ಕ್ಷಣವನ್ನು ಸಹೋದ್ಯೋಗಿಗೆ ತಿಳಿಸಿ."
+      },
+      "objectiveStr": "Tell your colleague about a proud moment a few years ago when you saved twenty people using your boat during a village flood.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Tell your colleague about a proud moment a few years ago when you saved twenty people using your boat during a village flood.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 5,
+    "created_at": "2026-04-01T05:52:18.187351+00:00",
+    "text_url": null
+  },
+  {
+    "id": "1dc680b8-8a57-4df7-bc37-78c81050cbf6",
+    "module_id": "33333333-3333-4333-a333-333333333333",
+    "title": {
+      "en": "Giving Advice: Career & Education",
+      "kn": "ಸಲಹೆ ನೀಡುವುದು: ವೃತ್ತಿ ಮತ್ತು ಶಿಕ್ಷಣದ ಬಗ್ಗೆ"
+    },
+    "notes": {
+      "en": "Fluency: Using modal verbs (should, could, might) and suggestive phrases to give influential yet polite advice.",
+      "kn": "Fluency: Using modal verbs (should, could, might) and suggestive phrases to give influential yet polite advice."
+    },
+    "video_url": "https://ffompmvolxnlqqqnhwhd.supabase.co/storage/v1/object/public/course-media/lessons/videos/1775022756217_AL7_Video.mov",
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Preeti: Brother, I am confused. Should I go for a traditional Engineering degree or a specialized course in Data Science? | ಅಣ್ಣ, ನನಗೆ ಗೊಂದಲವಿದೆ. ನಾನು ಸಾಂಪ್ರದಾಯಿಕ ಇಂಜಿನಿಯರಿಂಗ್ ಪದವಿಗೆ ಹೋಗಬೇಕೆ ಅಥವಾ ಡೇಟಾ ಸೈನ್ಸ್‌ನಲ್ಲಿ ವಿಶೇಷ ಕೋರ್ಸ್ ಮಾಡಬೇಕೆ?\nManjunath: In my opinion, you should build a strong foundation first. If I were in your shoes, I would choose Engineering and then take a certification in Data Science later. | ನನ್ನ ಅಭಿಪ್ರಾಯದಲ್ಲಿ, ನೀವು ಮೊದಲು ಬಲವಾದ ಅಡಿಪಾಯವನ್ನು ನಿರ್ಮಿಸಬೇಕು. ನಾನು ನಿಮ್ಮ ಜಾಗದಲ್ಲಿ ಇದ್ದಿದ್ದರೆ, ನಾನು ಇಂಜಿನಿಯರಿಂಗ್ ಆರಿಸಿಕೊಳ್ಳುತ್ತಿದ್ದೆ ಮತ್ತು ನಂತರ ಡೇಟಾ ಸೈನ್ಸ್‌ನಲ್ಲಿ ಸರ್ಟಿಫಿಕೇಶನ್ ಮಾಡುತ್ತಿದ್ದೆ.\nManjunath: You might find it difficult to handle advanced topics without the basics. Why don't you talk to some seniors before deciding? | ಮೂಲ ವಿಷಯಗಳಿಲ್ಲದೆ ಮುಂದುವರಿದ ವಿಷಯಗಳನ್ನು ನಿರ್ವಹಿಸುವುದು ನಿಮಗೆ ಕಷ್ಟವಾಗಬಹುದು. ನಿರ್ಧರಿಸುವ ಮೊದಲು ನೀವು ಕೆಲವು ಹಿರಿಯರೊಂದಿಗೆ ಏಕೆ ಮಾತನಾಡಬಾರದು?",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often use 'ಮಾಡು' (Do it) or 'ಮಾಡಬೇಡ' (Don't do it). In English, direct commands can sound too bossy. We use **'MODAL VERBS'** like **'SHOULD'** (ಮಾಡಬೇಕು) or **'COULD'** (ಮಾಡಬಹುದು). The phrase **'IF I WERE IN YOUR SHOES'** is a powerful 'Simplish' tool to show empathy while giving strong advice.\n\n📚 KEY PHRASES:\n- In my opinion...: A professional way to introduce your perspective.\n  Example: \"In my opinion, this plan is better.\"\n- If I were in your shoes...: A very common English idiom meaning 'If I were you'.\n  Example: \"If I were in your shoes, I would take the job.\"\n- Why don't you...?: A polite way to suggest an action without sounding like you are giving an order.\n  Example: \"Why don't you try calling them again?\"\n\n🗣️ PRONUNCIATION:\n- Shoes (ಶೂಸ್): Keep the 'Sh' soft and long. Not 'Suse', but 'Shooz'.\n- Opinion (ಅಪಿನಿಯನ್): Say 'O-pin-yun'. Don't say 'O-pie-nion'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**In my opinion**, you **should** focus on your skills. **If I were in your shoes**, I would **choose** this course. **Why don't you** check the **details** online? It **might** be **helpful** for your career.",
+    "scenario": {
+      "character": {
+        "en": "Sister Preeti",
+        "kn": "ತಂಗಿ ಪ್ರೀತಿ"
+      },
+      "objective": {
+        "en": "Give career advice to your sister Preeti: suggest choosing Engineering first to build a foundation and taking a Data Science certification later.",
+        "kn": "ನಿಮ್ಮ ತಂಗಿ ಪ್ರೀತಿಗೆ ಉದ್ಯೋಗ ಸಲಹೆ ನೀಡಿ: ಮೊದಲು ಇಂಜಿನಿಯರಿಂಗ್ ಪದವಿ ಪಡೆದು ಬಲವಾದ ಅಡಿಪಾಯ ನಿರ್ಮಿಸಿಕೊಂಡು ನಂತರ ಡೇಟಾ ಸೈನ್ಸ್ ಕೋರ್ಸ್ ಮಾಡಲು ಸೂಚಿಸಿ."
+      },
+      "objectiveStr": "Give career advice to your sister Preeti: suggest choosing Engineering first to build a foundation and taking a Data Science certification later.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Give career advice to your sister Preeti: suggest choosing Engineering first to build a foundation and taking a Data Science certification later.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 6,
+    "created_at": "2026-04-01T05:52:41.849773+00:00",
+    "text_url": null
+  },
+  {
+    "id": "ae1b4cdb-6e36-4211-be4c-aa56b1e7c8a3",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "The Formal Interview: Behavioral Questions (ಸಂದರ್ಶನ: ವರ್ತನೆಯ ಆಧಾರಿತ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸುವುದು)",
+      "kn": "The Formal Interview: Behavioral Questions (ಸಂದರ್ಶನ: ವರ್ತನೆಯ ಆಧಾರಿತ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸುವುದು)"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the STAR (Situation, Task, Action, Result) method to answer complex questions like 'Tell me about a time you failed'.",
+      "kn": "Professionalism: Mastering the STAR (Situation, Task, Action, Result) method to answer complex questions like 'Tell me about a time you failed'."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Interviewer: Rahul, tell me about a time you had to handle a difficult client. How did you manage the situation? Behavioral breakdowns under pressure are key to our executive selection. | ರಾಹುಲ್, ನೀವು ಕಷ್ಟಕರವಾದ ಗ್ರಾಹಕರನ್ನು ನಿಭಾಯಿಸಬೇಕಾದ ಸಮಯದ ಬಗ್ಗೆ ತಿಳಿಸಿ. ಆ ಪರಿಸ್ಥಿತಿಯನ್ನು ನೀವು ಹೇಗೆ ನಿರ್ವಹಿಸಿದ್ದೀರಿ? ಒತ್ತಡದ ಸಂದರ್ಭದಲ್ಲಿ ವರ್ತನೆಯ ವಿಶ್ಲೇಷಣೆಯು ನಮ್ಮ ಕಾರ್ಯನಿರ್ವಾಹಕ ಆಯ್ಕೆಗೆ ಪ್ರಮುಖವಾಗಿದೆ.\nRahul: Certainly. In my previous role, a high-value enterprise account encountered a severe operational bottleneck due to an unverified third-party clearing delay, which induced significant stakeholders anxiety (Situation). My direct mandate was to stabilize the account architecture, protect our enterprise rapport, and immediately implement a robust technical recovery roadmap (Task). | ಖಂಡಿತ. ನನ್ನ ಹಿಂದಿನ ಉದ್ಯೋಗದಲ್ಲಿ, ಪರಿಶೀಲಿಸದ ಮೂರನೇ ವ್ಯಕ್ತಿಯ ಕ್ಲಿಯರಿಂಗ್ ವಿಳಂಬದಿಂದಾಗಿ ಹೆಚ್ಚಿನ ಮೌಲ್ಯದ ಕಾರ್ಪೊರೇಟ್ ಖಾತೆಯು ತೀವ್ರವಾದ ಕಾರ್ಯಾಚರಣೆಯ ಅಡಚಣೆಯನ್ನು ಎದುರಿಸಿತು, ಇದು ಸ್ಟೇಕ್ಹೋಲ್ಡರ್ಗಳಲ್ಲಿ ತೀವ್ರ ಆತಂಕವನ್ನು ಉಂಟುಮಾಡಿತು (ಪರಿಸ್ಥಿತಿ). ಖಾತೆಯ ಚೌಕಟ್ಟನ್ನು ಸ್ಥಿರಗೊಳಿಸುವುದು, ನಮ್ಮ ಸಾಂಸ್ಥಿಕ ಬಾಂಧವ್ಯವನ್ನು ರಕ್ಷಿಸುವುದು ಮತ್ತು ತಕ್ಷಣವೇ ದೃಢವಾದ ತಾಂತ್ರಿಕ ಮರುಪಡೆಯುವಿಕೆ ಮಾರ್ಗಸೂಚಿಯನ್ನು ಜಾರಿಗೆ ತರುವುದು ನನ್ನ ನೇರ ಆದೇಶವಾಗಿತ್ತು (ಕಾರ್ಯ).\nRahul: I proactively took the initiative to establish a cross-functional war room, systematically bypassing standard queue parameters to run automated data verification scripts. Subsequently, I scheduled a real-time technical alignment brief with the client's executive leadership team to present a secure workaround pipeline (Action). Consequently, we successfully mitigated all transmission anomalies, resulting in absolute client satisfaction and a seamless hundred percent contract renewal worth two million dollars (Result). | ಸ್ವಯಂಚಾಲಿತ ಡೇಟಾ ಪರಿಶೀಲನಾ ಸ್ಕ್ರಿಪ್ಟ್ಗಳನ್ನು ರನ್ ಮಾಡಲು ಪ್ರಮಾಣಿತ ಕ್ಯೂ ನಿಯತಾಂಕಗಳನ್ನು ವ್ಯವಸ್ಥಿತವಾಗಿ ಬೈಪಾಸ್ ಮಾಡುವ ಮೂಲಕ ನಾನು ಜಂಟಿ ತುರ್ತು ನಿರ್ವಹಣಾ ಕೊಠಡಿಯನ್ನು ಸ್ಥಾಪಿಸಲು ಸಕ್ರಿಯವಾಗಿ ಮುಂದಾದೆ. ತರುವಾಯ, ಸುರಕ್ಷಿತ ಪರಿಹಾರ ಪೈಪ್ಲೈನ್ ಅನ್ನು ಪ್ರಸ್ತುತಪಡಿಸಲು ನಾನು ಗ್ರಾಹಕರ ಕಾರ್ಯನಿರ್ವಾಹಕ ನಾಯಕತ್ವ ತಂಡದೊಂದಿಗೆ ನೈಜ-ಸಮಯದ ತಾಂತ್ರಿಕ ಹೊಂದಾಣಿಕೆಯ ಸಭೆಯನ್ನು ನಿಗದಿಪಡಿಸಿದೆ (ಕ್ರಮ). ಪರಿಣಾಮವಾಗಿ, ನಾವು ಎಲ್ಲಾ ಪ್ರಸರಣ ವೈಪಲ್ಯಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ತಗ್ಗಿಸಿದೆವು, ಇದು ಸಂಪೂರ್ಣ ಗ್ರಾಹಕ ತೃಪ್ತಿ ಮತ್ತು ಎರಡು ಮಿಲಿಯನ್ ಡಾಲರ್ ಮೌಲ್ಯದ ನೂರಕ್ಕೆ ನೂರರಷ್ಟು ಒಪ್ಪಂದದ ನವೀಕರಣಕ್ಕೆ ಕಾರಣವಾಯಿತು (ಫಲಿತಾಂಶ).",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada professional spaces, individuals frequently tell business stories by linking events using 'ಆಮೇಲೆ' or saying 'ನಾನು ಪೂರ್ತಿ ಜವಾಬ್ದಾರಿ ತಗೊಂಡೆ' in a conversational tone. In an elite global corporate ecosystem, this must be systematically upgraded to formal, high-impact English parameters. Drop raw, ungrounded declarations and confidently deploy anchored phrases like **'In my previous role...'**, **'I took the initiative to...'**, and **'Consequently, our operations achieved...'**. When articulating positive final outcomes, replace colloquial markers like 'everyone was happy' with the exact analytical structural framework: **'The client was thoroughly satisfied and we successfully fulfilled our committed deliverables'** to demonstrate absolute operational mastery.\n\n📚 KEY PHRASES:\n- In my previous role...: Setting up the situation context professionally.\n  Example: \"In my previous role, our primary database migration faced resource constraints due to server deprecations.\"\n- I took the initiative to...: Highlighting proactive actions and leadership capabilities.\n  Example: \"I took the initiative to establish a cross-functional technical war room.\"\n- Consequently, we successfully...: Specifying structured outcomes and deliverables.\n  Example: \"Consequently, we successfully mitigated all transmission anomalies and renewed the contract.\"\n\n📚 RHETORIC & RHYTHMS:\nAt the expert fluency layer, professional speech must transcend simple narrative recounting and embrace calculated rhetorical structures that mirror global corporate excellence. When delivering high-stakes behavioral evidence, professionals must abandon chronological storytelling mechanisms in favor of the structured STAR (Situation, Task, Action, Result) grid framework. This architecture enforces absolute precision, preventing personal bias or rambling tangents from diluting the impact of the delivery. Advanced communication relies on precise vocabulary parameters where generic phrases are aggressively replaced with systemic terms. For instance, rather than saying 'I helped my team when they were confused', an expert framework utilizes 'I proactively drove cross-functional alignment to mitigate operational constraints'. This shift completely alters how an evaluation panel judges your leadership competence and intellectual depth.\n\n📚 ADVANCED PRESENTATION STRUCTURES:\nExpert presentations demand seamless cognitive transitions through the sophisticated deployment of logical connectors and structural markers. Avoid basic transition phrases like 'and then' or 'after that'. Instead, weave high-density verbal anchors such as 'consequently', 'subsequently', 'nevertheless', and 'therefore' into your speech blocks. These structures signal mathematical clarity to your audience, linking cause and effect dynamically. When presenting an execution summary, structure your narrative metrics around high-accountability concepts: use 'spear-headed a comprehensive security blueprint' instead of 'I checked the files nicely', and upgrade 'the problem was solved' to 'we successfully executed a robust remediation roadmap that entirely safeguarded our core capital parameters'.\n\n📚 MODAL VERBS FOR EXECUTIVE DIPLOMACY:\nModal verbs like 'could', 'would', and 'should' serve as key rhetorical shields when managing senior stakeholder conflicts or presenting risk forecasting models. Saying 'Our code will never fail' sounds presumptive and ungrounded to seasoned board members. Elevate your delivery by implementing precise conditional qualifiers: 'Should our primary R&D pipeline encounter unexpected anomalies, we could potentially deploy an agile minimum viable framework to preserve account traction, which should theoretically sustain our target parameters.' This strategic phrasing signals balanced risk mitigation awareness, proving you can manage large enterprise assets under intense scrutiny without losing diplomatic poise.\n\n🗣️ PRONUNCIATION:\n- Consequently (ಕಾನ್ಸಿಕ್ವೆಂಟ್ಲಿ): Say 'Kon-si-kwent-lee'. Stress the first part 'Kon'.\n- Initiative (ಇನಿಶಿಯೇಟಿವ್): Say 'In-i-sha-tiv'. The 'tiative' part is fast.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "{\"english_text_to_read\":\"Good afternoon, esteemed members of the executive selection board. In my previous role as a senior operations director, I frequently encountered highly complex, volatile business environments that demanded immediate, high-stakes behavioral leadership. For instance, when our flagship enterprise software architecture suffered a sudden, catastrophic database crash during a critical holiday launch window, I proactively took the absolute initiative to spear-head a resilient cross-functional turnaround strategy. My target mandate was to immediately mitigate severe operational bottlenecks, calm intense stakeholder anxieties, and safeguard our core digital assets. Subsequently, I systematically engineered a secure, automated data verification pipeline that successfully bypassed the damaged clearing gateway entirely. Consequently, my task force fully recovered one hundred percent of the compromised account data well within our stringent four-hour milestone window. This rapid, calculated remediation roadmap completely restored commercial trust, resulting in absolute client satisfaction and a seamless contract renewal worth two million dollars. I am entirely confident that I can bring this exact blend of strategic foresight, crisis resilience, and elite professional excellence to your rapidly expanding global operations team.\",\"transcription_to_read_kannada_phonetic\":\"ಗುಡ್ ಆಫ್ಟರ್ನೂನ್, ಎಸ್ಟೀಮ್ಡ್ ಮೆಂಬರ್ಸ್ ಆಫ್ ದ ಎಕ್ಸಿಕ್ಯೂಟಿವ್ ಸೆಲೆಕ್ಷನ್ ಬೋರ್ಡ್. ಇನ್ ಮೈ ಪ್ರೀವಿಯಸ್ ರೋಲ್ ಆಸ್ ಎ ಸೀನಿಯರ್ ಆಪರೇಷನ್ಸ್ ಡೈರೆಕ್ಟರ್, ಐ ಫ್ರೀಕ್ವೆಂಟ್ಲಿ ಎನ್ಕೌಂಟರ್ಡ್ ಹೈಲಿ ಕಾಂಪ್ಲೆಕ್ಸ್, ವಾಲಟೈಲ್ ಬಿಸಿನೆಸ್ ಎನ್ವಿರಾನ್ಮೆಂಟ್ಸ್ ದ್ಯಾಟ್ ಡಿಮ್ಯಾಂಡೆಡ್ ಇಮ್ಮಿಡಿಯೇಟ್, ಹೈ-ಸ್ಟೇಕ್ಸ್ ಬಿಹೇವಿಯರಲ್ ಲೀಡರ್ಶಿಪ್. ಫಾರ್ ಇನ್ಸ್ಟೆನ್ಸ್, ವೆನ್ ಅವರ್ ಫ್ಲಾಗ್ಶಿಪ್ ಎಂಟರ್ಪ್ರೈಸ್ ಸಾಫ್ಟ್ವೇರ್ ಆರ್ಕಿಟೆಕ್ಚರ್ ಸಫರ್ಡ್ ಎ ಸಡನ್, ಕ್ಯಾಟಸ್ಟ್ರಾಫಿಕ್ ಡೇಟಾಬೇಸ್ ಕ್ರಾಶ್ ಡ್ಯುರಿಂಗ್ ಎ ಕ್ರಿಟಿಕಲ್ ಹಾಲಿಡೇ ಲಾಂಚ್ ವಿಂಡೋ, ಐ ಪ್ರೊಆಕ್ಟಿವ್ಲಿ ಟುಕ್ ದ ಆಬ್ಸಲ್ಯೂಟ್ ಇನಿಷಿಯೇಟಿವ್ ಟು ಸ್ಪಿಯರ್-ಹೆಡ್ ಎ ರೆಸಿಲಿಯೆಂಟ್ ಕ್ರಾಸ್-ಫಂಕ್ಷನಲ್ ಟರ್ನರೌಂಡ್ ಸ್ಟ್ರಾಟಜಿ. ಮೈ ಟಾರ್ಗೆಟ್ ಮ್ಯಾಂಡೇಟ್ ವಾಸ್ ಟು ಇಮ್ಮಿಡಿಯೇಟ್ಲಿ ಮಿಟಿಗೇಟ್ ಸಿವಿಯರ್ ಆಪರೇಷನಲ್ ಬಾಟಲ್ನೆಕ್ಸ್, ಕಾಮ್ ಇಂಟೆನ್ಸ್ ಸ್ಟೇಕ್ಹೋಲ್ಡರ್ ಆಂಗ್ಸೈಟೀಸ್, ಆಂಡ್ ಸೇಫ್ಗಾರ್ಡ್ ಅವರ್ ಕೋರ್ ಡಿಜಿಟಲ್ ಅಸ್ಸೆಟ್ಸ್. ಸಬ್ಸಿಕ್ವೆಂಟ್ಲಿ, ಐ ಸಿಸ್ಟಮ್ಯಾಟಿಕಲಿ ಎಂಜಿನಿಯರ್ಡ್ ಎ ಸೆಕ್ಯೂರ್, ಆಟೋಮೇಟೆಡ್ ಡೇಟಾ ವೆರಿಫಿಕೇಷನ್ ಪೈಪ್ಲೈನ್ ದ್ಯಾಟ್ ಸಕ್ಸಸ್ಫುಲಿ ಬೈಪಾಸ್ಡ್ ದ ಡ್ಯಾಮೇಜ್ಡ್ ಕ್ಲಿಯರಿಂಗ್ ಗೇಟ್ವೇ ಎಂಟೈರ್ಲಿ. ಕಾನ್ಸಿಕ್ವೆಂಟ್ಲಿ, ಮೈ ಟಾಸ್ಕ್ ಫೋರ್ಸ್ ಫುಲ್ಲಿ ರಿಕವರ್ಡ್ ವನ್ ಹಂಡ್ರೆಡ್ ಪರ್ಸೆಂಟ್ ಆಫ್ ದ ಕಾಂಪ್ರಮೈಸ್ಡ್ ಅಕೌಂಟ್ ಡೇಟಾ ವೆಲ್ ವಿಥಿನ್ ಅವರ್ ಸ್ಟ್ರಿಂಜೆಂಟ್ ಫೋರ್-ಅವರ್ ಮೈಲಿಗಲ್ಲು ವಿಂಡೋ. ದಿಸ್ ರ್ಯಾಪಿಡ್, ಕ್ಯಾಲ್ಕ್ಯುಲೇಟೆಡ್ ರೆಮಿಡಿಯೇಷನ್ ರೋಡ್ಮ್ಯಾಪ್ ಕಂಪ್ಲೀಟ್ಲಿ ರಿಸ್ಟೋರ್ಡ್ ಕಮರ್ಷಿಯಲ್ ಟ್ರಸ್ಟ್, ರಿಸಲ್ಟಿಂಗ್ ಇನ್ ಆಬ್ಸಲ್ಯೂಟ್ ಕ್ಲೈಂಟ್ ಸ್ಯಾಟಿಸ್ಫ್ಯಾಕ್ಷನ್ ಆಂಡ್ ಎ ಸೀಮ್ಲೆಸ್ ಕಾಂಟ್ರಾಕ್ಟ್ ರಿನ್ಯೂವಲ್ ವರ್ತ್ ಟೂ ಮಿಲಿಯನ್ ಡಾಲರ್ಸ್. ಐ ಆಮ್ ಎಂಟೈರ್ಲಿ ಕಾನ್ಫಿಡೆಂಟ್ ದ್ಯಾಟ್ ಐ ಕ್ಯಾನ್ ಬ್ರಿಂಗ್ ದಿಸ್ ಎಗ್ಜಾಕ್ಟ್ ಬ್ಲೆಂಡ್ ಆಫ್ ಸ್ಟ್ರಾಟೆಜಿಕ್ ಫೋರ್ಸೈಟ್, ಕ್ರೈಸಿಸ್ ರೆಸಿಲಿಯೆನ್ಸ್, ಆಂಡ್ ಎಲೈಟ್ ಪ್ರೊಫೆಷನಲ್ ಎಕ್ಸಲೆನ್ಸ್ ಟು ಯುವರ್ ರ್ಯಾಪಿಡ್ಲಿ ಎಕ್ಸ್ಪ್ಯಾಂಡಿಂಗ್ ಗ್ಲೋಬಲ್ ಆಪರೇಷನ್ಸ್ ಟೀಮ್.\",\"instruction\":\"Deliver this formal 204-word executive briefing speech block with total commanding authority, an even volume profile, and an unhurried, moderate speed cadence. Ensure you introduce precise, half-second pauses immediately after structural connectors like 'subsequently' and 'consequently' to emphasize your logical flow. Rely completely on the phonetic Kannada translation array to iron out complex multisyllabic transitions without introducing any translation lag.\"}",
+    "scenario": {
+      "character": {
+        "en": "Executive Chairman",
+        "kn": "ಕಾರ್ಯನಿರ್ವಾಹಕ ಅಧ್ಯಕ್ಷರು (Executive Chairman)"
+      },
+      "objectiveStr": "You are undergoing an intense, high-stakes board-level performance audit roleplay session. Your AI Executive Chairman aggressively challenges your management capabilities, structures complex cross-functional performance critiques, and questions your handling of architectural resource failures. Navigate through 10+ turns of adaptive branching dialogue using strict STAR parameters, corporate rhetoric indicators, and modal buffers to defend your leadership record and lock down your operational advancement.",
+      "objective": {
+        "en": "You are undergoing an intense, high-stakes board-level performance audit roleplay session. Your AI Executive Chairman aggressively challenges your management capabilities, structures complex cross-functional performance critiques, and questions your handling of architectural resource failures. Navigate through 10+ turns of adaptive branching dialogue using strict STAR parameters, corporate rhetoric indicators, and modal buffers to defend your leadership record and lock down your operational advancement.",
+        "kn": "You are undergoing an intense, high-stakes board-level performance audit roleplay session. Your AI Executive Chairman aggressively challenges your management capabilities, structures complex cross-functional performance critiques, and questions your handling of architectural resource failures. Navigate through 10+ turns of adaptive branching dialogue using strict STAR parameters, corporate rhetoric indicators, and modal buffers to defend your leadership record and lock down your operational advancement."
+      },
+      "systemInstruction": "Mission: You are undergoing an intense, high-stakes board-level performance audit roleplay session. Your AI Executive Chairman aggressively challenges your management capabilities, structures complex cross-functional performance critiques, and questions your handling of architectural resource failures. Navigate through 10+ turns of adaptive branching dialogue using strict STAR parameters, corporate rhetoric indicators, and modal buffers to defend your leadership record and lock down your operational advancement.\n\nAnticipated Mistakes:\n\n\nPronunciation Focus:  ()",
+      "initialMessage": "Vikas, let's skip the introductory pleasantries and examine your recent project logs. Your department missed a major infrastructure alignment target last quarter. As an expert leader, how do you defend this clear operational breakdown?",
+      "choice_based_roleplay": [
+        {
+          "turn": 1,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "Vikas, let's skip the introductory pleasantries and examine your recent project logs. Your department missed a major infrastructure infrastructure target last quarter. As an expert leader, how do you defend this clear operational breakdown?",
+            "kannada": "ವಿಕಾಸ್, ನಾವು ಪರಿಚಯದ ಮಾತುಗಳನ್ನು ಬದಿಗಿಟ್ಟು ನಿಮ್ಮ ಇತ್ತೀಚಿನ ಪ್ರಾಜೆಕ್ಟ್ ಲಾಗ್ಗಳನ್ನು ಪರಿಶೀಲಿಸೋಣ. ನಿಮ್ಮ ಇಲಾಖೆಯು ಕಳೆದ ತ್ರೈಮಾಸಿಕದಲ್ಲಿ ಪ್ರಮುಖ ಮೂಲಸೌಕರ್ಯ ಹೊಂದಾಣಿಕೆಯ ಗುರಿಯನ್ನು ತಪ್ಪಿಸಿಕೊಂಡಿದೆ. ಒಬ್ಬ ಪರಿಣಿತ ನಾಯಕರಾಗಿ, ಈ ಸಷ್ಟ ಕಾರ್ಯಾಚರಣೆಯ ವೈಫಲ್ಯವನ್ನು ನೀವು ಹೇಗೆ ಸಮರ್ಥಿಸಿಕೊಳ್ಳುತ್ತೀರಿ?",
+            "transliteration": "Vikas, let's skip the introductory pleasantries and examine your recent project logs. Your department missed a major infrastructure infrastructure target last quarter. As an expert leader, how do you defend this clear operational breakdown?"
+          },
+          "options": [
+            {
+              "option_id": "1A",
+              "english": "I acknowledge the target variance, Mr. Chairman. In my previous role last quarter, our primary database migration project faced a severe resource constraint due to sudden international server deprecations (Situation).",
+              "kannada": "ಗುರಿಯ ವ್ಯತ್ಯಾಸವನ್ನು ನಾನು ಒಪ್ಪಿಕೊಳ್ಳುತ್ತೇನೆ, ಮಿಸ್ಟರ್ ಚೇರ್ಮನ್. ಕಳೆದ ತ್ರೈಮಾಸಿಕದಲ್ಲಿ ನನ್ನ ಹಿಂದಿನ ಜವಾಬ್ದಾರಿಯಲ್ಲಿ, ನಮ್ಮ ಪ್ರಾಥಮಿಕ ಡೇಟಾಬೇಸ್ ವಲಸೆ ಯೋಜನೆಯು ಹಠಾತ್ ಅಂತರರಾಷ್ಟ್ರೀಯ ಸರ್ವರ್ ನಿಷ್ಕ್ರಿಯತೆಯಿಂದಾಗಿ ತೀವ್ರವಾದ ಸಂಪನ್ಮೂಲ ಮಿತಿಯನ್ನು ಎದುರಿಸಿತು (ಪರಿಸ್ಥಿತಿ).",
+              "feedback": "Masterful behavioral framing! Taking absolute ownership of the variance while anchoring the situation with 'In my previous role...' sets a pristine professional foundation."
+            },
+            {
+              "option_id": "1B",
+              "english": "Sir, it was not my mistake. The foreign team deleted the server without telling us, so we got late.",
+              "kannada": "ಸರ್, ಇದು ನನ್ನ ತಪ್ಪಲ್ಲ. ವಿದೇಶಿ ತಂಡದವರು ನಮಗೆ ತಿಳಿಸದೆ ಸರ್ವರ್ ಡಿಲೀಟ್ ಮಾಡಿದರು, ಅದಕ್ಕೆ ನಮಗೆ ತಡವಾಯಿತು.",
+              "feedback": "Highly defensive and shifts blame directly to external teams, destroying executive authority. Frame the challenge as an objective 'resource constraint' instead."
+            },
+            {
+              "option_id": "1C",
+              "english": "We had some delay because the foreign server was deleted, but it wasn't really our fault.",
+              "kannada": "ವಿದೇಶಿ ಸರ್ವರ್ ಡಿಲೀಟ್ ಆಗಿದ್ದರಿಂದ ನಮಗೆ ಸ್ವಲ್ಪ ತಡವಾಯಿತು, ಆದರೆ ಅದು ನಿಜವಾಗಿಯೂ ನಮ್ಮ ತಪ್ಪಲ್ಲ.",
+              "feedback": "Slightly defensive and lacks the structured STAR setup. Try to start with a professional situation anchor."
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "Server deprecation is a known industry risk, not an excuse for a missed deadline. What was your explicit individual directive to resolve this structural issue before it impacted our corporate clients?",
+            "kannada": "ಸರ್ವರ್ ನಿಷ್ಕ್ರಿಯತೆಯು ಉದ್ಯೋಗ ಕ್ಷೇತ್ರದಲ್ಲಿ ಎಲ್ಲರಿಗೂ ತಿಳಿದಿರುವ ಅಪಾಯವಾಗಿದೆ, ಅದು ಗಡುವು ತಪ್ಪಿಹೋಗಲು ಕಾರಣವಾಗಬಾರದು. ಇದು ನಮ್ಮ ಕಾರ್ಪೊರೇಟ್ ಗ್ರಾಹಕರ ಮೇಲೆ ಪರಿಣಾಮ ಬೀರುವ ಮೊದಲು ಈ ರಚನಾತ್ಮಕ ಸಮಸ್ಯೆಯನ್ನು ಪರಿಹರಿಸಲು ನಿಮ್ಮ ನಿಖರವಾದ ವೈಯಕ್ತಿಕ ಆದೇಶ ಏನಿತ್ತು?",
+            "transliteration": "Server deprecation is a known industry risk, not an excuse for a missed deadline. What was your explicit individual directive to resolve this structural issue before it impacted our corporate clients?"
+          },
+          "options": [
+            {
+              "option_id": "2A",
+              "english": "My immediate mandate was to construct a robust mitigation workflow, completely isolate our high-value client portals from the server failure, and re-engineer our pipeline links securely (Task).",
+              "kannada": "ದೃಢವಾದ ಪರಿಹಾರ ಕಾರ್ಯವಿಧಾನವನ್ನು ನಿರ್ಮಿಸುವುದು, ಸರ್ವರ್ ವೈಫಲ್ಯದಿಂದ ನಮ್ಮ ಹೆಚ್ಚಿನ ಮೌಲ್ಯದ ಗ್ರಾಹಕ ಪೋರ್ಟಲ್ಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಪ್ರತ್ಯೇಕಿಸುವುದು ಮತ್ತು ನಮ್ಮ ಪೈಪ್ಲೈನ್ ಲಿಂಕ್ಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಮರು-ರೂಪಿಸುವುದು ನನ್ನ ತಕ್ಷಣದ ಆದೇಶವಾಗಿತ್ತು (ಕಾರ್ಯ).",
+              "feedback": "Brilliant task definition! Using systemic terminology like 'construct a robust mitigation workflow' outlines highly mature enterprise task tracking capabilities."
+            },
+            {
+              "option_id": "2B",
+              "english": "My task was to make sure clients didn't get angry and fix the software system fast before anyone complained.",
+              "kannada": "ಗ್ರಾಹಕರು ಕೋಪಗೊಳ್ಳದಂತೆ ನೋಡಿಕೊಳ್ಳುವುದು ಮತ್ತು ಯಾರೂ ದೂರು ನೀಡುವ ಮುನ್ನ ಸಾಫ್ಟ್ವೇರ್ ಸಿಸ್ಟಮ್ ಅನ್ನು ಬೇಗನೆ ಸರಿಪಡಿಸುವುದು ನನ್ನ ಕೆಲಸವಾಗಿತ್ತು.",
+              "feedback": "Too casual and focuses on avoiding complaints rather than strategic recovery parameters. Implement high-value frameworks like 'mitigation workflow execution'."
+            },
+            {
+              "option_id": "2C",
+              "english": "I wanted to call the client and tell them we will solve it as fast as possible.",
+              "kannada": "ನಾನು ಗ್ರಾಹಕರಿಗೆ ಕರೆ ಮಾಡಿ ನಾವು ಅದನ್ನು ಆದಷ್ಟು ಬೇಗ ಪರಿಹರಿಸುತ್ತೇವೆ ಎಂದು ಹೇಳಲು ಬಯಸಿದ್ದೆ.",
+              "feedback": "Lacks specific administrative task definition. Focus on defining clean, robust recovery mandates instead."
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "A directive is meaningless without agile execution. What concrete architectural operations did you personally orchestrate to manage this transition pipeline safely?",
+            "kannada": "ಚುರುಕಾದ ಅನುಷ್ಠಾನವಿಲ್ಲದೆ ಆದೇಶಕ್ಕೆ ಯಾವುದೇ ಅರ್ಥವಿರುವುದಿಲ್ಲ. ಈ ಪರಿವರ್ತನೆಯ ಪೈಪ್ಲೈನ್ ಅನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ನಿರ್ವಹಿಸಲು ನೀವು ವೈಯಕ್ತಿಕವಾಗಿ ಯಾವ ನಿರ್ದಿಷ್ಟ ರಚನಾತ್ಮಕ ಕಾರ್ಯಾಚರಣೆಗಳನ್ನು ಸಂಘಟಿಸಿದ್ದೀರಿ?",
+            "transliteration": "A directive is meaningless without agile execution. What concrete architectural operations did you personally orchestrate to manage this transition pipeline safely?"
+          },
+          "options": [
+            {
+              "option_id": "3A",
+              "english": "I proactively took the initiative to establish a dedicated technical war room. Subsequently, we systematically routed our core assets into an encrypted temporary backup architecture (Action).",
+              "kannada": "ನಾನು ಸಕ್ರಿಯವಾಗಿ ಒಂದು ಪ್ರತ್ಯೇಕ ತಾಂತ್ರಿಕ ತುರ್ತು ನಿರ್ವಹಣಾ ಕೊಠಡಿಯನ್ನು ಸ್ಥಾಪಿಸಲು ಮುಂದಾದೆ. ತರುವಾಯ, ನಾವು ನಮ್ಮ ಪ್ರಮುಖ ಆಸ್ತಿಗಳನ್ನು ಎನ್ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ತಾತ್ಕಾಲಿಕ ಬ್ಯಾಕಪ್ ಚೌಕಟ್ಟಿಗೆ ವ್ಯವಸ್ಥಿತವಾಗಿ ವರ್ಗಾಯಿಸಿದೆವು (ಕ್ರಮ).",
+              "feedback": "Stellar implementation of action matrices! Integrating the sequential connector 'subsequently' with 'systematically routed core assets' shows exceptional operational command."
+            },
+            {
+              "option_id": "3B",
+              "english": "So then I called our top engineers and we shifted all data files to another computer server room on weekends.",
+              "kannada": "ಆದ್ದರಿಂದ ನಾನು ನಮ್ಮ ಉನ್ನತ ಎಂಜಿನಿಯರ್ಗಳನ್ನು ಕರೆದೆ ಮತ್ತು ನಾವು ವೀಕೆಂಡ್ನಲ್ಲಿ ಎಲ್ಲಾ ಡೇಟಾ ಫೈಲ್ಗಳನ್ನು ಮತ್ತೊಂದು ಕಂಪ್ಯೂಟರ್ ಸರ್ವರ್ ಕೋಣೆಗೆ ವರ್ಗಾಯಿಸಿದೆವು.",
+              "feedback": "Phrases like 'So then I called' drop conversational dignity. Rely on elite rhetorical anchors like 'Subsequently, we systematically routed...' to state actions."
+            },
+            {
+              "option_id": "3C",
+              "english": "I just talked to the engineering team and we changed the backup servers.",
+              "kannada": "ನಾನು ಎಂಜಿನಿಯರಿಂಗ್ ತಂಡದೊಂದಿಗೆ ಮಾತನಾಡಿದೆ ಮತ್ತು ನಾವು ಬ್ಯಾಕಪ್ ಸರ್ವರ್ಗಳನ್ನು ಬದಲಾಯಿಸಿದೆವು.",
+              "feedback": "Using conversational narrative connectors like 'I just talked' reduces boardroom competence. Rely on systemic action terms."
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "Shifting architectural routes introduces severe data integrity liabilities. What were the definitive quantitative results of this emergency backup maneuvers?",
+            "kannada": "ರಚನಾತ್ಮಕ ಮಾರ್ಗಗಳನ್ನು ಬದಲಾಯಿಸುವುದು ಡೇಟಾ ಸಮಗ್ರತೆಗೆ ತೀವ್ರವಾದ ಹೊಣೆಗಾರಿಕೆಯನ್ನು ತರುತ್ತದೆ. ಈ ತುರ್ತು ಬ್ಯಾಕಪ್ ಕ್ರಮಗಳ ನಿರ್ಣಾಯಕ ಪರಿಮಾಣಾತ್ಮಕ ಫಲಿತಾಂಶಗಳು ಏನೇನು?",
+            "transliteration": "Shifting architectural routes introduces severe data integrity liabilities. What were the definitive quantitative results of this emergency backup maneuvers?"
+          },
+          "options": [
+            {
+              "option_id": "4A",
+              "english": "Consequently, we successfully achieved one hundred percent data sanitization across all platforms, ensuring absolute zero data loss metrics and maintaining total client satisfaction (Result).",
+              "kannada": "ಪರಿಣಾಮವಾಗಿ, ನಾವು ಎಲ್ಲಾ ಪ್ಲಾಟ್ಫಾರ್ಮ್ಗಳಲ್ಲಿ ನೂರಕ್ಕೆ ನೂರರಷ್ಟು ಡೇಟಾ ಸ್ವಚ್ಛಗೊಳಿಸುವಿಕೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸಾಧಿಸಿದೆವು, ಶೂನ್ಯ ಡೇಟಾ ನಷ್ಟದ ಮೆಟ್ರಿಕ್ಸ್ಗಳನ್ನು ಖಚಿತಪಡಿಸಿದೆವು ಮತ್ತು ಸಂಪೂರ್ಣ ಗ್ರಾಹಕ ತೃಪ್ತಿಯನ್ನು ಉಳಿಸಿಕೊಂಡೆವು (ಫಲಿತಾಂಶ).",
+              "feedback": "Flawless STAR result tracking integration! Using the high-density anchor 'Consequently' paired with exact quantitative markers ('hundred percent data sanitization') is magnificent."
+            },
+            {
+              "option_id": "4B",
+              "english": "As a result, data was totally safe and clients were happy at last because everything worked good.",
+              "kannada": "ಫಲಿತಾಂಶವಾಗಿ, ಡೇಟಾ ಸಂಪೂರ್ಣವಾಗಿ ಸುರಕ್ಷಿತವಾಗಿತ್ತು ಮತ್ತು ಕೊನೆಯಲ್ಲಿ ಗ್ರಾಹಕರು ಸಂತೋಷಪಟ್ಟರು ಏಕೆಂದರೆ ಎಲ್ಲವೂ ಚೆನ್ನಾಗಿ ಕೆಲಸ ಮಾಡಿತು.",
+              "feedback": "Too simple. Upgrading basic statements like 'worked good' to 'achieved absolute zero data loss metrics' delivers the mandatory expert professional tone."
+            },
+            {
+              "option_id": "4C",
+              "english": "Our database was running again and the clients didn't lose their data in the end.",
+              "kannada": "ನಮ್ಮ ಡೇಟಾಬೇಸ್ ಮತ್ತೆ ಚಾಲನೆಯಲ್ಲಿತ್ತು ಮತ್ತು ಕೊನೆಯಲ್ಲಿ ಗ್ರಾಹಕರು ತಮ್ಮ ಡೇಟಾವನ್ನು ಕಳೆದುಕೊಳ್ಳಲಿಲ್ಲ.",
+              "feedback": "Too casual for an expert level summary. State exact structural metrics like 'zero data loss and absolute data sanitization'."
+            }
+          ]
+        },
+        {
+          "turn": 5,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "Achieving zero data loss during a migration crisis is acceptable performance. However, your bimonthly updates indicate that team burnout risk spiked sharply during this recovery window. How do you explain this leadership failure?",
+            "kannada": "ಸ್ಥಳಾಂತರದ ಬಿಕ್ಕಟ್ಟಿನ ಸಂದರ್ಭದಲ್ಲಿ ಶೂನ್ಯ ಡೇಟಾ ನಷ್ಟವನ್ನು ಸಾಧಿಸುವುದು ಸ್ವೀಕಾರಾರ್ಹ ಪ್ರದರ್ಶನವಾಗಿದೆ. ಆದಾಗ್ಯೂ, ನಿಮ್ಮ ದ್ವಿಭಾಷಾ ಕಾರ್ಯಾಚರಣೆಯ ವರದಿಗಳು ಈ ಚೇತರಿಕೆಯ ಅವಧಿಯಲ್ಲಿ ತಂಡದ ಬರ್ನ್ಔಟ್ ಅಪಾಯವು ತೀವ್ರವಾಗಿ ಏರಿರುವುದನ್ನು ತೋರಿಸುತ್ತವೆ. ಈ ನಾಯಕತ್ವದ ವೈಫಲ್ಯವನ್ನು ನೀವು ಹೇಗೆ ವಿವರಿಸುತ್ತೀರಿ?",
+            "transliteration": "Achieving zero data loss during a migration crisis is acceptable performance. However, your bimonthly updates indicate that team burnout risk spiked sharply during this recovery window. How do you explain this leadership failure?"
+          },
+          "options": [
+            {
+              "option_id": "5A",
+              "english": "I analyze it as a short-term capacity constraint rather than a leadership failure. We proactively initiated a mental wellness blueprint immediately following the deployment to mitigate burnout risks.",
+              "kannada": "ನಾನು ಇದನ್ನು ನಾಯಕತ್ವದ ವೈಫಲ್ಯ ಎನ್ನುವುದಕ್ಕಿಂತ ಹೆಚ್ಚಾಗಿ ಅಲ್ಪಾವಧಿಯ ಸಾಮರ್ಥ್ಯದ ಮಿತಿ ಎಂದು ವಿಶ್ಲೇಷಿಸುತ್ತೇನೆ. ಬರ್ನ್ಔಟ್ ಅಪಾಯಗಳನ್ನು ತಗ್ಗಿಸಲು ನಿಯೋಜನೆಯ ಬೆನ್ನಲ್ಲೇ ನಾವು ಸಕ್ರಿಯವಾಗಿ ಮಾನಸಿಕ ಸ್ವಾಸ್ಥ್ಯದ ನೀಲನಕ್ಷೆಯನ್ನು ಪ್ರಾರಂಭಿಸಿದೆವು.",
+              "feedback": "Exceptional executive diplomacy! Reframing the challenge from 'leadership failure' to 'short-term capacity constraint' while detailing proactive solutions is stellar."
+            },
+            {
+              "option_id": "5B",
+              "english": "The team had to work full night, so they got tired. I gave them two days leave later so they are fine now.",
+              "kannada": "ತಂಡವು ಇಡೀ ರಾತ್ರಿ ಕೆಲಸ ಮಾಡಬೇಕಾಯಿತು, ಆದ್ದರಿಂದ ಅವರು ಸುಸ್ತಾದರು. ನಾನು ಅವರಿಗೆ ನಂತರ ಎರಡು ದಿನ ರಜೆ ನೀಡಿದೆ ಆದ್ದರಿಂದ ಅವರು ಈಗ ಆರಾಮಾಗಿದ್ದಾರೆ.",
+              "feedback": "Highly casual response format. Swap 'team got tired' and 'gave them leave' for polished concepts like 'capacity constraints' and 'mental wellness blueprint'."
+            },
+            {
+              "option_id": "5C",
+              "english": "The workload was heavy so the team felt stressed, but we gave them some free time later.",
+              "kannada": "ಕೆಲಸದ ಹೊರೆ ಹೆಚ್ಚಾಗಿತ್ತು ಆದ್ದರಿಂದ ತಂಡದವರು ಒತ್ತಡ ಅನುಭವಿಸಿದರು, ಆದರೆ ನಾವು ಅವರಿಗೆ ನಂತರ ಸ್ವಲ್ಪ ಬಿಡುವು ನೀಡಿದೆವು.",
+              "feedback": "Focuses on casual employee feelings. Reframe as 'capacity constraints' and discuss proactive wellness protocols."
+            }
+          ]
+        },
+        {
+          "turn": 6,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "A wellness blueprint is an administrative cushion, not a long-term resource strategy. If our international scaling goals double next quarter, how will your current infrastructure endure that load without collapsing?",
+            "kannada": "ಸ್ವಾಸ್ಥ್ಯದ ನೀಲನಕ್ಷೆಯು ಒಂದು ಆಡಳಿತಾತ್ಮಕ ತಾತ್ಕಾಲಿಕ ವ್ಯವಸ್ಥೆಯಷ್ಟೇ, ಅದು ದೀರ್ಘಕಾಲೀನ ಸಂಪನ್ಮೂಲ ತಂತ್ರವಲ್ಲ. ಮುಂದಿನ ತ್ರೈಮಾಸಿಕದಲ್ಲಿ ನಮ್ಮ ಅಂತರರಾಷ್ಟ್ರೀಯ ವಿಸ್ತರಣೆಯ ಗುರಿಗಳು ದ್ವಿಗುಣಗೊಂಡರೆ, ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಮೂಲಸೌಕರ್ಯವು ಕುಸಿಯದೆ ಆ ಹೊರೆಯನ್ನು ಹೇಗೆ ತಡೆದುಕೊಳ್ಳುತ್ತದೆ?",
+            "transliteration": "A wellness blueprint is an administrative cushion, not a long-term resource strategy. If our international scaling goals double next quarter, how will your current infrastructure endure that load without collapsing?"
+          },
+          "options": [
+            {
+              "option_id": "6A",
+              "english": "Should our international scaling parameters double, we could potentially leverage an automated, real-time cloud redundancy pipeline, which would completely shield our internal server capacity.",
+              "kannada": "ನಮ್ಮ ಅಂತರರಾಷ್ಟ್ರೀಯ ವಿಸ್ತರಣೆಯ ನಿಯತಾಂಕಗಳು ದ್ವಿಗುಣಗೊಂಡರೆ, ನಾವು ಸ್ವಯಂಚಾಲಿತ, ನೈಜ-ಸಮಯದ ಕ್ಲೌಡ್ ಪುನರಾವರ್ತಿತ ಪೈಪ್ಲೈನ್ ಅನ್ನು ಬಳಸಿಕೊಳ್ಳಬಹುದು, ಇದು ನಮ್ಮ ಆಂತರಿಕ ಸರ್ವರ್ ಸಾಮರ್ಥ್ಯವನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ರಕ್ಷಿಸುತ್ತದೆ.",
+              "feedback": "Perfect integration of conditional modal structures! Deploying 'Should our parameters double, we could potentially leverage...' displays supreme strategic foresight."
+            },
+            {
+              "option_id": "6B",
+              "english": "We will buy more cloud storage space from Amazon so that everything runs very fast and never stops.",
+              "kannada": "ಎಲ್ಲವೂ ತುಂಬಾ ವೇಗವಾಗಿ ಚಲಿಸಲು ಮತ್ತು ಎಂದಿಗೂ ನಿಲ್ಲದಂತೆ ಮಾಡಲು ನಾವು ಅಮೆಜಾನ್ನಿಂದ ಹೆಚ್ಚಿನ ಕ್ಲೌಡ್ ಸ್ಟೋರೇಜ್ ಜಾಗವನ್ನು ಖರೀದಿಸುತ್ತೇವೆ.",
+              "feedback": "Sounds technologically shallow and basic. Frame scaling solutions around advanced mechanisms like 'automated real-time cloud redundancy pipelines'."
+            },
+            {
+              "option_id": "6C",
+              "english": "We will ask the local server team to handle extra users so that nothing crashes.",
+              "kannada": "ಏನೂ ಕ್ರ್ಯಾಶ್ ಆಗದಂತೆ ನೋಡಿಕೊಳ್ಳಲು ನಾವು ಸ್ಥಳೀಯ ಸರ್ವರ್ ತಂಡಕ್ಕೆ ಹೆಚ್ಚುವರಿ ಬಳಕೆದಾರರನ್ನು ನಿಭಾಯಿಸಲು ಕೇಳುತ್ತೇವೆ.",
+              "feedback": "Lacks technical design authority. Frame scale parameters around redundancy solutions."
+            }
+          ]
+        },
+        {
+          "turn": 7,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "An automated cloud redundancy pipeline represents a substantial capital allocation investment. How do you propose we justify this heavy technical expenditure to our conservative chief financial officer?",
+            "kannada": "ಸ್ವಯಂಚಾಲಿತ ಕ್ಲೌಡ್ ಪುನರಾವರ್ತಿತ ಪೈಪ್ಲೈನ್ ಗಮನಾರ್ಹ ಬಂಡವಾಳ ಹಂಚಿಕೆಯ ಹೂಡಿಕೆಯನ್ನು ಬಯಸುತ್ತದೆ. ನಮ್ಮ ಮಿತವ್ಯಯಿ ಮುಖ್ಯ ಹಣಕಾಸು ಅಧಿಕಾರಿಗೆ ಈ ಭಾರಿ ತಾಂತ್ರಿಕ ವೆಚ್ಚವನ್ನು ಸಮರ್ಥಿಸಲು grandparent ಹೇಗೆ ಪ್ರಸ್ತಾಪಿಸುತ್ತೀರಿ?",
+            "transliteration": "An automated cloud redundancy pipeline represents a substantial capital allocation investment. How do you propose we justify this heavy technical expenditure to our conservative chief financial officer?"
+          },
+          "options": [
+            {
+              "option_id": "7A",
+              "english": "I recommend drafting a comprehensive collaborative performance projection deck that highlights how this initial expenditure actively prevents millions in potential system downtime liabilities.",
+              "kannada": "ಈ ಆರಂಭಿಕ ವೆಚ್ಚವು ಸಂಭಾವ್ಯ ಸಿಸ್ಟಮ್ ಡೌನ್ಟೈಮ್ ಹೊಣೆಗಾರಿಕೆಗಳಲ್ಲಿ ಲಕ್ಷಾಂತರ ಹಣ ನಷ್ಟವಾಗುವುದನ್ನು ಹೇಗೆ ಸಕ್ರಿಯವಾಗಿ ತಡೆಯುತ್ತದೆ ಎಂಬುದನ್ನು ಎತ್ತಿ ತೋರಿಸುವ ಸಮಗ್ರ ಜಂಟಿ ಪ್ರದರ್ಶನ ಪ್ರೊಜೆಕ್ಷನ್ ಡೆಕ್ ಅನ್ನು ಸಿದ್ಧಪಡಿಸಲು ನಾನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ.",
+              "feedback": "Outstanding financial defense framework! Proposing a 'collaborative performance projection deck' mapped to 'downtime liability prevention' addresses enterprise goals flawlessly."
+            },
+            {
+              "option_id": "7B",
+              "english": "I will make one PPT and show the CFO that if we don't buy this, big loss will happen next year.",
+              "kannada": "ನಾನು ಒಂದು ಪಿಪಿಟಿ ಮಾಡಿ ಸಿಎಫ್ಓ ಅವರಿಗೆ ತೋರಿಸುತ್ತೇನೆ, ನಾವು ಇದನ್ನು ಖರೀದಿಸದಿದ್ದರೆ ಮುಂದಿನ ವರ್ಷ ದೊಡ್ಡ ನಷ್ಟ ಉಂಟಾಗುತ್ತದೆ.",
+              "feedback": "Vague and overly dramatic phrasing ('big loss will happen'). Upgrade to standard corporate markers like 'comprehensive performance projection deck highlighting downtime liabilities'."
+            },
+            {
+              "option_id": "7C",
+              "english": "I will show the financial details and explain that backup is very important for database safety.",
+              "kannada": "ನಾನು ಹಣಕಾಸಿನ ವಿವರಗಳನ್ನು ತೋರಿಸುತ್ತೇನೆ ಮತ್ತು ಡೇಟಾಬೇಸ್ ಸುರಕ್ಷತೆಗೆ ಬ್ಯಾಕಪ್ ಬಹಳ ಮುಖ್ಯ ಎಂದು ವಿವರಿಸುತ್ತೇನೆ.",
+              "feedback": "Too simplistic. Use professional terms like 'performance projection deck' and 'downtime liability mitigation'."
+            }
+          ]
+        },
+        {
+          "turn": 8,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "Preventing system downtime liabilities is a compelling ROI thesis. If the CFO signs off on this budget allocation, who will take personal ownership of the entire international deployment roadmap?",
+            "kannada": "ಸಿಸ್ಟಮ್ ಡೌನ್ಟೈಮ್ ಹೊಣೆಗಾರಿಕೆಗಳನ್ನು ತಡೆಗಟ್ಟುವುದು ಒಂದು ಬಲವಾದ ROI ಸಿದ್ಧಾಂತವಾಗಿದೆ. ಸಿಎಫ್ಓ ಈ ಬಜೆಟ್ ಹಂಚಿಕೆಯನ್ನು ಅನುಮೋದಿಸಿದರೆ, ಇಡೀ ಅಂತರರಾಷ್ಟ್ರೀಯ ನಿಯೋಜನೆ ಮಾರ್ಗಸೂಚಿಯ ವೈಯಕ್ತಿಕ ಜವಾಬ್ದಾರಿಯನ್ನು ಯಾರು ತೆಗೆದುಕೊಳ್ಳುತ್ತಾರೆ?",
+            "transliteration": "Preventing system downtime liabilities is a compelling ROI thesis. If the CFO signs off on this budget allocation, who will take personal ownership of the entire international deployment roadmap?"
+          },
+          "options": [
+            {
+              "option_id": "8A",
+              "english": "I am fully prepared to take absolute personal ownership of the roadmap, ensuring strict compliance across all global regulatory and department parameters.",
+              "kannada": "ಎಲ್ಲಾ ಜಾಗತಿಕ ನಿಯಂತ್ರಕ ಮತ್ತು ಇಲಾಖೆಯ ನಿಯತಾಂಕಗಳಲ್ಲಿ ಕಟ್ಟುನಿಟ್ಟಾದ ಅನುಸರಣೆಯನ್ನು ಖಾತರಿಪಡಿಸುತ್ತಾ, ಮಾರ್ಗಸೂಚಿಯ ಸಂಪೂರ್ಣ ವೈಯಕ್ತಿಕ ಜವಾಬ್ದಾರಿಯನ್ನು ತೆಗೆದುಕೊಳ್ಳಲು ನಾನು ಸಂಪೂರ್ಣವಾಗಿ ಸಿದ್ಧನಾಗಿದ್ದೇನೆ.",
+              "feedback": "Perfect executive readiness positioning! Committing to 'absolute personal ownership' combined with 'regulatory and department parameters' shows supreme leadership capability."
+            },
+            {
+              "option_id": "8B",
+              "english": "I will take all responsibility sir. I will watch the engineers every day so work finishes beautifully.",
+              "kannada": "ನಾನೇ ಎಲ್ಲಾ ಜವಾಬ್ದಾರಿ ತಗೋತೀನಿ ಸರ್. ಕೆಲಸವು ಸುಂದರವಾಗಿ ಮುಗಿಯಲು ನಾನು ಪ್ರತಿದಿನ ಎಂಜಿನಿಯರ್ಗಳನ್ನು ಗಮನಿಸುತ್ತೇನೆ.",
+              "feedback": "Phrases like 'work finishes beautifully' lack corporate sophistication. Transition to formal operational indicators like 'strict compliance across global parameters'."
+            },
+            {
+              "option_id": "8C",
+              "english": "I can help the deployment team whenever they need my guidance on servers.",
+              "kannada": "ಸರ್ವರ್ಗಳ ಬಗ್ಗೆ ತಂಡಕ್ಕೆ ನನ್ನ ಮಾರ್ಗದರ್ಶನ ಅಗತ್ಯವಿದ್ದಾಗಲೆಲ್ಲಾ ನಾನು ಅವರಿಗೆ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ.",
+              "feedback": "Too generic. State absolute personal ownership and regulatory parameters explicitly."
+            }
+          ]
+        },
+        {
+          "turn": 9,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "Taking absolute ownership demonstrates the exact caliber of operational maturity we require. However, cross-functional friction between your engineers and the global marketing cluster could stall the initial rollout. How do you plan to handle this structural friction?",
+            "kannada": "ಸಂಪೂರ್ಣ ಜವಾಬ್ದಾರಿ ತೆಗೆದುಕೊಳ್ಳುವುದು ನಮಗೆ ಅಗತ್ಯವಿರುವ ಕಾರ್ಯಾಚರಣೆಯ ಪರಿಪಕ್ವತೆಯ ನಿಖರವಾದ ಸಾಮರ್ಥ್ಯವನ್ನು ಪ್ರದರ್ಶಿಸುತ್ತದೆ. ಆದಾಗ್ಯೂ, ನಿಮ್ಮ ಎಂಜಿನಿಯರ್ಗಳು ಮತ್ತು ಜಾಗತಿಕ ಮಾರ್ಕೆಟಿಂಗ್ ತಂಡದ ನಡುವಿನ ಜಂಟಿ ಘರ್ಷಣೆಯು ಆರಂಭಿಕ ಬಿಡುಗಡೆಯನ್ನು ಸ್ಥಗಿತಗೊಳಿಸಬಹುದು. ಈ ರಚನಾತ್ಮಕ ಘರ್ಷಣೆಯನ್ನು ನಿಭಾಯಿಸಲು ನೀವು ಹೇಗೆ ಯೋಜಿಸುತ್ತೀರಿ?",
+            "transliteration": "Taking absolute ownership demonstrates the exact caliber of operational maturity we require. However, cross-functional friction between your engineers and the global marketing cluster could stall the initial rollout. How do you plan to handle this structural friction?"
+          },
+          "options": [
+            {
+              "option_id": "9A",
+              "english": "I suggest initiating a structured collaborative alignment protocol, co-presenting the deployment timeline so that marketing targets match our core technical capacity milestones perfectly.",
+              "kannada": "ನಾನು ಸುಸಂಘಟಿತ ಜಂಟಿ ಹೊಂದಾಣಿಕೆಯ ಪ್ರೋಟೋಕಾಲ್ ಅನ್ನು ಪ್ರಾರಂಭಿಸಲು ಸೂಚಿಸುತ್ತೇನೆ, ನಿಯೋಜನೆಯ ವೇಳಾಪಟ್ಟಿಯನ್ನು ಜಂಟಿಯಾಗಿ ಪ್ರಸ್ತುತಪಡಿಸುವ ಮೂಲಕ ಮಾರ್ಕೆಟಿಂಗ್ ಗುರಿಗಳು ನಮ್ಮ ಪ್ರಮುಖ ತಾಂತ್ರಿಕ ಸಾಮರ್ಥ್ಯದ ಮೈಲಿಗಲ್ಲುಗಳಿಗೆ ಸಂಪೂರ್ಣವಾಗಿ ಹೊಂದಿಕೆಯಾಗುತ್ತವೆ.",
+              "feedback": "Magnificent cross-functional resolution protocol! Suggesting a 'collaborative alignment protocol' to blend 'technical capacity milestones' shares ownership masterfully."
+            },
+            {
+              "option_id": "9B",
+              "english": "I will call one big sync meeting and tell marketing people to not give extra pressure to my engineers.",
+              "kannada": "ನಾನು ಒಂದು ದೊಡ್ಡ ಸಿಂಕ್ ಮೀಟಿಂಗ್ ಕರೆದು ಮಾರ್ಕೆಟಿಂಗ್ ಜನರಿಗೆ ನನ್ನ ಎಂಜಿನಿಯರ್ಗಳಿಗೆ ಹೆಚ್ಚುವರಿ ಒತ್ತಡ ನೀಡದಂತೆ ಹೇಳುತ್ತೇನೆ.",
+              "feedback": "Defensive and creates silos between departments. Reframe the alignment professionally around 'collaborative alignment protocols matching capacity milestones'."
+            },
+            {
+              "option_id": "9C",
+              "english": "I will tell both departments to work together and not fight about timelines.",
+              "kannada": "ನಾನು ಎರಡು ಇಲಾಖೆಗಳಿಗೆ ಒಟ್ಟಿಗೆ ಕೆಲಸ ಮಾಡಲು ಮತ್ತು ಸಮಯದ ಬಗ್ಗೆ ಜಗಳವಾಡದಂತೆ ಹೇಳುತ್ತೇನೆ.",
+              "feedback": "Uses non-professional words like 'fight'. Use structured collaboration terms like 'collaborative alignment protocols'."
+            }
+          ]
+        },
+        {
+          "turn": 10,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "A structured alignment protocol completely addresses our rollout concerns. You have systematically defended your record, displayed flawless risk mitigation mastery, and outlined clear expansion roadmaps. How should we formally finalize your executive contract details?",
+            "kannada": "ಸುಸಂಘಟಿತ ಹೊಂದಾಣಿಕೆಯ ಪ್ರೋಟೋಕಾಲ್ ನಮ್ಮ ಆಂತರಿಕ ಬಿಡುಗಡೆಯ ಕಾಳಜಿಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಪರಿಹರಿಸುತ್ತದೆ. ನೀವು ನಿಮ್ಮ ದಾಖಲೆಯನ್ನು ವ್ಯವಸ್ಥಿತವಾಗಿ ಸಮರ್ಥಿಸಿಕೊಂಡಿದ್ದೀರಿ, ದೋಷರಹಿತ ಬಿಕ್ಕಟ್ಟು ತಗ್ಗಿಸುವ ಪಾಂಡಿತ್ಯವನ್ನು ಪ್ರದರ್ಶಿಸಿದ್ದೀರಿ ಮತ್ತು ಸ್ಪಷ್ಟ ವಿಸ್ತರಣೆಯ ಮಾರ್ಗಸೂಚಿಗಳನ್ನು ರೂಪಿಸಿದ್ದೀರಿ. ನಿಮ್ಮ ಕಾರ್ಯನಿರ್ವಾಹಕ ನಿರ್ದೇಶಕ ಹುದ್ದೆಯ ಒಪ್ಪಂದದ ವಿವರಗಳನ್ನು ನಾವು ಅಧಿಕೃತವಾಗಿ ಹೇಗೆ ಅಂತಿಮಗೊಳಿಸಬೇಕು?",
+            "transliteration": "A structured alignment protocol completely addresses our rollout concerns. You have systematically defended your record, displayed flawless risk mitigation mastery, and outlined clear expansion roadmaps. How should we formally finalize your executive contract details?"
+          },
+          "options": [
+            {
+              "option_id": "10A",
+              "english": "I recommend drafting a comprehensive collaborative onboarding schedule this evening to ensure absolute strategic alignment across all corporate and legal parameters.",
+              "kannada": "ಎಲ್ಲಾ ಕಾರ್ಪೊರೇಟ್ ಮತ್ತು ಕಾನೂನು ನಿಯತಾಂಕಗಳಲ್ಲಿ ಸಂಪೂರ್ಣ ಕಾರ್ಯತಂತ್ರದ ಹೊಂದಾಣಿಕೆಯನ್ನು ಖಾತರಿಪಡಿಸಲು ಇಂದು ಸಂಜೆ ಸಮಗ್ರ ಜಂಟಿ ಆನ್ಬೋರ್ಡಿಂಗ್ ವೇಳಾಪಟ್ಟಿಯನ್ನು ಸಿದ್ಧಪಡಿಸಲು ನಾನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇನೆ.",
+              "feedback": "Exceptional administrative completion loop query! Proposing a 'comprehensive collaborative onboarding schedule' to align regulatory parameters proves ultimate executive readiness."
+            },
+            {
+              "option_id": "10B",
+              "english": "Send me the official director contract papers fast, I will sign them tonight so we lock the deal.",
+              "kannada": "ಅಧಿಕೃತ ನಿರ್ದೇಶಕ ಒಪ್ಪಂದದ ಪತ್ರಗಳನ್ನು ನನಗೆ ಬೇಗನೆ ಕಳುಹಿಸಿ, ಒಪ್ಪಂದವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ನಾನು ಇಂದೇ ರಾತ್ರಿ ಸಹಿ ಮಾಡುತ್ತೇನೆ.",
+              "feedback": "Too rushed and lacks formal boardroom decorum. Maintain pristine executive structure by wrapping closures around 'collaborative onboarding schedules and strategic alignment'."
+            },
+            {
+              "option_id": "10C",
+              "english": "Please send the agreement papers to my email, I will review and sign them soon.",
+              "kannada": "ದಯವಿಟ್ಟು ಒಪ್ಪಂದದ ಪತ್ರಗಳನ್ನು ನನ್ನ ಇಮೇಲ್ಗೆ ಕಳುಹಿಸಿ, ನಾನು ಅವುಗಳನ್ನು ಶೀಘ್ರದಲ್ಲೇ ಪರಿಶೀಲಿಸಿ ಸಹಿ ಮಾಡುತ್ತೇನೆ.",
+              "feedback": "Too informal. Propose structured alignment schedules and strategic onboarding parameters."
+            }
+          ]
+        },
+        {
+          "turn": 11,
+          "ai_prompt": {
+            "speaker": "Executive Chairman",
+            "english": "That is an exceptionally precise and poised operational framework, Vikas. The entire board of directors is thoroughly convinced of your strategic vision, structural resilience, and elite executive communication competencies. Welcome to the global director suite.",
+            "kannada": "ಇದು ಅತ್ಯಂತ ನಿಖರವಾದ ಮತ್ತು ಸಮತೋಲಿತ ಕಾರ್ಯಾಚರಣೆಯ ಚೌಕಟ್ಟಾಗಿದೆ, ವಿಕಾಸ್. ನಿಮ್ಮ ಕಾರ್ಯತಂತ್ರದ ದೃಷ್ಟಿ, ರಚನಾತ್ಮಕ ಸ್ಥಿತಿಸ್ಥಾಪಕತ್ವ ಮತ್ತು ಗಣ್ಯ ಕಾರ್ಯನಿರ್ವಾಹಕ ಸಂವಹನ ಸಾಮರ್ಥ್ಯಗಳ ಬಗ್ಗೆ ಇಡೀ ನಿರ್ದೇಶಕರ ಮಂಡಳಿಯು ಸಂಪೂರ್ಣವಾಗಿ ಮನಗಂಡಿದೆ. ಜಾಗತಿಕ ನಿರ್ದೇಶಕರ ಸೂಟ್‌ಗೆ ಸುಸ್ವಾಗತ.",
+            "transliteration": "That is an exceptionally precise and poised operational framework, Vikas. The entire board of directors is thoroughly convinced of your strategic vision, structural resilience, and elite executive communication competencies. Welcome to the global director suite."
+          }
+        }
+      ]
+    },
+    "order_index": 0,
+    "created_at": "2026-04-01T05:53:00.313538+00:00",
+    "text_url": null,
+    "english_text_to_read": "Good afternoon, esteemed members of the executive selection board. In my previous role as a senior operations director, I frequently encountered highly complex, volatile business environments that demanded immediate, high-stakes behavioral leadership. For instance, when our flagship enterprise software architecture suffered a sudden, catastrophic database crash during a critical holiday launch window, I proactively took the absolute initiative to spear-head a resilient cross-functional turnaround strategy. My target mandate was to immediately mitigate severe operational bottlenecks, calm intense stakeholder anxieties, and safeguard our core digital assets. Subsequently, I systematically engineered a secure, automated data verification pipeline that successfully bypassed the damaged clearing gateway entirely. Consequently, my task force fully recovered one hundred percent of the compromised account data well within our stringent four-hour milestone window. This rapid, calculated remediation roadmap completely restored commercial trust, resulting in absolute client satisfaction and a seamless contract renewal worth two million dollars. I am entirely confident that I can bring this exact blend of strategic foresight, crisis resilience, and elite professional excellence to your rapidly expanding global operations team.",
+    "transcription_to_read_kannada_phonetic": "ಗುಡ್ ಆಫ್ಟರ್ನೂನ್, ಎಸ್ಟೀಮ್ಡ್ ಮೆಂಬರ್ಸ್ ಆಫ್ ದ ಎಕ್ಸಿಕ್ಯೂಟಿವ್ ಸೆಲೆಕ್ಷನ್ ಬೋರ್ಡ್. ಇನ್ ಮೈ ಪ್ರೀವಿಯಸ್ ರೋಲ್ ಆಸ್ ಎ ಸೀನಿಯರ್ ಆಪರೇಷನ್ಸ್ ಡೈರೆಕ್ಟರ್, ಐ ಫ್ರೀಕ್ವೆಂಟ್ಲಿ ಎನ್ಕೌಂಟರ್ಡ್ ಹೈಲಿ ಕಾಂಪ್ಲೆಕ್ಸ್, ವಾಲಟೈಲ್ ಬಿಸಿನೆಸ್ ಎನ್ವಿರಾನ್ಮೆಂಟ್ಸ್ ದ್ಯಾಟ್ ಡಿಮ್ಯಾಂಡೆಡ್ ಇಮ್ಮಿಡಿಯೇಟ್, ಹೈ-ಸ್ಟೇಕ್ಸ್ ಬಿಹೇವಿಯರಲ್ ಲೀಡರ್ಶಿಪ್. ಫಾರ್ ಇನ್ಸ್ಟೆನ್ಸ್, ವೆನ್ ಅವರ್ ಫ್ಲಾಗ್ಶಿಪ್ ಎಂಟರ್ಪ್ರೈಸ್ ಸಾಫ್ಟ್ವೇರ್ ಆರ್ಕಿಟೆಕ್ಚರ್ ಸಫರ್ಡ್ ಎ ಸಡನ್, ಕ್ಯಾಟಸ್ಟ್ರಾಫಿಕ್ ಡೇಟಾಬೇಸ್ ಕ್ರಾಶ್ ಡ್ಯುರಿಂಗ್ ಎ ಕ್ರಿಟಿಕಲ್ ಹಾಲಿಡೇ ಲಾಂಚ್ ವಿಂಡೋ, ಐ ಪ್ರೊಆಕ್ಟಿವ್ಲಿ ಟುಕ್ ದ ಆಬ್ಸಲ್ಯೂಟ್ ಇನಿಷಿಯೇಟಿವ್ ಟು ಸ್ಪಿಯರ್-ಹೆಡ್ ಎ ರೆಸಿಲಿಯೆಂಟ್ ಕ್ರಾಸ್-ಫಂಕ್ಷನಲ್ ಟರ್ನರೌಂಡ್ ಸ್ಟ್ರಾಟಜಿ. ಮೈ ಟಾರ್ಗೆಟ್ ಮ್ಯಾಂಡೇಟ್ ವಾಸ್ ಟು ಇಮ್ಮಿಡಿಯೇಟ್ಲಿ ಮಿಟಿಗೇಟ್ ಸಿವಿಯರ್ ಆಪರೇಷನಲ್ ಬಾಟಲ್ನೆಕ್ಸ್, ಕಾಮ್ ಇಂಟೆನ್ಸ್ ಸ್ಟೇಕ್ಹೋಲ್ಡರ್ ಆಂಗ್ಸೈಟೀಸ್, ಆಂಡ್ ಸೇಫ್ಗಾರ್ಡ್ ಅವರ್ ಕೋರ್ ಡಿಜಿಟಲ್ ಅಸ್ಸೆಟ್ಸ್. ಸಬ್ಸಿಕ್ವೆಂಟ್ಲಿ, ಐ ಸಿಸ್ಟಮ್ಯಾಟಿಕಲಿ ಎಂಜಿನಿಯರ್ಡ್ ಎ ಸೆಕ್ಯೂರ್, ಆಟೋಮೇಟೆಡ್ ಡೇಟಾ ವೆರಿಫಿಕೇಷನ್ ಪೈಪ್ಲೈನ್ ದ್ಯಾಟ್ ಸಕ್ಸಸ್ಫುಲಿ ಬೈಪಾಸ್ಡ್ ದ ಡ್ಯಾಮೇಜ್ಡ್ ಕ್ಲಿಯರಿಂಗ್ ಗೇಟ್ವೇ ಎಂಟೈರ್ಲಿ. ಕಾನ್ಸಿಕ್ವೆಂಟ್ಲಿ, ಮೈ ಟಾಸ್ಕ್ ಫೋರ್ಸ್ ಫುಲ್ಲಿ ರಿಕವರ್ಡ್ ವನ್ ಹಂಡ್ರೆಡ್ ಪರ್ಸೆಂಟ್ ಆಫ್ ದ ಕಾಂಪ್ರಮೈಸ್ಡ್ ಅಕೌಂಟ್ ಡೇಟಾ ವೆಲ್ ವಿಥಿನ್ ಅವರ್ ಸ್ಟ್ರಿಂಜೆಂಟ್ ಫೋರ್-ಅವರ್ ಮೈಲಿಗಲ್ಲು ವಿಂಡೋ. ದಿಸ್ ರ್ಯಾಪಿಡ್, ಕ್ಯಾಲ್ಕ್ಯುಲೇಟೆಡ್ ರೆಮಿಡಿಯೇಷನ್ ರೋಡ್ಮ್ಯಾಪ್ ಕಂಪ್ಲೀಟ್ಲಿ ರಿಸ್ಟೋರ್ಡ್ ಕಮರ್ಷಿಯಲ್ ಟ್ರಸ್ಟ್, ರಿಸಲ್ಟಿಂಗ್ ಇನ್ ಆಬ್ಸಲ್ಯೂಟ್ ಕ್ಲೈಂಟ್ ಸ್ಯಾಟಿಸ್ಫ್ಯಾಕ್ಷನ್ ಆಂಡ್ ಎ ಸೀಮ್ಲೆಸ್ ಕಾಂಟ್ರಾಕ್ಟ್ ರಿನ್ಯೂವಲ್ ವರ್ತ್ ಟೂ ಮಿಲಿಯನ್ ಡಾಲರ್ಸ್. ಐ ಆಮ್ ಎಂಟೈರ್ಲಿ ಕಾನ್ಫಿಡೆಂಟ್ ದ್ಯಾಟ್ ಐ ಕ್ಯಾನ್ ಬ್ರಿಂಗ್ ದಿಸ್ ಎಗ್ಜಾಕ್ಟ್ ಬ್ಲೆಂಡ್ ಆಫ್ ಸ್ಟ್ರಾಟೆಜಿಕ್ ಫೋರ್ಸೈಟ್, ಕ್ರೈಸಿಸ್ ರೆಸಿಲಿಯೆನ್ಸ್, ಆಂಡ್ ಎಲೈಟ್ ಪ್ರೊಫೆಷನಲ್ ಎಕ್ಸಲೆನ್ಸ್ ಟು ಯುವರ್ ರ್ಯಾಪಿಡ್ಲಿ ಎಕ್ಸ್ಪ್ಯಾಂಡಿಂಗ್ ಗ್ಲೋಬಲ್ ಆಪರೇಷನ್ಸ್ ಟೀಮ್.",
+    "transcription_to_read_transliteration": null
+  },
+  {
+    "id": "445742a3-1232-4d7d-b3e3-d9fec9c760d0",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Leading a Meeting: Opening & Summarizing",
+      "kn": "ಸಭೆಯನ್ನು ಮುನ್ನಡೆಸುವುದು: ಆರಂಭ ಮತ್ತು ಸಾರಾಂಶ"
+    },
+    "notes": {
+      "en": "Professionalism: Using 'Signposting' language to control the flow of a meeting and ensure everyone is aligned.",
+      "kn": "Professionalism: Using 'Signposting' language to control the flow of a meeting and ensure everyone is aligned."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Shakti: Good morning everyone. Let’s get started. The main objective of today’s meeting is to finalize the budget. | ಎಲ್ಲರಿಗೂ ಶುಭೋದಯ. ಪ್ರಾರಂಭಿಸೋಣ. ಇಂದಿನ ಸಭೆಯ ಮುಖ್ಯ ಉದ್ದೇಶ ಬಜೆಟ್ ಅನ್ನು ಅಂತಿಮಗೊಳಿಸುವುದು.\nShakti: Moving on to the next point, we need to discuss the timeline. (Later...) To wrap up, we have agreed to the new costs and the deadline is Friday. | ಮುಂದಿನ ವಿಷಯಕ್ಕೆ ಹೋಗೋಣ, ನಾವು ಸಮಯದ ಬಗ್ಗೆ ಚರ್ಚಿಸಬೇಕಾಗಿದೆ. (ನಂತರ...) ಮುಕ್ತಾಯಗೊಳಿಸಲು, ನಾವು ಹೊಸ ವೆಚ್ಚಗಳಿಗೆ ಒಪ್ಪಿದ್ದೇವೆ ಮತ್ತು ಗಡುವು ಶುಕ್ರವಾರವಾಗಿದೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might use 'ಆಯ್ತು' (Aytu) or 'ನೆಕ್ಸ್ಟ್' (Next) to change topics. In Expert English, we use **'SIGNPOSTING'**. Phrases like **'MOVING ON TO'** or **'TURNING OUR ATTENTION TO'** act like traffic signals for your listeners. They know exactly where the conversation is going.\n\n📚 KEY PHRASES:\n- Let’s get started.: A professional way to call the meeting to order.\n  Example: \"If everyone is here, let's get started.\"\n- Moving on to...: Signposting language to move from one topic to the next.\n  Example: \"Moving on to the marketing updates.\"\n- To wrap up / In summary...: Used to conclude and repeat the most important points.\n  Example: \"To wrap up, please send the files by EOD.\"\n\n🗣️ PRONUNCIATION:\n- Objective (ಅಬ್ಜೆಕ್ಟಿವ್): Say 'Ob-jek-tiv'. Don't emphasize the 'O' too much.\n- Agenda (ಅಜೆಂಡಾ): Say 'A-jen-da'. The 'g' is a soft 'ಜ' (ja).\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Good morning**. Let's **get started**. The **objective** is clear. **Moving on** to the next item on the **agenda**. To **wrap up**, we need to **finish** by Friday.",
+    "scenario": {
+      "character": {
+        "en": "Team Members",
+        "kn": "ತಂಡದ ಸದಸ್ಯರು"
+      },
+      "objective": {
+        "en": "Lead a team meeting: open the meeting, state the objective to finalize the budget and discuss timelines, and summarize the deadlines at the end.",
+        "kn": "ತಂಡದ ಮೀಟಿಂಗ್ ಮುನ್ನಡೆಸಿ: ಮೀಟಿಂಗ್ ಆರಂಭಿಸಿ, ಬಜೆಟ್ ಅಂತಿಮಗೊಳಿಸುವ ಮತ್ತು ಸಮಯದ ಚರ್ಚೆಯ ಉದ್ದೇಶ ತಿಳಿಸಿ, ನಂತರ ಕೊನೆಯಲ್ಲಿ ಗಡುವುಗಳನ್ನು ಸಾರಾಂಶಗೊಳಿಸಿ."
+      },
+      "objectiveStr": "Lead a team meeting: open the meeting, state the objective to finalize the budget and discuss timelines, and summarize the deadlines at the end.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Lead a team meeting: open the meeting, state the objective to finalize the budget and discuss timelines, and summarize the deadlines at the end.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson.",
+      "choice_based_roleplay": [
+        {
+          "turn": 1,
+          "ai_prompt": {
+            "speaker": "Team Members",
+            "english": "Good morning, Shakti. Everyone is present. How would you like to open today's budget meeting?",
+            "kannada": "ಶುಭೋದಯ, ಶಕ್ತಿ. ಎಲ್ಲರೂ ಬಂದಿದ್ದಾರೆ. ಇಂದಿನ ಬಜೆಟ್ ಸಭೆಯನ್ನು ನೀವು ಹೇಗೆ ಪ್ರಾರಂಭಿಸಲು ಬಯಸುತ್ತೀರಿ?",
+            "transliteration": "Good morning, Shakti. Everyone is present. How would you like to open today's budget meeting?"
+          },
+          "options": [
+            {
+              "option_id": "1A",
+              "english": "Good morning everyone. Let’s get started. The main objective of today’s meeting is to finalize the budget.",
+              "kannada": "ಎಲ್ಲರಿಗೂ ಶುಭೋದಯ. ಪ್ರಾರಂಭಿಸೋಣ. ಇಂದಿನ ಸಭೆಯ ಮುಖ್ಯ उद्देश्य ಬಜೆಟ್ ಅನ್ನು ಅಂತಿಮಗೊಳಿಸುವುದು.",
+              "feedback": "Perfect! This is a professional opening using clear signposting to state the main objective."
+            },
+            {
+              "option_id": "1B",
+              "english": "Hello guys. Let's start the talk now because we have to complete the budget quickly.",
+              "kannada": "ಹಲೋ ಗಾಯ್ಸ್. ಈಗಲೇ ಚರ್ಚೆ ಶುರು ಮಾಡೋಣ ಯಾಕಂದ್ರೆ ಬಜೆಟ್ ಬೇಗ ಮುಗಿಸಬೇಕು.",
+              "feedback": "A bit too informal. Using 'Good morning everyone. Let's get started' is more professional in business settings."
+            },
+            {
+              "option_id": "1C",
+              "english": "Okay, look here. Today we will decide the money details and budget limits.",
+              "kannada": "ಸರಿ, ಇಲ್ಲಿ ನೋಡಿ. ಇಂದು ನಾವು ಬಜೆಟ್ ಮಿತಿಗಳನ್ನು ನಿರ್ಧರಿಸುತ್ತೇವೆ.",
+              "feedback": "Too commanding and informal. Use 'Let's get started. The main objective is...' for a structured approach."
+            }
+          ]
+        },
+        {
+          "turn": 2,
+          "ai_prompt": {
+            "speaker": "Team Members",
+            "english": "Understood. The budget details are clear. How should we transition to the project timeline discussion?",
+            "kannada": "ಅರ್ಥವಾಯಿತು. ಬಜೆಟ್ ವಿವರಗಳು ಸ್ಪಷ್ಟವಾಗಿವೆ. ಪ್ರಾಜೆಕ್ಟ್ ವೇಳಾಪಟ್ಟಿಯ ಚರ್ಚೆಗೆ ನಾವು ಹೇಗೆ ವರ್ಗಾಯಿಸಬೇಕು?",
+            "transliteration": "Understood. The budget details are clear. How should we transition to the project timeline discussion?"
+          },
+          "options": [
+            {
+              "option_id": "2A",
+              "english": "Moving on to the next point, we need to discuss the timeline.",
+              "kannada": "ಮುಂದಿನ ವಿಷಯಕ್ಕೆ ಹೋಗೋಣ, ನಾವು ಸಮಯದ ಬಗ್ಗೆ ಚರ್ಚಿಸಬೇಕಾಗಿದೆ.",
+              "feedback": "Excellent signposting! 'Moving on to the next point' signals a clear transition to your listeners."
+            },
+            {
+              "option_id": "2B",
+              "english": "Next thing is we must discuss when we will finish this project.",
+              "kannada": "ಮುಂದಿನ ವಿಷಯ ಅಂದ್ರೆ ನಾವು ಈ ಪ್ರಾಜೆಕ್ಟ್ ಯಾವಾಗ ಮುಗಿಸುತ್ತೇವೆ ಅಂತ ಚರ್ಚಿಸಬೇಕು.",
+              "feedback": "A bit casual. Using 'Moving on to...' or 'Turning our attention to...' sounds much more sophisticated."
+            },
+            {
+              "option_id": "2C",
+              "english": "Okay, budget is done. Now speak about the timelines.",
+              "kannada": "ಸರಿ, ಬಜೆಟ್ ಮುಗಿಯಿತು. ಈಗ ಸಮಯದ ಬಗ್ಗೆ ಮಾತನಾಡಿ.",
+              "feedback": "Too blunt. Good meeting leads use signposting like 'Moving on to the next point' to guide the team smoothly."
+            }
+          ]
+        },
+        {
+          "turn": 3,
+          "ai_prompt": {
+            "speaker": "Team Members",
+            "english": "Perfect, we've finalized the timeline. Could you summarize the conclusions and close the meeting?",
+            "kannada": "ಉತ್ತಮ, ನಾವು ವೇಳಾಪಟ್ಟಿಯನ್ನು ಅಂತಿಮಗೊಳಿಸಿದ್ದೇವೆ. ಸಭೆಯ ತೀರ್ಮಾನಗಳನ್ನು ಸಂಕ್ಷೇಪಿಸಿ ಮುಕ್ತಾಯಗೊಳಿಸುತ್ತೀರಾ?",
+            "transliteration": "Perfect, we've finalized the timeline. Could you summarize the conclusions and close the meeting?"
+          },
+          "options": [
+            {
+              "option_id": "3A",
+              "english": "To wrap up, we have agreed to the new costs and the deadline is Friday.",
+              "kannada": "ಮುಕ್ತಾಯಗೊಳಿಸಲು, ನಾವು ಹೊಸ ವೆಚ್ಚಗಳಿಗೆ ಒಪ್ಪಿದ್ದೇವೆ ಮತ್ತು ಗಡುವು ಶುಕ್ರವಾರವಾಗಿದೆ.",
+              "feedback": "Brilliant wrap-up! 'To wrap up' is standard signposting for summarizing agreements before ending meetings."
+            },
+            {
+              "option_id": "3B",
+              "english": "So meeting is finished. Send me the final budget sheet by Friday.",
+              "kannada": "ಹಾಗಾಗಿ ಮೀಟಿಂಗ್ ಮುಗಿಯಿತು. ಶುಕ್ರವಾರದೊಳಗೆ ಕೊನೆಯ ಬಜೆಟ್ ಶೀಟ್ ಕಳುಹಿಸಿ.",
+              "feedback": "Lacks formal structure. 'To wrap up, we have agreed...' provides a clear summary of outcomes."
+            },
+            {
+              "option_id": "3C",
+              "english": "Okay, everything is done. Go back to work and finish by Friday.",
+              "kannada": "ಸರಿ, ಎಲ್ಲವೂ ಮುಗಿದಿದೆ. ಕೆಲಸಕ್ಕೆ ಹಿಂತಿರುಗಿ ಮತ್ತು ಶುಕ್ರವಾರದೊಳಗೆ ಮುಗಿಸಿ.",
+              "feedback": "Too demanding and informal. Close meetings gracefully using signposting to summarize agreements."
+            }
+          ]
+        },
+        {
+          "turn": 4,
+          "ai_prompt": {
+            "speaker": "Team Members",
+            "english": "Thank you, Shakti. That summarizes all our deliverables perfectly. Let's close the session now.",
+            "kannada": "ಧನ್ಯವಾದಗಳು, ಶಕ್ತಿ. ಇದು ನಮ್ಮ ಎಲ್ಲಾ ಕಾರ್ಯಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಸಂಕ್ಷೇಪಿಸುತ್ತದೆ. ಈಗ ಸಭೆಯನ್ನು ಮುಕ್ತಾಯಗೊಳಿಸೋಣ.",
+            "transliteration": "Thank you, Shakti. That summarizes all our deliverables perfectly. Let's close the session now."
+          }
+        }
+      ]
+    },
+    "order_index": 1,
+    "created_at": "2026-04-01T05:53:15.619745+00:00",
+    "text_url": null
+  },
+  {
+    "id": "bbc88dde-dcc3-4712-b361-6bb93622a6c5",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Negotiation: Salary & Contracts",
+      "kn": "ಸಮಾಲೋಚನೆ: ಸಂಬಳ ಮತ್ತು ಒಪ್ಪಂದದ ನಿಯಮಗಳು"
+    },
+    "notes": {
+      "en": "Professionalism: Using persuasive logic and 'Conditional Language' (if/then) to negotiate terms without appearing demanding.",
+      "kn": "Professionalism: Using persuasive logic and 'Conditional Language' (if/then) to negotiate terms without appearing demanding."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Ms. Deepa: We are excited to offer you the position at sixty thousand rupees per month. What are your thoughts? | ನಿಮಗೆ ತಿಂಗಳಿಗೆ ಅರವತ್ತು ಸಾವಿರ ರೂಪಾಯಿ ಸಂಬಳದೊಂದಿಗೆ ಈ ಹುದ್ದೆಯನ್ನು ನೀಡಲು ನಾವು ಉತ್ಸುಕರಾಗಿದ್ದೇವೆ. ನಿಮ್ಮ ಅಭಿಪ್ರಾಯವೇನು?\nVinay: Thank you for the offer. Based on my five years of experience in this niche, I was expecting something closer to seventy thousand. Is there any flexibility in the budget? | ಆಫರ್‌ಗಾಗಿ ಧನ್ಯವಾದಗಳು. ಈ ಕ್ಷೇತ್ರದಲ್ಲಿ ನನ್ನ ಐದು ವರ್ಷಗಳ ಅನುಭವದ ಆಧಾರದ ಮೇಲೆ, ನಾನು ಎಪ್ಪತ್ತು ಸಾವಿರದ ಆಸುಪಾಸಿನಲ್ಲಿ ನಿರೀಕ್ಷಿಸುತ್ತಿದ್ದೆ. ಬಜೆಟ್‌ನಲ್ಲಿ ಏನಾದರೂ ಬದಲಾವಣೆಗೆ ಅವಕಾಶವಿದೆಯೇ?\nMs. Deepa: That is a bit higher than our range. What if we offer a performance bonus instead? | ಅದು ನಮ್ಮ ಮಿತಿಗಿಂತ ಸ್ವಲ್ಪ ಹೆಚ್ಚಾಯಿತು. ಬದಲಾಗಿ ನಾವು ಕಾರ್ಯಕ್ಷಮತೆಯ ಬೋನಸ್ ನೀಡಿದರೆ ಹೇಗಿರುತ್ತದೆ?\nVinay: If we can settle on sixty-five thousand as the base pay, then I would be happy to accept the offer immediately. | ನಾವು ಅರವತ್ತೈದು ಸಾವಿರ ಮೂಲ ವೇತನಕ್ಕೆ ಒಪ್ಪುವುದಾದರೆ, ನಾನು ತಕ್ಷಣವೇ ಆಫರ್ ಸ್ವೀಕರಿಸಲು ಸಂತೋಷಪಡುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we might feel shy to ask for more money or say 'ನನಗೆ ಇಷ್ಟು ಬೇಕು' (I want this much). In Expert English, we use **'ANCHORING'**. Instead of 'wanting' money, we say **'BASED ON THE MARKET'** or **'BASED ON MY EXPERIENCE'**. This moves the conversation from 'feelings' to 'facts'. Also, use the word **'FLEXIBILITY'** (ನಮ್ಯತೆ/ಬದಲಾವಣೆ) instead of 'Change'—it sounds much more professional.\n\n📚 KEY PHRASES:\n- Is there any flexibility...?: A very polite way to ask if a price or salary can be changed.\n  Example: \"Is there any flexibility in the joining date?\"\n- Based on my experience...: Provides a logical reason for your demand so it doesn't look like greed.\n  Example: \"Based on my skills, I deserve a higher role.\"\n- If we can... then I would...: Conditional logic used to close a deal by offering a compromise.\n  Example: \"If you provide transport, then I would accept the night shift.\"\n\n🗣️ PRONUNCIATION:\n- Negotiation (ನೆಗೋಷಿಯೇಷನ್): Say 'Ne-go-shee-ay-shun'. The 'ti' sounds like 'ಶ' (sha).\n- Flexibility (ಫ್ಲೆಕ್ಸಿಬಿಲಿಟಿ): Keep the 'F' and 'L' together. Say 'Flex-i-bil-i-tee'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Thank you for the **offer**. **Based on** my skills, I was **expecting** a higher **salary**. Is there any **flexibility** in the **budget**? **If** we can agree on this, **then** I am ready to **join**.",
+    "scenario": {
+      "character": {
+        "en": "HR Ms. Deepa",
+        "kn": "ಹೆಚ್.ಆರ್ ದೀಪಾ"
+      },
+      "objective": {
+        "en": "Negotiate your job offer base salary with HR: request seventy thousand instead of sixty thousand based on your experience, and offer sixty-five thousand as a base pay.",
+        "kn": "ಹೆಚ್.ಆರ್ ಸಿಬ್ಬಂದಿಯೊಂದಿಗೆ ಸಂಬಳದ ಚರ್ಚೆ ಮಾಡಿ: ನಿಮ್ಮ ಅನುಭವದ ಆಧಾರದಲ್ಲಿ 60 ಸಾವಿರದ ಆಫರ್ ಬದಲಿಗೆ 70 ಸಾವಿರ ಕೋರಿ, 65 ಸಾವಿರಕ್ಕೆ ಒಪ್ಪಂದ ಮಾಡಿಕೊಳ್ಳಿ."
+      },
+      "objectiveStr": "Negotiate your job offer base salary with HR: request seventy thousand instead of sixty thousand based on your experience, and offer sixty-five thousand as a base pay.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Negotiate your job offer base salary with HR: request seventy thousand instead of sixty thousand based on your experience, and offer sixty-five thousand as a base pay.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 2,
+    "created_at": "2026-04-01T05:53:31.748597+00:00",
+    "text_url": null
+  },
+  {
+    "id": "509d979b-9aa5-4a62-b94d-be9f94156a3d",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Public Speaking: Speeches & Presentations",
+      "kn": "ಸಾರ್ವಜನಿಕ ಭಾಷಣ: ಭಾಷಣ ಮತ್ತು ಪ್ರೆಸೆಂಟೇಶನ್"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the 'Hook-Body-Close' structure, using rhetorical pauses, and projecting confidence to an audience.",
+      "kn": "Professionalism: Mastering the 'Hook-Body-Close' structure, using rhetorical pauses, and projecting confidence to an audience."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Manasa: Good evening, everyone. Standing here today, I am reminded of a simple truth: success is never a solo journey. | ಎಲ್ಲರಿಗೂ ಶುಭ ಸಂಜೆ. ಇಂದು ಇಲ್ಲಿ ನಿಂತಿರುವಾಗ, ನನಗೆ ಒಂದು ಸರಳ ಸತ್ಯ ನೆನಪಾಗುತ್ತಿದೆ: ಯಶಸ್ಸು ಎಂಬುದು ಎಂದಿಗೂ ಒಬ್ಬಂಟಿ ಪ್ರಯಾಣವಲ್ಲ.\nManasa: I want to express my deepest gratitude to my mentors and my hardworking team. Without your support, this achievement would not be possible. | ನನ್ನ ಮಾರ್ಗದರ್ಶಕರಿಗೆ ಮತ್ತು ನನ್ನ ಕಠಿಣ ಪರಿಶ್ರಮಿ ತಂಡಕ್ಕೆ ನನ್ನ ಆಳವಾದ ಕೃತಜ್ಞತೆಯನ್ನು ವ್ಯಕ್ತಪಡಿಸಲು ನಾನು ಬಯಸುತ್ತೇನೆ. ನಿಮ್ಮ ಬೆಂಬಲವಿಲ್ಲದೆ, ಈ ಸಾಧನೆ ಸಾಧ್ಯವಾಗುತ್ತಿರಲಿಲ್ಲ.\nManasa: As we move forward, let us continue to turn every challenge into an opportunity. Thank you once again for this incredible honor. | ನಾವು ಮುಂದೆ ಸಾಗುತ್ತಿರುವಾಗ, ಪ್ರತಿಯೊಂದು ಸವಾಲನ್ನು ಅವಕಾಶವಾಗಿ ಪರಿವರ್ತಿಸುವುದನ್ನು ಮುಂದುವರಿಸೋಣ. ಈ ಅದ್ಭುತ ಗೌರವಕ್ಕಾಗಿ ಮತ್ತೊಮ್ಮೆ ಧನ್ಯವಾದಗಳು.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we often start speeches with long lists of names (ಅಧ್ಯಕ್ಷರೇ, ಅತಿಥಿಗಳೇ...). In English public speaking, we start with a **'HOOK'**—a thought or a quote that captures attention immediately. Instead of just saying 'Thank you', use **'EXPRESS MY GRATITUDE'**. It fills the room with more emotion and professional weight.\n\n📚 KEY PHRASES:\n- I am reminded of...: A powerful way to start a speech with a reflection or a story (The Hook).\n  Example: \"I am reminded of my first day at this office.\"\n- Express my deepest gratitude: A formal and high-impact way to say 'Thank you'.\n  Example: \"I want to express my deepest gratitude to my parents.\"\n- Incredible honor: Used to describe a significant award or recognition.\n  Example: \"It is an incredible honor to lead this project.\"\n\n🗣️ PRONUNCIATION:\n- Honor (ಆನರ್): The 'H' is silent! Say 'On-er'. Just like 'Honestly'.\n- Gratitude (ಗ್ರಾಟಿಟ್ಯೂಡ್): Say 'Gra-ti-tyood'. Stress the first syllable 'Gra'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "**Good evening**. I am **reminded** of a simple **truth**. Success is a **journey**. I want to **express** my **gratitude** to everyone. Thank you for this **incredible honor**.",
+    "scenario": {
+      "character": {
+        "en": "Audience",
+        "kn": "ಪ್ರೇಕ್ಷಕರು"
+      },
+      "objective": {
+        "en": "Give a thank you speech at an award ceremony, thanking your mentors and team, and expressing your motivation for future challenges.",
+        "kn": "ಪ್ರಶಸ್ತಿ ಪ್ರದಾನ ಸಮಾರಂಭದಲ್ಲಿ ಧನ್ಯವಾದ ಭಾಷಣ ಮಾಡಿ: ನಿಮ್ಮ ಮಾರ್ಗದರ್ಶಕರು ಮತ್ತು ತಂಡಕ್ಕೆ ಕೃತಜ್ಞತೆ ಸಲ್ಲಿಸಿ ಮುಂದಿನ ಸವಾಲುಗಳಿಗೆ ಪ್ರೇರಣೆ ನೀಡಿ."
+      },
+      "objectiveStr": "Give a thank you speech at an award ceremony, thanking your mentors and team, and expressing your motivation for future challenges.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Give a thank you speech at an award ceremony, thanking your mentors and team, and expressing your motivation for future challenges.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 3,
+    "created_at": "2026-04-01T05:53:50.487896+00:00",
+    "text_url": null
+  },
+  {
+    "id": "0d4624cb-75a3-47e0-b484-208e24c673bb",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Professional Networking: Making an Impression",
+      "kn": "ವೃತ್ತಿಪರ ನೆಟ್‌ವರ್ಕಿಂಗ್: ಪ್ರಭಾವಶಾಲಿ ಪರಿಚಯ"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the 'Elevator Pitch' and 'Open-Ended Questions' to build meaningful connections at events.",
+      "kn": "Professionalism: Mastering the 'Elevator Pitch' and 'Open-Ended Questions' to build meaningful connections at events."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Suman: Hello Mr. Hegde, I really enjoyed your talk on digital literacy. I am Suman, and I am building an AI platform called Simplish. | ಹಲೋ ಮಿಸ್ಟರ್ ಹೆಗಡೆ, ಡಿಜಿಟಲ್ ಸಾಕ್ಷರತೆಯ ಕುರಿತು ನಿಮ್ಮ ಮಾತು ನನಗೆ ತುಂಬಾ ಇಷ್ಟವಾಯಿತು. ನಾನು ಸುಮನ್, ನಾನು ಸಿಂಪ್ಲಿಷ್ ಎಂಬ ಎಐ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಅನ್ನು ನಿರ್ಮಿಸುತ್ತಿದ್ದೇನೆ.\nMr. Hegde: Nice to meet you, Suman. What does Simplish do exactly? | ನಿಮ್ಮನ್ನು ಭೇಟಿಯಾಗಿದ್ದಕ್ಕೆ ಸಂತೋಷ ಸುಮನ್. ಸಿಂಪ್ಲಿಷ್ ನಿಖರವಾಗಿ ಏನು ಮಾಡುತ್ತದೆ?\nSuman: We help Kannada speakers overcome the 'English wall' through bilingual AI coaching. I’d love to hear your thoughts on how we can scale this in rural areas. | ದ್ವಿಭಾಷಾ ಎಐ ತರಬೇತಿಯ ಮೂಲಕ ನಾವು ಕನ್ನಡಿಗರು 'ಇಂಗ್ಲಿಷ್ ತಡೆಗೋಡೆ'ಯನ್ನು ಜಯಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತೇವೆ. ಗ್ರಾಮೀಣ ಪ್ರದೇಶಗಳಲ್ಲಿ ನಾವು ಇದನ್ನು ಹೇಗೆ ವಿಸ್ತರಿಸಬಹುದು ಎಂಬ ಬಗ್ಗೆ ನಿಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಕೇಳಲು ನಾನು ಇಷ್ಟಪಡುತ್ತೇನೆ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada networking, we sometimes wait for others to speak first. In Expert English, we use a **'COMPLIMENT HOOK'**. Start by praising something they did (**I enjoyed your talk...**). This opens the 'door' immediately. Also, instead of asking 'Yes/No' questions, use **'YOUR THOUGHTS ON'**. It forces a deeper conversation and shows you are a thinker.\n\n📚 KEY PHRASES:\n- I really enjoyed your talk on...: A perfect 'Icebreaker' to start a conversation with a speaker or guest.\n  Example: \"I really enjoyed your talk on rural innovation.\"\n- I'd love to hear your thoughts on...: An open-ended request that makes the other person feel valued and keeps the conversation going.\n  Example: \"I'd love to hear your thoughts on the new education policy.\"\n- Let's stay in touch.: The professional way to suggest continuing the connection later (via LinkedIn or email).\n  Example: \"It was great meeting you; let's stay in touch.\"\n\n🗣️ PRONUNCIATION:\n- Literacy (ಲಿಟರಸಿ): Say 'Lit-er-a-see'. Keep the 'Lit' short and sharp.\n- Rural (ರೂರಲ್): Say 'Roo-rul'. It's a tricky 'R' sound—try not to say 'Lural'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hello! I **really** enjoyed your **presentation**. I am **building** a platform for **learners**. I'd **love** to hear your **thoughts** on our **vision**. Let's stay in **touch**.",
+    "scenario": {
+      "character": {
+        "en": "Expert Mr. Hegde",
+        "kn": "ತಜ್ಞ ಹೆಗಡೆ"
+      },
+      "objective": {
+        "en": "Approach an industry expert at a conference, compliment his digital literacy session, and ask for his thoughts on scaling your bilingual AI platform in rural areas.",
+        "kn": "ಸಮ್ಮೇಳನದಲ್ಲಿ ತಜ್ಞ ಹೆಗಡೆ ಅವರನ್ನು ಭೇಟಿಯಾಗಿ, ಅವರ ಡಿಜಿಟಲ್ ಸಾಕ್ಷರತೆಯ ಭಾಷಣವನ್ನು ಶ್ಲಾಘಿಸಿ ಮತ್ತು ನಿಮ್ಮ ದ್ವಿಭಾಷಾ ಎಐ ವೇದಿಕೆಯನ್ನು ಹಳ್ಳಿಗಳಲ್ಲಿ ವಿಸ್ತರಿಸುವ ಬಗ್ಗೆ ಅವರ ಸಲಹೆ ಕೇಳಿ."
+      },
+      "objectiveStr": "Approach an industry expert at a conference, compliment his digital literacy session, and ask for his thoughts on scaling your bilingual AI platform in rural areas.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Approach an industry expert at a conference, compliment his digital literacy session, and ask for his thoughts on scaling your bilingual AI platform in rural areas.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 4,
+    "created_at": "2026-04-01T06:06:26.791326+00:00",
+    "text_url": null
+  },
+  {
+    "id": "468dab25-472b-49b0-829d-ff24cc1950cc",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Giving Feedback: The Sandwich Method",
+      "kn": "ಅಭಿಪ್ರಾಯ ನೀಡುವುದು: ಸ್ಯಾಂಡ್‌ವಿಚ್ ವಿಧಾನ"
+    },
+    "notes": {
+      "en": "Professionalism: Mastering the 'Sandwich Method' (Positive-Negative-Positive) to correct mistakes without demotivating the team.",
+      "kn": "Professionalism: Mastering the 'Sandwich Method' (Positive-Negative-Positive) to correct mistakes without demotivating the team."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Vidyadhar: Arpan, your design for the client presentation was excellent and very creative. | ಅರ್ಪಣ್, ಕ್ಲೈಂಟ್ ಪ್ರೆಸೆಂಟೇಶನ್‌ಗಾಗಿ ನಿಮ್ಮ ವಿನ್ಯಾಸವು ಅತ್ಯುತ್ತಮವಾಗಿತ್ತು ಮತ್ತು ಬಹಳ ಸೃಜನಾತ್ಮಕವಾಗಿತ್ತು.\nVidyadhar: However, I noticed a few spelling errors in the final slides. We need to be more careful with the details to maintain our professional image. | ಆದರೆ, ಅಂತಿಮ ಸ್ಲೈಡ್‌ಗಳಲ್ಲಿ ನಾನು ಕೆಲವು ಕಾಗುಣಿತ ತಪ್ಪುಗಳನ್ನು ಗಮನಿಸಿದೆ. ನಮ್ಮ ವೃತ್ತಿಪರ ಇಮೇಜ್ ಉಳಿಸಿಕೊಳ್ಳಲು ನಾವು ವಿವರಗಳ ಬಗ್ಗೆ ಹೆಚ್ಚು ಜಾಗರೂಕರಾಗಿರಬೇಕು.\nVidyadhar: Overall, your hard work really showed. Keep up the great spirit and just double-check the text next time! | ಒಟ್ಟಾರೆಯಾಗಿ, ನಿಮ್ಮ ಕಠಿಣ ಪರಿಶ್ರಮ ಎದ್ದು ಕಾಣುತ್ತಿತ್ತು. ಇದೇ ಉತ್ಸಾಹವನ್ನು ಮುಂದುವರಿಸಿ ಮತ್ತು ಮುಂದಿನ ಬಾರಿ ಪಠ್ಯವನ್ನು ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸಿ!",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, when someone makes a mistake, we might be very direct (ಉದಾ: 'ತಪ್ಪು ಮಾಡಿದ್ದೀಯಾ'). In Expert English, we use the **'SANDWICH METHOD'**. We 'sandwich' the correction between two layers of praise. This ensures the person listens to the feedback instead of getting defensive. Instead of 'You made a mistake', use **'I NOTICED'**—it focuses on the observation, not the person.\n\n📚 KEY PHRASES:\n- I noticed that...: A neutral way to point out an error without sounding like an accusation.\n  Example: \"I noticed that the report was late.\"\n- However, we need to...: The 'middle' of the sandwich; used to introduce the correction.\n  Example: \"However, we need to improve our response time.\"\n- Keep up the great work!: A positive closing to ensure the employee feels valued.\n  Example: \"You are doing well, keep up the great work!\"\n\n🗣️ PRONUNCIATION:\n- Creative (ಕ್ರಿಯೇಟಿವ್): Say 'Kree-ay-tiv'. Don't say 'Kray-tive'.\n- Maintain (ಮೇಂಟೇನ್): Keep the 'Main' long. Say 'Main-tayn'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Your **design** was **excellent**. **However**, I **noticed** a few **errors**. We **need** to be **careful**. Overall, you are doing a **great** job. **Keep** it up!",
+    "scenario": {
+      "character": {
+        "en": "Intern Arpan",
+        "kn": "ಇಂಟರ್ನ್ ಅರ್ಪಣ್"
+      },
+      "objective": {
+        "en": "Give constructive feedback to the intern Arpan: praise his client presentation design, point out spelling errors, and encourage him to double-check next time.",
+        "kn": "ಇಂಟರ್ನ್ ಅರ್ಪಣ್‌ಗೆ ರಚನಾತ್ಮಕ ಫೀಡ್‌ಬ್ಯಾಕ್ ನೀಡಿ: ಅವರ ಪ್ರೆಸೆಂಟೇಶನ್ ವಿನ್ಯಾಸವನ್ನು ಶ್ಲಾಘಿಸಿ, ಕಾಗುಣಿತ ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಲು ತಿಳಿಸಿ ಮತ್ತು ಮುಂದಿನ ಸಲ ಮರುಪರಿಶೀಲಿಸಲು ಪ್ರೋತ್ಸಾಹಿಸಿ."
+      },
+      "objectiveStr": "Give constructive feedback to the intern Arpan: praise his client presentation design, point out spelling errors, and encourage him to double-check next time.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Give constructive feedback to the intern Arpan: praise his client presentation design, point out spelling errors, and encourage him to double-check next time.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 5,
+    "created_at": "2026-04-01T06:06:42.555818+00:00",
+    "text_url": null
+  },
+  {
+    "id": "9bd839f5-652d-4f67-b4fe-3a4feea5f5a0",
+    "module_id": "44444444-4444-4444-a444-444444444444",
+    "title": {
+      "en": "Email to Speech: Formal Briefing",
+      "kn": "ಇಮೇಲ್‌ನಿಂದ ಮೌಖಿಕ ವಿವರಣೆ: ವೃತ್ತಿಪರ ಬ್ರೀಫಿಂಗ್"
+    },
+    "notes": {
+      "en": "Professionalism: Learning to convert a dry, formal email into a natural, authoritative verbal briefing for a team.",
+      "kn": "Professionalism: Learning to convert a dry, formal email into a natural, authoritative verbal briefing for a team."
+    },
+    "video_url": null,
+    "audio_url": null,
+    "pdf_url": null,
+    "text_content": "Anand (Reading Email): Dear All, please note that according to the new policy, unauthorized access to the server room is strictly prohibited. | ಎಲ್ಲರಿಗೂ ನಮಸ್ಕಾರ, ಹೊಸ ನೀತಿಯ ಪ್ರಕಾರ, ಸರ್ವರ್ ರೂಮ್‌ಗೆ ಅನಧಿಕೃತ ಪ್ರವೇಶವನ್ನು ಕಟ್ಟುನಿಟ್ಟಾಗಿ ನಿಷೇಧಿಸಲಾಗಿದೆ ಎಂಬುದನ್ನು ದಯವಿಟ್ಟು ಗಮನಿಸಿ.\nAnand (Verbal Briefing): Hi Team, just a quick update on security. From today, please do not enter the server room without permission. We need to keep our data safe. If you have questions, let me know. | ಹಾಯ್ ಟೀಮ್, ಭದ್ರತೆಯ ಬಗ್ಗೆ ಒಂದು ಸಣ್ಣ ಅಪ್‌ಡೇಟ್. ಇಂದಿನಿಂದ, ದಯವಿಟ್ಟು ಅನುಮತಿಯಿಲ್ಲದೆ ಸರ್ವರ್ ರೂಮ್ ಪ್ರವೇಶಿಸಬೇಡಿ. ನಮ್ಮ ಡೇಟಾವನ್ನು ನಾವು ಸುರಕ್ಷಿತವಾಗಿಡಬೇಕು. ನಿಮಗೇನಾದರೂ ಪ್ರಶ್ನೆಗಳಿದ್ದರೆ, ನನಗೆ ತಿಳಿಸಿ.",
+    "study_text_content": "🌟 BRIDGE:\nIn Kannada, we use different 'levels' for writing (ಗ್ರಾಂಥಿಕ) and speaking (ಆಡುಭಾಷೆ). English is the same! An email uses big words like **'PROHIBITED'** or **'UNAUTHORIZED'**. But when you speak, use 'Simplish'—say **'PLEASE DO NOT ENTER'** or **'WITHOUT PERMISSION'**. This makes you sound like a human leader, not a robot reading a document.\n\n📚 KEY PHRASES:\n- Just a quick update...: A casual yet professional way to start a verbal briefing.\n  Example: \"Just a quick update on the project status.\"\n- What this means is...: Used to explain the 'real-world' meaning of a formal rule.\n  Example: \"What this means is we should finish the work by 5 PM.\"\n- Let me know if...: An open invitation for feedback or questions.\n  Example: \"Let me know if you need more time.\"\n\n🗣️ PRONUNCIATION:\n- Unauthorized (ಅನ್-ಆಥರೈಸ್ಡ್): Break it: Un-au-tho-ryzed. Focus on the 'th' like 'ಥ'.\n- Permission (ಪರ್ಮಿಷನ್): Say 'Per-mi-shun'. Stress the middle 'mi'.\n",
+    "speak_pdf_url": null,
+    "speak_text_url": null,
+    "speak_text_content": "Hi **Team**. Just a **quick** update. From **today**, we have a **new** security **policy**. What this **means** is, we need to be **careful**. Let me **know** if you have **questions**.",
+    "scenario": {
+      "character": {
+        "en": "Team Members",
+        "kn": "ತಂಡದ ಸದಸ್ಯರು"
+      },
+      "objective": {
+        "en": "Brief your team in the huddle about a new security policy regarding prohibited server room access based on an email you sent.",
+        "kn": "ತಂಡದ ಸಭೆಯಲ್ಲಿ ಸರ್ವರ್ ರೂಮ್ ಪ್ರವೇಶ ನಿಷೇಧದ ಹೊಸ ಭದ್ರತಾ ನೀತಿಯ ಬಗ್ಗೆ ನಿಮ್ಮ ಇಮೇಲ್ ಆಧಾರದ ಮೇಲೆ ಸಣ್ಣ ಮಾಹಿತಿ ಹಂಚಿಕೊಳ್ಳಿ."
+      },
+      "objectiveStr": "Brief your team in the huddle about a new security policy regarding prohibited server room access based on an email you sent.",
+      "initialMessage": "Hello! Let's practice our English.",
+      "systemInstruction": "Mission: Brief your team in the huddle about a new security policy regarding prohibited server room access based on an email you sent.\n\nAnticipated Mistakes:\n- Try to stick to correct phrasing.\n- Pay attention to grammar rules learned in this lesson."
+    },
+    "order_index": 6,
+    "created_at": "2026-04-01T06:07:00.384749+00:00",
+    "text_url": null
+  }
+]
