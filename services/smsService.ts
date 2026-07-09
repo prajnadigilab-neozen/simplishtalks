@@ -82,17 +82,21 @@ export async function sendOTPViaSMSGateWayHub(
         channel: SMSGATEWAYHUB_CHANNEL
       });
 
-      if (!rpcError && data && data.success) {
-        const content = data.content;
-        console.log("[SMSGateWayHub] RPC Proxy Success response:", content);
-        if (content && (content.ErrorMessage === 'Success' || content.status === 'Success' || content.ErrorCode === '000' || content.status?.toLowerCase() === 'success')) {
-          return { success: true, otp };
+      if (!rpcError && data) {
+        if (data.success) {
+          const content = data.content;
+          console.log("[SMSGateWayHub] RPC Proxy Success response:", content);
+          if (content && (content.ErrorMessage === 'Success' || content.status === 'Success' || content.ErrorCode === '000' || content.status?.toLowerCase() === 'success')) {
+            return { success: true, otp };
+          } else {
+            return { success: false, error: content?.ErrorMessage || 'Failed to send SMS through gateway proxy' };
+          }
         } else {
-          return { success: false, error: content?.ErrorMessage || 'Failed to send SMS through gateway proxy' };
+          console.warn("[SMSGateWayHub] RPC proxy SQL error:", data.error || data);
         }
       }
 
-      console.warn("[SMSGateWayHub] RPC proxy failed or not deployed. Falling back to direct browser fetch...", rpcError);
+      console.warn("[SMSGateWayHub] RPC proxy failed or not deployed. Data:", data, "Error:", rpcError);
     } catch (rpcErr) {
       console.warn("[SMSGateWayHub] RPC invocation exception. Falling back to direct browser fetch...", rpcErr);
     }
