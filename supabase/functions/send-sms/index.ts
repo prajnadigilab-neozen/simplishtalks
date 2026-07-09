@@ -2,7 +2,8 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 /**
  * Supabase Edge Function: send-sms
- * Sends OTP via SMSGateWayHub API over HTTPS from Supabase edge network.
+ * Proxies OTP requests to SMSGateWayHub from Supabase's edge network.
+ * smsgatewayhub.com rejects HTTPS from server environments, so we try HTTP first.
  */
 
 const corsHeaders = {
@@ -10,21 +11,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-function jsonResponse(body: Record<string, unknown>, status = 200) {
+function jsonResponse(body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status,
+    status: 200, // Always 200 — supabase-js discards body on non-2xx
   })
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Read credentials from Supabase Secrets
     const SMS_API_KEY = Deno.env.get('SMS_GATEWAY_API_KEY') ?? ''
     const SMS_SENDER_ID = Deno.env.get('SMS_GATEWAY_SENDER_ID') ?? 'SMPLSH'
     const SMS_CHANNEL = Deno.env.get('SMS_GATEWAY_CHANNEL') ?? '2'
@@ -32,23 +31,14 @@ serve(async (req) => {
     const SMS_REGISTER_TEMPLATE_ID = Deno.env.get('SMS_GATEWAY_TEMPLATE_ID') ?? ''
     const SMS_RESET_TEMPLATE_ID = Deno.env.get('SMS_GATEWAY_RESET_TEMPLATE_ID') ?? ''
 
-    // Validate secrets are configured
     if (!SMS_API_KEY) {
-      console.error('[send-sms] SMS_GATEWAY_API_KEY secret is not set!')
       return jsonResponse({
         success: false,
-        error: 'SMS service not configured. SMS_GATEWAY_API_KEY secret is missing.',
-        debug: {
-          hasApiKey: false,
-          hasSenderId: !!SMS_SENDER_ID,
-          hasChannel: !!SMS_CHANNEL,
-          hasPeid: !!SMS_PEID,
-          hasTemplateId: !!SMS_REGISTER_TEMPLATE_ID,
-        }
+        error: 'SMS_GATEWAY_API_KEY secret is not set in Supabase.',
+        debug: { hasApiKey: false, hasSenderId: !!SMS_SENDER_ID, hasPeid: !!SMS_PEID },
       })
     }
 
-    // Parse request body
     let body: any
     try {
       body = await req.json()
@@ -57,15 +47,13 @@ serve(async (req) => {
     }
 
     const { phone, otp, type = 'register' } = body
-
     if (!phone || !otp) {
-      return jsonResponse({ success: false, error: 'Missing phone or otp in request body' })
+      return jsonResponse({ success: false, error: 'Missing phone or otp' })
     }
 
-    // Build message per DLT registered templates
-    let message = ''
-    let templateId = ''
-
+    // Build message per DLT templates
+    let message: string
+    let templateId: string
     if (type === 'reset') {
       message = `To reset your SIMPLISH TALKS account password, use the code: ${otp}. - PRAJNA DIGILAB`
       templateId = SMS_RESET_TEMPLATE_ID
@@ -74,39 +62,62 @@ serve(async (req) => {
       templateId = SMS_REGISTER_TEMPLATE_ID
     }
 
-    // Build SMSGateWayHub API URL
-    let url = `https://login.smsgatewayhub.com/api/mt/SendSMS` +
-      `?APIKey=${encodeURIComponent(SMS_API_KEY)}` +
+    // Build query string (shared between HTTP and HTTPS attempts)
+    let qs = `?APIKey=${encodeURIComponent(SMS_API_KEY)}` +
       `&senderid=${encodeURIComponent(SMS_SENDER_ID)}` +
       `&channel=${encodeURIComponent(SMS_CHANNEL)}` +
       `&DCS=0&flashsms=0` +
       `&number=91${phone}` +
       `&text=${encodeURIComponent(message)}`
+    if (SMS_PEID) qs += `&EntityId=${encodeURIComponent(SMS_PEID)}`
+    if (templateId) qs += `&dlttemplateid=${encodeURIComponent(templateId)}`
 
-    if (SMS_PEID) url += `&EntityId=${encodeURIComponent(SMS_PEID)}`
-    if (templateId) url += `&dlttemplateid=${encodeURIComponent(templateId)}`
+    const httpUrl = `http://login.smsgatewayhub.com/api/mt/SendSMS${qs}`
+    const httpsUrl = `https://login.smsgatewayhub.com/api/mt/SendSMS${qs}`
+
+    const fetchHeaders = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/json, text/plain, */*',
+    }
 
     console.log(`[send-sms] Sending ${type} OTP to 91${phone}`)
 
-    let response: Response
+    let response: Response | null = null
+    let usedProtocol = ''
+    let httpError = ''
+    let httpsError = ''
+
+    // Attempt 1: Plain HTTP (smsgatewayhub.com rejects HTTPS from servers)
     try {
-      response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/plain, */*',
-        },
-      })
-    } catch (fetchErr: any) {
-      console.error('[send-sms] Fetch to gateway failed:', fetchErr.message)
+      console.log('[send-sms] Trying HTTP...')
+      response = await fetch(httpUrl, { method: 'GET', headers: fetchHeaders })
+      usedProtocol = 'http'
+    } catch (err: any) {
+      httpError = err.message
+      console.warn(`[send-sms] HTTP failed: ${httpError}`)
+    }
+
+    // Attempt 2: HTTPS fallback
+    if (!response) {
+      try {
+        console.log('[send-sms] Trying HTTPS...')
+        response = await fetch(httpsUrl, { method: 'GET', headers: fetchHeaders })
+        usedProtocol = 'https'
+      } catch (err: any) {
+        httpsError = err.message
+        console.error(`[send-sms] HTTPS also failed: ${httpsError}`)
+      }
+    }
+
+    if (!response) {
       return jsonResponse({
         success: false,
-        error: `Gateway connection failed: ${fetchErr.message}`,
+        error: `Gateway unreachable. HTTP: ${httpError}. HTTPS: ${httpsError}`,
       })
     }
 
     const text = await response.text()
-    console.log(`[send-sms] Gateway HTTP ${response.status}, body: ${text}`)
+    console.log(`[send-sms] Gateway responded via ${usedProtocol}, HTTP ${response.status}: ${text}`)
 
     let data: any
     try {
@@ -123,16 +134,13 @@ serve(async (req) => {
 
     return jsonResponse({
       success: isSuccess,
+      protocol: usedProtocol,
       data,
       error: isSuccess ? null : (data?.ErrorMessage || `Gateway error code: ${data?.ErrorCode}`),
     })
 
   } catch (error: any) {
-    console.error(`[send-sms] Unexpected error:`, error.message, error.stack)
-    // ALWAYS return 200 — supabase-js discards the body on non-2xx responses
-    return jsonResponse({
-      success: false,
-      error: `Server error: ${error.message}`,
-    })
+    console.error('[send-sms] Unexpected error:', error.message)
+    return jsonResponse({ success: false, error: `Server error: ${error.message}` })
   }
 })
