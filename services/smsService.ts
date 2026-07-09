@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+
 /**
  * SMSGateWayHub Integration Service
  */
@@ -26,7 +28,7 @@ export function generate6DigitOTP(): string {
 
 /**
  * Sends a 6-digit OTP to the user's mobile device via SMSGateWayHub API.
- * If credentials are not configured, it logs the OTP and shows a visual toast for testing.
+ * Uses a server-side Supabase RPC proxy to prevent CORS blocks and browser network errors.
  * 
  * @param phone 10-digit phone number
  * @param otp 6-digit OTP code
@@ -67,7 +69,37 @@ export async function sendOTPViaSMSGateWayHub(
       return { success: true, otp };
     }
 
-    // Build the SMSGateWayHub DLT compliant API endpoint URL
+    // ── PRIMARY PATH: Invoke server-side Supabase Database RPC Proxy ────────────────
+    console.log("[SMSGateWayHub] Attempting server-side RPC proxy send...");
+    try {
+      const { data, error: rpcError } = await supabase.rpc('send_sms_via_gateway', {
+        phone,
+        message,
+        template_id: templateId,
+        peid: SMSGATEWAYHUB_PEID,
+        api_key: SMSGATEWAYHUB_API_KEY,
+        sender_id: SMSGATEWAYHUB_SENDER_ID,
+        channel: SMSGATEWAYHUB_CHANNEL
+      });
+
+      if (!rpcError && data && data.success) {
+        const content = data.content;
+        console.log("[SMSGateWayHub] RPC Proxy Success response:", content);
+        if (content && (content.ErrorMessage === 'Success' || content.status === 'Success' || content.ErrorCode === '000' || content.status?.toLowerCase() === 'success')) {
+          return { success: true, otp };
+        } else {
+          return { success: false, error: content?.ErrorMessage || 'Failed to send SMS through gateway proxy' };
+        }
+      }
+
+      console.warn("[SMSGateWayHub] RPC proxy failed or not deployed. Falling back to direct browser fetch...", rpcError);
+    } catch (rpcErr) {
+      console.warn("[SMSGateWayHub] RPC invocation exception. Falling back to direct browser fetch...", rpcErr);
+    }
+    // ────────────────────────────────────────────────────────────────────────────────
+
+    // ── FALLBACK PATH: Direct browser-side HTTP Fetch ──────────────────────────────
+    console.log("[SMSGateWayHub] Running direct fetch fallback...");
     const encodedText = encodeURIComponent(message);
     let url = `https://login.smsgatewayhub.com/api/mt/SendSMS?APIKey=${SMSGATEWAYHUB_API_KEY}&senderid=${SMSGATEWAYHUB_SENDER_ID}&channel=${SMSGATEWAYHUB_CHANNEL}&DCS=0&flashsms=0&number=91${phone}&text=${encodedText}`;
 
@@ -80,16 +112,16 @@ export async function sendOTPViaSMSGateWayHub(
 
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("[SMSGateWayHub] Response data:", data);
+    console.log("[SMSGateWayHub] Direct fetch response data:", data);
 
     if (data.ErrorMessage === 'Success' || data.status === 'Success' || data.ErrorCode === '000' || data.status?.toLowerCase() === 'success') {
       return { success: true, otp };
     } else {
-      return { success: false, error: data.ErrorMessage || 'Failed to send SMS through SMSGateWayHub' };
+      return { success: false, error: data.ErrorMessage || 'Failed to send SMS through SMSGateWayHub direct fetch' };
     }
   } catch (error: any) {
     console.error("[SMSGateWayHub] Error sending SMS:", error);
