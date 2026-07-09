@@ -137,6 +137,14 @@ serve(async (req) => {
       protocol: usedProtocol,
       data,
       error: isSuccess ? null : (data?.ErrorMessage || `Gateway error code: ${data?.ErrorCode}`),
+      // Diagnostic info to verify secrets are correct (values partially masked)
+      credentials_used: {
+        apiKey: SMS_API_KEY ? `${SMS_API_KEY.substring(0, 5)}...${SMS_API_KEY.substring(SMS_API_KEY.length - 3)} (len=${SMS_API_KEY.length})` : 'EMPTY',
+        senderId: SMS_SENDER_ID,
+        channel: SMS_CHANNEL,
+        peid: SMS_PEID || 'NOT SET',
+        templateId: templateId || 'NOT SET',
+      },
     })
 
   } catch (error: any) {
