@@ -69,64 +69,53 @@ export async function sendOTPViaSMSGateWayHub(
       return { success: true, otp };
     }
 
-    // ── PRIMARY PATH: Invoke server-side Supabase Database RPC Proxy ────────────────
+    // ── ONLY PATH: Invoke server-side Supabase Database RPC Proxy ───────────────────
+    // The SMS gateway (smsgatewayhub.com) does not support HTTPS, so it cannot be
+    // called directly from the browser (mixed-content block). All requests must go
+    // through the Supabase database RPC which uses plain HTTP internally.
     console.log("[SMSGateWayHub] Attempting server-side RPC proxy send...");
-    try {
-      const { data, error: rpcError } = await supabase.rpc('send_sms_via_gateway', {
-        phone,
-        message,
-        template_id: templateId,
-        peid: SMSGATEWAYHUB_PEID,
-        api_key: SMSGATEWAYHUB_API_KEY,
-        sender_id: SMSGATEWAYHUB_SENDER_ID,
-        channel: SMSGATEWAYHUB_CHANNEL
-      });
+    const { data, error: rpcError } = await supabase.rpc('send_sms_via_gateway', {
+      phone,
+      message,
+      template_id: templateId,
+      peid: SMSGATEWAYHUB_PEID,
+      api_key: SMSGATEWAYHUB_API_KEY,
+      sender_id: SMSGATEWAYHUB_SENDER_ID,
+      channel: SMSGATEWAYHUB_CHANNEL
+    });
 
-      if (!rpcError && data) {
-        if (data.success) {
-          const content = data.content;
-          console.log("[SMSGateWayHub] RPC Proxy Success response:", content);
-          if (content && (content.ErrorMessage === 'Success' || content.status === 'Success' || content.ErrorCode === '000' || content.status?.toLowerCase() === 'success')) {
-            return { success: true, otp };
-          } else {
-            return { success: false, error: content?.ErrorMessage || 'Failed to send SMS through gateway proxy' };
-          }
-        } else {
-          console.warn("[SMSGateWayHub] RPC proxy SQL error:", data.error || data);
-        }
-      }
-
-      console.warn("[SMSGateWayHub] RPC proxy failed or not deployed. Data:", data, "Error:", rpcError);
-    } catch (rpcErr) {
-      console.warn("[SMSGateWayHub] RPC invocation exception. Falling back to direct browser fetch...", rpcErr);
-    }
-    // ────────────────────────────────────────────────────────────────────────────────
-
-    // ── FALLBACK PATH: Direct browser-side HTTP Fetch ──────────────────────────────
-    console.log("[SMSGateWayHub] Running direct fetch fallback...");
-    const encodedText = encodeURIComponent(message);
-    let url = `https://login.smsgatewayhub.com/api/mt/SendSMS?APIKey=${SMSGATEWAYHUB_API_KEY}&senderid=${SMSGATEWAYHUB_SENDER_ID}&channel=${SMSGATEWAYHUB_CHANNEL}&DCS=0&flashsms=0&number=91${phone}&text=${encodedText}`;
-
-    if (SMSGATEWAYHUB_PEID) {
-      url += `&EntityId=${SMSGATEWAYHUB_PEID}`;
-    }
-    if (templateId) {
-      url += `&dlttemplateid=${templateId}`;
+    if (rpcError) {
+      console.error("[SMSGateWayHub] RPC call error:", rpcError);
+      return { success: false, error: 'OTP service unavailable. Please try again later.' };
     }
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error status: ${response.status}`);
+    if (!data) {
+      console.error("[SMSGateWayHub] RPC returned no data.");
+      return { success: false, error: 'OTP service returned an empty response.' };
     }
 
-    const data = await response.json();
-    console.log("[SMSGateWayHub] Direct fetch response data:", data);
+    if (!data.success) {
+      console.warn("[SMSGateWayHub] RPC proxy SQL error:", data.error);
+      return { success: false, error: data.error || 'Failed to send OTP via server proxy.' };
+    }
 
-    if (data.ErrorMessage === 'Success' || data.status === 'Success' || data.ErrorCode === '000' || data.status?.toLowerCase() === 'success') {
+    const content = data.content;
+    console.log("[SMSGateWayHub] RPC Proxy response:", content);
+
+    if (content && (
+      content.ErrorMessage === 'Success' ||
+      content.status === 'Success' ||
+      content.ErrorCode === '000' ||
+      content.status?.toLowerCase() === 'success'
+    )) {
       return { success: true, otp };
-    } else {
-      return { success: false, error: data.ErrorMessage || 'Failed to send SMS through SMSGateWayHub direct fetch' };
     }
+
+    return {
+      success: false,
+      error: content?.ErrorMessage || 'SMS gateway rejected the request.'
+    };
+
   } catch (error: any) {
     console.error("[SMSGateWayHub] Error sending SMS:", error);
     return { success: false, error: error.message || 'SMS service error occurred' };

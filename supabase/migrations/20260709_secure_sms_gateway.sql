@@ -1,10 +1,13 @@
 -- Migration: Secure SMS Gateway Proxy via Supabase PostgreSQL RPC
--- Uses correct http_request composite type syntax for Supabase's pgsql-http extension.
+-- Uses plain HTTP (not HTTPS) for smsgatewayhub.com which does not support TLS.
 
 -- 1. Enable http extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS http;
 
--- 2. Create the SMS Gateway Proxy function
+-- 2. Drop old version to ensure a clean replacement
+DROP FUNCTION IF EXISTS public.send_sms_via_gateway(text, text, text, text, text, text, text);
+
+-- 3. Create the SMS Gateway Proxy function using plain HTTP
 CREATE OR REPLACE FUNCTION public.send_sms_via_gateway(
   phone text,
   message text,
@@ -19,8 +22,9 @@ DECLARE
   resp http_response;
   resp_content jsonb;
 BEGIN
-  -- Construct the SMSGateWayHub URL with URL-encoded query parameters
-  url := 'https://login.smsgatewayhub.com/api/mt/SendSMS?APIKey=' || urlencode(api_key) ||
+  -- NOTE: smsgatewayhub.com does NOT support HTTPS on their API endpoint.
+  -- Using plain http:// here is intentional and required for the connection to succeed.
+  url := 'http://login.smsgatewayhub.com/api/mt/SendSMS?APIKey=' || urlencode(api_key) ||
          '&senderid=' || urlencode(sender_id) ||
          '&channel=' || urlencode(channel) ||
          '&DCS=0&flashsms=0&number=91' || phone ||
@@ -33,8 +37,7 @@ BEGIN
     url := url || '&dlttemplateid=' || urlencode(template_id);
   end if;
 
-  -- Use full http_request composite to pass User-Agent header
-  -- This is the correct syntax for the pgsql-http extension used by Supabase
+  -- Use http_request composite type with User-Agent header
   SELECT * INTO resp FROM http((
     'GET'::http_method,
     url,
@@ -66,7 +69,7 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$ LANGUAGE plpgsql;
 
--- 3. Grant access to execute this RPC from the frontend (unauthenticated during registration)
+-- 4. Grant access to execute this RPC from the frontend (unauthenticated during registration)
 GRANT EXECUTE ON FUNCTION public.send_sms_via_gateway(text, text, text, text, text, text, text) TO anon;
 GRANT EXECUTE ON FUNCTION public.send_sms_via_gateway(text, text, text, text, text, text, text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.send_sms_via_gateway(text, text, text, text, text, text, text) TO service_role;
