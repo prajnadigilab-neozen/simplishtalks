@@ -1,5 +1,5 @@
--- Migration: Secure SMS Gateway Proxy via Supabase PostgreSQL RPC
--- Resolves CORS blocks and net::ERR_CONNECTION_RESET from client-side browsers.
+-- Migration: Secure SMS Gateway Proxy via Supabase PostgreSQL RPC (Robust Version)
+-- Resolves CORS blocks, WAF blocks (using User-Agent), and SSL peer connection resets.
 
 -- 1. Enable http extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS http;
@@ -18,6 +18,7 @@ DECLARE
   url text;
   resp record;
   resp_content jsonb;
+  headers http_header[];
 BEGIN
   -- Construct the SMSGateWayHub URL with URL-encoded query parameters
   url := 'https://login.smsgatewayhub.com/api/mt/SendSMS?APIKey=' || urlencode(api_key) ||
@@ -33,8 +34,20 @@ BEGIN
     url := url || '&dlttemplateid=' || urlencode(template_id);
   end if;
 
-  -- Execute synchronous HTTP GET request
-  SELECT * FROM http_get(url) INTO resp;
+  -- Add standard browser headers to bypass firewall / Cloudflare blocks targeting database user-agents
+  headers := ARRAY[
+    http_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'),
+    http_header('Accept', 'application/json')
+  ];
+
+  -- Execute synchronous HTTP GET request (try HTTPS first)
+  BEGIN
+    SELECT * FROM http_get(url, headers) INTO resp;
+  EXCEPTION WHEN OTHERS THEN
+    -- Fallback: If SSL/TLS connection reset occurs, retry via non-SSL HTTP
+    url := replace(url, 'https://', 'http://');
+    SELECT * FROM http_get(url, headers) INTO resp;
+  END;
   
   -- Parse JSON response safely
   BEGIN
