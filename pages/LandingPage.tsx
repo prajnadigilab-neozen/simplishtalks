@@ -54,10 +54,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
           })}
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md mx-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-2xl mx-auto px-4">
           <button
             onClick={handleCTA}
-            className="w-full bg-orange-500 text-white px-8 py-5 rounded-2xl font-black text-xl hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-orange-500/20 border-b-4 border-orange-700 flex items-center justify-center gap-2 group"
+            className="w-full sm:flex-1 bg-orange-500 text-white px-8 py-5 rounded-2xl font-black text-xl hover:bg-orange-600 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-orange-500/20 border-b-4 border-orange-700 flex items-center justify-center gap-2 group"
           >
             {isLoggedIn
               ? (session.role === UserRole.SUPER_ADMIN || session.role === UserRole.MODERATOR 
@@ -65,6 +65,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
                   : t({ en: 'Continue Learning', kn: 'ಕಲಿಕೆ ಮುಂದುವರಿಸಿ' }))
               : t({ en: 'Open The Door', kn: 'ಬಾಗಿಲು ತೆರೆಯಿರಿ' })}
             <span className="text-2xl group-hover:translate-x-1 transition-transform">➔</span>
+          </button>
+          
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('simplish-trigger-pwa-install'));
+            }}
+            className="w-full sm:flex-1 bg-white dark:bg-slate-800 text-slate-800 dark:text-white border-2 border-slate-200 dark:border-slate-700 px-8 py-5 rounded-2xl font-black text-xl hover:bg-slate-50 dark:hover:bg-slate-750 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg"
+          >
+            📥 {t({ en: 'Download App', kn: 'ಆಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ' })}
           </button>
         </div>
         {isLoggedIn && (

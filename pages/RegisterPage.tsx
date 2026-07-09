@@ -1096,6 +1096,19 @@ const RegisterPage: React.FC = () => {
             )}
           </p>
 
+          {/* Download App Option */}
+          <div className="mt-8 pt-6 border-t border-slate-200/60 dark:border-slate-800 flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('simplish-trigger-pwa-install'));
+              }}
+              className="flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-slate-100/50 hover:bg-blue-50 dark:bg-slate-800/40 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 rounded-2xl transition-all active:scale-95 shadow-sm"
+            >
+              📥 {t({ en: 'Download App', kn: 'ಆಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ' })}
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
