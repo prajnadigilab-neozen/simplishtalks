@@ -78,11 +78,25 @@ export async function sendOTPViaSMSGateWayHub(
     });
 
     if (fnError) {
-      console.error("[SMSGateWayHub] Edge Function error:", fnError);
-      return { success: false, error: 'OTP service unavailable. Please try again later.' };
+      // Try to read the error response body for diagnostics
+      let errorDetail = fnError.message || 'Unknown edge function error';
+      try {
+        if (fnError.context && typeof fnError.context.json === 'function') {
+          const errBody = await fnError.context.json();
+          console.error("[SMSGateWayHub] Edge Function error body:", errBody);
+          errorDetail = errBody?.error || errorDetail;
+        }
+      } catch { /* ignore parse errors */ }
+      console.error("[SMSGateWayHub] Edge Function error:", errorDetail);
+      return { success: false, error: errorDetail };
     }
 
     console.log("[SMSGateWayHub] Edge Function response:", fnData);
+
+    // Check for debug info (missing secrets etc.)
+    if (fnData?.debug) {
+      console.warn("[SMSGateWayHub] Debug info from Edge Function:", fnData.debug);
+    }
 
     if (fnData?.success) {
       return { success: true, otp };
