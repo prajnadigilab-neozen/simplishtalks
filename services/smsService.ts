@@ -60,7 +60,6 @@ export async function sendOTPViaSMSGateWayHub(
     if (SMSGATEWAYHUB_MOCK || !SMSGATEWAYHUB_API_KEY) {
       console.warn("⚠️ SMSGateWayHub API key not set or Mock enabled. Using developer fallback.");
       
-      // Also register a custom developer event in window so frontend can display a toast helper
       if (typeof window !== 'undefined') {
         const event = new CustomEvent('dev-otp-sent', { detail: { phone, otp } });
         window.dispatchEvent(event);
@@ -69,51 +68,29 @@ export async function sendOTPViaSMSGateWayHub(
       return { success: true, otp };
     }
 
-    // ── ONLY PATH: Invoke server-side Supabase Database RPC Proxy ───────────────────
-    // The SMS gateway (smsgatewayhub.com) does not support HTTPS, so it cannot be
-    // called directly from the browser (mixed-content block). All requests must go
-    // through the Supabase database RPC which uses plain HTTP internally.
-    console.log("[SMSGateWayHub] Attempting server-side RPC proxy send...");
-    const { data, error: rpcError } = await supabase.rpc('send_sms_via_gateway', {
-      phone,
-      message,
-      template_id: templateId,
-      peid: SMSGATEWAYHUB_PEID,
-      api_key: SMSGATEWAYHUB_API_KEY,
-      sender_id: SMSGATEWAYHUB_SENDER_ID,
-      channel: SMSGATEWAYHUB_CHANNEL
+    // ── Edge Function Proxy (Deno fetch = full HTTPS support, no browser CORS) ──────
+    // The database RPC (pg http extension) fails TLS handshake with smsgatewayhub.com.
+    // The Supabase Edge Function uses Deno's native fetch which handles HTTPS properly.
+    // Credentials (API key etc.) are stored securely as Supabase Secrets, never in the bundle.
+    console.log("[SMSGateWayHub] Invoking send-sms Edge Function...");
+    const { data: fnData, error: fnError } = await supabase.functions.invoke('send-sms', {
+      body: { phone, otp, type }
     });
 
-    if (rpcError) {
-      console.error("[SMSGateWayHub] RPC call error:", rpcError);
+    if (fnError) {
+      console.error("[SMSGateWayHub] Edge Function error:", fnError);
       return { success: false, error: 'OTP service unavailable. Please try again later.' };
     }
 
-    if (!data) {
-      console.error("[SMSGateWayHub] RPC returned no data.");
-      return { success: false, error: 'OTP service returned an empty response.' };
-    }
+    console.log("[SMSGateWayHub] Edge Function response:", fnData);
 
-    if (!data.success) {
-      console.warn("[SMSGateWayHub] RPC proxy SQL error:", data.error);
-      return { success: false, error: data.error || 'Failed to send OTP via server proxy.' };
-    }
-
-    const content = data.content;
-    console.log("[SMSGateWayHub] RPC Proxy response:", content);
-
-    if (content && (
-      content.ErrorMessage === 'Success' ||
-      content.status === 'Success' ||
-      content.ErrorCode === '000' ||
-      content.status?.toLowerCase() === 'success'
-    )) {
+    if (fnData?.success) {
       return { success: true, otp };
     }
 
     return {
       success: false,
-      error: content?.ErrorMessage || 'SMS gateway rejected the request.'
+      error: fnData?.error || fnData?.data?.ErrorMessage || 'SMS gateway rejected the request.'
     };
 
   } catch (error: any) {
