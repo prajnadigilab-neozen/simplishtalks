@@ -113,7 +113,7 @@ const Navigation: React.FC<NavigationProps> = ({ onSignOut, session }) => {
   return (
     <header className={`px-4 py-2.5 md:px-8 md:py-3 sticky top-0 z-50 flex justify-between items-center border-b-2 transition-all duration-300 backdrop-blur-md ${isLanding
       ? 'bg-white/95 dark:bg-slate-900/95 border-gray-100 dark:border-slate-800 shadow-sm'
-      : 'bg-blue-900/95 dark:bg-slate-955/95 border-blue-900/50 dark:border-black text-white shadow-lg'
+      : 'bg-blue-900/95 dark:bg-slate-950/95 border-blue-900/50 dark:border-black text-white shadow-lg'
       }`}>
       <div className="flex flex-row items-center shrink-0 whitespace-nowrap">
         <div
@@ -639,15 +639,15 @@ const MobileNavItem: React.FC<{ icon: string; label: string; to: string }> = ({ 
     <button
       onClick={() => navigate(to)}
       className={`flex flex-col items-center justify-center p-1 transition-all flex-1 active:scale-90 ${isActive
-        ? 'text-blue-900 dark:text-blue-400 scale-105'
-        : 'text-slate-400 dark:text-slate-600 opacity-60'
+        ? 'text-blue-600 dark:text-blue-400 scale-105'
+        : 'text-slate-500 dark:text-slate-400'
         }`}
     >
       <div className={`text-xl mb-1 flex items-center justify-center h-8 w-8 rounded-xl transition-all ${isActive ? 'bg-blue-50 dark:bg-blue-900/30 shadow-sm' : ''}`}>
         {icon}
       </div>
-      <span className={`text-[8px] font-black uppercase tracking-[0.1em] text-center px-1 ${isActive ? 'opacity-100' : 'opacity-60'}`}>{label}</span>
-      {isActive && <div className="mt-0.5 w-1 h-1 bg-blue-900 dark:bg-blue-400 rounded-full"></div>}
+      <span className={`text-[8.5px] font-black uppercase tracking-[0.1em] text-center px-1 ${isActive ? 'opacity-100' : 'opacity-70'}`}>{label}</span>
+      {isActive && <div className="mt-0.5 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full"></div>}
     </button>
   );
 };
