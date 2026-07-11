@@ -82,8 +82,8 @@ serve(async (req) => {
     if (SMS_PEID) qs += `&EntityId=${encodeURIComponent(SMS_PEID)}`
     if (templateId) qs += `&dlttemplateid=${encodeURIComponent(templateId)}`
 
-    const httpUrl = `http://login.smsgatewayhub.com/api/mt/SendSMS${qs}`
-    const httpsUrl = `https://login.smsgatewayhub.com/api/mt/SendSMS${qs}`
+    const httpUrl = `http://www.smsgatewayhub.com/api/mt/SendSMS${qs}`
+    const httpsUrl = `https://www.smsgatewayhub.com/api/mt/SendSMS${qs}`
 
     const fetchHeaders = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -97,25 +97,25 @@ serve(async (req) => {
     let httpError = ''
     let httpsError = ''
 
-    // Attempt 1: Plain HTTP (smsgatewayhub.com rejects HTTPS from servers)
+    // Attempt 1: HTTPS (preferred modern secure endpoint)
     try {
-      console.log('[send-sms] Trying HTTP...')
-      response = await fetch(httpUrl, { method: 'GET', headers: fetchHeaders })
-      usedProtocol = 'http'
+      console.log('[send-sms] Trying HTTPS...')
+      response = await fetch(httpsUrl, { method: 'GET', headers: fetchHeaders })
+      usedProtocol = 'https'
     } catch (err: any) {
-      httpError = err.message
-      console.warn(`[send-sms] HTTP failed: ${httpError}`)
+      httpsError = err.message
+      console.warn(`[send-sms] HTTPS failed: ${httpsError}`)
     }
 
-    // Attempt 2: HTTPS fallback
-    if (!response) {
+    // Attempt 2: HTTP fallback
+    if (!response || response.status !== 200) {
       try {
-        console.log('[send-sms] Trying HTTPS...')
-        response = await fetch(httpsUrl, { method: 'GET', headers: fetchHeaders })
-        usedProtocol = 'https'
+        console.log('[send-sms] Trying HTTP...')
+        response = await fetch(httpUrl, { method: 'GET', headers: fetchHeaders })
+        usedProtocol = 'http'
       } catch (err: any) {
-        httpsError = err.message
-        console.error(`[send-sms] HTTPS also failed: ${httpsError}`)
+        httpError = err.message
+        console.error(`[send-sms] HTTP also failed: ${httpError}`)
       }
     }
 
@@ -147,15 +147,6 @@ serve(async (req) => {
       protocol: usedProtocol,
       data,
       error: isSuccess ? null : (data?.ErrorMessage || `Gateway error code: ${data?.ErrorCode}`),
-      // Diagnostic info to verify secrets are correct (values partially masked)
-      credentials_used: {
-        apiKey: SMS_API_KEY ? `${SMS_API_KEY.substring(0, 5)}...${SMS_API_KEY.substring(SMS_API_KEY.length - 3)} (len=${SMS_API_KEY.length})` : 'EMPTY',
-        senderId: SMS_SENDER_ID,
-        channel: SMS_CHANNEL,
-        route: SMS_ROUTE || 'NOT SET',
-        peid: SMS_PEID || 'NOT SET',
-        templateId: templateId || 'NOT SET',
-      },
     })
 
   } catch (error: any) {
