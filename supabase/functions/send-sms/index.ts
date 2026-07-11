@@ -26,10 +26,19 @@ serve(async (req) => {
   try {
     const SMS_API_KEY = Deno.env.get('SMS_GATEWAY_API_KEY') ?? ''
     const SMS_SENDER_ID = Deno.env.get('SMS_GATEWAY_SENDER_ID') ?? 'SMPLSH'
-    const SMS_CHANNEL = Deno.env.get('SMS_GATEWAY_CHANNEL') ?? '2'
+    const SMS_CHANNEL_RAW = Deno.env.get('SMS_GATEWAY_CHANNEL') ?? '2'
+    const SMS_ROUTE_RAW = Deno.env.get('SMS_GATEWAY_ROUTE') ?? ''
     const SMS_PEID = Deno.env.get('SMS_GATEWAY_PEID') ?? ''
     const SMS_REGISTER_TEMPLATE_ID = Deno.env.get('SMS_GATEWAY_TEMPLATE_ID') ?? ''
     const SMS_RESET_TEMPLATE_ID = Deno.env.get('SMS_GATEWAY_RESET_TEMPLATE_ID') ?? ''
+
+    // Smart mapping: if channel is set to a route ID (e.g. '47'), separate them
+    let SMS_CHANNEL = SMS_CHANNEL_RAW
+    let SMS_ROUTE = SMS_ROUTE_RAW
+    if (SMS_CHANNEL_RAW !== '1' && SMS_CHANNEL_RAW !== '2' && SMS_CHANNEL_RAW.toUpperCase() !== 'OTP' && SMS_CHANNEL_RAW.toUpperCase() !== 'INT') {
+      SMS_ROUTE = SMS_CHANNEL_RAW
+      SMS_CHANNEL = '2' // Default to Transactional
+    }
 
     if (!SMS_API_KEY) {
       return jsonResponse({
@@ -69,6 +78,7 @@ serve(async (req) => {
       `&DCS=0&flashsms=0` +
       `&number=91${phone}` +
       `&text=${encodeURIComponent(message)}`
+    if (SMS_ROUTE) qs += `&route=${encodeURIComponent(SMS_ROUTE)}`
     if (SMS_PEID) qs += `&EntityId=${encodeURIComponent(SMS_PEID)}`
     if (templateId) qs += `&dlttemplateid=${encodeURIComponent(templateId)}`
 
@@ -142,6 +152,7 @@ serve(async (req) => {
         apiKey: SMS_API_KEY ? `${SMS_API_KEY.substring(0, 5)}...${SMS_API_KEY.substring(SMS_API_KEY.length - 3)} (len=${SMS_API_KEY.length})` : 'EMPTY',
         senderId: SMS_SENDER_ID,
         channel: SMS_CHANNEL,
+        route: SMS_ROUTE || 'NOT SET',
         peid: SMS_PEID || 'NOT SET',
         templateId: templateId || 'NOT SET',
       },
