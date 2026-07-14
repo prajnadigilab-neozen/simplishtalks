@@ -9,6 +9,7 @@ import { LEVEL_ORDER } from '../constants';
 import { db } from '../lib/db';
 import { syncUp } from '../services/syncService';
 import { evaluateSnehiScorecard } from '../services/geminiService';
+import { attributionService } from '../services/attributionService';
 
 interface AppState {
     session: any | null;
@@ -75,6 +76,13 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         set({ loading: true });
         console.log("🚀 Starting App Initialization...");
+
+        // Trigger web-to-app attribution fingerprinting match
+        try {
+            await attributionService.matchAndClaimAttribution();
+        } catch (attrErr) {
+            console.error("Attribution fingerprint check error:", attrErr);
+        }
 
         let userId: string | undefined;
         try {

@@ -4,6 +4,7 @@ import { useLanguage } from '../components/LanguageContext';
 import { UserRole } from '../types';
 import Logo from '../components/Logo';
 import TestimonialWidget from '../components/TestimonialWidget';
+import { attributionService } from '../services/attributionService';
 
 interface LandingPageProps {
   session?: any;
@@ -23,6 +24,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
   const [simScenario, setSimScenario] = useState<'office' | 'travel'>('office');
   const [simRecording, setSimRecording] = useState(false);
   const [simProgress, setSimProgress] = useState(0);
+
+  useEffect(() => {
+    attributionService.cacheUTMParameters();
+    attributionService.logEvent('web_page_viewed', {
+      page_url: window.location.href,
+      referrer: document.referrer
+    });
+  }, []);
 
   useEffect(() => {
     let interval: any;

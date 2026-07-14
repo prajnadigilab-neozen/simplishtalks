@@ -8,6 +8,7 @@ import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
 import { getSystemConfig } from '../services/systemConfigService';
 import SnehiCheckoutModal from '../components/SnehiCheckoutModal';
+import { attributionService } from '../services/attributionService';
 
 const Dashboard: React.FC = () => {
   const { session, modules, scenarios, progress, evaluationHistory, feedback, loading, initialized } = useAppStore();
@@ -381,6 +382,8 @@ const Dashboard: React.FC = () => {
                   </button>
                   <button
                     onClick={() => {
+                      attributionService.recordPendingAttribution('android');
+                      attributionService.logEvent('web_download_button_clicked', { platform: 'android', source: 'dashboard_talks' });
                       window.dispatchEvent(new CustomEvent('simplish-trigger-pwa-install'));
                     }}
                     className="w-full py-2.5 border-2 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-1.5"
@@ -442,6 +445,8 @@ const Dashboard: React.FC = () => {
                     {(snehiState === 'ACTIVE' || snehiState === 'AWAITING_PMT') && (
                       <button
                         onClick={() => {
+                          attributionService.recordPendingAttribution('android');
+                          attributionService.logEvent('web_download_button_clicked', { platform: 'android', source: 'dashboard_snehi' });
                           window.dispatchEvent(new CustomEvent('simplish-trigger-pwa-install'));
                         }}
                         className="w-full py-2.5 border-2 border-orange-200 dark:border-orange-800 text-orange-600 dark:text-orange-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all active:scale-95 flex items-center justify-center gap-1.5"

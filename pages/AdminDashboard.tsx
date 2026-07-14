@@ -28,7 +28,9 @@ const AdminDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config' | 'custom_scenarios' | 'snehi_access' | 'feedback'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config' | 'custom_scenarios' | 'snehi_access' | 'feedback' | 'attribution'>('users');
+  const [attributionStats, setAttributionStats] = useState<any>(null);
+  const [loadingAttribution, setLoadingAttribution] = useState(false);
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
   const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -328,10 +330,80 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
   };
 
+  const fetchAttributionData = async () => {
+    setLoadingAttribution(true);
+    try {
+      // 1. Fetch analytics events
+      const { data: events, error: eventsError } = await supabase
+        .from('analytics_events')
+        .select('*');
+
+      if (eventsError && !eventsError.message.includes('relation "analytics_events" does not exist')) {
+        throw eventsError;
+      }
+
+      // 2. Fetch profiles with attribution details
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, utm_source, utm_medium, utm_campaign, package_type, package_status, created_at');
+
+      if (profilesError) throw profilesError;
+
+      // 3. Compute counts
+      const totalVisits = (events || []).filter(e => e.event_name === 'web_page_viewed').length;
+      const totalClicks = (events || []).filter(e => e.event_name === 'web_download_button_clicked').length;
+      const totalInstalls = (events || []).filter(e => e.event_name === 'app_first_open').length;
+      
+      const totalRegistered = profiles?.length || 0;
+      const totalSubscribed = profiles?.filter(p => p.package_status === 'ACTIVE' || p.package_status === 'ACTIVE_Snehi').length || 0;
+
+      // UTM breakdowns
+      const utmSources: Record<string, any> = {};
+      profiles?.forEach(p => {
+        const src = p.utm_source || 'organic';
+        if (!utmSources[src]) {
+          utmSources[src] = { source: src, clicks: 0, installs: 0, signups: 0, subscribers: 0 };
+        }
+        utmSources[src].signups++;
+        if (p.package_status === 'ACTIVE' || p.package_status === 'ACTIVE_Snehi') {
+          utmSources[src].subscribers++;
+        }
+      });
+
+      // Map clicks and installs from events per source
+      (events || []).forEach(e => {
+        const src = e.properties?.utm_source || 'organic';
+        if (!utmSources[src]) {
+          utmSources[src] = { source: src, clicks: 0, installs: 0, signups: 0, subscribers: 0 };
+        }
+        if (e.event_name === 'web_download_button_clicked') {
+          utmSources[src].clicks++;
+        } else if (e.event_name === 'app_first_open') {
+          utmSources[src].installs++;
+        }
+      });
+
+      setAttributionStats({
+        totalVisits: totalVisits || 1, // Avoid divide by zero
+        totalClicks: totalClicks || 1,
+        totalInstalls: totalInstalls || 0,
+        totalRegistered: totalRegistered || 0,
+        totalSubscribed: totalSubscribed || 0,
+        utmBreakdown: Object.values(utmSources)
+      });
+    } catch (err) {
+      console.error('Error fetching attribution data:', err);
+    } finally {
+      setLoadingAttribution(false);
+    }
+  };
+
   useEffect(() => {
     fetchAccessRequests();
     if (activeTab === 'feedback') {
       fetchFeedbackData();
+    } else if (activeTab === 'attribution') {
+      fetchAttributionData();
     }
   }, [activeTab]);
 
@@ -386,7 +458,13 @@ const AdminDashboard: React.FC = () => {
       const stats = await getGlobalStats();
 
       // Fetch total refunded amount — wrapped to prevent crashing the whole load
-      const { data: refunds } = await supabase.from('refunds').select('refund_amount, status').catch(() => ({ data: [] })) as { data: any[] };
+      let refunds: any[] = [];
+      try {
+        const { data } = await supabase.from('refunds').select('refund_amount, status');
+        if (data) refunds = data;
+      } catch (err) {
+        console.warn("Failed to fetch refunds:", err);
+      }
       const totalRefunded = (refunds || [])
         .filter((r: any) => r.status === 'completed')
         .reduce((sum: number, r: any) => sum + Number(r.refund_amount || 0), 0);
@@ -740,6 +818,7 @@ const AdminDashboard: React.FC = () => {
           )}
           <button key="stats" onClick={() => setActiveTab('stats')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'stats' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'General Stats', kn: 'ಅಂಕಿಅಂಶಗಳು' })}</button>
           <button key="reports" onClick={() => setActiveTab('reports')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'reports' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Reports', kn: 'ವರದಿಗಳು' })}</button>
+          <button key="attribution" onClick={() => setActiveTab('attribution')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'attribution' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'App Tracking', kn: 'ಆಪ್ ಟ್ರ್ಯಾಕಿಂಗ್' })}</button>
           <button 
             key="feedback" 
             onClick={() => setActiveTab('feedback')} 
@@ -1665,6 +1744,170 @@ const AdminDashboard: React.FC = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'attribution' && (
+        <div className="space-y-8 animate-in fade-in">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-black text-blue-900 dark:text-blue-300">{t({ en: 'Web-to-App Tracking & Funnel Analytics', kn: 'ವೆಬ್-ಟು-ಆಪ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಮತ್ತು ಫನಲ್ ವಿಶ್ಲೇಷಣೆ' })}</h3>
+            <button onClick={fetchAttributionData} disabled={loadingAttribution} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors disabled:opacity-50 flex items-center gap-1.5">
+              {loadingAttribution && <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>}
+              {t({ en: 'Refresh Data', kn: 'ಡೇಟಾ ನವೀಕರಿಸಿ' })}
+            </button>
+          </div>
+
+          {loadingAttribution || !attributionStats ? (
+            <div className="flex items-center justify-center p-20">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <>
+              {/* Funnel KPI Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{t({ en: '1. Web Page Views', kn: '೧. ವೆಬ್ ಪುಟ ವೀಕ್ಷಣೆಗಳು' })}</span>
+                  <h4 className="text-3xl font-black text-slate-850 dark:text-slate-100 mt-2">{attributionStats.totalVisits.toLocaleString()}</h4>
+                </div>
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{t({ en: '2. Download Clicks', kn: '೨. ಡೌನ್‌ಲೋಡ್ ಕ್ಲಿಕ್‌ಗಳು' })}</span>
+                  <h4 className="text-3xl font-black text-slate-850 dark:text-slate-100 mt-2">{attributionStats.totalClicks.toLocaleString()}</h4>
+                  <p className="text-xs font-bold text-blue-500 mt-1">CTR: {((attributionStats.totalClicks / attributionStats.totalVisits) * 100).toFixed(1)}%</p>
+                </div>
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{t({ en: '3. App Installs (Opens)', kn: '೩. ಆಪ್ ಇನ್‌ಸ್ಟಾಲ್‌ಗಳು' })}</span>
+                  <h4 className="text-3xl font-black text-slate-850 dark:text-slate-100 mt-2">{attributionStats.totalInstalls.toLocaleString()}</h4>
+                  <p className="text-xs font-bold text-green-500 mt-1">CTI: {((attributionStats.totalInstalls / Math.max(1, attributionStats.totalClicks)) * 100).toFixed(1)}%</p>
+                </div>
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{t({ en: '4. Registered Users', kn: '೪. ನೋಂದಾಯಿತ ಬಳಕೆದಾರರು' })}</span>
+                  <h4 className="text-3xl font-black text-slate-850 dark:text-slate-100 mt-2">{attributionStats.totalRegistered.toLocaleString()}</h4>
+                  <p className="text-xs font-bold text-purple-500 mt-1">Match Rate: {((attributionStats.totalRegistered / Math.max(1, attributionStats.totalInstalls)) * 100).toFixed(1)}%</p>
+                </div>
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 shadow-sm">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{t({ en: '5. Paid Subscribers', kn: '೫. ಚಂದಾದಾರರು' })}</span>
+                  <h4 className="text-3xl font-black text-slate-850 dark:text-slate-100 mt-2">{attributionStats.totalSubscribed.toLocaleString()}</h4>
+                  <p className="text-xs font-bold text-amber-500 mt-1">Conv Rate: {((attributionStats.totalSubscribed / Math.max(1, attributionStats.totalRegistered)) * 100).toFixed(1)}%</p>
+                </div>
+              </div>
+
+              {/* Custom Web-to-App Funnel Visualization */}
+              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl animate-in fade-in duration-300">
+                <h4 className="text-lg font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tight">{t({ en: 'Web-to-App Conversion Funnel Progress', kn: 'ವೆಬ್-ಟು-ಆಪ್ ಪರಿವರ್ತನೆ ಹಂತಗಳು' })}</h4>
+                <div className="space-y-6">
+                  {/* Step 1 */}
+                  <div>
+                    <div className="flex justify-between text-xs font-black uppercase mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">1. Web Visits (Baseline)</span>
+                      <span className="text-slate-900 dark:text-white">100%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-6 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full flex items-center justify-end px-3 text-[10px] font-black text-white" style={{ width: '100%' }}>
+                        {attributionStats.totalVisits} Views
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div>
+                    <div className="flex justify-between text-xs font-black uppercase mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">2. Download Click CTR</span>
+                      <span className="text-blue-600 dark:text-blue-400">{((attributionStats.totalClicks / attributionStats.totalVisits) * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-6 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-blue-600 to-cyan-500 h-full flex items-center justify-end px-3 text-[10px] font-black text-white" style={{ width: `${Math.min(100, (attributionStats.totalClicks / attributionStats.totalVisits) * 100)}%` }}>
+                        {attributionStats.totalClicks} Clicks
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div>
+                    <div className="flex justify-between text-xs font-black uppercase mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">3. Click-to-Install (CTI)</span>
+                      <span className="text-green-600 dark:text-green-400">{((attributionStats.totalInstalls / Math.max(1, attributionStats.totalClicks)) * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-6 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-green-500 to-teal-500 h-full flex items-center justify-end px-3 text-[10px] font-black text-white" style={{ width: `${Math.min(100, (attributionStats.totalInstalls / Math.max(1, attributionStats.totalVisits)) * 100)}%` }}>
+                        {attributionStats.totalInstalls} Installs
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div>
+                    <div className="flex justify-between text-xs font-black uppercase mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">4. Signup Conversion</span>
+                      <span className="text-purple-600 dark:text-purple-400">{((attributionStats.totalRegistered / Math.max(1, attributionStats.totalInstalls)) * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-6 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full flex items-center justify-end px-3 text-[10px] font-black text-white" style={{ width: `${Math.min(100, (attributionStats.totalRegistered / Math.max(1, attributionStats.totalVisits)) * 100)}%` }}>
+                        {attributionStats.totalRegistered} Signups
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 5 */}
+                  <div>
+                    <div className="flex justify-between text-xs font-black uppercase mb-1">
+                      <span className="text-slate-600 dark:text-slate-400">5. Overall Subscriber Conversion</span>
+                      <span className="text-amber-600 dark:text-amber-400">{((attributionStats.totalSubscribed / Math.max(1, attributionStats.totalRegistered)) * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-6 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full flex items-center justify-end px-3 text-[10px] font-black text-white" style={{ width: `${Math.min(100, (attributionStats.totalSubscribed / Math.max(1, attributionStats.totalVisits)) * 100)}%` }}>
+                        {attributionStats.totalSubscribed} Subs
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Attribution Source Performance Table */}
+              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 p-8 shadow-xl overflow-hidden">
+                <h4 className="text-lg font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tight">{t({ en: 'Campaign Tracking Performance', kn: 'ಅಭಿಯಾನ ಮತ್ತು ಟ್ರ್ಯಾಕಿಂಗ್ ಪ್ರಗತಿ' })}</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <th className="p-6">{t({ en: 'Campaign Source', kn: 'ಅಭಿಯಾನ ಮೂಲ' })}</th>
+                        <th className="p-6">{t({ en: 'Clicks', kn: 'ಕ್ಲಿಕ್‌ಗಳು' })}</th>
+                        <th className="p-6">{t({ en: 'Installs', kn: 'ಇನ್‌ಸ್ಟಾಲ್‌ಗಳು' })}</th>
+                        <th className="p-6">CTI %</th>
+                        <th className="p-6">{t({ en: 'Signups', kn: 'ನೋಂದಣಿಗಳು' })}</th>
+                        <th className="p-6">{t({ en: 'Subscribers', kn: 'ಚಂದಾದಾರರು' })}</th>
+                        <th className="p-6">LTV Conv %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {attributionStats.utmBreakdown.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="p-6 text-center text-slate-400 font-bold">
+                            No campaign tracking data logged yet.
+                          </td>
+                        </tr>
+                      ) : (
+                        attributionStats.utmBreakdown.map((row: any) => (
+                          <tr key={row.source} className="border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="p-6 font-bold text-slate-900 dark:text-white">{row.source}</td>
+                            <td className="p-6">{row.clicks || 0}</td>
+                            <td className="p-6">{row.installs || 0}</td>
+                            <td className="p-6 font-bold text-green-600 dark:text-green-400">
+                              {row.clicks > 0 ? `${((row.installs / row.clicks) * 100).toFixed(1)}%` : '0%'}
+                            </td>
+                            <td className="p-6">{row.signups || 0}</td>
+                            <td className="p-6">{row.subscribers || 0}</td>
+                            <td className="p-6 font-black text-blue-600 dark:text-blue-400">
+                              {row.signups > 0 ? `${((row.subscribers / row.signups) * 100).toFixed(1)}%` : '0%'}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 

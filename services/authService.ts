@@ -1,6 +1,7 @@
 import { UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import DOMPurify from 'dompurify';
+import { attributionService } from './attributionService';
 
 export interface RegisterData {
   fullName: string;
@@ -52,6 +53,9 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
     const cleanFullName = DOMPurify.sanitize(data.fullName);
     const cleanPlace = data.place ? DOMPurify.sanitize(data.place) : '';
 
+    // Fetch cached UTM parameters for web-to-app attribution
+    const utm = attributionService.getCachedUTM();
+
     const { data: authData, error: authError } = await supabase.auth.signUp({
       phone: data.phone,
       password: data.password,
@@ -81,7 +85,12 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
         if (signinData.user) {
           const { error: profileError } = await supabase.from('profiles').update({
             full_name: cleanFullName,
-            place: cleanPlace
+            place: cleanPlace,
+            utm_source: utm.utm_source,
+            utm_medium: utm.utm_medium,
+            utm_campaign: utm.utm_campaign,
+            attribution_method: 'cached_local_storage',
+            attributed_at: new Date().toISOString()
           }).eq('id', signinData.user.id);
 
           if (profileError && !profileError.message.includes('row-level')) {
@@ -90,7 +99,12 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
               full_name: cleanFullName,
               phone: data.phone,
               place: cleanPlace,
-              role: role
+              role: role,
+              utm_source: utm.utm_source,
+              utm_medium: utm.utm_medium,
+              utm_campaign: utm.utm_campaign,
+              attribution_method: 'cached_local_storage',
+              attributed_at: new Date().toISOString()
             }]);
             await supabase.from('user_progress').upsert([{ user_id: signinData.user.id }], { onConflict: 'user_id' });
           }
@@ -104,14 +118,19 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
 
     if (authData.user) {
       // If a Postgres trigger handles creation, `.insert` will fail with RLS.
-      // We will first try to let the trigger do its job, then do an `.upsert` or `.update()`.
+      // We will first try to let the trigger do its job, then do an `.update()`.
       const { data: updatedRows, error: profileError } = await supabase
         .from('profiles')
         .update({
           full_name: cleanFullName,
           phone: data.phone,
           place: cleanPlace,
-          role: role
+          role: role,
+          utm_source: utm.utm_source,
+          utm_medium: utm.utm_medium,
+          utm_campaign: utm.utm_campaign,
+          attribution_method: 'cached_local_storage',
+          attributed_at: new Date().toISOString()
         })
         .eq('id', authData.user.id)
         .select();
@@ -125,7 +144,12 @@ export async function registerUser(data: RegisterData): Promise<{ success: boole
           full_name: cleanFullName,
           phone: data.phone,
           place: cleanPlace,
-          role: role
+          role: role,
+          utm_source: utm.utm_source,
+          utm_medium: utm.utm_medium,
+          utm_campaign: utm.utm_campaign,
+          attribution_method: 'cached_local_storage',
+          attributed_at: new Date().toISOString()
         }]);
         if (insertError && !insertError.message.includes('row-level')) {
           console.error("Profile generic insert failed:", insertError);
