@@ -268,6 +268,54 @@ export async function completeSnehiPayment(
 }
 
 /**
+ * Completes the SNEHI payment and activates user access securely (V2 with optional coupon code).
+ */
+export async function completeSnehiPaymentV2(
+  userId: string,
+  requestId: string,
+  baseAmount: number,
+  taxAmount: number,
+  discountAmount: number,
+  finalAmount: number,
+  gateway: string,
+  transactionId: string,
+  couponCode: string | null = null
+): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc('complete_snehi_payment_v2', {
+      p_user_id: userId,
+      p_request_id: requestId,
+      p_base_amount: Math.round(baseAmount),
+      p_tax_amount: Math.round(taxAmount),
+      p_discount_amount: Math.round(discountAmount),
+      p_final_amount: Math.round(finalAmount),
+      p_gateway: gateway,
+      p_transaction_id: transactionId,
+      p_coupon_code: couponCode
+    });
+
+    if (error) throw error;
+
+    // Create success notification
+    await createNotification(
+      userId,
+      JSON.stringify({ en: 'Payment Captured', kn: 'ಪಾವತಿ ಯಶಸ್ವಿಯಾಗಿದೆ' }),
+      JSON.stringify({
+        en: 'Payment received successfully! Your SIMPLISH-SNEHI access is now active.',
+        kn: 'ಪಾವತಿ ಯಶಸ್ವಿಯಾಗಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ! ನಿಮ್ಮ SIMPLISH-SNEHI ಪ್ರವೇಶ ಈಗ ಸಕ್ರಿಯವಾಗಿದೆ.'
+      }),
+      'success'
+    );
+
+    return true;
+  } catch (err: any) {
+    console.error("completeSnehiPaymentV2 failed:", err.message || err);
+    return false;
+  }
+}
+
+
+/**
  * Issues a simulated refund for a user's SNEHI payment.
  */
 export async function issueSnehiRefund(

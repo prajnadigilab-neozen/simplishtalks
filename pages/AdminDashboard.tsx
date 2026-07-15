@@ -10,6 +10,7 @@ import { useAppStore } from '../store/useAppStore';
 import { clearAllRecordings } from '../utils/recordingStore';
 import { getSystemConfig, updateSystemConfig, SystemConfig } from '../services/systemConfigService';
 import { VisualContentAdmin } from '../components/VisualContentAdmin';
+import { DiscountManagementAdmin } from '../components/DiscountManagementAdmin';
 import { getAllAccessRequests, approveAccessRequest, rejectAccessRequest, disableAccessRequest, issueSnehiRefund } from '../services/snehiAccessService';
 import { supabase } from '../lib/supabase';
 
@@ -28,7 +29,7 @@ const AdminDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config' | 'custom_scenarios' | 'snehi_access' | 'feedback' | 'attribution'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stats' | 'audit' | 'content' | 'ai' | 'mods' | 'usage_history' | 'reports' | 'config' | 'custom_scenarios' | 'snehi_access' | 'feedback' | 'attribution' | 'discounts'>('users');
   const [attributionStats, setAttributionStats] = useState<any>(null);
   const [loadingAttribution, setLoadingAttribution] = useState(false);
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
@@ -834,6 +835,9 @@ const AdminDashboard: React.FC = () => {
             )}
           </button>
           <button key="content" onClick={() => setActiveTab('content')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'content' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Visual Content', kn: 'ದೃಶ್ಯ ವಿಷಯ' })}</button>
+          {(currentUser?.role === UserRole.SUPER_ADMIN || currentUser?.role === UserRole.MODERATOR) && (
+            <button key="discounts" onClick={() => setActiveTab('discounts')} className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${activeTab === 'discounts' ? 'bg-white shadow text-blue-800' : 'text-slate-400'}`}>{t({ en: 'Discounts', kn: 'ರಿಯಾಯಿತಿ ನಿರ್ವಹಣೆ' })}</button>
+          )}
 
           {currentUser?.role === UserRole.SUPER_ADMIN && (
             <>
@@ -2204,6 +2208,11 @@ const AdminDashboard: React.FC = () => {
       {activeTab === 'content' && (currentUser?.role === UserRole.SUPER_ADMIN || currentUser?.role === UserRole.MODERATOR) && (
         <div className="space-y-6 animate-in fade-in">
           <VisualContentAdmin />
+        </div>
+      )}
+      {activeTab === 'discounts' && (currentUser?.role === UserRole.SUPER_ADMIN || currentUser?.role === UserRole.MODERATOR) && (
+        <div className="space-y-6 animate-in fade-in">
+          <DiscountManagementAdmin currentUser={currentUser} />
         </div>
       )}
 

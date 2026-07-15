@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../components/LanguageContext';
 import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
+import { validateCoupon } from '../services/discountService';
 import { PackageType } from '../types';
 import Logo from '../components/Logo';
 
@@ -20,6 +21,49 @@ const TopupPage: React.FC = () => {
   const [selected, setSelected] = useState(TOPUP_PACKAGES[1]);
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Coupon States
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+
+  const getDiscountedPrice = (base: number) => {
+    if (!appliedCoupon) return base;
+    if (appliedCoupon.discount_type === 'PERCENTAGE') {
+      return Math.round(base * (1 - appliedCoupon.discount_value / 100));
+    } else if (appliedCoupon.discount_type === 'FREE_ACCESS') {
+      return 0;
+    }
+    return base;
+  };
+
+  const handleApplyCoupon = async () => {
+    setCouponError('');
+    if (!couponCode.trim() || !session?.id) return;
+    setIsValidatingCoupon(true);
+    try {
+      const res = await validateCoupon(couponCode, session.id, 'TOPUP', selected.rs);
+      if (res.is_valid) {
+        setAppliedCoupon(res);
+        setCouponError('');
+      } else {
+        setCouponError(res.error_message);
+        setAppliedCoupon(null);
+      }
+    } catch (err: any) {
+      setCouponError(err.message || 'Validation failed');
+      setAppliedCoupon(null);
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+  };
 
   // Restrict to SNEHI/BOTH users who have SNEHI access approved
   React.useEffect(() => {
@@ -38,48 +82,43 @@ const TopupPage: React.FC = () => {
     
     try {
       // Simulate Payment Delay
-      await new Promise(r => setTimeout(r, 2000));
+      await new Promise(r => setTimeout(r, 1500));
 
-      const newCredits = (session.agentCredits || 0) + selected.mins;
-      const newTopupAmount = (session.topupAmount || 0) + selected.rs;
+      const finalPayable = getDiscountedPrice(selected.rs);
 
-      // 1. Update Profile
-      const { error: pError } = await supabase
+      // Call secure topup RPC
+      const { data, error: topupError } = await supabase.rpc('process_user_topup_v2', {
+        p_user_id: session.id,
+        p_amount: selected.rs, // original amount
+        p_minutes: selected.mins,
+        p_coupon_code: appliedCoupon ? appliedCoupon.coupon_code : null
+      });
+
+      if (topupError) throw topupError;
+
+      // 2. Fetch updated profile stats to synchronize the Zustand store state securely
+      const { data: updatedProfile, error: profileError } = await supabase
         .from('profiles')
-        .update({ 
-          agent_credits: newCredits,
-          topup_amount: newTopupAmount 
-        })
-        .eq('id', session.id);
+        .select('agent_credits, topup_amount')
+        .eq('id', session.id)
+        .single();
 
-      if (pError) throw pError;
-
-      // 2. Log Transaction
-      const { error: tError } = await supabase
-        .from('topup_transactions')
-        .insert([{
-          user_id: session.id,
-          amount: selected.rs,
-          minutes: selected.mins,
-          status: 'SUCCESS'
-        }]);
-
-      if (tError) throw tError;
+      if (profileError) throw profileError;
 
       // 3. Update Local Store
       useAppStore.setState({ 
         session: { 
           ...session, 
-          agentCredits: newCredits,
-          topupAmount: newTopupAmount
+          agentCredits: updatedProfile?.agent_credits || 0,
+          topupAmount: updatedProfile?.topup_amount || 0
         } 
       });
 
       setSuccess(true);
       setTimeout(() => navigate('/talk'), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Topup failed:', err);
-      alert('Payment failed. Please try again.');
+      alert(err.message || 'Payment failed. Please try again.');
     } finally {
       setProcessing(false);
     }
@@ -118,11 +157,17 @@ const TopupPage: React.FC = () => {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {TOPUP_PACKAGES.map((pkg) => (
             <div
               key={pkg.id}
-              onClick={() => setSelected(pkg)}
+              onClick={() => {
+                setSelected(pkg);
+                // Clear active coupon if not eligible for new package amount
+                if (appliedCoupon) {
+                  handleRemoveCoupon();
+                }
+              }}
               className={`relative cursor-pointer group transition-all duration-300 ${
                 selected.id === pkg.id 
                   ? 'scale-105 z-10' 
@@ -149,7 +194,10 @@ const TopupPage: React.FC = () => {
                 <p className="text-slate-400 font-bold text-sm mb-6">Talk Pack</p>
                 
                 <div className="flex items-baseline gap-1 mb-8">
-                  <span className="text-4xl font-black text-slate-900 dark:text-white">₹{pkg.rs}</span>
+                  {appliedCoupon && appliedCoupon.discount_type !== 'FREE_MONTHS' && (
+                    <span className="text-2xl font-bold line-through text-slate-400 mr-2">₹{pkg.rs}</span>
+                  )}
+                  <span className="text-4xl font-black text-slate-900 dark:text-white">₹{getDiscountedPrice(pkg.rs)}</span>
                   <span className="text-slate-400 font-bold text-sm">/ one-time</span>
                 </div>
 
@@ -165,6 +213,62 @@ const TopupPage: React.FC = () => {
           ))}
         </div>
 
+        {/* Coupon Code section */}
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-8 mb-8 shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <span className="text-3xl bg-blue-50 dark:bg-blue-900/30 p-3 rounded-2xl">🎟️</span>
+              <div>
+                <h4 className="text-lg font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">Have a Coupon Code?</h4>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Apply a promo code to discount your top-up plan</p>
+              </div>
+            </div>
+            <div className="flex-1 max-w-md w-full">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  disabled={!!appliedCoupon || isValidatingCoupon}
+                  onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="Enter Coupon Code (e.g. STUDENT50)"
+                  className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-2xl text-xs font-mono font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                />
+                {appliedCoupon ? (
+                  <button
+                    onClick={handleRemoveCoupon}
+                    className="px-6 py-3 bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400 rounded-2xl text-xs font-black uppercase hover:bg-red-100 dark:hover:bg-red-950/40 transition-all cursor-pointer border border-red-200 dark:border-red-900/35"
+                  >
+                    Remove
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={isValidatingCoupon || !couponCode.trim()}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md"
+                  >
+                    {isValidatingCoupon ? "..." : "Apply"}
+                  </button>
+                )}
+              </div>
+              {couponError && <p className="text-[10px] text-red-500 font-bold mt-2 ml-1">⚠️ {couponError}</p>}
+              {appliedCoupon && (
+                <div className="bg-green-50/50 dark:bg-green-950/10 border border-green-100 dark:border-green-900/20 rounded-xl p-4 mt-3 animate-in slide-in-from-top-2 duration-300">
+                  <p className="text-xs text-green-700 dark:text-green-400 font-black">
+                    ✓ Coupon Applied: {appliedCoupon.coupon_code}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 mt-2 text-[10px] text-slate-500 dark:text-slate-400 font-bold">
+                    <div>Customer Group: {appliedCoupon.customer_type}</div>
+                    <div>Discount: {
+                      appliedCoupon.discount_type === 'PERCENTAGE' ? `${appliedCoupon.discount_value}%` :
+                      appliedCoupon.discount_type === 'FREE_ACCESS' ? '100% Free' : 'N/A'
+                    }</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex-1 space-y-2">
@@ -173,6 +277,11 @@ const TopupPage: React.FC = () => {
               </h2>
               <p className="text-slate-500 dark:text-slate-400 font-bold">
                 You are adding <span className="text-blue-600">{selected.mins} minutes</span> of high-quality Live Talk time.
+                {appliedCoupon && (
+                  <span className="block text-xs text-green-600 dark:text-green-400 font-bold mt-1">
+                    Coupon ({appliedCoupon.coupon_code}) active: Saved ₹{selected.rs - getDiscountedPrice(selected.rs)}
+                  </span>
+                )}
               </p>
             </div>
             
@@ -186,7 +295,7 @@ const TopupPage: React.FC = () => {
                   <div className="w-5 h-5 border-3 border-current border-t-transparent rounded-full animate-spin" />
                   Processing...
                 </>
-              ) : `Pay ₹${selected.rs} Now`}
+              ) : `Pay ₹${getDiscountedPrice(selected.rs)} Now`}
             </button>
           </div>
           

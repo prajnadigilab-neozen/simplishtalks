@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { clearProfileCache } from '../services/authService';
 import { getMyAccessRequestStatus, submitSnehiRequest } from '../services/snehiAccessService';
 import SnehiCheckoutModal from '../components/SnehiCheckoutModal';
+import { validateCoupon } from '../services/discountService';
 
 interface CombinedTransactionItem {
   id: string;
@@ -36,6 +37,56 @@ const PackageSelection: React.FC = () => {
     const [snehiRequest, setSnehiRequest] = useState<any>(null);
     const [loadingRequest, setLoadingRequest] = useState(false);
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+
+    // Coupon States
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<any | null>(null);
+    const [couponError, setCouponError] = useState('');
+    const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+
+    const getDiscountedPrice = (base: number) => {
+        if (!appliedCoupon) return base;
+        if (appliedCoupon.discount_type === 'PERCENTAGE') {
+            return base * (1 - appliedCoupon.discount_value / 100);
+        } else if (appliedCoupon.discount_type === 'FREE_ACCESS') {
+            return 0;
+        }
+        return base;
+    };
+
+    const talksOriginalPrice = sysConfig?.price_talks || 299;
+    const talksPrice = getDiscountedPrice(talksOriginalPrice);
+
+    const snehiOriginalPrice = sysConfig?.price_snehi || 499;
+    const snehiPrice = getDiscountedPrice(snehiOriginalPrice);
+
+    const handleApplyCoupon = async () => {
+        setCouponError('');
+        if (!couponCode.trim() || !session?.id) return;
+        setIsValidatingCoupon(true);
+        try {
+            const res = await validateCoupon(couponCode, session.id, 'NEW', 100);
+            if (res.is_valid) {
+                setAppliedCoupon(res);
+                setCouponError('');
+                setMessage({ type: 'success', text: t({ en: 'Coupon applied successfully!', kn: 'ಕೂಪನ್ ಯಶಸ್ವಿಯಾಗಿ ಅನ್ವಯಿಸಲಾಗಿದೆ!' }) });
+            } else {
+                setCouponError(res.error_message);
+                setAppliedCoupon(null);
+            }
+        } catch (err: any) {
+            setCouponError(err.message || 'Validation failed');
+            setAppliedCoupon(null);
+        } finally {
+            setIsValidatingCoupon(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode('');
+        setCouponError('');
+    };
 
     // Transaction History & Refunds States
     const [packageTransactions, setPackageTransactions] = useState<any[]>([]);
@@ -149,7 +200,8 @@ const PackageSelection: React.FC = () => {
     // Handle Package Activation (Navigate to Payment)
     const handleActivatePackage = (selectedPackage: PackageType) => {
         if (!session?.id) return;
-        navigate(`/payment?package=${selectedPackage}`);
+        const couponParam = appliedCoupon ? `&coupon=${appliedCoupon.coupon_code}` : '';
+        navigate(`/payment?package=${selectedPackage}${couponParam}`);
     };
 
     const handleTopUp = async (type: 'talks' | 'snehi', amount: number) => {
@@ -162,10 +214,11 @@ const PackageSelection: React.FC = () => {
         
         const addedMinutes = type === 'snehi' ? (sysConfig?.snehi_topup_duration_mins || 60) : 0;
         
-        const { error } = await supabase.rpc('process_user_topup', {
+        const { error } = await supabase.rpc('process_user_topup_v2', {
             p_user_id: session.id,
             p_amount: amount,
-            p_minutes: addedMinutes
+            p_minutes: addedMinutes,
+            p_coupon_code: appliedCoupon ? appliedCoupon.coupon_code : null
         });
             
         if (!error) {
@@ -365,7 +418,8 @@ const PackageSelection: React.FC = () => {
                         isRecommended={!hasBoth && !isAdvanced}
                         isActive={hasTalks}
                         disabled={hasTalks}
-                        price={sysConfig?.price_talks || 299}
+                        price={talksPrice}
+                        originalPrice={talksOriginalPrice}
                         gstPercent={sysConfig?.gst_percentage || 18}
                         onSelect={() => handleActivatePackage(PackageType.TALKS)}
                     />
@@ -394,7 +448,10 @@ const PackageSelection: React.FC = () => {
                                     {t({ en: 'Top-up Price', kn: 'ಟಾಪ್-ಅಪ್ ಬೆಲೆ' })}
                                 </p>
                                 <p className="text-2xl font-black text-blue-600 dark:text-blue-400 flex flex-col">
-                                    <span>₹{Math.round((sysConfig?.subscription_price || 99) * (1 + (sysConfig?.gst_percentage || 18) / 100))}</span>
+                                    {appliedCoupon && appliedCoupon.discount_type !== 'FREE_MONTHS' && (
+                                        <span className="line-through text-slate-400 text-xs font-bold">₹{Math.round((sysConfig?.subscription_price || 99) * (1 + (sysConfig?.gst_percentage || 18) / 100))}</span>
+                                    )}
+                                    <span>₹{Math.round(getDiscountedPrice(sysConfig?.subscription_price || 99) * (1 + (sysConfig?.gst_percentage || 18) / 100))}</span>
                                     <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">(GST Included)</span>
                                 </p>
                             </div>
@@ -449,8 +506,16 @@ const PackageSelection: React.FC = () => {
                                                     <span className="text-[10px]">✓</span> Approved
                                                 </span>
                                             )}
-                                            <span className="font-black text-slate-900 dark:text-white text-lg text-right">
-                                                ₹{Math.round((sysConfig?.price_snehi || 499) * (1 + (sysConfig?.gst_percentage || 18) / 100))} <span className="text-[9px] text-slate-400 block font-bold uppercase tracking-tighter">(GST Included) /mo</span>
+                                            <span className="font-black text-slate-900 dark:text-white text-lg text-right flex flex-col items-end">
+                                                {appliedCoupon && (
+                                                    <span className="line-through text-slate-400 text-xs font-bold">
+                                                        ₹{Math.round((sysConfig?.price_snehi || 499) * (1 + (sysConfig?.gst_percentage || 18) / 100))}
+                                                    </span>
+                                                )}
+                                                <span>
+                                                    ₹{Math.round(snehiPrice * (1 + (sysConfig?.gst_percentage || 18) / 100))} <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">/mo</span>
+                                                </span>
+                                                <span className="text-[8px] text-slate-400 block font-black uppercase tracking-widest mt-0.5">(GST Included)</span>
                                             </span>
                                         </div>
                                     </div>
@@ -459,7 +524,8 @@ const PackageSelection: React.FC = () => {
                                         {snehiStatus === 'ACTIVE' ? '✅ Access Activated' : 
                                          snehiStatus === 'PENDING' ? '⏳ Request Under Review' : 
                                          snehiStatus === 'AWAITING_PMT' ? '💳 Approval Granted' : 
-                                         (snehiStatus === 'DISABLED' || snehiStatus === 'REJECTED') ? '🔒 Access Disabled' : 
+                                         snehiStatus === 'REJECTED' ? '❌ Request Rejected' : 
+                                         snehiStatus === 'DISABLED' ? '🔒 Access Disabled' : 
                                          '🔒 SIMPLISH-SNEHI'}
                                     </h3>
                                     
@@ -467,7 +533,8 @@ const PackageSelection: React.FC = () => {
                                         {snehiStatus === 'ACTIVE' ? 'Your SIMPLISH-SNEHI access is active. Click below to start voice practice.' : 
                                          snehiStatus === 'PENDING' ? 'Your request has been submitted and is currently under administrative review.' : 
                                          snehiStatus === 'AWAITING_PMT' ? 'Your request has been approved! Complete payment to activate your access.' : 
-                                         (snehiStatus === 'DISABLED' || snehiStatus === 'REJECTED') ? 'Please contact support for assistance.' : 
+                                         snehiStatus === 'REJECTED' ? 'Your previous request was rejected. You may request approval again.' : 
+                                         snehiStatus === 'DISABLED' ? 'Please contact support for assistance.' : 
                                          'Exclusive guided voice service. Submit a request to initiate administrative approval.'}
                                     </p>
 
@@ -501,7 +568,15 @@ const PackageSelection: React.FC = () => {
                                         >
                                             Pay Now
                                         </button>
-                                    ) : (snehiStatus === 'DISABLED' || snehiStatus === 'REJECTED') ? (
+                                    ) : snehiStatus === 'REJECTED' ? (
+                                        <button
+                                            onClick={handleRequestAccess}
+                                            disabled={loadingRequest}
+                                            className="w-full py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all bg-red-600 text-white shadow-xl hover:bg-red-700 cursor-pointer flex items-center justify-center gap-2"
+                                        >
+                                            {loadingRequest ? 'Submitting...' : 'Request Again'}
+                                        </button>
+                                    ) : snehiStatus === 'DISABLED' ? (
                                         <button
                                             disabled
                                             className="w-full py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all bg-slate-100 text-slate-400 dark:bg-slate-800 cursor-not-allowed border border-slate-200 dark:border-slate-700"
@@ -547,7 +622,10 @@ const PackageSelection: React.FC = () => {
                                     {t({ en: 'Top-up Price', kn: 'ಟಾಪ್-ಅಪ್ ಬೆಲೆ' })}
                                 </p>
                                 <p className="text-2xl font-black text-orange-500 dark:text-orange-400 flex flex-col">
-                                    <span>₹{Math.round((sysConfig?.snehi_subscription_price || 99) * (1 + (sysConfig?.gst_percentage || 18) / 100))}</span>
+                                    {appliedCoupon && appliedCoupon.discount_type !== 'FREE_MONTHS' && (
+                                        <span className="line-through text-slate-400 text-xs font-bold">₹{Math.round((sysConfig?.snehi_subscription_price || 99) * (1 + (sysConfig?.gst_percentage || 18) / 100))}</span>
+                                    )}
+                                    <span>₹{Math.round(getDiscountedPrice(sysConfig?.snehi_subscription_price || 99) * (1 + (sysConfig?.gst_percentage || 18) / 100))}</span>
                                     <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">(GST Included)</span>
                                 </p>
                             </div>
@@ -572,6 +650,62 @@ const PackageSelection: React.FC = () => {
                                     : t({ en: 'Requires SNEHI Access Approved', kn: 'ಸ್ನೇಹಿ ಪ್ರವೇಶ ಅನುಮೋದನೆ ಅಗತ್ಯವಿದೆ' })
                             }
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Coupon Code section */}
+            <div className="w-full max-w-5xl mt-8 bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 shadow-xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <span className="text-3xl bg-blue-50 dark:bg-blue-900/30 p-3 rounded-2xl">🎟️</span>
+                        <div>
+                            <h4 className="text-lg font-black text-blue-900 dark:text-blue-300 uppercase tracking-tight">Have a Coupon Code?</h4>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Apply a promo code to discount your subscription or top-up</p>
+                        </div>
+                    </div>
+                    <div className="flex-1 max-w-md w-full">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={couponCode}
+                                disabled={!!appliedCoupon || isValidatingCoupon}
+                                onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                                placeholder={t({ en: "Enter Coupon Code (e.g. STUDENT50)", kn: "ಕೂಪನ್ ಕೋಡ್ ನಮೂದಿಸಿ" })}
+                                className="flex-1 px-4 py-4 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-2xl text-xs font-mono font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                            />
+                            {appliedCoupon ? (
+                                <button
+                                    onClick={handleRemoveCoupon}
+                                    className="px-6 py-4 bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400 rounded-2xl text-xs font-black uppercase hover:bg-red-100 dark:hover:bg-red-950/40 transition-all cursor-pointer border border-red-200 dark:border-red-900/35"
+                                >
+                                    Remove
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleApplyCoupon}
+                                    disabled={isValidatingCoupon || !couponCode.trim()}
+                                    className="px-6 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md"
+                                >
+                                    {isValidatingCoupon ? "..." : "Apply"}
+                                </button>
+                            )}
+                        </div>
+                        {couponError && <p className="text-[10px] text-red-500 font-bold mt-2 ml-1">⚠️ {couponError}</p>}
+                        {appliedCoupon && (
+                            <div className="bg-green-50/50 dark:bg-green-950/10 border border-green-100 dark:border-green-900/20 rounded-xl p-4 mt-3 animate-in slide-in-from-top-2 duration-300">
+                                <p className="text-xs text-green-700 dark:text-green-400 font-black">
+                                    ✓ Coupon Applied: {appliedCoupon.coupon_code}
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 mt-2 text-[10px] text-slate-500 dark:text-slate-400 font-bold">
+                                    <div>Customer Group: {appliedCoupon.customer_type}</div>
+                                    <div>Discount: {
+                                        appliedCoupon.discount_type === 'PERCENTAGE' ? `${appliedCoupon.discount_value}%` :
+                                        appliedCoupon.discount_type === 'FREE_MONTHS' ? `+${appliedCoupon.discount_value} Free Month(s)` : '100% Free Access'
+                                    }</div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -748,6 +882,7 @@ const PackageSelection: React.FC = () => {
                     userId={session.id}
                     requestId={snehiRequest.id}
                     basePrice={sysConfig?.price_snehi || 499}
+                    initialCouponCode={appliedCoupon ? appliedCoupon.coupon_code : ''}
                     onClose={() => setShowCheckoutModal(false)}
                     onSuccess={async () => {
                         setShowCheckoutModal(false);
@@ -777,9 +912,10 @@ const PackageCard: React.FC<{
     isActive: boolean; 
     disabled: boolean; 
     price: number;
+    originalPrice?: number;
     gstPercent: number;
     onSelect: () => void 
-}> = ({ type, isRecommended, isActive, disabled, price, gstPercent, onSelect }) => {
+}> = ({ type, isRecommended, isActive, disabled, price, originalPrice, gstPercent, onSelect }) => {
     const isTalks = type === PackageType.TALKS;
 
     // Visual tweaks for disabled cards
@@ -812,8 +948,14 @@ const PackageCard: React.FC<{
                                 <span className="text-[10px]">✓</span> Owned
                             </span>
                         )}
-                        <span className="font-black text-slate-900 dark:text-white text-lg text-right">
-                            ₹{Math.round(price * (1 + gstPercent / 100))} <span className="text-[9px] text-slate-400 block font-bold uppercase tracking-tighter">(GST Included) /mo</span>
+                        <span className="font-black text-slate-900 dark:text-white text-lg text-right flex flex-col items-end">
+                            {originalPrice && originalPrice !== price && (
+                                <span className="line-through text-slate-400 text-xs font-bold">₹{Math.round(originalPrice * (1 + gstPercent / 100))}</span>
+                            )}
+                            <span>
+                                ₹{Math.round(price * (1 + gstPercent / 100))} <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">/mo</span>
+                            </span>
+                            <span className="text-[8px] text-slate-400 block font-black uppercase tracking-widest mt-0.5">(GST Included)</span>
                         </span>
                     </div>
                 </div>

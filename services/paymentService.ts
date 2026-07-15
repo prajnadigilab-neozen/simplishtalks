@@ -44,6 +44,37 @@ export const applyMockLocalFulfillmentDB = async (
     if (rpcError) throw rpcError;
 };
 
+export const applyMockLocalFulfillmentDBV2 = async (
+    userId: string,
+    updates: {
+        package_type: PackageType;
+        package_status: PackageStatus;
+        package_start_date: string;
+        package_end_date: string;
+        agent_credits: number;
+    },
+    transactionLog: {
+        user_id: string;
+        package_type: PackageType;
+        amount: number;
+        payment_provider: string;
+    },
+    couponCode: string | null = null
+) => {
+    const { error: rpcError } = await supabase.rpc('dev_mock_payment_fulfillment_v2', {
+        p_user_id: userId,
+        p_package_type: updates.package_type,
+        p_package_status: updates.package_status,
+        p_package_start_date: updates.package_start_date,
+        p_package_end_date: updates.package_end_date,
+        p_agent_credits: updates.agent_credits,
+        p_amount: transactionLog.amount,
+        p_coupon_code: couponCode
+    });
+
+    if (rpcError) throw rpcError;
+};
+
 /**
  * Evaluates the hierarchical business logic for package purchases. 
  * If a user with an active subscription buys a complementary package 

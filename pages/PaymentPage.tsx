@@ -4,8 +4,9 @@ import { PackageType, PackageStatus } from '../types';
 import { useAppStore } from '../store/useAppStore';
 import { clearProfileCache } from '../services/authService';
 import { getSystemConfig } from '../services/systemConfigService';
-import { applyMockLocalFulfillmentDB, resolveUpgradedPackage, calculateBonusCredits } from '../services/paymentService';
+import { applyMockLocalFulfillmentDBV2, resolveUpgradedPackage, calculateBonusCredits } from '../services/paymentService';
 import { supabase } from '../lib/supabase';
+import { validateCoupon } from '../services/discountService';
 
 // --- CONFIGURATION CONSTANTS ---
 const PACKAGE_CONFIG: Record<PackageType, { label: string; price: number; displayPrice: string }> = {
@@ -21,7 +22,19 @@ const MS_IN_A_DAY = 24 * 60 * 60 * 1000;
 
 // --- PRESENTATIONAL SUB-COMPONENTS ---
 
-const OrderSummary = ({ packageLabel, packagePrice }: { packageLabel: string, packagePrice: string }) => (
+const OrderSummary = ({ 
+    packageLabel, 
+    originalPrice, 
+    discountAmount, 
+    finalPayable,
+    couponCode 
+}: { 
+    packageLabel: string; 
+    originalPrice: number; 
+    discountAmount: number; 
+    finalPayable: number;
+    couponCode?: string;
+}) => (
     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-slate-100 dark:border-slate-800 shadow-xl">
         <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Order Summary</h3>
         <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800">
@@ -29,11 +42,17 @@ const OrderSummary = ({ packageLabel, packagePrice }: { packageLabel: string, pa
                 <div className="font-black text-slate-900 dark:text-white">{packageLabel}</div>
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">1 Month Subscription</div>
             </div>
-            <div className="font-black text-slate-900 dark:text-white">{packagePrice}</div>
+            <div className="font-black text-slate-900 dark:text-white">₹{originalPrice}</div>
         </div>
+        {discountAmount > 0 && (
+            <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800 text-green-600 font-bold text-xs">
+                <span>Discount Applied ({couponCode})</span>
+                <span>-₹{discountAmount}</span>
+            </div>
+        )}
         <div className="flex justify-between items-center pt-6">
             <div className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Total Amount</div>
-            <div className="text-2xl font-black text-blue-600">{packagePrice}</div>
+            <div className="text-2xl font-black text-blue-600">₹{finalPayable}</div>
         </div>
     </div>
 );
@@ -77,6 +96,12 @@ const PaymentPage: React.FC = () => {
     });
     const [paymentMethod, setPaymentMethod] = useState<'mock' | 'wallet'>('mock');
 
+    // Coupon States
+    const [appliedCoupon, setAppliedCoupon] = useState<any | null>(null);
+    const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+    const [couponInput, setCouponInput] = useState('');
+    const [couponError, setCouponError] = useState('');
+
     useEffect(() => {
         mounted.current = true;
         let active = true;
@@ -98,10 +123,64 @@ const PaymentPage: React.FC = () => {
     }, []);
 
     const selectedPackage = searchParams.get('package') as PackageType;
+    const couponParam = searchParams.get('coupon') || '';
     const isValidPackage = Object.values(PackageType).includes(selectedPackage);
     const safePackageKey = isValidPackage ? selectedPackage : PackageType.NONE;
     
     const currentPrice = prices[safePackageKey] || 0;
+
+    // Pre-populate input if couponParam exists
+    useEffect(() => {
+        if (couponParam) {
+            setCouponInput(couponParam);
+        }
+    }, [couponParam]);
+
+    // Validate Initial Coupon on Mount
+    useEffect(() => {
+        if (couponParam && session?.id && currentPrice > 0 && !appliedCoupon) {
+            setIsValidatingCoupon(true);
+            validateCoupon(couponParam, session.id, 'NEW', currentPrice).then(res => {
+                if (res.is_valid) {
+                    setAppliedCoupon(res);
+                } else {
+                    setCouponError(res.error_message);
+                }
+                setIsValidatingCoupon(false);
+            });
+        }
+    }, [couponParam, session, currentPrice]);
+
+    const handleApplyCoupon = async () => {
+        setCouponError('');
+        if (!couponInput.trim() || !session?.id || currentPrice <= 0) return;
+        setIsValidatingCoupon(true);
+        try {
+            const res = await validateCoupon(couponInput, session.id, 'NEW', currentPrice);
+            if (res.is_valid) {
+                setAppliedCoupon(res);
+                setCouponError('');
+            } else {
+                setCouponError(res.error_message);
+                setAppliedCoupon(null);
+            }
+        } catch (err: any) {
+            setCouponError(err.message || 'Validation failed');
+            setAppliedCoupon(null);
+        } finally {
+            setIsValidatingCoupon(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponInput('');
+        setCouponError('');
+    };
+
+    const discountAmount = appliedCoupon ? appliedCoupon.discount_amount : 0;
+    const finalPayablePrice = Math.max(0, currentPrice - discountAmount);
+
     const packageLabel = safePackageKey === PackageType.TALKS 
         ? 'SIMPLISH - TALKS' 
         : safePackageKey === PackageType.SNEHI 
@@ -109,7 +188,7 @@ const PaymentPage: React.FC = () => {
             : safePackageKey === PackageType.BOTH 
                 ? 'PREMIUM BUNDLE' 
                 : 'NONE';
-    const packagePrice = `₹${currentPrice}`;
+    const packagePrice = `₹${finalPayablePrice}`;
 
     useEffect(() => {
         if (!session) {
@@ -124,16 +203,27 @@ const PaymentPage: React.FC = () => {
         setPaymentStep('processing');
 
         try {
+            // Free Access instantly fulfills
+            if (appliedCoupon && appliedCoupon.discount_type === 'FREE_ACCESS') {
+                await simulateBackendFulfillment();
+                setPaymentStep('success');
+                setTimeout(() => {
+                    if (mounted.current) navigate('/dashboard', { replace: true });
+                }, 2000);
+                return;
+            }
+
             if (paymentMethod === 'wallet') {
                 const userBalance = session?.topupAmount || 0;
-                if (userBalance < currentPrice) {
+                if (userBalance < finalPayablePrice) {
                     throw new Error('Insufficient wallet balance.');
                 }
                 
-                const { error: walletError } = await supabase.rpc('pay_package_with_wallet', {
+                const { error: walletError } = await supabase.rpc('pay_package_with_wallet_v2', {
                     p_user_id: session!.id,
                     p_package_type: safePackageKey,
-                    p_amount: currentPrice
+                    p_amount: currentPrice,
+                    p_coupon_code: appliedCoupon ? appliedCoupon.coupon_code : null
                 });
 
                 if (walletError) throw walletError;
@@ -248,12 +338,12 @@ const PaymentPage: React.FC = () => {
         const transactionLog = {
             user_id: session!.id,
             package_type: safePackageKey,
-            amount: currentPrice,
+            amount: finalPayablePrice,
             payment_provider: 'simulated_backend_tokenized'
         };
 
         // DATABASE SIDE-EFFECTS EXTRACTED TO SERVICE LAYER
-        await applyMockLocalFulfillmentDB(session!.id, updates, transactionLog);
+        await applyMockLocalFulfillmentDBV2(session!.id, updates, transactionLog, appliedCoupon ? appliedCoupon.coupon_code : null);
 
         // CRITICAL: Immediately update the Zustand store with the new package data
         const currentSession = useAppStore.getState().session;
@@ -322,7 +412,62 @@ const PaymentPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                     {/* Order Summary & Badges  */}
                     <div className="md:col-span-3 space-y-6">
-                        <OrderSummary packageLabel={packageLabel} packagePrice={packagePrice} />
+                        <OrderSummary 
+                            packageLabel={packageLabel} 
+                            originalPrice={currentPrice} 
+                            discountAmount={discountAmount} 
+                            finalPayable={finalPayablePrice} 
+                            couponCode={appliedCoupon?.coupon_code}
+                        />
+
+                        {/* Coupon Code section */}
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800 shadow-xl space-y-4">
+                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <span>🎟️</span> Apply Promo Code
+                            </h4>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={couponInput}
+                                    disabled={!!appliedCoupon || isValidatingCoupon}
+                                    onChange={e => setCouponInput(e.target.value.toUpperCase())}
+                                    placeholder="Enter Coupon Code (e.g. STUDENT50)"
+                                    className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-mono font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                />
+                                {appliedCoupon ? (
+                                    <button
+                                        onClick={handleRemoveCoupon}
+                                        className="px-5 py-3 bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400 rounded-xl text-xs font-black uppercase hover:bg-red-100 dark:hover:bg-red-950/40 transition-all border border-red-200 dark:border-red-900/35"
+                                    >
+                                        Remove
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleApplyCoupon}
+                                        disabled={isValidatingCoupon || !couponInput.trim()}
+                                        className="px-5 py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50"
+                                    >
+                                        {isValidatingCoupon ? '...' : 'Apply'}
+                                    </button>
+                                )}
+                            </div>
+                            {couponError && <p className="text-[10px] text-red-500 font-bold">⚠️ {couponError}</p>}
+                            {appliedCoupon && (
+                                <div className="bg-green-50/50 dark:bg-green-950/10 border border-green-100 dark:border-green-900/20 rounded-xl p-3">
+                                    <p className="text-xs text-green-700 dark:text-green-400 font-black">
+                                        ✓ Coupon Applied: {appliedCoupon.coupon_code}
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-2 mt-1.5 text-[10px] text-slate-500 dark:text-slate-400 font-bold">
+                                        <div>Group: {appliedCoupon.customer_type}</div>
+                                        <div>Discount: {
+                                            appliedCoupon.discount_type === 'PERCENTAGE' ? `${appliedCoupon.discount_value}%` :
+                                            appliedCoupon.discount_type === 'FREE_MONTHS' ? `+${appliedCoupon.discount_value} Free Month(s)` : '100% Free Access'
+                                        }</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <TrustBadges />
                     </div>
 

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../components/LanguageContext';
 import { getSystemConfig, SystemConfig } from '../services/systemConfigService';
-import { completeSnehiPayment } from '../services/snehiAccessService';
+import { completeSnehiPaymentV2 } from '../services/snehiAccessService';
+import { validateCoupon } from '../services/discountService';
 
 interface SnehiCheckoutModalProps {
   userId: string;
   requestId: string;
   basePrice?: number;
+  initialCouponCode?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -15,6 +17,7 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
   userId,
   requestId,
   basePrice = 499,
+  initialCouponCode = '',
   onClose,
   onSuccess
 }) => {
@@ -24,7 +27,7 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
   // Pricing States
   const [gstPercent, setGstPercent] = useState(18);
   const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_percent: number } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_percent: number; discount_type: string } | null>(null);
   const [couponError, setCouponError] = useState('');
   
   // Payment States
@@ -41,22 +44,34 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
     });
   }, []);
 
-  const handleApplyCoupon = () => {
+  // Pre-fill initial coupon code
+  useEffect(() => {
+    if (initialCouponCode && initialCouponCode.trim()) {
+      setCouponCode(initialCouponCode);
+      handleApplyCoupon(initialCouponCode);
+    }
+  }, [initialCouponCode]);
+
+  const handleApplyCoupon = async (codeOverride?: string | any) => {
+    const codeToValidate = (typeof codeOverride === 'string' ? codeOverride : couponCode);
     setCouponError('');
-    if (!couponCode.trim()) return;
+    if (!codeToValidate || !codeToValidate.trim()) return;
 
-    // Fetch config coupons or fall back to default approved promo coupons
-    const couponsList = sysConfig?.coupons || [
-      { code: 'SIMPLISH_PRO_2026', discount_percent: 20 },
-      { code: 'SNEHI_FREE', discount_percent: 100 }
-    ];
-
-    const match = couponsList.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase());
-    if (match) {
-      setAppliedCoupon(match);
-      setCouponError('');
-    } else {
-      setCouponError(t({ en: 'Invalid coupon code', kn: 'ಅಮಾನ್ಯ ಕೂಪನ್ ಕೋಡ್' }));
+    try {
+      const res = await validateCoupon(codeToValidate, userId, 'NEW', basePrice);
+      if (res.is_valid) {
+        setAppliedCoupon({
+          code: res.coupon_code || codeToValidate,
+          discount_percent: res.discount_value || 0,
+          discount_type: res.discount_type || 'PERCENTAGE'
+        });
+        setCouponError('');
+      } else {
+        setCouponError(res.error_message);
+        setAppliedCoupon(null);
+      }
+    } catch (err: any) {
+      setCouponError(err.message || 'Validation error');
       setAppliedCoupon(null);
     }
   };
@@ -68,8 +83,17 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
   };
 
   // Computations
+  const getDiscountAmount = () => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.discount_type === 'FREE_ACCESS') return basePrice;
+    if (appliedCoupon.discount_type === 'PERCENTAGE') {
+      return Math.round((basePrice * appliedCoupon.discount_percent) / 100);
+    }
+    return 0; // FREE_MONTHS is 0 price discount
+  };
+
   const discountPercent = appliedCoupon ? appliedCoupon.discount_percent : 0;
-  const discountAmount = Math.round((basePrice * discountPercent) / 100);
+  const discountAmount = getDiscountAmount();
   const taxableAmount = Math.max(0, basePrice - discountAmount);
   const taxAmount = Math.round((taxableAmount * gstPercent) / 100);
   const finalPayable = taxableAmount + taxAmount;
@@ -85,8 +109,8 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
     // Generate simulated Gateway reference id
     const mockTxnId = `TXN-${gateway}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-    // Map amounts to Paise for completeSnehiPayment DB columns
-    const success = await completeSnehiPayment(
+    // Map amounts to Paise for completeSnehiPaymentV2 DB columns
+    const success = await completeSnehiPaymentV2(
       userId,
       requestId,
       basePrice * 100,
@@ -94,7 +118,8 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
       discountAmount * 100,
       finalPayable * 100,
       gateway,
-      mockTxnId
+      mockTxnId,
+      appliedCoupon ? appliedCoupon.code : null
     );
 
     if (success) {
@@ -107,6 +132,7 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
       setTxnError(t({ en: 'Payment failed at gateway. Please try again.', kn: 'ಪಾವತಿ ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.' }));
     }
   };
+
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">

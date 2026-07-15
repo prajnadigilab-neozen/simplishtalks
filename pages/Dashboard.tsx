@@ -434,7 +434,15 @@ const Dashboard: React.FC = () => {
                         {t({ en: '💳 Pay Now', kn: '💳 ಪಾವತಿಸಿ' })}
                       </button>
                     )}
-                    {(snehiState === 'DISABLED' || snehiState === 'REJECTED') && (
+                    {snehiState === 'REJECTED' && (
+                      <button
+                        onClick={() => navigate('/packages')}
+                        className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
+                        {t({ en: '🔄 Request Again', kn: '🔄 ಮತ್ತೆ ವಿನಂತಿಸಿ' })}
+                      </button>
+                    )}
+                    {snehiState === 'DISABLED' && (
                       <button
                         disabled
                         className="w-full py-3 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed border border-red-200/50 dark:border-red-800/50"

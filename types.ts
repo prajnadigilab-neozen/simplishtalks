@@ -104,6 +104,7 @@ export interface UserProgress {
   completedScenarios: string[];
   topupAmount?: number;
   snehiAccessEnabled?: boolean;
+  customer_type?: string;
 }
 
 export interface AccessRequest {
@@ -238,4 +239,55 @@ export interface FeedbackAuditLog {
   };
 }
 
+export interface DiscountMaster {
+  id: string;
+  customer_type: string;
+  display_name?: string;
+  coupon_code: string;
+  discount_type: 'PERCENTAGE' | 'FREE_MONTHS' | 'FREE_ACCESS';
+  discount_value: number;
+  description?: string;
+  is_active: boolean;
+  start_date?: string;
+  end_date?: string;
+  max_usage: number;
+  current_usage: number;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
 
+export interface UserDiscountUsage {
+  id: string;
+  user_id: string;
+  coupon_id?: string;
+  customer_type: string;
+  coupon_code: string;
+  discount_applied: number;
+  purchase_type: 'NEW' | 'RENEWAL' | 'TOPUP';
+  amount_before_discount: number;
+  discount_amount: number;
+  final_amount: number;
+  transaction_id: string;
+  used_on: string;
+}
+
+export interface DiscountAuditLog {
+  id: string;
+  action: 'CREATE' | 'UPDATE' | 'DISABLE' | 'ACTIVATE' | 'DELETE' | 'APPLY';
+  coupon_code: string;
+  performed_by?: string;
+  ip_address?: string;
+  details?: any;
+  created_at: string;
+}
+
+export interface DiscountAnalytics {
+  totalCreated: number;
+  totalUsed: number;
+  revenueLost: number;
+  revenueGenerated: number;
+  topPerforming: { code: string; count: number; revenue: number }[];
+  conversionRate: number;
+  customerDistribution: { type: string; count: number }[];
+}
