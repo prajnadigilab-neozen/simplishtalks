@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /analytics
+Disallow: /quota
+
+Sitemap: https://talks.simplish.in/sitemap.xml
