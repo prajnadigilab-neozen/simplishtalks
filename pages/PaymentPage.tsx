@@ -24,35 +24,59 @@ const MS_IN_A_DAY = 24 * 60 * 60 * 1000;
 
 const OrderSummary = ({ 
     packageLabel, 
-    originalPrice, 
+    basePrice, 
+    gstPercent,
+    gstAmount,
+    inclusivePrice,
     discountAmount, 
     finalPayable,
     couponCode 
 }: { 
     packageLabel: string; 
-    originalPrice: number; 
+    basePrice: number; 
+    gstPercent: number;
+    gstAmount: number;
+    inclusivePrice: number;
     discountAmount: number; 
     finalPayable: number;
     couponCode?: string;
 }) => (
     <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-slate-100 dark:border-slate-800 shadow-xl">
         <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Order Summary</h3>
+        
+        {/* Base Price */}
         <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800">
             <div>
                 <div className="font-black text-slate-900 dark:text-white">{packageLabel}</div>
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">1 Month Subscription</div>
             </div>
-            <div className="font-black text-slate-900 dark:text-white">₹{originalPrice}</div>
+            <div className="font-black text-slate-900 dark:text-white">₹{Math.round(basePrice)}</div>
         </div>
+
+        {/* GST Details */}
+        <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold text-xs">
+            <span>GST ({gstPercent}%)</span>
+            <span>+₹{Math.round(gstAmount)}</span>
+        </div>
+
+        {/* Subtotal (GST Included) */}
+        <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs">
+            <span>Package Total (GST Included)</span>
+            <span>₹{Math.round(inclusivePrice)}</span>
+        </div>
+
+        {/* Discount (if any) */}
         {discountAmount > 0 && (
             <div className="flex justify-between items-center py-4 border-b border-slate-50 dark:border-slate-800 text-green-600 font-bold text-xs">
                 <span>Discount Applied ({couponCode})</span>
-                <span>-₹{discountAmount}</span>
+                <span>-₹{Math.round(discountAmount)}</span>
             </div>
         )}
+
+        {/* Final Payable */}
         <div className="flex justify-between items-center pt-6">
             <div className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Total Amount</div>
-            <div className="text-2xl font-black text-blue-600">₹{finalPayable}</div>
+            <div className="text-2xl font-black text-blue-600">₹{Math.round(finalPayable)}</div>
         </div>
     </div>
 );
@@ -94,6 +118,7 @@ const PaymentPage: React.FC = () => {
         [PackageType.BOTH]: 798,
         [PackageType.NONE]: 0
     });
+    const [gstPercent, setGstPercent] = useState<number>(18);
     const [paymentMethod, setPaymentMethod] = useState<'mock' | 'wallet'>('mock');
 
     // Coupon States
@@ -108,6 +133,9 @@ const PaymentPage: React.FC = () => {
         getSystemConfig().then(cfg => {
             if (active && mounted.current && cfg) {
                 setCostPerMinute(cfg.cost_per_minute);
+                if (cfg.gst_percentage != null) {
+                    setGstPercent(Number(cfg.gst_percentage));
+                }
                 setPrices({
                     [PackageType.TALKS]: cfg.price_talks || 299,
                     [PackageType.SNEHI]: cfg.price_snehi || 499,
@@ -128,6 +156,9 @@ const PaymentPage: React.FC = () => {
     const safePackageKey = isValidPackage ? selectedPackage : PackageType.NONE;
     
     const currentPrice = prices[safePackageKey] || 0;
+    const gstAmount = Math.round(currentPrice * (gstPercent / 100));
+    const inclusivePrice = currentPrice + gstAmount;
+    const isLiveMode = !import.meta.env.DEV;
 
     // Pre-populate input if couponParam exists
     useEffect(() => {
@@ -138,9 +169,9 @@ const PaymentPage: React.FC = () => {
 
     // Validate Initial Coupon on Mount
     useEffect(() => {
-        if (couponParam && session?.id && currentPrice > 0 && !appliedCoupon) {
+        if (couponParam && session?.id && inclusivePrice > 0 && !appliedCoupon) {
             setIsValidatingCoupon(true);
-            validateCoupon(couponParam, session.id, 'NEW', currentPrice).then(res => {
+            validateCoupon(couponParam, session.id, 'NEW', inclusivePrice).then(res => {
                 if (res.is_valid) {
                     setAppliedCoupon(res);
                 } else {
@@ -149,14 +180,14 @@ const PaymentPage: React.FC = () => {
                 setIsValidatingCoupon(false);
             });
         }
-    }, [couponParam, session, currentPrice]);
+    }, [couponParam, session, inclusivePrice]);
 
     const handleApplyCoupon = async () => {
         setCouponError('');
-        if (!couponInput.trim() || !session?.id || currentPrice <= 0) return;
+        if (!couponInput.trim() || !session?.id || inclusivePrice <= 0) return;
         setIsValidatingCoupon(true);
         try {
-            const res = await validateCoupon(couponInput, session.id, 'NEW', currentPrice);
+            const res = await validateCoupon(couponInput, session.id, 'NEW', inclusivePrice);
             if (res.is_valid) {
                 setAppliedCoupon(res);
                 setCouponError('');
@@ -178,8 +209,8 @@ const PaymentPage: React.FC = () => {
         setCouponError('');
     };
 
-    const discountAmount = appliedCoupon ? appliedCoupon.discount_amount : 0;
-    const finalPayablePrice = Math.max(0, currentPrice - discountAmount);
+    const discountAmount = appliedCoupon ? Math.round(appliedCoupon.discount_amount) : 0;
+    const finalPayablePrice = Math.max(0, inclusivePrice - discountAmount);
 
     const packageLabel = safePackageKey === PackageType.TALKS 
         ? 'SIMPLISH - TALKS' 
@@ -222,7 +253,7 @@ const PaymentPage: React.FC = () => {
                 const { error: walletError } = await supabase.rpc('pay_package_with_wallet_v2', {
                     p_user_id: session!.id,
                     p_package_type: safePackageKey,
-                    p_amount: currentPrice,
+                    p_amount: inclusivePrice,
                     p_coupon_code: appliedCoupon ? appliedCoupon.coupon_code : null
                 });
 
@@ -231,7 +262,7 @@ const PaymentPage: React.FC = () => {
                 // Optimistically update Zustand store
                 const newPackageType = resolveUpgradedPackage(session?.packageType, safePackageKey);
                 const safeCostPerMinute = (costPerMinute && costPerMinute > 0) ? costPerMinute : DEFAULT_COST_PER_MINUTE;
-                const addedCredits = calculateBonusCredits(safePackageKey, currentPrice, safeCostPerMinute);
+                const addedCredits = calculateBonusCredits(safePackageKey, finalPayablePrice, safeCostPerMinute);
 
                 const currentSession = useAppStore.getState().session;
                 if (currentSession) {
@@ -239,7 +270,7 @@ const PaymentPage: React.FC = () => {
                         ...currentSession,
                         packageType: newPackageType,
                         packageStatus: PackageStatus.ACTIVE,
-                        topupAmount: Math.max(0, (currentSession.topupAmount || 0) - currentPrice),
+                        topupAmount: Math.max(0, (currentSession.topupAmount || 0) - finalPayablePrice),
                         agentCredits: (currentSession.agentCredits || 0) + addedCredits,
                         packageEndDate: new Date(Date.now() + SUBSCRIPTION_DAYS_DURATION * MS_IN_A_DAY).toISOString()
                     });
@@ -319,7 +350,7 @@ const PaymentPage: React.FC = () => {
         // PURE MATH & LOGIC EXTRACTED TO SERVICE LAYER
         const safeCostPerMinute = (costPerMinute && costPerMinute > 0) ? costPerMinute : DEFAULT_COST_PER_MINUTE;
         const newPackageType = resolveUpgradedPackage(session?.packageType, safePackageKey);
-        const addedCredits = calculateBonusCredits(safePackageKey, currentPrice, safeCostPerMinute);
+        const addedCredits = calculateBonusCredits(safePackageKey, finalPayablePrice, safeCostPerMinute);
 
         const currentCredits = session?.agentCredits || 0;
         const now = new Date();
@@ -414,7 +445,10 @@ const PaymentPage: React.FC = () => {
                     <div className="md:col-span-3 space-y-6">
                         <OrderSummary 
                             packageLabel={packageLabel} 
-                            originalPrice={currentPrice} 
+                            basePrice={currentPrice} 
+                            gstPercent={gstPercent}
+                            gstAmount={gstAmount}
+                            inclusivePrice={inclusivePrice}
                             discountAmount={discountAmount} 
                             finalPayable={finalPayablePrice} 
                             couponCode={appliedCoupon?.coupon_code}
@@ -476,8 +510,14 @@ const PaymentPage: React.FC = () => {
                         <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border-2 border-blue-500 shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 bg-blue-500 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">Selected</div>
                             <div className="text-2xl mb-4">💳</div>
-                            <h4 className="font-black text-slate-900 dark:text-white text-sm mb-1 uppercase tracking-tight">Mock Payment</h4>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">Clicking "Pay Now" will simulate a successful transaction for testing.</p>
+                            <h4 className="font-black text-slate-900 dark:text-white text-sm mb-1 uppercase tracking-tight">
+                                {isLiveMode ? 'Secure Checkout' : 'Mock Payment'}
+                            </h4>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
+                                {isLiveMode 
+                                    ? 'Pay securely via Razorpay using cards, UPI, netbanking or wallets.' 
+                                    : 'Clicking "Pay Now" will simulate a successful transaction for testing.'}
+                            </p>
                         </div>
 
                         <div className="bg-slate-100 dark:bg-slate-800/50 rounded-[2rem] p-6 border border-slate-200 dark:border-slate-700 opacity-40 grayscale flex items-center justify-between">

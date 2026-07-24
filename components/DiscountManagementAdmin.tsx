@@ -232,7 +232,7 @@ export const DiscountManagementAdmin: React.FC<DiscountManagementAdminProps> = (
         maxUsage: Number(bulkData.max_usage),
         startDate: bulkData.start_date ? new Date(bulkData.start_date).toISOString() : undefined,
         endDate: bulkData.end_date ? new Date(bulkData.end_date).toISOString() : undefined,
-        description: bulkData.description || `Bulk generated ${bulkData.display_name} Coupons`
+        description: bulkData.description || `Bulk generated ${bulkData.customer_type} Coupons`
       }, currentUser?.id);
 
       showMsg(`Successfully bulk generated ${inserted.length} coupons!`);
