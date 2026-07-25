@@ -5,6 +5,7 @@ import { useLanguage } from '../components/LanguageContext';
 import { useAppStore } from '../store/useAppStore';
 import { supabase } from '../lib/supabase';
 import { validateCoupon } from '../services/discountService';
+import { openRazorpayCheckout } from '../services/razorpayService';
 import { PackageType } from '../types';
 import Logo from '../components/Logo';
 
@@ -81,46 +82,72 @@ const TopupPage: React.FC = () => {
     setProcessing(true);
     
     try {
-      // Simulate Payment Delay
-      await new Promise(r => setTimeout(r, 1500));
-
       const finalPayable = getDiscountedPrice(selected.rs);
 
-      // Call secure topup RPC
-      const { data, error: topupError } = await supabase.rpc('process_user_topup_v2', {
-        p_user_id: session.id,
-        p_amount: selected.rs, // original amount
-        p_minutes: selected.mins,
-        p_coupon_code: appliedCoupon ? appliedCoupon.coupon_code : null
+      const processTopupFulfillment = async () => {
+        const { error: topupError } = await supabase.rpc('process_user_topup_v2', {
+          p_user_id: session.id,
+          p_amount: selected.rs,
+          p_minutes: selected.mins,
+          p_coupon_code: appliedCoupon ? appliedCoupon.coupon_code : null
+        });
+
+        if (topupError) throw topupError;
+
+        const { data: updatedProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('agent_credits, topup_amount')
+          .eq('id', session.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        useAppStore.setState({ 
+          session: { 
+            ...session, 
+            agentCredits: updatedProfile?.agent_credits || 0,
+            topupAmount: updatedProfile?.topup_amount || 0
+          } 
+        });
+
+        setSuccess(true);
+        setTimeout(() => navigate('/talk'), 3000);
+      };
+
+      if (finalPayable === 0) {
+        await processTopupFulfillment();
+        return;
+      }
+
+      const opened = await openRazorpayCheckout({
+        amountRupees: finalPayable,
+        name: 'SIMPLISH TALKS',
+        description: `Top-up Wallet ₹${selected.rs} (${selected.mins} Mins)`,
+        prefill: {
+          name: session?.full_name || session?.name || '',
+          contact: session?.phone || session?.phoneNumber || '',
+          email: session?.email || ''
+        },
+        onSuccess: async () => {
+          await processTopupFulfillment();
+        },
+        onDismiss: () => {
+          setProcessing(false);
+        },
+        onError: (err) => {
+          console.error("Topup Razorpay Error:", err);
+          setProcessing(false);
+          alert(err.message || 'Payment failed.');
+        }
       });
 
-      if (topupError) throw topupError;
-
-      // 2. Fetch updated profile stats to synchronize the Zustand store state securely
-      const { data: updatedProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('agent_credits, topup_amount')
-        .eq('id', session.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      // 3. Update Local Store
-      useAppStore.setState({ 
-        session: { 
-          ...session, 
-          agentCredits: updatedProfile?.agent_credits || 0,
-          topupAmount: updatedProfile?.topup_amount || 0
-        } 
-      });
-
-      setSuccess(true);
-      setTimeout(() => navigate('/talk'), 3000);
+      if (!opened) {
+        setProcessing(false);
+      }
     } catch (err: any) {
       console.error('Topup failed:', err);
-      alert(err.message || 'Payment failed. Please try again.');
-    } finally {
       setProcessing(false);
+      alert(err.message || 'Topup failed.');
     }
   };
 

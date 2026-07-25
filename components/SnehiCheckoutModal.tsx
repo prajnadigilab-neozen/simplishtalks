@@ -3,6 +3,7 @@ import { useLanguage } from '../components/LanguageContext';
 import { getSystemConfig, SystemConfig } from '../services/systemConfigService';
 import { completeSnehiPaymentV2 } from '../services/snehiAccessService';
 import { validateCoupon } from '../services/discountService';
+import { openRazorpayCheckout } from '../services/razorpayService';
 
 interface SnehiCheckoutModalProps {
   userId: string;
@@ -103,33 +104,65 @@ const SnehiCheckoutModal: React.FC<SnehiCheckoutModalProps> = ({
     setStep('processing');
     setTxnError('');
 
-    // Simulate 2 second gateway response
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (finalPayable === 0) {
+      const mockTxnId = `FREE-${Date.now()}`;
+      const success = await completeSnehiPaymentV2(
+        userId,
+        requestId,
+        basePrice * 100,
+        taxAmount * 100,
+        discountAmount * 100,
+        finalPayable * 100,
+        gateway,
+        mockTxnId,
+        appliedCoupon ? appliedCoupon.code : null
+      );
+      if (success) {
+        setStep('success');
+        setTimeout(() => onSuccess(), 1500);
+      } else {
+        setStep('error');
+        setTxnError(t({ en: 'Fulfillment error.', kn: 'ಪಾವತಿ ವಿಫಲವಾಗಿದೆ.' }));
+      }
+      return;
+    }
 
-    // Generate simulated Gateway reference id
-    const mockTxnId = `TXN-${gateway}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const opened = await openRazorpayCheckout({
+      amountRupees: finalPayable,
+      name: 'SIMPLISH SNEHI',
+      description: 'Activate SNEHI Access',
+      onSuccess: async (paymentId) => {
+        const success = await completeSnehiPaymentV2(
+          userId,
+          requestId,
+          basePrice * 100,
+          taxAmount * 100,
+          discountAmount * 100,
+          finalPayable * 100,
+          'RAZORPAY_LIVE',
+          paymentId,
+          appliedCoupon ? appliedCoupon.code : null
+        );
+        if (success) {
+          setStep('success');
+          setTimeout(() => onSuccess(), 1500);
+        } else {
+          setStep('error');
+          setTxnError(t({ en: 'Payment succeeded but access activation failed.', kn: 'ಪಾವತಿ ಸಫಲವಾಗಿದೆ ಆದರೆ ಸಕ್ರಿಯಗೊಳಿಸುವಿಕೆ ವಿಫಲವಾಗಿದೆ.' }));
+        }
+      },
+      onDismiss: () => {
+        setStep('checkout');
+      },
+      onError: (err) => {
+        console.error("Snehi Razorpay Error:", err);
+        setStep('error');
+        setTxnError(err.message || 'Payment failed at gateway.');
+      }
+    });
 
-    // Map amounts to Paise for completeSnehiPaymentV2 DB columns
-    const success = await completeSnehiPaymentV2(
-      userId,
-      requestId,
-      basePrice * 100,
-      taxAmount * 100,
-      discountAmount * 100,
-      finalPayable * 100,
-      gateway,
-      mockTxnId,
-      appliedCoupon ? appliedCoupon.code : null
-    );
-
-    if (success) {
-      setStep('success');
-      setTimeout(() => {
-        onSuccess();
-      }, 1500);
-    } else {
-      setStep('error');
-      setTxnError(t({ en: 'Payment failed at gateway. Please try again.', kn: 'ಪಾವತಿ ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.' }));
+    if (!opened) {
+      setStep('checkout');
     }
   };
 

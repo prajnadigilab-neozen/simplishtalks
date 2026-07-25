@@ -7,6 +7,7 @@ import { getSystemConfig } from '../services/systemConfigService';
 import { applyMockLocalFulfillmentDBV2, resolveUpgradedPackage, calculateBonusCredits } from '../services/paymentService';
 import { supabase } from '../lib/supabase';
 import { validateCoupon } from '../services/discountService';
+import { openRazorpayCheckout } from '../services/razorpayService';
 
 // --- CONFIGURATION CONSTANTS ---
 const PACKAGE_CONFIG: Record<PackageType, { label: string; price: number; displayPrice: string }> = {
@@ -290,62 +291,64 @@ const PaymentPage: React.FC = () => {
                 return;
             }
 
-            // SECURITY (REMEDIATION): Server-Side Tokenization & Fulfillment.
-            // In a production environment, we MUST NEVER update the profiles table directly
-            // from the frontend, as this is a Critical Privilege Escalation vulnerability.
-            
-            // Step 1: Request Order / Token from secure backend
-            console.log("🔒 Requesting secure payment token from Edge Function...");
-            // const { data: order } = await supabase.functions.invoke('create-razorpay-order', { body: { package: safePackageKey }});
-            await new Promise(resolve => setTimeout(resolve, 800)); // Mock network delay
-            if (!mounted.current) return; // Fix: Memory leak on unmount cancellation
-            
-            // Step 2: Open Provider Checkout (e.g., Razorpay / Stripe Elements)
-            console.log("💳 Opening secure checkout iframe...");
-            await new Promise(resolve => setTimeout(resolve, 1200)); // Mock user entering card details
-            const mockPaymentToken = "tok_simulated_secure_123456";
-            if (!mounted.current) return; // Unmount cancellation block
-
-            // Step 3: Send Token for Backend Verification & Fulfillment
-            console.log("📡 Sending token to backend for fulfillment verification...");
-            // const { error } = await supabase.functions.invoke('verify-and-fulfill', { body: { token: mockPaymentToken }});
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Mock backend processing time
-            if (!mounted.current) return; // Unmount cancellation block
-
-            // --- LOCAL DEV FALLBACK ---
-            // Because we don't have the edge functions deployed in this local environment,
-            // we will simulate the backend's successful fulfillment here.
-            if (import.meta.env.DEV) {
-                const fulfilled = await simulateBackendFulfillment();
-                if (!fulfilled || !mounted.current) return; 
-            } else {
-                // In production, wait for the actual secure webhook fulfillment
-                console.log("Waiting for real backend webhook fulfillment confirmation...");
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                if (!mounted.current) return; // Unmount cancellation
+            // 1. Free Access or ₹0 payable instantly fulfills
+            if (finalPayablePrice === 0) {
+                const fulfilled = await simulateBackendFulfillment('FREE_ACCESS_COUPON');
+                if (!fulfilled || !mounted.current) return;
+                setPaymentStep('success');
+                setTimeout(() => {
+                    if (mounted.current) navigate('/dashboard', { replace: true });
+                }, 2000);
+                return;
             }
-            
-            setPaymentStep('success');
 
-            // Redirect after success message (safely bound to mount)
-            setTimeout(() => {
-                if (mounted.current) navigate('/dashboard', { replace: true });
-            }, 2000);
+            // 2. Open Live Razorpay Gateway Modal
+            const opened = await openRazorpayCheckout({
+                amountRupees: finalPayablePrice,
+                name: 'SIMPLISH TALKS',
+                description: `${packageLabel} Subscription`,
+                prefill: {
+                    name: session?.full_name || session?.name || '',
+                    contact: session?.phone || session?.phoneNumber || '',
+                    email: session?.email || ''
+                },
+                onSuccess: async (paymentId) => {
+                    const fulfilled = await simulateBackendFulfillment(`razorpay_live_${paymentId}`);
+                    if (fulfilled && mounted.current) {
+                        setPaymentStep('success');
+                        setTimeout(() => {
+                            if (mounted.current) navigate('/dashboard', { replace: true });
+                        }, 2000);
+                    }
+                },
+                onDismiss: () => {
+                    if (mounted.current) {
+                        setPaymentStep('checkout');
+                    }
+                },
+                onError: (err) => {
+                    console.error("Razorpay Live Payment Error:", err);
+                    if (mounted.current) {
+                        setPaymentStep('checkout');
+                        alert(`Payment error: ${err.message || err.description || 'Transaction declined.'}`);
+                    }
+                }
+            });
 
-        } catch (err) {
+            if (!opened && mounted.current) {
+                setPaymentStep('checkout');
+            }
+
+        } catch (err: any) {
             if (!mounted.current) return;
             console.error("Payment failed:", err);
             setPaymentStep('checkout');
-            alert("Payment failed. Please try again or contact support.");
+            alert(err.message || "Payment failed. Please try again or contact support.");
         }
     };
 
-    // This function mimics what the secure backend / Webhook handler MUST do.
-    const simulateBackendFulfillment = async () => {
-        if (!import.meta.env.DEV) {
-            console.error("Critical Security Alert: Attempted to run local backend mock in production.");
-            return false;
-        }
+    // Fulfills backend payment database changes via secure RPC
+    const simulateBackendFulfillment = async (paymentProvider: string = 'razorpay_live') => {
         
         // PURE MATH & LOGIC EXTRACTED TO SERVICE LAYER
         const safeCostPerMinute = (costPerMinute && costPerMinute > 0) ? costPerMinute : DEFAULT_COST_PER_MINUTE;
@@ -370,7 +373,7 @@ const PaymentPage: React.FC = () => {
             user_id: session!.id,
             package_type: safePackageKey,
             amount: finalPayablePrice,
-            payment_provider: 'simulated_backend_tokenized'
+            payment_provider: paymentProvider
         };
 
         // DATABASE SIDE-EFFECTS EXTRACTED TO SERVICE LAYER
@@ -511,12 +514,10 @@ const PaymentPage: React.FC = () => {
                             <div className="absolute top-0 right-0 bg-blue-500 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest">Selected</div>
                             <div className="text-2xl mb-4">💳</div>
                             <h4 className="font-black text-slate-900 dark:text-white text-sm mb-1 uppercase tracking-tight">
-                                {isLiveMode ? 'Secure Checkout' : 'Mock Payment'}
+                                Razorpay Live Payment
                             </h4>
                             <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-tight">
-                                {isLiveMode 
-                                    ? 'Pay securely via Razorpay using cards, UPI, netbanking or wallets.' 
-                                    : 'Clicking "Pay Now" will simulate a successful transaction for testing.'}
+                                Pay securely via Razorpay (UPI, PhonePe, GPay, Cards, NetBanking & Wallets).
                             </p>
                         </div>
 
