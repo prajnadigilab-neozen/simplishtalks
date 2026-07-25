@@ -3,12 +3,26 @@
  */
 
 export const getRazorpayKeyId = (): string => {
-  let rawKey = (import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TE82BKGXSC75KJ').trim();
+  const envKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+  if (!envKey) {
+    console.error("❌ VITE_RAZORPAY_KEY_ID is missing from environment variables.");
+    return '';
+  }
+  let rawKey = envKey.trim();
+
+  // Normalize prefix
   if (rawKey.startsWith('RZP_LIVE_')) {
     rawKey = rawKey.replace('RZP_LIVE_', 'rzp_live_');
   } else if (rawKey.startsWith('RZP_TEST_')) {
     rawKey = rawKey.replace('RZP_TEST_', 'rzp_test_');
   }
+
+  // Remediation for Hostinger auto-uppercasing environment variable values:
+  // If Hostinger converted TE82BkgxsC75Kj to TE82BKGXSC75KJ, restore exact case required by Razorpay API.
+  if (rawKey.toLowerCase() === 'rzp_live_te82bkgxsc75kj') {
+    rawKey = 'rzp_live_TE82BkgxsC75Kj';
+  }
+
   return rawKey;
 };
 
@@ -60,6 +74,13 @@ export const openRazorpayCheckout = async (options: OpenRazorpayOptions): Promis
   }
 
   const keyId = getRazorpayKeyId();
+  if (!keyId) {
+    if (options.onError) {
+      options.onError(new Error('Razorpay Key ID (VITE_RAZORPAY_KEY_ID) is not configured in environment variables.'));
+    }
+    return false;
+  }
+
   console.log("💳 Initializing Razorpay Checkout with Key ID:", keyId);
 
   const razorpayOptions = {
@@ -94,7 +115,10 @@ export const openRazorpayCheckout = async (options: OpenRazorpayOptions): Promis
   rzp.on('payment.failed', function (response: any) {
     console.error("❌ Razorpay Payment Failed:", response.error);
     if (options.onError) {
-      const errReason = response.error?.description || response.error?.reason || 'Payment failed or API key unauthorized.';
+      let errReason = response.error?.description || response.error?.reason;
+      if (!errReason || errReason.includes('undefined')) {
+        errReason = 'Razorpay Key Unauthorized (401). Please check if Live Mode is activated in Razorpay Dashboard and talks.simplish.in is added under Website URLs.';
+      }
       options.onError(new Error(errReason));
     }
   });
