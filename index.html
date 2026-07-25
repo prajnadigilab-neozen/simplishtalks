@@ -9,6 +9,8 @@
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
   <link rel="canonical" href="https://talks.simplish.in/" />
   <link rel="apple-touch-icon" href="/logo-new.png" />
+  <link rel="preload" href="/brand-image.avif" as="image" type="image/avif">
+  <link rel="preload" href="/brand-image.webp" as="image" type="image/webp">
   <link rel="preload" href="/fonts/NotoSansKannada.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/DancingScript-Bold.woff2" as="font" type="font/woff2" crossorigin>
   
@@ -77,7 +79,8 @@
 <body class="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-100">
   <picture>
     <source srcset="/brand-image.avif" type="image/avif" />
-    <img src="/brand-image.png" alt="SIMPLISH Talks Hero" loading="eager" fetchpriority="high" class="fixed inset-0 w-full h-full object-cover -z-10 opacity-20 pointer-events-none" />
+    <source srcset="/brand-image.webp" type="image/webp" />
+    <img src="/brand-image.png" alt="SIMPLISH Talks Hero" loading="eager" fetchpriority="high" width="1920" height="1080" class="fixed inset-0 w-full h-full object-cover -z-10 opacity-20 pointer-events-none" />
   </picture>
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>

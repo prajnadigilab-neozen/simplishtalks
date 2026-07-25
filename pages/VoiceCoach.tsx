@@ -370,7 +370,8 @@ const VoiceCoach: React.FC = () => {
                 <div className={`overflow-hidden rounded-[2.5rem] w-16 h-16 md:w-32 md:h-32 lg:w-44 lg:h-44 border-4 transition-all duration-700 ${audio.isAiTalking ? 'border-white/50 scale-105 shadow-blue-500/20' : (isAiThinking || gemini.isConnecting) ? 'border-amber-400/50 scale-95 shadow-amber-500/20' : 'border-white/10'}`}>
                   <picture>
                     <source srcSet={man ? '/male_coach.avif' : '/female_coach.avif'} type="image/avif" />
-                    <img src={man ? '/male_coach.png' : '/female_coach.png'} alt="Coach" className={`w-full h-full object-cover transition-all duration-700 ${(audio.isAiTalking || isAiThinking) ? 'grayscale-0' : 'grayscale-[0.3]'}`} />
+                    <source srcSet={man ? '/male_coach.webp' : '/female_coach.webp'} type="image/webp" />
+                    <img src={man ? '/male_coach.png' : '/female_coach.png'} alt="Coach" loading="lazy" decoding="async" className={`w-full h-full object-cover transition-all duration-700 ${(audio.isAiTalking || isAiThinking) ? 'grayscale-0' : 'grayscale-[0.3]'}`} />
                   </picture>
                   {(isAiThinking || gemini.isConnecting) && (
                     <div className="absolute inset-0 bg-amber-500/20 flex items-center justify-center">

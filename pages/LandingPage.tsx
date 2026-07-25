@@ -407,11 +407,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
 
             <div className="lg:col-span-5 flex flex-col items-center">
               <div className="relative w-64 h-64 md:w-80 md:h-80 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-[3rem] overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500 border-4 border-white dark:border-slate-800">
-                <img
-                  src="/female_coach.png"
-                  alt="Snehi AI"
-                  className="w-full h-full object-cover object-top filter contrast-[1.05]"
-                />
+                <picture>
+                  <source srcset="/female_coach.avif" type="image/avif" />
+                  <source srcset="/female_coach.webp" type="image/webp" />
+                  <img
+                    src="/female_coach.png"
+                    alt="Snehi AI"
+                    loading="lazy"
+                    decoding="async"
+                    width="320"
+                    height="320"
+                    className="w-full h-full object-cover object-top filter contrast-[1.05]"
+                  />
+                </picture>
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/80 to-transparent p-6 text-white text-center">
                   <span className="font-black text-2xl">SNEHI</span>
                   <span className="block text-xs font-bold text-amber-300 uppercase tracking-widest mt-1">

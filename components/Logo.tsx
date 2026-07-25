@@ -15,11 +15,18 @@ const Logo: React.FC<LogoProps> = ({ className = "w-12 h-12", textOnly = false, 
   if (symbolOnly) {
     return (
       <div className={`flex items-center justify-center select-none ${className}`}>
-        <img
-          src="/simplish_logo_final1.png"
-          alt="SIMPLISH Symbol"
-          className="w-full h-full object-contain"
-        />
+        <picture>
+          <source srcset="/simplish_logo_final1.avif" type="image/avif" />
+          <source srcset="/simplish_logo_final1.webp" type="image/webp" />
+          <img
+            src="/simplish_logo_final1.png"
+            alt="SIMPLISH Symbol"
+            width="96"
+            height="96"
+            decoding="async"
+            className="w-full h-full object-contain"
+          />
+        </picture>
       </div>
     );
   }
@@ -35,11 +42,20 @@ const Logo: React.FC<LogoProps> = ({ className = "w-12 h-12", textOnly = false, 
 
   return (
     <div className={`flex flex-col items-center justify-center select-none ${className}`}>
-      <img
-        src="/simplish_logo_final1.png"
-        alt="SIMPLISH Symbol"
-        className="w-16 h-16 md:w-24 md:h-24 object-contain mb-2 drop-shadow-2xl"
-      />
+      <picture>
+        <source srcset="/simplish_logo_final1.avif" type="image/avif" />
+        <source srcset="/simplish_logo_final1.webp" type="image/webp" />
+        <img
+          src="/simplish_logo_final1.png"
+          alt="SIMPLISH Symbol"
+          width="96"
+          height="96"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          className="w-16 h-16 md:w-24 md:h-24 object-contain mb-2 drop-shadow-2xl"
+        />
+      </picture>
       <div className="flex flex-row items-baseline gap-1.5 text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)] whitespace-nowrap">
         <span className="font-black tracking-tighter uppercase text-base md:text-xl">
           SIMPLISH

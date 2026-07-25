@@ -13,9 +13,35 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       target: 'es2022',
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'react-vendor';
+              }
+              if (id.includes('@supabase')) {
+                return 'supabase-vendor';
+              }
+              if (id.includes('recharts')) {
+                return 'recharts-vendor';
+              }
+              if (id.includes('lucide-react')) {
+                return 'icons-vendor';
+              }
+              if (id.includes('dexie')) {
+                return 'dexie-vendor';
+              }
+            }
+          }
+        }
+      }
     },
     esbuild: {
       target: 'es2022',
+      drop: mode === 'production' ? ['console', 'debugger'] : [],
     },
     optimizeDeps: {
       esbuildOptions: {
@@ -35,12 +61,15 @@ export default defineConfig(({ mode }) => {
           quality: 80,
         },
         webp: {
-          lossless: true,
+          quality: 80,
         },
+        avif: {
+          quality: 75,
+        }
       }),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo-new.png'],
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo-new.png', 'brand-image.avif', 'brand-image.webp'],
         manifest: {
           name: 'SIMPLISH',
           short_name: 'SIMPLISH',
@@ -77,7 +106,7 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,ttf,eot}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,avif,woff,woff2,ttf,eot}'],
           // Exclude auth endpoints from SW so sessions/roles are always live
           navigateFallbackDenylist: [/^\/auth\//],
           runtimeCaching: [
