@@ -2,7 +2,15 @@
  * Razorpay Integration Service for Live Payments
  */
 
-export const RAZORPAY_LIVE_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'RZP_LIVE_TE82BKGXSC75KJ';
+export const getRazorpayKeyId = (): string => {
+  let rawKey = (import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TE82BKGXSC75KJ').trim();
+  if (rawKey.startsWith('RZP_LIVE_')) {
+    rawKey = rawKey.replace('RZP_LIVE_', 'rzp_live_');
+  } else if (rawKey.startsWith('RZP_TEST_')) {
+    rawKey = rawKey.replace('RZP_TEST_', 'rzp_test_');
+  }
+  return rawKey;
+};
 
 /**
  * Dynamically loads the Razorpay Standard Checkout SDK script.
@@ -51,8 +59,11 @@ export const openRazorpayCheckout = async (options: OpenRazorpayOptions): Promis
     return false;
   }
 
+  const keyId = getRazorpayKeyId();
+  console.log("💳 Initializing Razorpay Checkout with Key ID:", keyId);
+
   const razorpayOptions = {
-    key: RAZORPAY_LIVE_KEY_ID,
+    key: keyId,
     amount: Math.round(options.amountRupees * 100), // in Paise
     currency: 'INR',
     name: options.name || 'SIMPLISH TALKS',
@@ -67,11 +78,13 @@ export const openRazorpayCheckout = async (options: OpenRazorpayOptions): Promis
       color: '#2563EB'
     },
     handler: async function (response: any) {
+      console.log("✅ Razorpay payment success:", response.razorpay_payment_id);
       const paymentId = response.razorpay_payment_id || `rzp_${Date.now()}`;
       await options.onSuccess(paymentId, response);
     },
     modal: {
       onDismiss: function () {
+        console.log("ℹ️ Razorpay checkout modal closed by user.");
         if (options.onDismiss) options.onDismiss();
       }
     }
@@ -79,8 +92,10 @@ export const openRazorpayCheckout = async (options: OpenRazorpayOptions): Promis
 
   const rzp = new (window as any).Razorpay(razorpayOptions);
   rzp.on('payment.failed', function (response: any) {
+    console.error("❌ Razorpay Payment Failed:", response.error);
     if (options.onError) {
-      options.onError(response.error);
+      const errReason = response.error?.description || response.error?.reason || 'Payment failed or API key unauthorized.';
+      options.onError(new Error(errReason));
     }
   });
 

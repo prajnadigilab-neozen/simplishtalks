@@ -155,7 +155,7 @@ BEGIN
 
   -- 4. Check usage limits
   IF v_coupon.current_usage >= v_coupon.max_usage THEN
-    RETURN QUERY SELECT FALSE, 'Coupon Usage Limit Reached'::TEXT, v_coupon.id, v_coupon.customer_type, v_coupon.coupon_code, v_coupon.discount_type, v_coupon.discount_value, 0::NUMERIC, p_original_price;
+    RETURN QUERY SELECT FALSE, 'Coupon no longer available.'::TEXT, v_coupon.id, v_coupon.customer_type, v_coupon.coupon_code, v_coupon.discount_type, v_coupon.discount_value, 0::NUMERIC, p_original_price;
     RETURN;
   END IF;
 

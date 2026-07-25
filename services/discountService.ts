@@ -58,9 +58,14 @@ export const validateCoupon = async (
       };
     }
 
+    let errMsg = data[0].error_message;
+    if (errMsg && (errMsg === 'Coupon Usage Limit Reached' || errMsg.toLowerCase().includes('usage limit'))) {
+      errMsg = 'Coupon no longer available.';
+    }
+
     return {
       is_valid: data[0].is_valid,
-      error_message: data[0].error_message,
+      error_message: errMsg,
       coupon_id: data[0].coupon_id,
       customer_type: data[0].customer_type,
       coupon_code: data[0].coupon_code,
