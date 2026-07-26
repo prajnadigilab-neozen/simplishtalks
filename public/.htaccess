@@ -2,6 +2,10 @@
   RewriteEngine On
   RewriteBase /
 
+  # 0. Enforce HTTPS Immediately (Collapses redirect chain)
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
   # 1. Block WordPress admin / login / install scanner probes instantly with 403 Forbidden
   # Intercepting these common automated scans at the web server layer saves resources and bandwidth.
   RewriteCond %{REQUEST_URI} ^/wp-(admin|login|content|includes|config|install) [NC,OR]
@@ -57,8 +61,14 @@
   <FilesMatch "\.(js|css|png|jpg|jpeg|gif|webp|avif|ico|woff2|svg)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
+
+  # HTML Document Caching -> Always revalidate with stale-while-revalidate
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate, stale-while-revalidate=60"
+  </FilesMatch>
   
   # Security & Network Performance
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
   Header set X-Content-Type-Options "nosniff"
   Header set Connection "keep-alive"
 </IfModule>

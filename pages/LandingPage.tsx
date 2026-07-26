@@ -26,11 +26,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
   const [simProgress, setSimProgress] = useState(0);
 
   useEffect(() => {
-    attributionService.cacheUTMParameters();
-    attributionService.logEvent('web_page_viewed', {
-      page_url: window.location.href,
-      referrer: document.referrer
-    });
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => {
+        attributionService.cacheUTMParameters();
+        attributionService.logEvent('web_page_viewed', {
+          page_url: window.location.href,
+          referrer: document.referrer
+        });
+      }, { timeout: 3000 });
+    } else {
+      setTimeout(() => {
+        attributionService.cacheUTMParameters();
+        attributionService.logEvent('web_page_viewed', {
+          page_url: window.location.href,
+          referrer: document.referrer
+        });
+      }, 2000);
+    }
   }, []);
 
   useEffect(() => {
