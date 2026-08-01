@@ -270,9 +270,9 @@ const FeedbackPage: React.FC = () => {
           <div className="w-20 h-20 bg-green-100 dark:bg-green-950 text-green-600 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto animate-bounce">
             ✓
           </div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase mb-2">
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase mb-2">
             {t({ en: '🙏 Thank You!', kn: '🙏 ಧನ್ಯವಾದಗಳು!' })}
-          </h1>
+          </h2>
           <p className="text-slate-600 dark:text-slate-400 font-bold mb-8 text-sm leading-relaxed">
             {t({ 
               en: 'Your feedback has been submitted successfully. Your opinion helps us improve the learning experience for future students.', 

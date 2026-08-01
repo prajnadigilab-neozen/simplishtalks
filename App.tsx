@@ -1,6 +1,7 @@
 /** V 1.0 */
 import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { HashRouter as Router, Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import SEOHead from './components/SEOHead';
 import { LanguageProvider, useLanguage } from './components/LanguageContext';
 import { ThemeProvider, useTheme } from './components/ThemeContext';
 import { TRANSLATIONS, INITIAL_MODULES, LEVEL_ORDER } from './constants';
@@ -657,6 +658,7 @@ const App: React.FC = () => (
     <ThemeProvider>
       <LanguageProvider>
         <Router>
+          <SEOHead />
           <AppContent />
         </Router>
       </LanguageProvider>

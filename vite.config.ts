@@ -73,7 +73,7 @@ export default defineConfig(({ mode }) => {
         manifest: {
           name: 'SIMPLISH',
           short_name: 'SIMPLISH',
-          description: 'AI Coaching Application',
+          description: 'Learn English through Kannada with SIMPLISH Talks AI coaching. Practice speaking, improve grammar and vocabulary.',
           theme_color: '#0F172A',
           background_color: '#FFFFFF',
           display: 'standalone',

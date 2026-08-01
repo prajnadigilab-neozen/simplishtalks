@@ -13,7 +13,7 @@ test.describe('Validation Matrix: Signup & Profile', () => {
 
   // --- Phase 1: Bilingual Integrity ---
   test('Matrix-001: Bilingual Registration (Kannada Name)', async ({ page }) => {
-    await page.goto(`${BASE_URL}/#/register`);
+    await page.goto(`${BASE_URL}/register`);
     
     // Fill registration form using evaluate to bypass keyboard limitations for Unicode
     const nameInput = page.getByPlaceholder(/name|ಹೆಸರು/i);
@@ -46,7 +46,7 @@ test.describe('Validation Matrix: Signup & Profile', () => {
 
   // --- Phase 2: Negative Testing ---
   test('Matrix-002: Negative Validation', async ({ page }) => {
-    await page.goto(`${BASE_URL}/#/register`);
+    await page.goto(`${BASE_URL}/register`);
     await page.getByRole('button', { name: /join|ಸೇರಿ/i }).click();
 
     // Verify REQUIRED fields are flagged
@@ -58,7 +58,7 @@ test.describe('Validation Matrix: Signup & Profile', () => {
   // --- Phase 3: Security Injections ---
   test('Matrix-003: Security Injection (XSS & SQLi)', async ({ page }) => {
     await loginAs(page, UNIQUE_PHONE, 'TestPass123!');
-    await page.goto(`${BASE_URL}/#/settings`);
+    await page.goto(`${BASE_URL}/settings`);
     await page.waitForLoadState('networkidle');
 
     const XSS_PAYLOAD = "<script>alert('xss')</script>";

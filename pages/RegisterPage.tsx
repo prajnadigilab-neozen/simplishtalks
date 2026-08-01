@@ -464,9 +464,9 @@ const RegisterPage: React.FC = () => {
         {/* Mobile logo */}
         <div className="lg:hidden flex flex-col items-center mb-8">
           <Logo symbolOnly className="w-20 h-20 mb-3" />
-          <h1 className="text-2xl font-black text-blue-900 dark:text-white tracking-tight flex items-center gap-1.5 whitespace-nowrap">
+          <h2 className="text-2xl font-black text-blue-900 dark:text-white tracking-tight flex items-center gap-1.5 whitespace-nowrap">
             SIMPLISH <span className="font-script italic text-amber-500 normal-case text-3xl">Talks</span>
-          </h1>
+          </h2>
         </div>
 
         <div className="w-full max-w-sm">

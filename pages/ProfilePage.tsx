@@ -219,7 +219,7 @@ const ProfilePage: React.FC = () => {
                 <div className="flex flex-col items-center mb-8">
                   <div className="relative">
                     <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-900 overflow-hidden border-2 border-blue-100 dark:border-slate-700">
-                      {formData.avatarUrl ? <img src={formData.avatarUrl} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center opacity-10">👤</div>}
+                      {formData.avatarUrl ? <img src={formData.avatarUrl} alt="User avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center opacity-10">👤</div>}
                     </div>
                     <label className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center cursor-pointer shadow-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">

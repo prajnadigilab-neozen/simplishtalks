@@ -7,8 +7,8 @@ import { test, expect } from '@playwright/test';
  */
 test.describe('404 Page Integrity & Localization', () => {
 
-  // Using /#/ prefix for HashRouter compatibility
-  const invalidRoutes = ['/#/user/hidden-route', '/#/404-test', '/#/dashboard/invalid-path'];
+  // Using paths for BrowserRouter compatibility
+  const invalidRoutes = ['/user/hidden-route', '/404-test', '/dashboard/invalid-path'];
 
   for (const route of invalidRoutes) {
     test(`Verify branded 404 on invalid route: ${route}`, async ({ page }) => {

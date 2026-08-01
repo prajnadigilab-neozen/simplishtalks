@@ -9,10 +9,7 @@ const routes = [
   { url: '/', priority: '1.0', changefreq: 'daily' },
   { url: '/packages', priority: '0.8', changefreq: 'weekly' },
   { url: '/curriculum', priority: '0.8', changefreq: 'weekly' },
-  { url: '/discover', priority: '0.7', changefreq: 'weekly' },
-  { url: '/login', priority: '0.6', changefreq: 'monthly' },
-  { url: '/register', priority: '0.6', changefreq: 'monthly' },
-  { url: '/placement', priority: '0.5', changefreq: 'monthly' },
+  { url: '/discover', priority: '0.8', changefreq: 'weekly' },
 ];
 
 const generateSitemap = () => {

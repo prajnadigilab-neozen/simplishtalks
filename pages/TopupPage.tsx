@@ -157,9 +157,9 @@ const TopupPage: React.FC = () => {
         <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center text-5xl mb-6 shadow-lg animate-bounce">
           ✓
         </div>
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tighter">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tighter">
           Topup Successful!
-        </h1>
+        </h2>
         <p className="text-slate-600 dark:text-slate-400 font-bold mb-8">
           {selected.mins} minutes have been added to your account.
           <br />Redirecting you back to Live Talk...
