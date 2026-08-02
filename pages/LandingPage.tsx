@@ -91,62 +91,62 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
   const faqs = [
     {
       q: t({
-        en: 'Do I need good English before using Talks or Snehi?',
-        kn: 'ಟಾಕ್ಸ್ ಅಥವಾ ಸ್ನೇಹಿ ಬಳಸುವ ಮುನ್ನ ನನಗೆ ಒಳ್ಳೆಯ ಇಂಗ್ಲಿಷ್ ಬೇಕೇ?'
+        en: 'Can I learn English through Kannada from zero as a beginner?',
+        kn: 'ಒಬ್ಬ ಆರಂಭಿಕರಾಗಿ ನಾನು ಶೂನ್ಯದಿಂದ ಕನ್ನಡದ ಮೂಲಕ ಇಂಗ್ಲಿಷ್ ಕಲಿಯಬಹುದೇ?'
       }),
       a: t({
-        en: 'No. You can start with basic English and improve through practice.',
-        kn: 'ಇಲ್ಲ. ನೀವು ಮೂಲ ಇಂಗ್ಲಿಷ್‌ನಿಂದ ಪ್ರಾರಂಭಿಸಿ ಅಭ್ಯಾಸದ ಮೂಲಕ ಸುಧಾರಿಸಬಹುದು.'
+        en: 'Yes! SIMPLISH Talks is designed specifically for beginners in Karnataka to learn spoken English from zero using Kannada explanations.',
+        kn: 'ಹೌದು! ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಅನ್ನು ವಿಶೇಷವಾಗಿ ಕರ್ನಾಟಕದ ಆರಂಭಿಕರಿಗಾಗಿ ಕನ್ನಡ ವಿವರಣೆಗಳನ್ನು ಬಳಸಿ ಶೂನ್ಯದಿಂದ ಸ್ಪೋಕನ್ ಇಂಗ್ಲಿಷ್ ಕಲಿಯಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.'
       })
     },
     {
       q: t({
-        en: 'Will Snehi correct every mistake?',
-        kn: 'ಸ್ನೇಹಿ ಪ್ರತಿ ತಪ್ಪನ್ನೂ ತಿದ್ದುತ್ತಾರೆಯೆ?'
+        en: 'How does the AI English Tutor help me speak English fluently?',
+        kn: 'AI ಇಂಗ್ಲಿಷ್ ಬೋಧಕರು ನಾನು ನಿರರ್ಗಳವಾಗಿ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡಲು ಹೇಗೆ ಸಹಾಯ ಮಾಡುತ್ತಾರೆ?'
       }),
       a: t({
-        en: 'Snehi focuses on helping you communicate confidently while encouraging improvement.',
-        kn: 'ಸ್ನೇಹಿ ನೀವು ಆತ್ಮಿವಿಶ್ವಾಸದಿಂದ ಸಂವಹನ ನಡೆಸಲು ಸಹಾಯ ಮಾಡುವತ್ತ ಗಮನ ಹರಿಸುತ್ತದೆ ಮತ್ತು ಸುಧಾರಣೆಗೆ ಪ್ರೋತ್ಸಾಹಿಸುತ್ತದೆ.'
+        en: 'Your AI English Companion Snehi provides 24/7 private voice practice, immediate speaking feedback, and natural conversation without any fear of judgment.',
+        kn: 'ನಿಮ್ಮ AI ಇಂಗ್ಲಿಷ್ ಸ್ನೇಹಿತೆ ಸ್ನೇಹಿ 24/7 ಖಾಸಗಿ ಧ್ವನಿ ಅಭ್ಯಾಸ, ತ್ವರಿತ ಮಾತನಾಡುವ ಪ್ರತಿಕ್ರಿಯೆ ಮತ್ತು ಯಾವುದೇ ತೀರ್ಪಿನ ಭಯವಿಲ್ಲದೆ ನೈಸರ್ಗಿಕ ಸಂಭಾಷಣೆಯನ್ನು ಒದಗಿಸುತ್ತದೆ.'
       })
     },
     {
       q: t({
-        en: 'Can I practice alone?',
-        kn: 'ನಾನು ಒಬ್ಬನೇ ಅಭ್ಯಾಸ ಮಾಡಬಹುದೇ?'
+        en: 'Does SIMPLISH Talks offer English grammar explained in Kannada?',
+        kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಕನ್ನಡದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ವ್ಯಾಕರಣ ವಿವರಣೆಯನ್ನು ನೀಡುತ್ತದೆಯೇ?'
       }),
       a: t({
-        en: 'Yes. SIMPLISH Talks is designed for private speaking practice.',
-        kn: 'ಹೌದು. ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಅನ್ನು ಖಾಸಗಿ ಮಾತನಾಡುವ ಅಭ್ಯಾಸಕ್ಕಾಗಿ ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.'
+        en: 'Yes, basic and advanced English grammar rules, tenses, sentence formation, and parts of speech are clearly explained in Kannada.',
+        kn: 'ಹೌದು, ಮೂಲ ಮತ್ತು ಮುಂದುವರಿದ ಇಂಗ್ಲಿಷ್ ವ್ಯಾಕರಣ ನಿಯಮಗಳು, ಕಾಲಗಳು, ವಾಕ್ಯ ರಚನೆ ಮತ್ತು ಭಾಷೆಯ ಭಾಗಗಳನ್ನು ಕನ್ನಡದಲ್ಲಿ ಸ್ಪಷ್ಟವಾಗಿ ವಿವರಿಸಲಾಗಿದೆ.'
       })
     },
     {
       q: t({
-        en: 'Can I choose conversation topics?',
-        kn: 'ನಾನು ಸಂಭಾಷಣೆಯ ವಿಷಯಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಬಹುದೇ?'
+        en: 'Is this suitable for HR job interview English and workplace communication?',
+        kn: 'ಇದು HR ಉದ್ಯೋಗ ಸಂದರ್ಶನ ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕೆಲಸದ ಸ್ಥಳದ ಸಂವಹನಕ್ಕೆ ಸೂಕ್ತವೇ?'
       }),
       a: t({
-        en: 'Yes. Snehi allows you to select or create practice scenarios.',
-        kn: 'ಹೌದು. ಸ್ನೇಹಿ ನಿಮಗೆ ಸನ್ನಿವೇಶಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಅಥವಾ ರಚಿಸಲು ಅನುಮತಿಸುತ್ತದೆ.'
+        en: 'Absolutely. SIMPLISH Talks includes dedicated HR job interview practice modules, business English scenarios, and office communication lessons for job seekers.',
+        kn: 'ಖಂಡಿತವಾಗಿಯೂ. ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಉದ್ಯೋಗ ಆಕಾಂಕ್ಷಿಗಳಿಗೆ ಮೀಸಲಾದ HR ಉದ್ಯೋಗ ಸಂದರ್ಶನ ಅಭ್ಯಾಸ ಮಾಡ್ಯೂಲ್‌ಗಳು, ಬಿಸಿನೆಸ್ ಇಂಗ್ಲಿಷ್ ಸನ್ನಿವೇಶಗಳು ಮತ್ತು ಕಚೇರಿ ಸಂವಹನ ಪಾಠಗಳನ್ನು ಒಳಗೊಂಡಿದೆ.'
       })
     },
     {
       q: t({
-        en: 'Is this suitable for interview preparation?',
-        kn: 'ಇದು ಸಂದರ್ಶನದ ಸಿದ್ಧತೆಗೆ ಸೂಕ್ತವೇ?'
+        en: 'Can I practice English speaking alone without a real human coach?',
+        kn: 'ನೈಜ ಮಾನವ ತರಬೇತುದಾರರಿಲ್ಲದೆ ನಾನು ಒಬ್ಬನೇ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡುವುದನ್ನು ಅಭ್ಯಾಸ ಮಾಡಬಹುದೇ?'
       }),
       a: t({
-        en: 'Absolutely. Many scenarios are designed around workplace and interview communication.',
-        kn: 'ಖಂಡಿತವಾಗಿಯೂ. ಅನೇಕ ಸನ್ನಿವೇಶಗಳನ್ನು ಕೆಲಸದ ಸ್ಥಳ ಮತ್ತು ಸಂದರ್ಶನದ ಸಂವಹನದ ಸುತ್ತ ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.'
+        en: 'Yes! SIMPLISH Talks is designed for 100% private speaking practice on your phone, whenever and wherever you want.',
+        kn: 'ಹೌದು! ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ 100% ಖಾಸಗಿ ಮಾತನಾಡುವ ಅಭ್ಯಾಸಕ್ಕಾಗಿ ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ, ನೀವು ಯಾವಾಗ ಮತ್ತು ಎಲ್ಲಿ ಬೇಕಾದರೂ ಅಭ್ಯಾಸ ಮಾಡಬಹುದು.'
       })
     },
     {
       q: t({
-        en: 'Will people hear my recordings?',
-        kn: 'ಜನರು ನನ್ನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ಕೇಳುತ್ತಾರೆಯೇ?'
+        en: 'Will people hear my recordings during practice?',
+        kn: 'ಅಭ್ಯಾಸದ ಸಮಯದಲ್ಲಿ ಜನರು ನನ್ನ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳನ್ನು ಕೇಳುತ್ತಾರೆಯೇ?'
       }),
       a: t({
-        en: 'No. Your practice sessions remain private.',
-        kn: 'ಇಲ್ಲ. ನಿಮ್ಮ ಅಭ್ಯಾಸದ ಅವಧಿಗಳು ಖಾಸಗಿಯಾಗಿರುತ್ತವೆ.'
+        en: 'No. Your voice recordings and practice sessions remain completely private.',
+        kn: 'ಇಲ್ಲ. ನಿಮ್ಮ ಧ್ವನಿ ರೆಕಾರ್ಡಿಂಗ್‌ಗಳು ಮತ್ತು ಅಭ್ಯಾಸದ ಅವಧಿಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಖಾಸಗಿಯಾಗಿರುತ್ತವೆ.'
       })
     }
   ];
@@ -178,32 +178,32 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
         {/* Headline */}
         <h1 className="text-4xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 leading-tight max-w-4xl tracking-tight">
           {t({
-            en: 'Speak English Without Fear',
-            kn: 'ಭಯವಿಲ್ಲದೆ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡಿ'
+            en: 'Learn English through Kannada with your Personal AI English Tutor',
+            kn: 'ನಿಮ್ಮ AI ಇಂಗ್ಲಿಷ್ ಬೋಧಕರೊಂದಿಗೆ ಕನ್ನಡದ ಮೂಲಕ ಇಂಗ್ಲಿಷ್ ಕಲಿಯಿರಿ'
           })}
         </h1>
 
         {/* Sub-headline */}
         <p className="text-lg md:text-2xl font-bold text-indigo-650 dark:text-indigo-400 mb-6 max-w-3xl leading-relaxed">
           {t({
-            en: 'Practice real conversations, improve your speaking skills, and build confidence with your AI English friend—Snehi.',
-            kn: 'ನಿಮ್ಮ AI ಇಂಗ್ಲಿಷ್ ಸ್ನೇಹಿತ ಸ್ನೇಹಿಯೊಂದಿಗೆ ನೈಜ ಸಂಭಾಷಣೆಗಳನ್ನು ಅಭ್ಯಾಸ ಮಾಡಿ, ನಿಮ್ಮ ಮಾತನಾಡುವ ಕೌಶಲ್ಯವನ್ನು ಸುಧಾರಿಸಿ ಮತ್ತು ಆತ್ಮವಿಶ್ವಾಸವನ್ನು ಬೆಳೆಸಿಕೊಳ್ಳಿ.'
+            en: 'Complete Spoken English Course & daily speaking practice tailored for Karnataka learners, job seekers, and beginners.',
+            kn: 'ಕರ್ನಾಟಕದ ವಿದ್ಯಾರ್ಥಿಗಳು, ಉದ್ಯೋಗ ಆಕಾಂಕ್ಷಿಗಳು ಮತ್ತು ಆರಂಭಿಕರಿಗಾಗಿ ವಿಶೇಷವಾಗಿ ವಿನ್ಯಾಸಗೊಳಿಸಲಾದ ಸ್ಪೋಕನ್ ಇಂಗ್ಲಿಷ್ ಕೋರ್ಸ್.'
           })}
         </p>
 
         {/* Supporting Copy */}
         <div className="max-w-3xl mb-12 text-slate-700 dark:text-slate-300 bg-white/45 dark:bg-slate-950/20 backdrop-blur-sm border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-6 md:p-8 text-center space-y-4">
           <p className="font-semibold text-lg">
-            {t({ en: 'Understanding English is only the first step.', kn: 'ಇಂಗ್ಲಿಷ್ ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು ಕೇವಲ ಮೊದಲ ಹೆಜ್ಜೆ.' })}
+            {t({ en: 'Learn English grammar in Kannada, build vocabulary, and practice HR job interviews.', kn: 'ಕನ್ನಡದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ವ್ಯಾಕರಣವನ್ನು ಕಲಿಯಿರಿ, ಶಬ್ದಕೋಶವನ್ನು ಬೆಳೆಸಿಕೊಳ್ಳಿ ಮತ್ತು HR ಸಂದರ್ಶನಗಳನ್ನು ಅಭ್ಯಾಸ ಮಾಡಿ.' })}
             <br />
             <span className="text-slate-900 dark:text-white font-black">
-              {t({ en: 'Real confidence comes from speaking.', kn: 'ನಿಜವಾದ ಆತ್ಮವಿಶ್ವಾಸ ಮಾತನಾಡುವುದರಿಂದ ಬರುತ್ತದೆ.' })}
+              {t({ en: 'Speak English fluently with 24/7 private AI voice practice.', kn: '24/7 ಖಾಸಗಿ AI ಧ್ವನಿ ಅಭ್ಯಾಸದೊಂದಿಗೆ ಇಂಗ್ಲಿಷ್ ಅನ್ನು ನಿರರ್ಗಳವಾಗಿ ಮಾತನಾಡಿ.' })}
             </span>
           </p>
           <p className="text-sm md:text-base leading-relaxed text-slate-650 dark:text-slate-400">
             {t({
-              en: 'With SIMPLISH Talks and Snehi, you can practice conversations, record your voice, improve pronunciation, learn useful vocabulary, and speak naturally—all in a safe, supportive environment designed for Kannada speakers.',
-              kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಮತ್ತು ಸ್ನೇಹಿಯೊಂದಿಗೆ, ನೀವು ಸಂಭಾಷಣೆಗಳನ್ನು ಅಭ್ಯಾಸ ಮಾಡಬಹುದು, ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಬಹುದು, ಉಚ್ಚಾರಣೆಯನ್ನು ಸುಧಾರಿಸಬಹುದು, ಉಪಯುಕ್ತ ಶಬ್ದಕೋಶವನ್ನು ಕಲಿಯಬಹುದು ಮತ್ತು ಸ್ವಾಭಾವಿಕವಾಗಿ ಮಾತನಾಡಬಹುದು—ಎಲ್ಲವೂ ಕನ್ನಡ ಮಾತನಾಡುವವರಿಗಾಗಿ ವಿನ್ಯಾಸಗೊಳಿಸಲಾದ ಸುರಕ್ಷಿತ ಮತ್ತು ಬೆಂಬಲಿತ ವಾತಾವರಣದಲ್ಲಿ.'
+              en: 'With SIMPLISH Talks and AI companion Snehi, practice daily English conversation, record your voice, master basic English grammar in Kannada, and prepare for career opportunities without fear of judgment.',
+              kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ಮತ್ತು AI ಸ್ನೇಹಿತೆ ಸ್ನೇಹಿಯೊಂದಿಗೆ, ದೈನಂದಿನ ಇಂಗ್ಲಿಷ್ ಸಂಭಾಷಣೆಯನ್ನು ಅಭ್ಯಾಸ ಮಾಡಿ, ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಿ, ಕನ್ನಡದಲ್ಲಿ ಮೂಲ ಇಂಗ್ಲಿಷ್ ವ್ಯಾಕರಣವನ್ನು ಕರಗತ ಮಾಡಿಕೊಳ್ಳಿ ಮತ್ತು ಭಯವಿಲ್ಲದೆ ವೃತ್ತಿಜೀವನದ ಅವಕಾಶಗಳಿಗೆ ಸಿದ್ಧರಾಗಿ.'
             })}
           </p>
           <div className="flex justify-center items-center gap-6 pt-2 text-xs font-black tracking-widest text-slate-400 uppercase">
@@ -321,23 +321,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
-              {t({ en: 'Practice Before Real Life', kn: 'ನೈಜ ಜೀವನಕ್ಕೆ ಮುನ್ನ ಅಭ್ಯಾಸ ಮಾಡಿ' })}
+              {t({ en: 'English Speaking Practice & HR Interview Preparation', kn: 'ಸ್ಪೋಕನ್ ಇಂಗ್ಲಿಷ್ ಅಭ್ಯಾಸ ಮತ್ತು HR ಸಂದರ್ಶನ ಸಿದ್ಧತೆ' })}
             </h2>
             <p className="text-xl text-blue-600 dark:text-blue-400 font-extrabold">
               {t({ en: 'SIMPLISH Talks', kn: 'ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್' })}
             </p>
             <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">
-              {t({ en: 'Your personal English practice space.', kn: 'ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಇಂಗ್ಲಿಷ್ ಅಭ್ಯಾಸದ ಸ್ಥಳ.' })}
+              {t({ en: 'Practice English speaking for job interviews, office communication, and daily conversations.', kn: 'ಉದ್ಯೋಗ ಸಂದರ್ಶನಗಳು, ಕಚೇರಿ ಸಂವಹನ ಮತ್ತು ದೈನಂದಿನ ಸಂಭಾಷಣೆಗಳಿಗಾಗಿ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡುವುದನ್ನು ಅಭ್ಯಾಸ ಮಾಡಿ.' })}
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-            <ScenarioCard icon="🏢" label={t({ en: 'Office conversations', kn: 'ಕಚೇರಿ ಸಂಭಾಷಣೆಗಳು' })} />
-            <ScenarioCard icon="🎓" label={t({ en: 'College discussions', kn: 'ಕಾಲೇಜು ಚರ್ಚೆಗಳು' })} />
-            <ScenarioCard icon="🛒" label={t({ en: 'Shopping', kn: 'ಶಾಪಿಂಗ್' })} />
-            <ScenarioCard icon="✈️" label={t({ en: 'Travel', kn: 'ಪ್ರಯಾಣ' })} />
-            <ScenarioCard icon="☎️" label={t({ en: 'Phone calls', kn: 'ಫೋನ್ ಕರೆಗಳು' })} />
-            <ScenarioCard icon="🤝" label={t({ en: 'Meeting new people', kn: 'ಹೊಸ ಜನರನ್ನು ಭೇಟಿಯಾಗುವುದು' })} />
+            <ScenarioCard icon="💼" label={t({ en: 'HR Job Interview English', kn: 'HR ಉದ್ಯೋಗ ಸಂದರ್ಶನ ಇಂಗ್ಲಿಷ್' })} />
+            <ScenarioCard icon="🏢" label={t({ en: 'Workplace & Office English', kn: 'ಕೆಲಸದ ಸ್ಥಳ ಮತ್ತು ಕಚೇರಿ ಇಂಗ್ಲಿಷ್' })} />
+            <ScenarioCard icon="🎓" label={t({ en: 'College & Student Discussions', kn: 'ಕಾಲೇಜು ಮತ್ತು ವಿದ್ಯಾರ್ಥಿ ಚರ್ಚೆಗಳು' })} />
+            <ScenarioCard icon="🗣️" label={t({ en: 'Daily English Conversation', kn: 'ದೈನಂದಿನ ಇಂಗ್ಲಿಷ್ ಸಂಭಾಷಣೆ' })} />
+            <ScenarioCard icon="✈️" label={t({ en: 'Travel & Public Places', kn: 'ಪ್ರಯಾಣ ಮತ್ತು ಸಾರ್ವಜನಿಕ ಸ್ಥಳಗಳು' })} />
+            <ScenarioCard icon="🤝" label={t({ en: 'Meeting & Client Calls', kn: 'ಸಭೆ ಮತ್ತು ಕ್ಲೈಂಟ್ ಕರೆಗಳು' })} />
           </div>
 
           <p className="text-center text-slate-600 dark:text-slate-400 font-black text-lg">
@@ -388,22 +388,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
-              {t({ en: 'Learn Through Real Conversations', kn: 'ನೈಜ ಸಂಭಾಷಣೆಗಳ ಮೂಲಕ ಕಲಿಯಿರಿ' })}
+              {t({ en: 'English Grammar in Kannada & Daily Vocabulary Builder', kn: 'ಕನ್ನಡದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ವ್ಯಾಕರಣ ಮತ್ತು ಶಬ್ದಕೋಶ ವರ್ಧಕ' })}
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
               {t({
-                en: 'Instead of memorizing isolated words, learn English through practical situations.',
-                kn: 'ಪ್ರತ್ಯೇಕ ಪದಗಳನ್ನು ಕಂಠಪಾಠ ಮಾಡುವ ಬದಲು, ಪ್ರಾಯೋಗಿಕ ಸನ್ನಿವೇಶಗಳ ಮೂಲಕ ಇಂಗ್ಲಿಷ್ ಕಲಿಯಿರಿ.'
+                en: 'Understand basic English grammar rules, tenses, sentence formation, and learn English words with Kannada meanings.',
+                kn: 'ಮೂಲ ಇಂಗ್ಲಿಷ್ ವ್ಯಾಕರಣ ನಿಯಮಗಳು, ಕಾಲಗಳು, ವಾಕ್ಯ ರಚನೆ ಮತ್ತು ಕನ್ನಡ ಅರ್ಥಗಳೊಂದಿಗೆ ಇಂಗ್ಲಿಷ್ ಪದಗಳನ್ನು ಕಲಿಯಿರಿ.'
               })}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-12">
-            <FeatureBadge icon="📖" title={t({ en: 'Everyday conversations', kn: 'ದೈನಂದಿನ ಸಂಭಾಷಣೆಗಳು' })} />
-            <FeatureBadge icon="📝" title={t({ en: 'Vocabulary cards', kn: 'ಶಬ್ದಕೋಶದ ಕಾರ್ಡ್‌ಗಳು' })} />
-            <FeatureBadge icon="🎯" title={t({ en: 'Quick quizzes', kn: 'ತ್ವರಿತ ರಸಪ್ರಶ್ನೆಗಳು' })} />
-            <FeatureBadge icon="💡" title={t({ en: 'Explanations for mistakes', kn: 'ತಪ್ಪು ಉತ್ತರಗಳಿಗೆ ವಿವರಣೆಗಳು' })} />
-            <FeatureBadge icon="😂" title={t({ en: 'Fun language tips & jokes', kn: 'ಮೋಜಿನ ಭಾಷಾ ಸಲಹೆಗಳು ಮತ್ತು ಹಾಸ್ಯಗಳು' })} />
+            <FeatureBadge icon="📖" title={t({ en: 'Daily conversations', kn: 'ದೈನಂದಿನ ಸಂಭಾಷಣೆಗಳು' })} />
+            <FeatureBadge icon="📝" title={t({ en: 'Vocabulary Builder', kn: 'ಶಬ್ದಕೋಶ ವರ್ಧಕ' })} />
+            <FeatureBadge icon="🎯" title={t({ en: 'Grammar Exercises & Quizzes', kn: 'ವ್ಯಾಕರಣ ಅಭ್ಯಾಸಗಳು ಮತ್ತು ರಸಪ್ರಶ್ನೆಗಳು' })} />
+            <FeatureBadge icon="💡" title={t({ en: 'Grammar Rules in Kannada', kn: 'ಕನ್ನಡದಲ್ಲಿ ವ್ಯಾಕರಣ ನಿಯಮಗಳು' })} />
+            <FeatureBadge icon="😂" title={t({ en: 'Fun English Tips & Practice', kn: 'ಮೋಜಿನ ಇಂಗ್ಲಿಷ್ ಸಲಹೆಗಳು ಮತ್ತು ಅಭ್ಯಾಸ' })} />
           </div>
 
           <p className="text-center text-blue-600 dark:text-blue-400 font-black text-xl">
@@ -420,8 +420,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
             <div className="lg:col-span-5 flex flex-col items-center">
               <div className="relative w-64 h-64 md:w-80 md:h-80 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-[3rem] overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500 border-4 border-white dark:border-slate-800">
                 <picture>
-                  <source srcset="/female_coach.avif" type="image/avif" />
-                  <source srcset="/female_coach.webp" type="image/webp" />
+                  <source srcSet="/female_coach.avif" type="image/avif" />
+                  <source srcSet="/female_coach.webp" type="image/webp" />
                   <img
                     src="/female_coach.png"
                     alt="Snehi AI"
@@ -527,10 +527,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ session }) => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
-              {t({ en: 'What Makes SIMPLISH Different?', kn: 'ಸಿಂಪ್ಲಿಷ್ ಅನ್ನು ವಿಭಿನ್ನವಾಗಿಸುವುದು ಯಾವುದು?' })}
+              {t({ en: 'Best English Learning App for Kannada Speakers in Karnataka', kn: 'ಕರ್ನಾಟಕದ ಕನ್ನಡಿಗರಿಗಾಗಿ ಅತ್ಯುತ್ತಮ ಇಂಗ್ಲಿಷ್ ಕಲಿಕೆಯ ಆ್ಯಪ್' })}
             </h2>
             <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
-              {t({ en: 'How does SIMPLISH compare to standard learning models?', kn: 'ಸಾಮಾನ್ಯ ಕಲಿಕೆಯ ವಿಧಾನಗಳಿಗಿಂತ ಸಿಂಪ್ಲಿಷ್ ಹೇಗೆ ಭಿನ್ನವಾಗಿದೆ?' })}
+              {t({ en: 'Why traditional English coaching fails vs how SIMPLISH Talks helps you speak English fluently', kn: 'ಸಾಂಪ್ರದಾಯಿಕ ಇಂಗ್ಲಿಷ್ ಕೋಚಿಂಗ್ ವರ್ಸಸ್ ಸಿಂಪ್ಲಿಷ್ ಟಾಕ್ಸ್ ನೀವು ಹೇಗೆ ನಿರರ್ಗಳವಾಗಿ ಇಂಗ್ಲಿಷ್ ಮಾತನಾಡಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ' })}
             </p>
           </div>
 

@@ -67,6 +67,11 @@
     Header set Cache-Control "public, max-age=0, must-revalidate, stale-while-revalidate=60"
   </FilesMatch>
   
+  # Sitemap & robots.txt -> Ensure search engines get fresh content with correct Content-Type
+  <FilesMatch "^(sitemap\.xml|robots\.txt)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  
   # Security & Network Performance
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
   Header set X-Content-Type-Options "nosniff"

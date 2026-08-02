@@ -16,8 +16,8 @@ const Logo: React.FC<LogoProps> = ({ className = "w-12 h-12", textOnly = false, 
     return (
       <div className={`flex items-center justify-center select-none ${className}`}>
         <picture>
-          <source srcset="/simplish_logo_final1.avif" type="image/avif" />
-          <source srcset="/simplish_logo_final1.webp" type="image/webp" />
+          <source srcSet="/simplish_logo_final1.avif" type="image/avif" />
+          <source srcSet="/simplish_logo_final1.webp" type="image/webp" />
           <img
             src="/simplish_logo_final1.png"
             alt="SIMPLISH Symbol"
@@ -43,15 +43,15 @@ const Logo: React.FC<LogoProps> = ({ className = "w-12 h-12", textOnly = false, 
   return (
     <div className={`flex flex-col items-center justify-center select-none ${className}`}>
       <picture>
-        <source srcset="/simplish_logo_final1.avif" type="image/avif" />
-        <source srcset="/simplish_logo_final1.webp" type="image/webp" />
+        <source srcSet="/simplish_logo_final1.avif" type="image/avif" />
+        <source srcSet="/simplish_logo_final1.webp" type="image/webp" />
         <img
           src="/simplish_logo_final1.png"
           alt="SIMPLISH Symbol"
           width="96"
           height="96"
           loading="eager"
-          fetchpriority="high"
+          fetchPriority="high"
           decoding="async"
           className="w-16 h-16 md:w-24 md:h-24 object-contain mb-2 drop-shadow-2xl"
         />

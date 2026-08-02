@@ -8,44 +8,44 @@ interface RouteSEO {
 
 const ROUTE_SEO: Record<string, RouteSEO> = {
   '/': {
-    title: 'SIMPLISH Talks | Learn English through Kannada with AI',
-    description: 'Learn English through Kannada with SIMPLISH Talks. Practice speaking with AI, improve grammar, vocabulary and confidence through bilingual coaching designed for Karnataka learners.',
+    title: 'Learn English through Kannada | AI English Tutor & Spoken English Course | SIMPLISH Talks',
+    description: 'Learn English through Kannada with SIMPLISH Talks. Practice English speaking with your AI tutor, master English grammar in Kannada, build daily vocabulary, and prepare for HR job interviews in Karnataka.',
   },
   '/packages': {
-    title: 'Pricing & Packages | SIMPLISH Talks',
-    description: 'Explore affordable plans for SIMPLISH Talks and AI companion Snehi. Unlock spoken English practice, voice feedback, and structured lessons.',
+    title: 'Spoken English Course Plans & Pricing | Learn English in Karnataka | SIMPLISH Talks',
+    description: 'Explore affordable spoken English course packages for Karnataka students & job seekers. Practice English speaking daily with personal AI English tutor Snehi.',
   },
   '/curriculum': {
-    title: 'English Learning Curriculum | SIMPLISH Talks',
-    description: 'Structured English learning path for Kannada speakers. Browse basic to advanced speaking modules, daily scenarios, and interview practice.',
+    title: 'Spoken English Curriculum & English Grammar in Kannada | SIMPLISH Talks',
+    description: 'Structured Kannada to English learning curriculum. Master basic English grammar in Kannada, sentence formation, tenses, daily conversations, and workplace English.',
   },
   '/discover': {
-    title: 'Visual English Learning & Vocabulary | SIMPLISH Talks',
-    description: 'Bite-sized visual learning cards, jokes, facts, and image description practice to enhance your English vocabulary through Kannada.',
+    title: 'English Vocabulary Builder & Learn English Words in Kannada | SIMPLISH Talks',
+    description: 'Interactive visual vocabulary builder, daily English words with Kannada meanings, image practice, and conversational phrases for beginners.',
   },
   '/login': {
-    title: 'Login | SIMPLISH Talks',
-    description: 'Sign in to your SIMPLISH Talks account to continue your English speaking journey.',
+    title: 'Login | SIMPLISH Talks - Learn English through Kannada',
+    description: 'Sign in to your SIMPLISH Talks account to continue your spoken English practice and AI conversation sessions.',
   },
   '/register': {
-    title: 'Create Account | SIMPLISH Talks',
-    description: 'Join SIMPLISH Talks today. Start practicing spoken English through Kannada with your AI companion Snehi.',
+    title: 'Start Learning Spoken English through Kannada Free | SIMPLISH Talks',
+    description: 'Create your account on SIMPLISH Talks. Start practicing spoken English from zero using Kannada with your AI companion Snehi.',
   },
   '/placement': {
-    title: 'English Placement Test | SIMPLISH Talks',
-    description: 'Assess your English proficiency level and get a customized learning roadmap.',
+    title: 'English Speaking Placement Test | Assess Spoken English | SIMPLISH Talks',
+    description: 'Take our quick English proficiency placement test to evaluate your English speaking level and receive a custom learning roadmap.',
   },
   '/dashboard': {
-    title: 'My Learning Dashboard | SIMPLISH Talks',
-    description: 'Track your speaking progress, access recent lessons, and practice with AI.',
+    title: 'My English Learning Dashboard | SIMPLISH Talks',
+    description: 'Track your spoken English fluency progress, access daily vocabulary lessons, and launch instant practice with your AI English teacher.',
   },
   '/talk': {
-    title: 'Practice with Snehi AI | SIMPLISH Talks',
-    description: 'Have real-time voice conversations with Snehi AI to build natural English speaking confidence.',
+    title: 'AI English Tutor & Voice Speaking Practice | Practice English Speaking | SIMPLISH Talks',
+    description: 'Have real-time 24/7 spoken English practice with AI Companion Snehi. Speak English fluently without fear of mistakes or judgment.',
   },
   '/coachchat': {
-    title: 'AI Coach Chat | SIMPLISH Talks',
-    description: 'Chat with your AI coach for personalized English grammar and vocabulary guidance.',
+    title: 'AI Spoken English Coach & Grammar Practice Chat | SIMPLISH Talks',
+    description: 'Chat with your AI language coach for instant English grammar explanations in Kannada, sentence corrections, and vocabulary guidance.',
   },
   '/settings': {
     title: 'Account Settings | SIMPLISH Talks',
